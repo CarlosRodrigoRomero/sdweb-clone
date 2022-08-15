@@ -60,7 +60,7 @@ export class ZonesCommentControlService {
     });
   }
 
-  createZonasLayer(informeId: string): VectorLayer {
+  createSmallZonesLayer(informeId: string): VectorLayer {
     const layer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyle(false),
@@ -75,15 +75,15 @@ export class ZonesCommentControlService {
     return layer;
   }
 
-  mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
+  mostrarSmallZones(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
     this.subscriptions.add(
       this.filterService.filteredElements$.subscribe((elems) => {
-        this.addZonas(zonas, layers, elems);
+        this.addZones(zonas, layers, elems);
       })
     );
   }
 
-  private addZonas(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
+  private addZones(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
       const informeId = l.getProperties().informeId;
@@ -109,7 +109,7 @@ export class ZonesCommentControlService {
               // area: this.getArea(coords),
               numElems: elemsZona.length,
               numChecked: elemsChecked.length,
-              // name: this.getSmallGlobal(zona.globalCoords),
+              label: this.getSmallGlobal(zona.globalCoords) + elemsChecked.length + '/' + elemsZona.length,
             },
           });
           source.addFeature(feature);
@@ -118,51 +118,55 @@ export class ZonesCommentControlService {
     });
   }
 
-  // ESTILOS COMENTARIOS
+  private getSmallGlobal(globalCoords: string[]): string {
+    const notNullGlobals = globalCoords.filter((gC) => gC !== null);
+    return notNullGlobals[notNullGlobals.length - 1].toString();
+  }
+
+  addBigZones(bigZones: LocationAreaInterface[][]) {
+    bigZones.forEach((zones, i) => {
+      const source = new VectorSource();
+
+      zones.forEach((zone) => {
+        const feature = new Feature({
+          geometry: new Polygon([this.olMapService.pathToCoordinate(zone.path)]),
+          properties: {
+            id: zone.globalCoords[i].toString(),
+            tipo: 'areaGlobalCoord',
+          },
+        });
+
+        source.addFeature(feature);
+      });
+
+      this.map.addLayer(
+        new VectorLayer({
+          source,
+          style: this.getStyleBigZones(),
+        })
+      );
+    });
+  }
+
+  // ESTILOS ZONAS PEQUEÑAS
   private getStyle(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        if (feature.getProperties().properties.numElems > 0) {
-          return new Style({
-            stroke: new Stroke({
-              color: this.currentZoom >= this.zoomChangeView ? this.getColor(feature, 1) : focused ? 'white' : 'black',
-              width: 2,
-            }),
-            fill:
-              this.currentZoom >= this.zoomChangeView
-                ? null
-                : new Fill({
-                    color: this.getColor(feature, 0.9),
-                  }),
-            text: this.getLabelStyle(feature),
-          });
-        } else {
-          return this.getNoAnomsStyle(feature, focused);
-        }
+        return new Style({
+          stroke: new Stroke({
+            color: this.currentZoom >= this.zoomChangeView ? this.getColor(feature, 1) : focused ? 'white' : 'black',
+            width: this.currentZoom >= this.zoomChangeView ? 4 : 2,
+          }),
+          fill:
+            this.currentZoom >= this.zoomChangeView
+              ? null
+              : new Fill({
+                  color: this.getColor(feature, 0.9),
+                }),
+          text: this.getLabelSmallZonesStyle(feature),
+        });
       }
     };
-  }
-
-  // ESTILO SIN ANOMALIAS
-  private getNoAnomsStyle(feature: Feature, focused: boolean) {
-    return new Style({
-      stroke: new Stroke({
-        color:
-          this.currentZoom >= this.zoomChangeView
-            ? Colors.hexToRgb(COLOR.color_no_anoms, 1)
-            : focused
-            ? 'white'
-            : 'black',
-        width: 2,
-      }),
-      fill:
-        this.currentZoom >= this.zoomChangeView
-          ? null
-          : new Fill({
-              color: Colors.hexToRgb(COLOR.color_no_anoms, 0.9),
-            }),
-      text: this.getLabelStyle(feature),
-    });
   }
 
   private getColor(feature: Feature, opacity: number) {
@@ -178,9 +182,9 @@ export class ZonesCommentControlService {
     }
   }
 
-  getLabelStyle(feature: Feature) {
+  getLabelSmallZonesStyle(feature: Feature) {
     return new Text({
-      text: feature.getProperties().properties.name,
+      text: feature.getProperties().properties.label,
       font: 'bold 14px Roboto',
       fill: new Fill({
         color: 'black',
@@ -188,6 +192,36 @@ export class ZonesCommentControlService {
       stroke: new Stroke({
         color: 'white',
         width: 4,
+      }),
+    });
+  }
+
+  private getStyleBigZones() {
+    return (feature) => {
+      if (feature !== undefined) {
+        return new Style({
+          stroke: new Stroke({
+            color: 'black',
+            width: 2,
+            lineDash: [4],
+          }),
+          fill: null,
+          text: this.getLabelBigZonesStyle(feature),
+        });
+      }
+    };
+  }
+
+  private getLabelBigZonesStyle(feature: Feature) {
+    return new Text({
+      text: feature.getProperties().properties.id,
+      font: 'bold 16px Roboto',
+      fill: new Fill({
+        color: 'white',
+      }),
+      stroke: new Stroke({
+        color: 'black',
+        width: 8,
       }),
     });
   }

@@ -44,12 +44,13 @@ export class ZonesCommentsComponent implements OnInit {
     this.smallZones = this.zonesService.zonesBySize[this.zonesService.zonesBySize.length - 1];
 
     // quitamos las más pequeñas porque ya se muestran por defecto
-    this.bigZones = this.zonesService.zonesBySize.filter((zones, index, allZones) => index < allZones.length - 1);
+    this.bigZones = this.zonesService.zonesBySize.filter((_, index, allZones) => index < allZones.length - 1);
 
     // iniciamos el servicio que controla las zonas y las cargamos
     this.zonesCommentControlService.initService().then((value) => {
       if (value) {
-        this.zonesCommentControlService.mostrarZonas(this.smallZones, this.zonesLayers);
+        this.zonesCommentControlService.mostrarSmallZones(this.smallZones, this.zonesLayers);
+        this.zonesCommentControlService.addBigZones(this.bigZones);
       }
     });
 
@@ -57,72 +58,14 @@ export class ZonesCommentsComponent implements OnInit {
 
     this.informe = this.reportControlService.informes[0];
 
-    // creamos las capas de zonas para los diferentes informes
-    this.olMapService.addZoneLayer(this.zonesCommentControlService.createZonasLayer(this.informe.id));
+    this.olMapService.addZoneLayer(this.zonesCommentControlService.createSmallZonesLayer(this.informe.id));
 
     this.olMapService.map$.subscribe((map) => {
       if (map !== undefined) {
         this.map = map;
 
         this.zonesLayers.forEach((l) => this.map.addLayer(l));
-
-        this.addBigZones();
       }
-    });
-  }
-
-  private addBigZones() {
-    this.bigZones.forEach((zones, i) => {
-      this.globalCoordAreasVectorSources[i] = new VectorSource();
-
-      zones.forEach((zone) => {
-        const feature = new Feature({
-          geometry: new Polygon([this.olMapService.pathToCoordinate(zone.path)]),
-          properties: {
-            id: zone.globalCoords[i].toString(),
-            tipo: 'areaGlobalCoord',
-          },
-        });
-
-        this.globalCoordAreasVectorSources[i].addFeature(feature);
-      });
-
-      this.map.addLayer(
-        (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
-          source: this.globalCoordAreasVectorSources[i],
-          style: this.getStyleBigZones(),
-        }))
-      );
-    });
-  }
-
-  private getStyleBigZones() {
-    return (feature) => {
-      if (feature !== undefined) {
-        return new Style({
-          stroke: new Stroke({
-            color: 'black',
-            width: 2,
-            lineDash: [4],
-          }),
-          fill: null,
-          text: this.getLabelStyle(feature),
-        });
-      }
-    };
-  }
-
-  private getLabelStyle(feature: Feature) {
-    return new Text({
-      text: feature.getProperties().properties.id,
-      font: 'bold 16px Roboto',
-      fill: new Fill({
-        color: 'white',
-      }),
-      stroke: new Stroke({
-        color: 'black',
-        width: 8,
-      }),
     });
   }
 }
