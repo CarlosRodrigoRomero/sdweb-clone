@@ -22,6 +22,7 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
+import { ViewCommentsService } from '@data/services/view-comments.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -39,6 +40,7 @@ export class MapCommentsComponent implements OnInit {
   private anomaliaLayers: VectorLayer[];
   private aerialLayers: TileLayer[];
   private prevFeatureSelected: Feature;
+  thermalVisible = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -47,7 +49,8 @@ export class MapCommentsComponent implements OnInit {
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
-    private anomaliasControlService: AnomaliasControlService
+    private anomaliasControlService: AnomaliasControlService,
+    private viewCommentsService: ViewCommentsService
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +71,7 @@ export class MapCommentsComponent implements OnInit {
 
           thermalLayer.setProperties({
             informeId: this.informe.id,
+            visible: false,
           });
 
           this.olMapService.addThermalLayer(thermalLayer);
@@ -114,6 +118,10 @@ export class MapCommentsComponent implements OnInit {
         }
       })
     );
+
+    this.subscriptions.add(
+      this.viewCommentsService.thermalLayerVisible$.subscribe((visible) => (this.thermalVisible = visible))
+    );
   }
 
   private initMap() {
@@ -132,7 +140,7 @@ export class MapCommentsComponent implements OnInit {
 
     geoLocLayer.setProperties({ type: 'geoLoc' });
 
-    const layers = [satelliteLayer, ...this.aerialLayers, geoLocLayer , ...this.thermalLayers];
+    const layers = [satelliteLayer, ...this.aerialLayers, geoLocLayer, ...this.thermalLayers];
 
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
@@ -231,5 +239,9 @@ export class MapCommentsComponent implements OnInit {
         element: centerControl,
       })
     );
+  }
+
+  setThermalVisibility() {
+    this.viewCommentsService.thermalLayerVisible = !this.viewCommentsService.thermalLayerVisible;
   }
 }

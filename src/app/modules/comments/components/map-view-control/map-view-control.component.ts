@@ -45,7 +45,6 @@ export class MapViewControlComponent implements OnInit, OnDestroy {
         this.olMapService
           .getThermalLayers()
           .pipe(
-            take(1),
             switchMap((layers) => {
               this.thermalLayer = layers[0];
 

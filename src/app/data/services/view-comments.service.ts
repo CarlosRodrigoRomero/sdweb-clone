@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class ViewCommentsService {
-  private _thermalLayerVisible = true;
+  private _thermalLayerVisible = false;
   thermalLayerVisible$ = new BehaviorSubject<boolean>(this._thermalLayerVisible);
 
   constructor() {}
