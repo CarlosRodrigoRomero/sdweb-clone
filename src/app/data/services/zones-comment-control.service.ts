@@ -92,25 +92,28 @@ export class ZonesCommentControlService {
       zonas.forEach((zona) => {
         const elemsZona = this.zonesControlService.getElemsZona(zona, elems);
 
-        const elemsChecked = elemsZona.filter((elem) => elem.checked);
+        // solo añadimos las zonas con anomalias
+        if (elemsZona.length > 0) {
+          const elemsChecked = elemsZona.filter((elem) => elem.checked);
 
-        const coords = this.zonesControlService.pathToLonLat(zona.path);
+          const coords = this.zonesControlService.pathToLonLat(zona.path);
 
-        // crea poligono seguidor
-        const feature = new Feature({
-          geometry: new Polygon(coords),
-          properties: {
-            // id: this.getGlobalsLabel(zona.globalCoords),
-            informeId,
-            // centroid: this.olMapService.getCentroid(coords[0]),
-            // type: 'zone',
-            // area: this.getArea(coords),
-            numElems: elemsZona.length,
-            numChecked: elemsChecked.length,
-            // name: this.getSmallGlobal(zona.globalCoords),
-          },
-        });
-        source.addFeature(feature);
+          // crea poligono seguidor
+          const feature = new Feature({
+            geometry: new Polygon(coords),
+            properties: {
+              // id: this.getGlobalsLabel(zona.globalCoords),
+              informeId,
+              // centroid: this.olMapService.getCentroid(coords[0]),
+              // type: 'zone',
+              // area: this.getArea(coords),
+              numElems: elemsZona.length,
+              numChecked: elemsChecked.length,
+              // name: this.getSmallGlobal(zona.globalCoords),
+            },
+          });
+          source.addFeature(feature);
+        }
       });
     });
   }

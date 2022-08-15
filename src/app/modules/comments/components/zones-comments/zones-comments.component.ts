@@ -2,15 +2,16 @@ import { Component, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { Map } from 'ol';
+import { Feature, Map } from 'ol';
 import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import Polygon from 'ol/geom/Polygon';
+import { Fill, Stroke, Style, Text } from 'ol/style';
 
-import { ZonesControlService } from '@data/services/zones-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesCommentControlService } from '@data/services/zones-comment-control.service';
-import { ComentariosControlService } from '@data/services/comentarios-control.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { InformeInterface } from '@core/models/informe';
@@ -21,11 +22,14 @@ import { InformeInterface } from '@core/models/informe';
   styleUrls: ['./zones-comments.component.css'],
 })
 export class ZonesCommentsComponent implements OnInit {
-  private zones: LocationAreaInterface[][] = [];
+  private smallZones: LocationAreaInterface[] = [];
+  private bigZones: LocationAreaInterface[][] = [];
   private zonesLayers: VectorLayer[];
   private map: Map;
   public selectedInformeId: string;
   private informe: InformeInterface;
+  public globalCoordAreasVectorSources: VectorSource[] = [];
+  public globalCoordAreasVectorLayers: VectorLayer[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -33,18 +37,19 @@ export class ZonesCommentsComponent implements OnInit {
     private reportControlService: ReportControlService,
     private zonesService: ZonesService,
     private olMapService: OlMapService,
-    private zonesControlService: ZonesControlService,
-    private zonesCommentControlService: ZonesCommentControlService,
-    private comentariosControlService: ComentariosControlService
+    private zonesCommentControlService: ZonesCommentControlService
   ) {}
 
   ngOnInit(): void {
-    this.zones = this.zonesService.zonesBySize;
+    this.smallZones = this.zonesService.zonesBySize[this.zonesService.zonesBySize.length - 1];
+
+    // quitamos las más pequeñas porque ya se muestran por defecto
+    this.bigZones = this.zonesService.zonesBySize.filter((zones, index, allZones) => index < allZones.length - 1);
 
     // iniciamos el servicio que controla las zonas y las cargamos
     this.zonesCommentControlService.initService().then((value) => {
       if (value) {
-        this.zonesCommentControlService.mostrarZonas(this.zones[this.zones.length - 1], this.zonesLayers);
+        this.zonesCommentControlService.mostrarZonas(this.smallZones, this.zonesLayers);
       }
     });
 
@@ -58,8 +63,66 @@ export class ZonesCommentsComponent implements OnInit {
     this.olMapService.map$.subscribe((map) => {
       if (map !== undefined) {
         this.map = map;
+
         this.zonesLayers.forEach((l) => this.map.addLayer(l));
+
+        this.addBigZones();
       }
+    });
+  }
+
+  private addBigZones() {
+    this.bigZones.forEach((zones, i) => {
+      this.globalCoordAreasVectorSources[i] = new VectorSource();
+
+      zones.forEach((zone) => {
+        const feature = new Feature({
+          geometry: new Polygon([this.olMapService.pathToCoordinate(zone.path)]),
+          properties: {
+            id: zone.globalCoords[i].toString(),
+            tipo: 'areaGlobalCoord',
+          },
+        });
+
+        this.globalCoordAreasVectorSources[i].addFeature(feature);
+      });
+
+      this.map.addLayer(
+        (this.globalCoordAreasVectorLayers[i] = new VectorLayer({
+          source: this.globalCoordAreasVectorSources[i],
+          style: this.getStyleBigZones(),
+        }))
+      );
+    });
+  }
+
+  private getStyleBigZones() {
+    return (feature) => {
+      if (feature !== undefined) {
+        return new Style({
+          stroke: new Stroke({
+            color: 'black',
+            width: 2,
+            lineDash: [4],
+          }),
+          fill: null,
+          text: this.getLabelStyle(feature),
+        });
+      }
+    };
+  }
+
+  private getLabelStyle(feature: Feature) {
+    return new Text({
+      text: feature.getProperties().properties.id,
+      font: 'bold 16px Roboto',
+      fill: new Fill({
+        color: 'white',
+      }),
+      stroke: new Stroke({
+        color: 'black',
+        width: 8,
+      }),
     });
   }
 }

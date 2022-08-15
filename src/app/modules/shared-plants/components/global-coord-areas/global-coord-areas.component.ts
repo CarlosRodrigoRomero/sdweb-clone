@@ -4,14 +4,11 @@ import { Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
 import VectorLayer from 'ol/layer/Vector';
-import { fromLonLat } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
-import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
 import Feature from 'ol/Feature';
 
-import { LatLngLiteral } from '@agm/core';
 
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -64,7 +61,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
     if (this.reportControlService.planta.hasOwnProperty('nombreGlobalCoords')) {
       // quitamos las más pequeñas porque ya se muestran por defecto
       this.nombreGlobalCoords = this.planta.nombreGlobalCoords.filter(
-        (nombre, index, nombres) => index < nombres.length - 1
+        (_, index, nombres) => index < nombres.length - 1
       );
     } else {
       for (let index = 0; index < this.numAreas; index++) {
@@ -77,7 +74,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
     });
 
     // quitamos las más pequeñas porque ya se muestran por defecto
-    this.zones = this.zonesService.zonesBySize.filter((zones, index, allZones) => index < allZones.length - 1);
+    this.zones = this.zonesService.zonesBySize.filter((_, index, allZones) => index < allZones.length - 1);
 
     this.subscriptions.add(
       this.olMapService.getMap().subscribe((map) => {
@@ -96,7 +93,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
 
       zones.forEach((zone) => {
         const feature = new Feature({
-          geometry: new Polygon([this.pathToCoordinate(zone.path)]),
+          geometry: new Polygon([this.olMapService.pathToCoordinate(zone.path)]),
           properties: {
             id: zone.globalCoords[i].toString(),
             tipo: 'areaGlobalCoord',
@@ -144,15 +141,6 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
         width: 8,
       }),
     });
-  }
-
-  private pathToCoordinate(path: LatLngLiteral[]): Coordinate[] {
-    const coordenadas: Coordinate[] = [];
-    path.forEach((coord) => {
-      const coordenada: Coordinate = fromLonLat([coord.lng, coord.lat]);
-      coordenadas.push(coordenada);
-    });
-    return coordenadas;
   }
 
   setVisibilityLayer(index: number) {
