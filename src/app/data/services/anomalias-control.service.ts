@@ -150,7 +150,7 @@ export class AnomaliasControlService {
     const perdidasLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStylePerdidas(false),
-      visible: true,
+      visible: false,
     });
     perdidasLayer.setProperties({
       informeId,

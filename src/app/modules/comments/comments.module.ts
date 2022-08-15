@@ -14,9 +14,10 @@ import { CommentComponent } from './components/comment/comment.component';
 import { CommentsListComponent } from './components/comments-list/comments-list.component';
 import { MapCommentsComponent } from './components/map-comments/map-comments.component';
 import { ZonesCommentsComponent } from './components/zones-comments/zones-comments.component';
+import { MapViewControlComponent } from './components/map-view-control/map-view-control.component';
 
 @NgModule({
-  declarations: [CommentsComponent, AnomaliasListComponent, AnomaliaContentComponent, AnomaliaInfoComponent, CommentsAreaComponent, NewCommentComponent, CommentComponent, CommentsListComponent, MapCommentsComponent, ZonesCommentsComponent],
+  declarations: [CommentsComponent, AnomaliasListComponent, AnomaliaContentComponent, AnomaliaInfoComponent, CommentsAreaComponent, NewCommentComponent, CommentComponent, CommentsListComponent, MapCommentsComponent, ZonesCommentsComponent, MapViewControlComponent],
   imports: [CommonModule, CommentsRoutingModule, SharedModule],
 })
 export class CommentsModule {}

@@ -25,7 +25,6 @@ import { AnomaliasControlService } from '@data/services/anomalias-control.servic
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
-import { Stroke, Style } from 'ol/style';
 
 @Component({
   selector: 'app-map-comments',
