@@ -39,10 +39,18 @@ export class Colors {
   static getColorGradNormMax(gradiente: number, opacity: number): string {
     if (gradiente < 10) {
       return this.hexToRgb(COLOR.colores_severity[0], opacity);
-    } else if (gradiente <=  40) {
+    } else if (gradiente <= 40) {
       return this.hexToRgb(COLOR.colores_severity[1], opacity);
     } else {
       return this.hexToRgb(COLOR.colores_severity[2], opacity);
+    }
+  }
+
+  static getColorComentarios(checked: boolean, opacity: number): string {
+    if (checked) {
+      return Colors.hexToRgb(COLOR.colores_comentarios[0], opacity);
+    } else {
+      return Colors.hexToRgb(COLOR.colores_comentarios[1], opacity);
     }
   }
 }

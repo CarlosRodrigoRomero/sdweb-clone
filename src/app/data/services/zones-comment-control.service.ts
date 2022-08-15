@@ -9,9 +9,9 @@ import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 
 import { OlMapService } from './ol-map.service';
-import { ReportControlService } from './report-control.service';
 import { FilterService } from './filter.service';
 import { ZonesControlService } from './zones-control.service';
+import { ViewCommentsService } from './view-comments.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { FilterableElement } from '@core/models/filterableInterface';
@@ -26,23 +26,18 @@ import { Colors } from '@core/classes/colors';
 export class ZonesCommentControlService {
   private map: Map;
   private currentZoom: number;
-  zoomChangeView = 18;
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private olMapService: OlMapService,
-    private reportControlService: ReportControlService,
     private filterService: FilterService,
-    private zonesControlService: ZonesControlService
+    private zonesControlService: ZonesControlService,
+    private viewCommentsService: ViewCommentsService
   ) {}
 
   initService(): Promise<boolean> {
     return new Promise((initService) => {
-      if (this.reportControlService.plantaFija) {
-        this.zoomChangeView = 20;
-      }
-
       this.subscriptions.add(
         this.olMapService.getMap().subscribe((map) => {
           this.map = map;
@@ -63,7 +58,7 @@ export class ZonesCommentControlService {
   createSmallZonesLayer(informeId: string): VectorLayer {
     const layer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyle(false),
+      style: this.getSmallZonesStyle(false),
       visible: true,
     });
     layer.setProperties({
@@ -78,12 +73,12 @@ export class ZonesCommentControlService {
   mostrarSmallZones(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
     this.subscriptions.add(
       this.filterService.filteredElements$.subscribe((elems) => {
-        this.addZones(zonas, layers, elems);
+        this.addSmallZones(zonas, layers, elems);
       })
     );
   }
 
-  private addZones(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
+  private addSmallZones(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
       const informeId = l.getProperties().informeId;
@@ -149,16 +144,21 @@ export class ZonesCommentControlService {
   }
 
   // ESTILOS ZONAS PEQUEÑAS
-  private getStyle(focused: boolean) {
+  private getSmallZonesStyle(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color: this.currentZoom >= this.zoomChangeView ? this.getColor(feature, 1) : focused ? 'white' : 'black',
-            width: this.currentZoom >= this.zoomChangeView ? 4 : 2,
+            color:
+              this.currentZoom >= this.viewCommentsService.zoomShowAnoms
+                ? this.getColor(feature, 1)
+                : focused
+                ? 'white'
+                : 'black',
+            width: this.currentZoom >= this.viewCommentsService.zoomShowAnoms ? 4 : 2,
           }),
           fill:
-            this.currentZoom >= this.zoomChangeView
+            this.currentZoom >= this.viewCommentsService.zoomShowAnoms
               ? null
               : new Fill({
                   color: this.getColor(feature, 0.9),
@@ -173,13 +173,7 @@ export class ZonesCommentControlService {
     const numChecked = feature.getProperties().properties.numChecked;
     const numElems = feature.getProperties().properties.numElems;
 
-    if (numChecked >= numElems) {
-      // VERDE OK
-      return COLOR.colores_severity[0].replace(',1)', ',' + opacity + ')');
-    } else {
-      // NARANJA PENDIENTE
-      return COLOR.colores_severity[1].replace(',1)', ',' + opacity + ')');
-    }
+    return Colors.getColorComentarios(numChecked >= numElems, opacity);
   }
 
   getLabelSmallZonesStyle(feature: Feature) {
@@ -224,5 +218,9 @@ export class ZonesCommentControlService {
         width: 8,
       }),
     });
+  }
+
+  resetService() {
+    this.subscriptions.unsubscribe();
   }
 }

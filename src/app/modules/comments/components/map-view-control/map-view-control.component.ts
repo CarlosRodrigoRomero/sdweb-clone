@@ -17,13 +17,11 @@ import { ZonesService } from '@data/services/zones.service';
   styleUrls: ['./map-view-control.component.css'],
 })
 export class MapViewControlComponent implements OnInit, OnDestroy {
-  private anomaliaLayers: VectorLayer[];
+  private anomaliaLayer: VectorLayer;
   private seguidorLayers: VectorLayer[];
   private zonesLayers: VectorLayer[];
   private thermalLayer: TileLayer;
   private currentZoom: number;
-  private zoomHideAnoms = 18;
-  private zoomHideZones = 16;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -37,7 +35,7 @@ export class MapViewControlComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // cambiamos el zoom para fijas
     if (this.reportControlService.plantaFija) {
-      this.zoomHideAnoms = 20;
+      this.viewCommentsService.zoomShowAnoms = 20;
     }
 
     if (this.reportControlService.plantaFija) {
@@ -59,7 +57,7 @@ export class MapViewControlComponent implements OnInit, OnDestroy {
       );
 
       this.subscriptions.add(
-        this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers))
+        this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayer = layers[0]))
       );
     } else {
       this.subscriptions.add(
@@ -94,19 +92,17 @@ export class MapViewControlComponent implements OnInit, OnDestroy {
       this.setZonesLayersVisibility();
     }
 
-    if (this.reportControlService.plantaFija !== undefined) {
-      if (this.reportControlService.plantaFija) {
-        this.setAnomaliaLayersVisibility();
-      } else {
-        this.setSeguidorLayersVisibility();
-      }
+    if (this.reportControlService.plantaFija) {
+      this.setAnomaliaLayersVisibility();
+    } else {
+      this.setSeguidorLayersVisibility();
     }
   }
 
   private setZonesLayersVisibility() {
-    if (this.zonesLayers.length) {
+    if (this.zonesLayers.length > 0) {
       this.zonesLayers.forEach((layer) => {
-        if (this.currentZoom >= this.zoomHideZones) {
+        if (this.currentZoom >= this.viewCommentsService.zoomShowSmallZones) {
           layer.setVisible(true);
         } else {
           layer.setVisible(false);
@@ -116,23 +112,23 @@ export class MapViewControlComponent implements OnInit, OnDestroy {
   }
 
   private setAnomaliaLayersVisibility() {
-    this.anomaliaLayers.forEach((layer) => {
+    if (this.anomaliaLayer !== undefined) {
       if (this.zonesService.thereAreZones) {
-        if (this.currentZoom >= this.zoomHideAnoms) {
-          layer.setVisible(true);
+        if (this.currentZoom >= this.viewCommentsService.zoomShowAnoms) {
+          this.anomaliaLayer.setVisible(true);
         } else {
-          layer.setVisible(false);
+          this.anomaliaLayer.setVisible(false);
         }
       } else {
-        layer.setVisible(true);
+        this.anomaliaLayer.setVisible(true);
       }
-    });
+    }
   }
 
   private setSeguidorLayersVisibility() {
     this.seguidorLayers.forEach((layer) => {
       if (this.zonesService.thereAreZones) {
-        if (this.currentZoom >= this.zoomHideAnoms) {
+        if (this.currentZoom >= this.viewCommentsService.zoomShowAnoms) {
           layer.setVisible(true);
         } else {
           layer.setVisible(false);

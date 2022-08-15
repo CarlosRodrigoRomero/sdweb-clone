@@ -23,6 +23,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ViewCommentsService } from '@data/services/view-comments.service';
+import { AnomaliasControlCommentsService } from '@data/services/anomalias-control-comments.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -50,7 +51,8 @@ export class MapCommentsComponent implements OnInit {
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
     private anomaliasControlService: AnomaliasControlService,
-    private viewCommentsService: ViewCommentsService
+    private viewCommentsService: ViewCommentsService,
+    private anomaliasControlCommentsService: AnomaliasControlCommentsService
   ) {}
 
   ngOnInit(): void {
@@ -78,7 +80,9 @@ export class MapCommentsComponent implements OnInit {
         }
 
         // creamos la capa de anomalías
-        this.olMapService.addAnomaliaLayer(this.anomaliasControlService.createCommentsAnomaliaLayers(this.informe.id));
+        this.olMapService.addAnomaliaLayer(
+          this.anomaliasControlCommentsService.createCommentsAnomaliaLayers(this.informe.id)
+        );
 
         // añadimos las ortofotos aereas de cada informe
         await this.olMapService.addAerialLayer(this.informe);
@@ -87,6 +91,7 @@ export class MapCommentsComponent implements OnInit {
 
         this.addSelectInteraction();
         this.addGeoLocation();
+        this.addZoomEvent();
       });
 
     this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers)));
@@ -159,10 +164,8 @@ export class MapCommentsComponent implements OnInit {
     this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
 
     // inicializamos el servicio que controla el comportamiento de las anomalias
-    this.anomaliasControlService.initService().then((value) => {
-      if (value) {
-        this.anomaliasControlService.mostrarAnomalias(true);
-      }
+    this.anomaliasControlCommentsService.initService().then(() => {
+      this.anomaliasControlCommentsService.mostrarAnomalias();
     });
   }
 
@@ -219,6 +222,12 @@ export class MapCommentsComponent implements OnInit {
     );
 
     this.addCenterControl(geoLocSource);
+  }
+
+  private addZoomEvent() {
+    this.map.on('moveend', () => {
+      this.olMapService.currentZoom = this.map.getView().getZoom();
+    });
   }
 
   addCenterControl(source: VectorSource) {

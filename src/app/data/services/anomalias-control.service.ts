@@ -146,43 +146,22 @@ export class AnomaliasControlService {
     return anomaliasLayers;
   }
 
-  createCommentsAnomaliaLayers(informeId: string): VectorLayer {
-    const perdidasLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStylePerdidas(false),
-      visible: false,
-    });
-    perdidasLayer.setProperties({
-      informeId,
-      type: 'anomalias',
-    });
-
-    return perdidasLayer;
-  }
-
-  mostrarAnomalias(comentarios?: boolean): void {
+  mostrarAnomalias(): void {
     this.subscriptions.add(
       this.filterService.filteredElements$.subscribe((anomalias) => {
-        if (comentarios) {
-          // dibujamos las anomalias del informe de comentarios
-          const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
-          this.dibujarAnomsComentarios(anomFil as Anomalia[]);
+        if (!this.sharedReportNoFilters) {
+          // Dibujar anomalias
+          this.dibujarAnomalias(anomalias as Anomalia[]);
           this.listaAnomalias = anomalias as Anomalia[];
-        } else {
-          if (!this.sharedReportNoFilters) {
-            // Dibujar anomalias
-            this.dibujarAnomalias(anomalias as Anomalia[]);
-            this.listaAnomalias = anomalias as Anomalia[];
 
-            // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
-            this.prevAnomaliaSelect = undefined;
-            this.anomaliaSelect = undefined;
-          } else {
-            // dibujamos solo anomalias del informe compartido
-            const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
-            this.dibujarAnomalias(anomFil as Anomalia[]);
-            this.listaAnomalias = anomalias as Anomalia[];
-          }
+          // reiniciamos las anomalias seleccionadas cada vez que se aplica un filtro
+          this.prevAnomaliaSelect = undefined;
+          this.anomaliaSelect = undefined;
+        } else {
+          // dibujamos solo anomalias del informe compartido
+          const anomFil = anomalias.filter((anom) => (anom as Anomalia).informeId === this.selectedInformeId);
+          this.dibujarAnomalias(anomFil as Anomalia[]);
+          this.listaAnomalias = anomalias as Anomalia[];
         }
       })
     );
@@ -218,30 +197,6 @@ export class AnomaliasControlService {
 
     // añadimos la nueva interaccion
     this.addSelectInteraction();
-  }
-
-  private dibujarAnomsComentarios(anomalias: Anomalia[]) {
-    // Para cada vector layer (que corresponde a un informe)
-    this.anomaliaLayers.forEach((l) => {
-      // filtra las anomalías correspondientes al informe
-      const anomaliasInforme = anomalias.filter((item) => item.informeId === l.getProperties().informeId);
-
-      const source = l.getSource();
-      source.clear();
-      anomaliasInforme.forEach((anom) => {
-        const feature = new Feature({
-          geometry: new Polygon([anom.featureCoords]),
-          properties: {
-            anomaliaId: anom.id,
-            informeId: anom.informeId,
-            perdidas: anom.perdidas,
-            type: 'anomalia',
-          },
-        });
-
-        source.addFeature(feature);
-      });
-    });
   }
 
   private removeSelectAnomaliaInteractions() {
