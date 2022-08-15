@@ -11,7 +11,11 @@
         [fixedTopGap]="70"
         position="start"
       >
-        <app-anomalias-list></app-anomalias-list>
+        <app-anomalias-list
+          [anomalias]="anomalias"
+          [dataSource]="dataSource"
+          [anomaliaSelected]="anomaliaSelected"
+        ></app-anomalias-list>
       </mat-sidenav>
 
       <mat-sidenav
