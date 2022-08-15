@@ -6,7 +6,6 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class ViewCommentsService {
-  zoomChangeView = 18;
   private _thermalLayerVisible = true;
   thermalLayerVisible$ = new BehaviorSubject<boolean>(this._thermalLayerVisible);
 

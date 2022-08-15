@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
@@ -16,12 +16,14 @@ import { ZonesService } from '@data/services/zones.service';
   templateUrl: './map-view-control.component.html',
   styleUrls: ['./map-view-control.component.css'],
 })
-export class MapViewControlComponent implements OnInit {
+export class MapViewControlComponent implements OnInit, OnDestroy {
   private anomaliaLayers: VectorLayer[];
   private seguidorLayers: VectorLayer[];
   private zonesLayers: VectorLayer[];
   private thermalLayer: TileLayer;
   private currentZoom: number;
+  private zoomHideAnoms = 18;
+  private zoomHideZones = 16;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -35,7 +37,7 @@ export class MapViewControlComponent implements OnInit {
   ngOnInit(): void {
     // cambiamos el zoom para fijas
     if (this.reportControlService.plantaFija) {
-      this.viewCommentsService.zoomChangeView = 20;
+      this.zoomHideAnoms = 20;
     }
 
     if (this.reportControlService.plantaFija) {
@@ -89,6 +91,10 @@ export class MapViewControlComponent implements OnInit {
   }
 
   private setLayersVisibility() {
+    if (this.zonesService.thereAreZones) {
+      this.setZonesLayersVisibility();
+    }
+
     if (this.reportControlService.plantaFija !== undefined) {
       if (this.reportControlService.plantaFija) {
         this.setAnomaliaLayersVisibility();
@@ -98,10 +104,22 @@ export class MapViewControlComponent implements OnInit {
     }
   }
 
+  private setZonesLayersVisibility() {
+    if (this.zonesLayers.length) {
+      this.zonesLayers.forEach((layer) => {
+        if (this.currentZoom >= this.zoomHideZones) {
+          layer.setVisible(true);
+        } else {
+          layer.setVisible(false);
+        }
+      });
+    }
+  }
+
   private setAnomaliaLayersVisibility() {
     this.anomaliaLayers.forEach((layer) => {
       if (this.zonesService.thereAreZones) {
-        if (this.currentZoom >= this.viewCommentsService.zoomChangeView) {
+        if (this.currentZoom >= this.zoomHideAnoms) {
           layer.setVisible(true);
         } else {
           layer.setVisible(false);
@@ -115,7 +133,7 @@ export class MapViewControlComponent implements OnInit {
   private setSeguidorLayersVisibility() {
     this.seguidorLayers.forEach((layer) => {
       if (this.zonesService.thereAreZones) {
-        if (this.currentZoom >= this.viewCommentsService.zoomChangeView) {
+        if (this.currentZoom >= this.zoomHideAnoms) {
           layer.setVisible(true);
         } else {
           layer.setVisible(false);
@@ -124,5 +142,9 @@ export class MapViewControlComponent implements OnInit {
         layer.setVisible(true);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
