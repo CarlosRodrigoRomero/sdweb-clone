@@ -6,17 +6,9 @@
   gap: 0.5rem;
 }
 
-.top-row {
-  display: flex;
-  justify-content: center;
-}
-
-.toggle-tipo-coment {
-  width: fit-content;
-}
-
-.bottom-row {
+.tab-content {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  justify-content: space-between;
+  height: calc(100vh - 347px);
 }

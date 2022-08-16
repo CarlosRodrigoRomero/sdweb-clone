@@ -14,7 +14,9 @@ export class CommentsAreaComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  setTipoComentario(event) {
-    this.comentariosControlService.tipoComentarioSelected = event.value;
+  setTipoComentario(event: any) {
+    const index = event.index;
+
+    this.comentariosControlService.tipoComentarioSelected = this.comentariosControlService.tiposComentarios[index];
   }
 }

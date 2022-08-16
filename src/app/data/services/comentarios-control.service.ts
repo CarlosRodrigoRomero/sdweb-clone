@@ -28,6 +28,7 @@ export class ComentariosControlService {
   vistas = ['map', 'list'];
   private _vistaSelected = 'list';
   vistaSelected$ = new BehaviorSubject<string>(this._vistaSelected);
+  tiposComentarios = ['anomalia', 'iv'];
 
   constructor(private reportControlService: ReportControlService) {}
 
