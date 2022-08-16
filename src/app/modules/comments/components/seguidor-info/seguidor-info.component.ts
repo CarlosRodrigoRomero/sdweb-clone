@@ -8,9 +8,11 @@ declare let fabric;
 
 import { SeguidorViewCommentsService } from '@data/services/seguidor-view-comments.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
+import { AnomaliasControlCommentsService } from '@data/services/anomalias-control-comments.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { Anomalia } from '@core/models/anomalia';
+import { PcInterface } from '@core/models/pc';
 
 @Component({
   selector: 'app-seguidor-info',
@@ -33,7 +35,8 @@ export class SeguidorInfoComponent implements OnInit {
 
   constructor(
     private seguidorViewCommentsService: SeguidorViewCommentsService,
-    private comentariosControlService: ComentariosControlService
+    private comentariosControlService: ComentariosControlService,
+    private anomaliasControlCommentsService: AnomaliasControlCommentsService
   ) {}
 
   ngOnInit(): void {
@@ -71,7 +74,7 @@ export class SeguidorInfoComponent implements OnInit {
               // obtenemos imagen visual
               this.seguidorViewCommentsService.getImageSeguidor(this.seguidorSelected, 'jpgVisual');
 
-              // this.drawAnomalias();
+              this.drawAnomalias();
             }
 
             return combineLatest([
@@ -167,5 +170,80 @@ export class SeguidorInfoComponent implements OnInit {
         }
       }
     });
+  }
+
+  drawAnomalias() {
+    this.anomsCanvas.clear();
+
+    this.seguidorSelected.anomaliasCliente.forEach((anom) => this.drawAnomalia(anom));
+  }
+
+  drawAnomalia(anomalia: Anomalia) {
+    const pc = anomalia as PcInterface;
+
+    let polygon;
+    if (pc.hasOwnProperty('coords')) {
+      const scaleCoords = this.getScaleCoords(pc.coords);
+
+      console.log(pc.coords, scaleCoords);
+
+      polygon = new fabric.Polygon(scaleCoords, {
+        fill: 'transparent',
+        stroke: this.anomaliasControlCommentsService.getExternalColor(anomalia, 1),
+        strokeWidth: 2,
+        hasControls: false,
+        lockMovementY: true,
+        lockMovementX: true,
+        anomId: anomalia.id,
+        ref: 'anom',
+        selectable: false,
+        hoverCursor: 'pointer',
+        rx: 4,
+        ry: 4,
+        anomalia,
+      });
+    } else {
+      polygon = new fabric.Rect({
+        left: this.getScaleWidth(pc.img_left),
+        top: this.getScaleHeight(pc.img_top),
+        fill: 'rgba(0,0,0,0)',
+        stroke: this.anomaliasControlCommentsService.getExternalColor(anomalia, 1),
+        strokeWidth: 2,
+        width: this.getScaleWidth(pc.img_width),
+        height: this.getScaleHeight(pc.img_height),
+        hasControls: false,
+        lockMovementY: true,
+        lockMovementX: true,
+        anomId: anomalia.id,
+        ref: 'anom',
+        selectable: false,
+        hoverCursor: 'pointer',
+        rx: 4,
+        ry: 4,
+        anomalia,
+      });
+    }
+
+    this.anomsCanvas.add(polygon);
+    this.anomsCanvas.renderAll();
+  }
+
+  private getScaleCoords(coords: any[]): any[] {
+    const scaleCoords = coords.map((coord) => {
+      const scaleX = this.getScaleWidth(coord.x);
+      const scaleY = this.getScaleHeight(coord.y);
+
+      return { x: scaleX, y: scaleY };
+    });
+
+    return scaleCoords;
+  }
+
+  private getScaleWidth(width: number): number {
+    return Math.round((width * this.seguidorViewCommentsService.imagesWidth) / 640);
+  }
+
+  private getScaleHeight(height: number): number {
+    return Math.round((height * this.seguidorViewCommentsService.imagesHeight) / 512);
   }
 }

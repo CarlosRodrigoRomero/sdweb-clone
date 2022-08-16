@@ -116,6 +116,10 @@ export class AnomaliasControlCommentsService {
     return Colors.getColorComentarios(feature.getProperties().properties.checked, opacity);
   }
 
+  getExternalColor(anomalia: Anomalia, opacity: number): string {
+    return Colors.getColorComentarios(anomalia.revisada, opacity);
+  }
+
   resetService() {
     this.subscriptions.unsubscribe();
   }
