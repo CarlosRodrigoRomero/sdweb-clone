@@ -12,11 +12,10 @@ import { OlMapService } from './ol-map.service';
 import { FilterService } from './filter.service';
 import { ZonesControlService } from './zones-control.service';
 import { ViewCommentsService } from './view-comments.service';
+import { ReportControlService } from './report-control.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { FilterableElement } from '@core/models/filterableInterface';
-
-import { COLOR } from '@data/constants/color';
 
 import { Colors } from '@core/classes/colors';
 import { Select } from 'ol/interaction';
@@ -34,7 +33,8 @@ export class ZonesCommentControlService {
     private olMapService: OlMapService,
     private filterService: FilterService,
     private zonesControlService: ZonesControlService,
-    private viewCommentsService: ViewCommentsService
+    private viewCommentsService: ViewCommentsService,
+    private reportControlService: ReportControlService
   ) {}
 
   initService(): Promise<boolean> {
@@ -81,7 +81,6 @@ export class ZonesCommentControlService {
   private addSmallZones(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
-      const informeId = l.getProperties().informeId;
       const source = l.getSource();
       source.clear();
       zonas.forEach((zona) => {
@@ -104,7 +103,7 @@ export class ZonesCommentControlService {
               // area: this.getArea(coords),
               numElems: elemsZona.length,
               numChecked: elemsChecked.length,
-              label: this.getSmallGlobal(zona.globalCoords) + elemsChecked.length + '/' + elemsZona.length,
+              label: this.getSmallGlobal(zona.globalCoords) + '\n\n' + elemsChecked.length + '/' + elemsZona.length,
             },
           });
           source.addFeature(feature);
@@ -115,7 +114,19 @@ export class ZonesCommentControlService {
 
   private getSmallGlobal(globalCoords: string[]): string {
     const notNullGlobals = globalCoords.filter((gC) => gC !== null);
-    return notNullGlobals[notNullGlobals.length - 1].toString();
+    const indexGlobal = notNullGlobals.length - 1;
+
+    let nombreGlobal = '';
+    if (this.reportControlService.planta.hasOwnProperty('nombreGlobalCoords')) {
+      nombreGlobal = this.reportControlService.planta.nombreGlobalCoords[indexGlobal];
+    }
+
+    let label = notNullGlobals[indexGlobal].toString();
+    if (nombreGlobal !== '') {
+      label = nombreGlobal + ' ' + label;
+    }
+
+    return label;
   }
 
   addBigZones(bigZones: LocationAreaInterface[][]) {
