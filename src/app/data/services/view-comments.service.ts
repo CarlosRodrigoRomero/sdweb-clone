@@ -2,18 +2,17 @@ import { Injectable } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs';
 
-import { ReportControlService } from './report-control.service';
-
 @Injectable({
   providedIn: 'root',
 })
 export class ViewCommentsService {
   zoomShowAnoms = 18;
+  zoomChangeAnomsView = 22;
   zoomShowSmallZones = 16;
   private _thermalLayerVisible = false;
   thermalLayerVisible$ = new BehaviorSubject<boolean>(this._thermalLayerVisible);
 
-  constructor(private reportControlService: ReportControlService) {}
+  constructor() {}
 
   get thermalLayerVisible() {
     return this._thermalLayerVisible;

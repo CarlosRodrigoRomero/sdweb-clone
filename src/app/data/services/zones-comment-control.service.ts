@@ -58,13 +58,12 @@ export class ZonesCommentControlService {
   createSmallZonesLayer(informeId: string): VectorLayer {
     const layer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getSmallZonesStyle(false),
+      style: this.getSmallZonesStyle(),
       visible: true,
     });
     layer.setProperties({
       informeId,
-      view: 0,
-      type: 'zonas',
+      type: 'smallZones',
     });
 
     return layer;
@@ -144,17 +143,12 @@ export class ZonesCommentControlService {
   }
 
   // ESTILOS ZONAS PEQUEÑAS
-  private getSmallZonesStyle(focused: boolean) {
+  private getSmallZonesStyle() {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color:
-              this.currentZoom >= this.viewCommentsService.zoomShowAnoms
-                ? this.getColor(feature, 1)
-                : focused
-                ? 'white'
-                : 'black',
+            color: this.currentZoom >= this.viewCommentsService.zoomShowAnoms ? this.getColor(feature, 1) : 'black',
             width: this.currentZoom >= this.viewCommentsService.zoomShowAnoms ? 4 : 2,
           }),
           fill:

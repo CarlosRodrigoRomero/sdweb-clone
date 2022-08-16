@@ -94,19 +94,19 @@ export class AnomaliasControlCommentsService {
         return new Style({
           stroke: new Stroke({
             color:
-              this.currentZoom >= this.viewCommentsService.zoomShowAnoms
+              this.currentZoom >= this.viewCommentsService.zoomChangeAnomsView
                 ? focused
                   ? 'white'
                   : this.getColor(feature, 1)
                 : focused
                 ? 'white'
                 : 'black',
-            width: this.currentZoom >= this.viewCommentsService.zoomShowAnoms ? 4 : focused ? 2 : 1,
+            width: this.currentZoom >= this.viewCommentsService.zoomChangeAnomsView ? 4 : focused ? 2 : 1,
           }),
           fill: new Fill({
             color:
-              this.currentZoom >= this.viewCommentsService.zoomShowAnoms
-                ? 'rgba(255,255,255, 0)'
+              this.currentZoom >= this.viewCommentsService.zoomChangeAnomsView
+                ? 'rgba(0,0,0,0)'
                 : this.getColor(feature, 0.9),
           }),
         });

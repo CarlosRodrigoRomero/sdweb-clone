@@ -21,7 +21,6 @@ import { ComentariosControlService } from '@data/services/comentarios-control.se
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
-import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ViewCommentsService } from '@data/services/view-comments.service';
 import { AnomaliasControlCommentsService } from '@data/services/anomalias-control-comments.service';
 
@@ -50,7 +49,6 @@ export class MapCommentsComponent implements OnInit {
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
-    private anomaliasControlService: AnomaliasControlService,
     private viewCommentsService: ViewCommentsService,
     private anomaliasControlCommentsService: AnomaliasControlCommentsService
   ) {}
@@ -103,7 +101,7 @@ export class MapCommentsComponent implements OnInit {
     this.subscriptions.add(
       this.comentariosControlService.anomaliaSelected$.subscribe((anom) => {
         if (this.prevFeatureSelected !== undefined) {
-          this.prevFeatureSelected.setStyle(this.anomaliasControlService.getStylePerdidas(false));
+          this.prevFeatureSelected.setStyle(this.anomaliasControlCommentsService.getStyleAnoms(false));
         }
 
         if (anom !== undefined) {
@@ -114,7 +112,7 @@ export class MapCommentsComponent implements OnInit {
               .find((feature) => feature.getProperties().properties.anomaliaId === anom.id);
 
             if (anomaliaFeature !== undefined) {
-              anomaliaFeature.setStyle(this.anomaliasControlService.getStylePerdidas(true));
+              anomaliaFeature.setStyle(this.anomaliasControlCommentsService.getStyleAnoms(true));
 
               // seleccionamos la anomalia para luego cambiar su estilo
               this.prevFeatureSelected = anomaliaFeature;
@@ -176,6 +174,13 @@ export class MapCommentsComponent implements OnInit {
   private addSelectInteraction() {
     const select = new Select({
       condition: click,
+      layers: (l) => {
+        if (l.getProperties().hasOwnProperty('type') && l.getProperties().type === 'anomalias') {
+          return true;
+        } else {
+          return false;
+        }
+      },
     });
 
     select.setProperties({ id: 'selectAnomalia' });
@@ -227,6 +232,15 @@ export class MapCommentsComponent implements OnInit {
   private addZoomEvent() {
     this.map.on('moveend', () => {
       this.olMapService.currentZoom = this.map.getView().getZoom();
+
+      this.map
+        .getLayers()
+        .getArray()
+        .forEach((layer) => {
+          if (layer.getProperties().type === 'smallZones' || layer.getProperties().type === 'anomalias') {
+            (layer as VectorLayer).getSource().changed();
+          }
+        });
     });
   }
 
