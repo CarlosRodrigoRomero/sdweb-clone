@@ -42,11 +42,20 @@ export class SeguidorInfoComponent implements OnInit {
       this.seguidorViewCommentsService.imagesLoaded$.subscribe((loaded) => (this.imagesLoaded = loaded))
     );
 
+    // nos adaptamos al ancho  de la ventana
+    this.seguidorViewCommentsService.setImagesWidthAndHeight();
+
     this.visualCanvas = new fabric.Canvas('visual-canvas');
+    this.visualCanvas.setWidth(this.seguidorViewCommentsService.imagesWidth);
+    this.visualCanvas.setHeight(this.seguidorViewCommentsService.imagesHeight);
     this.seguidorViewCommentsService.visualCanvas = this.visualCanvas;
     this.thermalCanvas = new fabric.Canvas('thermal-canvas');
+    this.thermalCanvas.setWidth(this.seguidorViewCommentsService.imagesWidth);
+    this.thermalCanvas.setHeight(this.seguidorViewCommentsService.imagesHeight);
     this.seguidorViewCommentsService.thermalCanvas = this.thermalCanvas;
     this.anomsCanvas = new fabric.Canvas('anomalias-canvas');
+    this.anomsCanvas.setWidth(this.seguidorViewCommentsService.imagesWidth);
+    this.anomsCanvas.setHeight(this.seguidorViewCommentsService.imagesHeight);
     this.seguidorViewCommentsService.anomsCanvas = this.anomsCanvas;
     this.setEventListenersCanvas();
 
@@ -57,7 +66,6 @@ export class SeguidorInfoComponent implements OnInit {
             this.seguidorSelected = seguidor;
 
             if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
-              console.log('ok');
               // obtenemos imagen térmica
               this.seguidorViewCommentsService.getImageSeguidor(this.seguidorSelected, 'jpg');
               // obtenemos imagen visual

@@ -5,7 +5,6 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { BehaviorSubject } from 'rxjs';
 
 import { Seguidor } from '@core/models/seguidor';
-import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +24,8 @@ export class SeguidorViewCommentsService {
   visualCanvas: any;
   thermalCanvas: any;
   anomsCanvas: any;
+  imagesWidth = 320;
+  imagesHeight = this.imagesWidth / 1.25;
 
   constructor(private storage: AngularFireStorage) {}
 
@@ -83,6 +84,11 @@ export class SeguidorViewCommentsService {
             break;
         }
       });
+  }
+
+  setImagesWidthAndHeight(): void {
+    this.imagesWidth = window.innerWidth - 16;
+    this.imagesHeight = this.imagesWidth / 1.25;
   }
 
   get thermalImageExist() {
