@@ -86,7 +86,7 @@ export class AnomaliasListComponent implements OnInit, OnChanges, OnDestroy {
 
   selectElems(row: any) {
     // seleccionamos la anomalia
-    this.comentariosControlService.anomaliaSelected = this.anomalias.find((anom) => anom.id === row.id);
+    this.comentariosControlService.anomaliaSelected = row.anomalia;
 
     // si es una planta de seguidores seleccionamos el seguidor
     if (!this.reportControlService.plantaFija) {

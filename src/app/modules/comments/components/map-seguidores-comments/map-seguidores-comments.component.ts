@@ -162,6 +162,8 @@ export class MapSeguidoresCommentsComponent implements OnInit {
 
           this.comentariosControlService.seguidorSelected = seguidor;
 
+          this.comentariosControlService.anomaliaSelected = seguidor.anomaliasCliente[0];
+
           this.comentariosControlService.infoOpened = true;
         }
       }

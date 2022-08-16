@@ -87,15 +87,15 @@ export class SeguidorInfoComponent implements OnInit {
           this.anomaliaSelected = anomSel;
           this.prevAnomaliaSelected = prevAnomSel;
 
-          // if (this.seguidorSelected !== undefined) {
-          //   if (this.anomaliaSelected !== undefined) {
-          //     this.setAnomaliaSelectedStyle(this.anomaliaSelected, true);
-          //   }
+          if (this.seguidorSelected !== undefined) {
+            if (this.anomaliaSelected !== undefined) {
+              this.setAnomaliaSelectedStyle(this.anomaliaSelected, true);
+            }
 
-          //   if (this.prevAnomaliaSelected !== undefined) {
-          //     this.setAnomaliaSelectedStyle(this.prevAnomaliaSelected, false);
-          //   }
-          // }
+            if (this.prevAnomaliaSelected !== undefined) {
+              this.setAnomaliaSelectedStyle(this.prevAnomaliaSelected, false);
+            }
+          }
 
           this.anomsCanvas.renderAll();
         })
@@ -185,8 +185,6 @@ export class SeguidorInfoComponent implements OnInit {
     if (pc.hasOwnProperty('coords')) {
       const scaleCoords = this.getScaleCoords(pc.coords);
 
-      console.log(pc.coords, scaleCoords);
-
       polygon = new fabric.Polygon(scaleCoords, {
         fill: 'transparent',
         stroke: this.anomaliasControlCommentsService.getExternalColor(anomalia, 1),
@@ -245,5 +243,17 @@ export class SeguidorInfoComponent implements OnInit {
 
   private getScaleHeight(height: number): number {
     return Math.round((height * this.seguidorViewCommentsService.imagesHeight) / 512);
+  }
+
+  private setAnomaliaSelectedStyle(anomalia: Anomalia, selected: boolean) {
+    const polygon = this.anomsCanvas.getObjects().find((anom) => anom.anomId === anomalia.id);
+
+    if (polygon !== undefined) {
+      if (selected) {
+        polygon.set({ stroke: 'white', strokeWidth: 4 });
+      } else {
+        polygon.set({ stroke: this.anomaliasControlCommentsService.getExternalColor(anomalia, 1), strokeWidth: 2 });
+      }
+    }
   }
 }
