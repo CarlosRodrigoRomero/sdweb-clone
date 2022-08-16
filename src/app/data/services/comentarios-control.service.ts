@@ -17,6 +17,8 @@ export class ComentariosControlService {
   infoOpened$ = new BehaviorSubject<boolean>(this._infoOpened);
   private _anomaliaSelected: Anomalia = undefined;
   anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
+  private _prevAnomaliaSelected: Anomalia = undefined;
+  prevAnomaliaSelected$ = new BehaviorSubject<Anomalia>(this._prevAnomaliaSelected);
   private _seguidorSelected: Seguidor = undefined;
   seguidorSelected$ = new BehaviorSubject<Seguidor>(this._seguidorSelected);
   private _dataLoaded = false;
@@ -54,6 +56,15 @@ export class ComentariosControlService {
   set anomaliaSelected(value: Anomalia) {
     this._anomaliaSelected = value;
     this.anomaliaSelected$.next(value);
+  }
+
+  get prevAnomaliaSelected() {
+    return this._prevAnomaliaSelected;
+  }
+
+  set prevAnomaliaSelected(value: Anomalia) {
+    this._prevAnomaliaSelected = value;
+    this.prevAnomaliaSelected$.next(value);
   }
 
   get seguidorSelected(): Seguidor {

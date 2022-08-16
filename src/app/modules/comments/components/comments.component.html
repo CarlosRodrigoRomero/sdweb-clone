@@ -31,8 +31,8 @@
       </mat-sidenav>
 
       <mat-sidenav-content>
+        <app-map-comments *ngIf="plantaFija"></app-map-comments>
         <app-map-seguidores-comments *ngIf="!plantaFija"></app-map-seguidores-comments>
-        <app-map-comments></app-map-comments>
 
         <app-zones-comments></app-zones-comments>
         <app-map-view-control></app-map-view-control>

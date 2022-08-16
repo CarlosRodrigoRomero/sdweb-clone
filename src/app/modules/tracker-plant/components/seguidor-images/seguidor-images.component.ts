@@ -7,7 +7,6 @@ import 'fabric';
 declare let fabric;
 
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
-import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 import { PcInterface } from '@core/models/pc';
@@ -44,7 +43,6 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
-    private mapSeguidoresService: MapSeguidoresService,
     private seguidorViewService: SeguidorViewService
   ) {}
 

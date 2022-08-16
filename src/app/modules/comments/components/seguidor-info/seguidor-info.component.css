@@ -1,0 +1,41 @@
+.content {
+  position: absolute;
+}
+
+.thermal-canvas {
+  z-index: 2;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.visual-canvas {
+  z-index: 1;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.anomalias-canvas {
+  z-index: 3;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.loading {
+  z-index: 10;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 320px;
+  height: 256px;
+  background: white;
+}
+
+app-spinner {
+  position: absolute;
+  top: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+}

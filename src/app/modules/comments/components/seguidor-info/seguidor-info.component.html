@@ -1,1 +1,16 @@
-<p>seguidor-info works!</p>
+<div class="content">
+  <div *ngIf="!imagesLoaded" class="loading">
+    <app-spinner></app-spinner>
+  </div>
+
+  <div class="thermal-canvas">
+    <canvas id="thermal-canvas" width="640" height="512"> </canvas>
+  </div>
+  <div class="visual-canvas">
+    <canvas id="visual-canvas" width="640" height="512"> </canvas>
+  </div>
+
+  <div class="anomalias-canvas">
+    <canvas id="anomalias-canvas" width="640" height="512"></canvas>
+  </div>
+</div>

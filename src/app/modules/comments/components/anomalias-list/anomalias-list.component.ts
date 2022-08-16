@@ -20,8 +20,10 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
+import { FilterService } from '@data/services/filter.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { Seguidor } from '@core/models/seguidor';
 
 export interface RowAnomData {
   id: string;
@@ -58,7 +60,8 @@ export class AnomaliasListComponent implements OnInit, OnChanges, OnDestroy {
     private reportControlService: ReportControlService,
     private comentariosControlService: ComentariosControlService,
     private olMapService: OlMapService,
-    private anomaliasControlService: AnomaliasControlService
+    private anomaliasControlService: AnomaliasControlService,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -81,11 +84,26 @@ export class AnomaliasListComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  selectAnomalia(row: any) {
-    this.openInfo();
-
+  selectElems(row: any) {
     // seleccionamos la anomalia
     this.comentariosControlService.anomaliaSelected = this.anomalias.find((anom) => anom.id === row.id);
+
+    // si es una planta de seguidores seleccionamos el seguidor
+    if (!this.reportControlService.plantaFija) {
+      const seguidorAnom = this.filterService.filteredElements.find((seg) => {
+        const seguidor = seg as Seguidor;
+
+        if (seguidor.anomalias.includes(row.anomalia)) {
+          return true;
+        } else {
+          return false;
+        }
+      }) as Seguidor;
+
+      this.comentariosControlService.seguidorSelected = seguidorAnom;
+    }
+
+    this.openInfo();
   }
 
   openInfo() {
@@ -95,8 +113,6 @@ export class AnomaliasListComponent implements OnInit, OnChanges, OnDestroy {
   closeListAndInfo() {
     this.comentariosControlService.listOpened = false;
     this.comentariosControlService.infoOpened = false;
-
-    // this.comentariosControlService.vistaSelected = 'map';
   }
 
   goToAnomMap(anomalia: Anomalia) {
