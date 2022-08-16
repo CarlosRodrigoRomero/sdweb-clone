@@ -1,8 +1,9 @@
 <div class="content">
+  <button class="back-btn" mat-raised-button (click)="closeInfo()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
   <div class="top-row">
-    <button class="back-btn" mat-icon-button (click)="closeInfo()">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
     <div class="infos">
       <app-seguidor-info *ngIf="!plantaFija"></app-seguidor-info>
       <app-anomalia-info></app-anomalia-info>
