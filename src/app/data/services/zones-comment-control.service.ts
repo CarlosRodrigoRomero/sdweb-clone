@@ -19,6 +19,7 @@ import { FilterableElement } from '@core/models/filterableInterface';
 import { COLOR } from '@data/constants/color';
 
 import { Colors } from '@core/classes/colors';
+import { Select } from 'ol/interaction';
 
 @Injectable({
   providedIn: 'root',
@@ -46,7 +47,7 @@ export class ZonesCommentControlService {
             initService(true);
 
             // añadimos acciones sobre las zonas
-            // this.addSelectInteraction();
+            this.addSelectInteraction();
           }
         })
       );
@@ -97,8 +98,8 @@ export class ZonesCommentControlService {
             geometry: new Polygon(coords),
             properties: {
               // id: this.getGlobalsLabel(zona.globalCoords),
-              informeId,
-              // centroid: this.olMapService.getCentroid(coords[0]),
+              // informeId,
+              centroid: this.olMapService.getCentroid(coords[0]),
               // type: 'zone',
               // area: this.getArea(coords),
               numElems: elemsZona.length,
@@ -139,6 +140,34 @@ export class ZonesCommentControlService {
           style: this.getStyleBigZones(),
         })
       );
+    });
+  }
+
+  private addSelectInteraction() {
+    const select = new Select({
+      style: this.getSmallZonesStyle(),
+      layers: (l) => {
+        if (l.getProperties().hasOwnProperty('type') && l.getProperties().type === 'smallZones') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    this.map.addInteraction(select);
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        if (e.selected[0].getProperties().hasOwnProperty('properties')) {
+          const zoomIn = this.viewCommentsService.zoomShowAnoms;
+          if (this.currentZoom < zoomIn) {
+            const centroidZone = e.selected[0].getProperties().properties.centroid;
+
+            this.olMapService.setViewCenter(centroidZone);
+            this.olMapService.setViewZoom(zoomIn);
+          }
+        }
+      }
     });
   }
 
