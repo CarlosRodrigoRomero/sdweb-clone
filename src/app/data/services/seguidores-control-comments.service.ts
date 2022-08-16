@@ -1,27 +1,27 @@
 import { Injectable } from '@angular/core';
+
 import { Subscription } from 'rxjs';
 
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style } from 'ol/style';
 import { Feature } from 'ol';
-import Polygon from 'ol/geom/Polygon';
 
 import { OlMapService } from './ol-map.service';
 import { ViewCommentsService } from './view-comments.service';
 import { FilterService } from './filter.service';
 
-import { Anomalia } from '@core/models/anomalia';
-
 import { Colors } from '@core/classes/colors';
+import { Seguidor } from '@core/models/seguidor';
+import Polygon from 'ol/geom/Polygon';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AnomaliasControlCommentsService {
+export class SeguidoresControlCommentsService {
   private currentZoom: number;
-  public listaAnomalias: Anomalia[];
-  private anomaliaLayer: VectorLayer;
+  private seguidoresLayer: VectorLayer;
+  private listaSeguidores: Seguidor[];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -36,48 +36,47 @@ export class AnomaliasControlCommentsService {
       this.subscriptions.add(this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom)));
 
       this.subscriptions.add(
-        this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayer = layers[0]))
+        this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidoresLayer = layers[0]))
       );
 
       initService();
     });
   }
 
-  createCommentsAnomaliaLayers(): VectorLayer {
+  createCommentsSeguidoresLayers(): VectorLayer {
     const layer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleAnoms(false),
+      style: this.getStyleSegs(false),
       visible: false,
     });
     layer.setProperties({
-      type: 'anomalias',
+      type: 'seguidores',
     });
 
     return layer;
   }
 
-  mostrarAnomalias(): void {
+  mostrarSeguidores(): void {
     this.subscriptions.add(
-      this.filterService.filteredElements$.subscribe((anomalias) => {
-        this.listaAnomalias = anomalias as Anomalia[];
+      this.filterService.filteredElements$.subscribe((elems) => {
+        this.listaSeguidores = elems as Seguidor[];
 
-        // dibujamos las anomalias del informe de comentarios
-        this.dibujarAnomalias(this.listaAnomalias);
+        // dibujamos los seguidores
+        this.dibujarSeguidores(this.listaSeguidores);
       })
     );
   }
 
-  private dibujarAnomalias(anomalias: Anomalia[]) {
-    const source = this.anomaliaLayer.getSource();
+  private dibujarSeguidores(seguidores: Seguidor[]) {
+    const source = this.seguidoresLayer.getSource();
     source.clear();
-    anomalias.forEach((anom) => {
+    seguidores.forEach((seg) => {
       const feature = new Feature({
-        geometry: new Polygon([anom.featureCoords]),
+        geometry: new Polygon([seg.featureCoords]),
         properties: {
-          anomaliaId: anom.id,
-          informeId: anom.informeId,
-          type: 'anomalia',
-          checked: anom.revisada,
+          seguidorId: seg.id,
+          type: 'seguidores',
+          // checked: seg.revisada,
         },
       });
 
@@ -86,7 +85,7 @@ export class AnomaliasControlCommentsService {
   }
 
   // ESTILOS
-  getStyleAnoms(focused: boolean) {
+  getStyleSegs(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
@@ -114,9 +113,5 @@ export class AnomaliasControlCommentsService {
 
   private getColor(feature: Feature, opacity: number): string {
     return Colors.getColorComentarios(feature.getProperties().properties.checked, opacity);
-  }
-
-  resetService() {
-    this.subscriptions.unsubscribe();
   }
 }

@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ReportControlService } from './report-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { Seguidor } from '@core/models/seguidor';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,8 @@ export class ComentariosControlService {
   infoOpened$ = new BehaviorSubject<boolean>(this._infoOpened);
   private _anomaliaSelected: Anomalia = undefined;
   anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
+  private _seguidorSelected: Seguidor = undefined;
+  seguidorSelected$ = new BehaviorSubject<Seguidor>(this._seguidorSelected);
   private _dataLoaded = false;
   dataLoaded$ = new BehaviorSubject<boolean>(this._dataLoaded);
   private _tipoComentarioSelected = 'anomalia';
@@ -51,6 +54,15 @@ export class ComentariosControlService {
   set anomaliaSelected(value: Anomalia) {
     this._anomaliaSelected = value;
     this.anomaliaSelected$.next(value);
+  }
+
+  get seguidorSelected(): Seguidor {
+    return this._seguidorSelected;
+  }
+
+  set seguidorSelected(value: Seguidor) {
+    this._seguidorSelected = value;
+    this.seguidorSelected$.next(value);
   }
 
   get dataLoaded(): boolean {

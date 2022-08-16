@@ -32,6 +32,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
   private anomalias: Anomalia[];
   private anomsData: RowAnomData[];
   dataSource: MatTableDataSource<RowAnomData>;
+  plantaFija: boolean;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -48,6 +49,8 @@ export class CommentsComponent implements OnInit, OnDestroy {
     this.reportControlService.initService().then((res) => {
       this.anomaliasLoaded = res;
 
+      this.plantaFija = this.reportControlService.plantaFija;
+
       this.comentariosControlService.dataLoaded = res;
 
       this.subscriptions.add(
@@ -55,7 +58,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
           .pipe(
             switchMap((elems) => {
               this.anomalias = [];
-              if (this.reportControlService.plantaFija) {
+              if (this.plantaFija) {
                 this.anomalias = elems as Anomalia[];
               } else {
                 elems.forEach((seg) => this.anomalias.push(...(seg as Seguidor).anomaliasCliente));

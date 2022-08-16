@@ -1,56 +1,51 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
 
 import Map from 'ol/Map';
-import { Control, defaults as defaultControls } from 'ol/control.js';
-import { fromLonLat } from 'ol/proj';
-import XYZ from 'ol/source/XYZ';
 import TileLayer from 'ol/layer/Tile';
-import View from 'ol/View';
 import VectorLayer from 'ol/layer/Vector';
-import { click } from 'ol/events/condition';
-import Select from 'ol/interaction/Select';
-import { circular } from 'ol/geom/Polygon';
+import { Control, defaults as defaultControls } from 'ol/control.js';
+import { Feature, View } from 'ol';
+import { XYZ } from 'ol/source';
 import VectorSource from 'ol/source/Vector';
-import Feature from 'ol/Feature';
-import Point from 'ol/geom/Point';
+import { fromLonLat } from 'ol/proj';
+import { Select } from 'ol/interaction';
+import { click } from 'ol/events/condition';
+import { circular } from 'ol/geom/Polygon';
 
-import { ComentariosControlService } from '@data/services/comentarios-control.service';
+import { SeguidoresControlCommentsService } from '@data/services/seguidores-control-comments.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { PlantaService } from '@data/services/planta.service';
-import { ViewCommentsService } from '@data/services/view-comments.service';
-import { AnomaliasControlCommentsService } from '@data/services/anomalias-control-comments.service';
+import { ComentariosControlService } from '@data/services/comentarios-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import { FilterService } from '@data/services/filter.service';
+import { Seguidor } from '@core/models/seguidor';
+import Point from 'ol/geom/Point';
 
 @Component({
-  selector: 'app-map-comments',
-  templateUrl: './map-comments.component.html',
-  styleUrls: ['./map-comments.component.css'],
+  selector: 'app-map-seguidores-comments',
+  templateUrl: './map-seguidores-comments.component.html',
+  styleUrls: ['./map-seguidores-comments.component.css'],
 })
-export class MapCommentsComponent implements OnInit {
+export class MapSeguidoresCommentsComponent implements OnInit {
   private map: Map;
   private planta: PlantaInterface;
   private informe: InformeInterface;
-  private thermalLayer: TileLayer;
-  private anomaliaLayer: VectorLayer;
   private aerialLayer: TileLayer;
+  private seguidoresLayer: VectorLayer;
   private prevFeatureSelected: Feature;
-  thermalVisible = false;
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
-    private comentariosControlService: ComentariosControlService,
     private olMapService: OlMapService,
+    private seguidoresControlCommentsService: SeguidoresControlCommentsService,
     private reportControlService: ReportControlService,
-    private plantaService: PlantaService,
-    private viewCommentsService: ViewCommentsService,
-    private anomaliasControlCommentsService: AnomaliasControlCommentsService
+    private comentariosControlService: ComentariosControlService,
+    private filterService: FilterService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -59,72 +54,47 @@ export class MapCommentsComponent implements OnInit {
       (inf) => inf.id === this.reportControlService.selectedInformeId
     );
 
-    this.plantaService
-      .getThermalLayers$(this.planta.id)
-      .pipe(take(1))
-      .subscribe(async (thermalLayers) => {
-        // creamos las capas termica, visual y de anomalías para cada informe
-        const thermalLayerDB = thermalLayers.find((item) => item.informeId === this.informe.id);
-
-        if (thermalLayerDB !== undefined) {
-          const thermalLayer = this.olMapService.createThermalLayer(thermalLayerDB, this.informe, 0);
-
-          thermalLayer.setProperties({
-            informeId: this.informe.id,
-            visible: false,
-          });
-
-          this.olMapService.addThermalLayer(thermalLayer);
-        }
-
-        // creamos la capa de anomalías
-        this.olMapService.addAnomaliaLayer(this.anomaliasControlCommentsService.createCommentsAnomaliaLayers());
-
-        // añadimos las ortofotos aereas de cada informe
-        await this.olMapService.addAerialLayer(this.informe);
-
-        this.initMap();
-
-        this.addSelectInteraction();
-        this.addGeoLocation();
-        this.addZoomEvent();
-      });
-
-    this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayer = layers[0])));
+    // creamos la capa de seguidores
+    this.olMapService.addSeguidorLayer(this.seguidoresControlCommentsService.createCommentsSeguidoresLayers());
 
     this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayer = layers[0])));
 
+    // añadimos las ortofotos aereas de cada informe
+    await this.olMapService.addAerialLayer(this.informe);
+
     this.subscriptions.add(
-      this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayer = layers[0]))
+      this.olMapService.getSeguidorLayers().subscribe((layers) => (this.seguidoresLayer = layers[0]))
     );
 
     this.subscriptions.add(
-      this.comentariosControlService.anomaliaSelected$.subscribe((anom) => {
+      this.comentariosControlService.seguidorSelected$.subscribe((seg) => {
         if (this.prevFeatureSelected !== undefined) {
-          this.prevFeatureSelected.setStyle(this.anomaliasControlCommentsService.getStyleAnoms(false));
+          this.prevFeatureSelected.setStyle(this.seguidoresControlCommentsService.getStyleSegs(false));
         }
 
-        if (anom !== undefined) {
-          if (this.anomaliaLayer !== undefined) {
-            const anomaliaFeature = this.anomaliaLayer
+        if (seg !== undefined) {
+          if (this.seguidoresLayer !== undefined) {
+            const seguidorFeature = this.seguidoresLayer
               .getSource()
               .getFeatures()
-              .find((feature) => feature.getProperties().properties.anomaliaId === anom.id);
+              .find((feature) => feature.getProperties().properties.anomaliaId === seg.id);
 
-            if (anomaliaFeature !== undefined) {
-              anomaliaFeature.setStyle(this.anomaliasControlCommentsService.getStyleAnoms(true));
+            if (seguidorFeature !== undefined) {
+              seguidorFeature.setStyle(this.seguidoresControlCommentsService.getStyleSegs(true));
 
               // seleccionamos la anomalia para luego cambiar su estilo
-              this.prevFeatureSelected = anomaliaFeature;
+              this.prevFeatureSelected = seguidorFeature;
             }
           }
         }
       })
     );
 
-    this.subscriptions.add(
-      this.viewCommentsService.thermalLayerVisible$.subscribe((visible) => (this.thermalVisible = visible))
-    );
+    this.initMap();
+
+    this.addSelectInteraction();
+    this.addGeoLocation();
+    this.addZoomEvent();
   }
 
   private initMap() {
@@ -143,7 +113,7 @@ export class MapCommentsComponent implements OnInit {
 
     geoLocLayer.setProperties({ type: 'geoLoc' });
 
-    const layers = [satelliteLayer, this.aerialLayer, geoLocLayer, this.thermalLayer];
+    const layers = [satelliteLayer, this.aerialLayer, geoLocLayer];
 
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
@@ -159,23 +129,19 @@ export class MapCommentsComponent implements OnInit {
     );
 
     // añadimos la capa de anomalías al mapa
-    this.map.addLayer(this.anomaliaLayer);
+    this.map.addLayer(this.seguidoresLayer);
 
     // inicializamos el servicio que controla el comportamiento de las anomalias
-    this.anomaliasControlCommentsService.initService().then(() => {
-      this.anomaliasControlCommentsService.mostrarAnomalias();
+    this.seguidoresControlCommentsService.initService().then(() => {
+      this.seguidoresControlCommentsService.mostrarSeguidores();
     });
-  }
-
-  openCloseList() {
-    this.comentariosControlService.listOpened = !this.comentariosControlService.listOpened;
   }
 
   private addSelectInteraction() {
     const select = new Select({
       condition: click,
       layers: (l) => {
-        if (l.getProperties().hasOwnProperty('type') && l.getProperties().type === 'anomalias') {
+        if (l.getProperties().hasOwnProperty('type') && l.getProperties().type === 'seguidores') {
           return true;
         } else {
           return false;
@@ -183,16 +149,18 @@ export class MapCommentsComponent implements OnInit {
       },
     });
 
-    select.setProperties({ id: 'selectAnomalia' });
+    select.setProperties({ id: 'selectSeguidor' });
 
     this.map.addInteraction(select);
     select.on('select', (e) => {
       if (e.selected.length > 0) {
         if (e.selected[0].getProperties().hasOwnProperty('properties')) {
-          const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
-          const anomalia = this.reportControlService.allAnomalias.find((anom) => anom.id === anomaliaId);
+          const seguidorId = e.selected[0].getProperties().properties.seguidorId;
+          const seguidor = this.filterService.filteredElements.find(
+            (seg) => (seg as Seguidor).id === seguidorId
+          ) as Seguidor;
 
-          this.comentariosControlService.anomaliaSelected = anomalia;
+          this.comentariosControlService.seguidorSelected = seguidor;
 
           this.comentariosControlService.infoOpened = true;
         }
@@ -257,14 +225,14 @@ export class MapCommentsComponent implements OnInit {
         .getLayers()
         .getArray()
         .forEach((layer) => {
-          if (layer.getProperties().type === 'smallZones' || layer.getProperties().type === 'anomalias') {
+          if (layer.getProperties().type === 'smallZones' || layer.getProperties().type === 'seguidores') {
             (layer as VectorLayer).getSource().changed();
           }
         });
     });
   }
 
-  setThermalVisibility() {
-    this.viewCommentsService.thermalLayerVisible = !this.viewCommentsService.thermalLayerVisible;
+  openCloseList() {
+    this.comentariosControlService.listOpened = !this.comentariosControlService.listOpened;
   }
 }

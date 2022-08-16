@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
+import { ReportControlService } from '@data/services/report-control.service';
 
 @Component({
   selector: 'app-anomalia-content',
@@ -8,9 +9,16 @@ import { ComentariosControlService } from '@data/services/comentarios-control.se
   styleUrls: ['./anomalia-content.component.css'],
 })
 export class AnomaliaContentComponent implements OnInit {
-  constructor(private comentariosControlService: ComentariosControlService) {}
+  plantaFija: boolean;
 
-  ngOnInit(): void {}
+  constructor(
+    private comentariosControlService: ComentariosControlService,
+    private reportControlService: ReportControlService
+  ) {}
+
+  ngOnInit(): void {
+    this.plantaFija = this.reportControlService.plantaFija;
+  }
 
   closeInfo() {
     this.comentariosControlService.infoOpened = false;
