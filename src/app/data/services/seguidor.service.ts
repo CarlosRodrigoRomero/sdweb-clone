@@ -109,14 +109,16 @@ export class SeguidorService {
                 // tslint:disable-next-line: triple-equals
                 .find((locA) => locA.globalCoords[0] == areaSeg.globalCoords[0]);
 
-              let modulo;
+              let modulo = null;
               if (zonaModulo !== undefined) {
                 modulo = zonaModulo.modulo;
               } else {
                 const anomaliaConModulo = anomaliasSeguidor.find(
                   (anom) => anom.modulo !== null && anom.modulo !== undefined
                 );
-                modulo = anomaliaConModulo.modulo;
+                if (anomaliaConModulo !== undefined) {
+                  modulo = anomaliaConModulo.modulo;
+                }
                 // modulo = this.getSeguidorModule(locAreaList);
               }
 
