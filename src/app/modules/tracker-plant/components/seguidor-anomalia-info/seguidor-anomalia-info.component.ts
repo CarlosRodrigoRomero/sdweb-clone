@@ -24,6 +24,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
   anomaliaSelected: Anomalia = undefined;
   anomaliaInfo = {};
   isAdmin = false;
+  showComments = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -50,6 +51,11 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
           this.anomaliaSelected = anom;
 
           if (this.anomaliaSelected !== undefined) {
+            let numComentarios = null;
+            if (this.anomaliaSelected.hasOwnProperty('comentarios') && this.anomaliaSelected.comentarios.length > 0) {
+              numComentarios = this.anomaliaSelected.comentarios.length;
+            }
+
             this.anomaliaInfo = {
               numAnom: this.anomaliaSelected.numAnom,
               clase: GLOBAL.labels_clase[this.anomaliaSelected.clase],
@@ -70,6 +76,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
               viento: (this.anomaliaSelected as PcInterface).viento,
               temperaturaAire: (this.anomaliaSelected as PcInterface).temperaturaAire,
               nubosidad: (this.anomaliaSelected as PcInterface).nubosidad,
+              numComentarios,
             };
           }
         })
@@ -94,6 +101,10 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
     }
     // actualizamos en la DB
     this.pcService.updatePc(this.anomaliaSelected as PcInterface);
+  }
+
+  showHideComments() {
+    this.showComments = !this.showComments;
   }
 
   ngOnDestroy(): void {
