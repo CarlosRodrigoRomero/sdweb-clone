@@ -56,13 +56,13 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
         // cambiammos la ultima columna con la vista seleccionada
         switch (this.viewSeleccionada) {
           case 0:
-            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'mae'];
+            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'mae', 'comentarios'];
             break;
           case 1:
-            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'celsCalientes'];
+            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'celsCalientes', 'comentarios'];
             break;
           case 2:
-            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'gradiente'];
+            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'gradiente', 'comentarios'];
             break;
         }
       })
@@ -85,6 +85,16 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
             .forEach((elem) => {
               const seguidor = elem as Seguidor;
 
+              let numComentarios = null;
+              if (seguidor.anomaliasCliente.length > 0) {
+                const anomWithComs = seguidor.anomaliasCliente.filter(
+                  (anom) => anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0
+                );
+                if (anomWithComs.length > 0) {
+                  numComentarios = anomWithComs.reduce((acc, anom) => acc + anom.comentarios.length, 0);
+                }
+              }
+
               filteredElements.push({
                 nombre: seguidor.nombre,
                 numAnomalias: seguidor.anomaliasCliente.length,
@@ -94,6 +104,7 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
                 gradiente: seguidor.gradienteNormalizado,
                 colors: this.getColorsViewSeguidor(seguidor),
                 seguidor,
+                numComentarios,
               });
             });
 
