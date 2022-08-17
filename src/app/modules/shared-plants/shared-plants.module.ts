@@ -16,6 +16,8 @@ import { SliderTemporalComponent } from './components/slider-temporal/slider-tem
 import { ViewControlComponent } from './components/view-control/view-control.component';
 import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
 import { LeyendaComponent } from './components/leyenda/leyenda.component';
+import { CommentsComponent } from './components/comments/comments.component';
+import { CommentComponent } from './components/comment/comment.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +34,8 @@ import { LeyendaComponent } from './components/leyenda/leyenda.component';
     ViewControlComponent,
     ViewToggleComponent,
     LeyendaComponent,
+    CommentsComponent,
+    CommentComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -45,6 +49,7 @@ import { LeyendaComponent } from './components/leyenda/leyenda.component';
     ViewControlComponent,
     ViewToggleComponent,
     LeyendaComponent,
+    CommentsComponent,
   ],
 })
 export class SharedPlantsModule {}

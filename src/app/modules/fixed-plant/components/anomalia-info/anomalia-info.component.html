@@ -140,52 +140,9 @@
             </div>
           </div>
         </mat-tab>
-        <mat-tab label="Módulo" *ngIf="seccionModulo">
-          <div class="tab-content">
-            <div class="elemento" *ngIf="infoAdicional.modulo.marcaModulo">
-              <span class="titulo">Marca módulo</span>
-              <span class="subtitulo">{{ infoAdicional.modulo.marcaModulo }}</span>
-            </div>
-            <div class="elemento" *ngIf="infoAdicional.modulo.modeloModulo">
-              <span class="titulo">Modelo módulo</span>
-              <span class="subtitulo">{{ infoAdicional.modulo.modeloModulo }}</span>
-            </div>
-            <!-- <div class="elemento" *ngIf="infoAdicional.modulo.tipoPanelModulo !== undefined">
-            <span class="titulo">Tipo de panel</span>
-            <span class="subtitulo">{{ infoAdicional.modulo.tipoPanelModulo }}</span>
-          </div> -->
-            <div class="elemento" *ngIf="infoAdicional.modulo.potencia">
-              <span class="titulo">Potencia</span>
-              <span class="subtitulo">{{ infoAdicional.modulo.potencia }} W</span>
-            </div>
-          </div>
-        </mat-tab>
-        <mat-tab label="Imagen" *ngIf="seccionImagen">
-          <div class="tab-content">
-            <!-- <div class="elemento">
-              <span class="titulo">Descargar RJPG</span>
-              <span class="subtitulo">
-                <a mat-button class="link-descarga" (click)="downloadRjpg(anomaliaSelect)"> descarga </a>
-              </span>
-            </div> -->
-            <!-- <div class="elemento">
-              <span class="titulo">Imagen Térmica</span> -->
-            <!-- <span class="subtitulo">{{ infoAdicional.imagen.urlImagenIR }}</span> -->
-            <!-- <a mat-button href="https://www.google.com/">Url imagen térmica</a>
-            </div> -->
-            <!-- <div class="elemento">
-              <span class="titulo">Imagen RGB</span> -->
-            <!-- <span class="subtitulo">{{ infoAdicional.imagen.urlImagenRGB }}</span> -->
-            <!--  <a mat-button href="https://www.google.com/">Url imagen RGB</a>
-            </div> -->
-            <div class="elemento" *ngIf="infoAdicional.imagen.camaraNombre">
-              <span class="titulo">Cámara</span>
-              <span class="subtitulo">{{ infoAdicional.imagen.camaraNombre }}</span>
-            </div>
-            <div class="elemento" *ngIf="infoAdicional.imagen.camaraSN">
-              <span class="titulo">S/N Cámara</span>
-              <span class="subtitulo">{{ infoAdicional.imagen.camaraSN }}</span>
-            </div>
+        <mat-tab label="OyM">
+          <div class="tab-comments">
+            <app-comments [anomalia]="anomaliaSelect"></app-comments>
           </div>
         </mat-tab>
       </mat-tab-group>

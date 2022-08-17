@@ -1,0 +1,29 @@
+.card {
+  padding: 0.5rem;
+}
+
+.delete {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.delete button {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+}
+
+.delete mat-icon {
+  font-size: 20px;
+}
+
+.date {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.date span {
+  font-size: 10px;
+}

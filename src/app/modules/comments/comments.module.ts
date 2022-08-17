@@ -19,7 +19,22 @@ import { MapSeguidoresCommentsComponent } from './components/map-seguidores-comm
 import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
 
 @NgModule({
-  declarations: [CommentsComponent, AnomaliasListComponent, AnomaliaContentComponent, AnomaliaInfoComponent, CommentsAreaComponent, NewCommentComponent, CommentComponent, CommentsListComponent, MapCommentsComponent, ZonesCommentsComponent, MapViewControlComponent, MapSeguidoresCommentsComponent, SeguidorInfoComponent],
+  declarations: [
+    CommentsComponent,
+    AnomaliasListComponent,
+    AnomaliaContentComponent,
+    AnomaliaInfoComponent,
+    CommentsAreaComponent,
+    NewCommentComponent,
+    CommentComponent,
+    CommentsListComponent,
+    MapCommentsComponent,
+    ZonesCommentsComponent,
+    MapViewControlComponent,
+    MapSeguidoresCommentsComponent,
+    SeguidorInfoComponent,
+  ],
   imports: [CommonModule, CommentsRoutingModule, SharedModule],
+  exports: [CommentsAreaComponent],
 })
 export class CommentsModule {}
