@@ -4,16 +4,12 @@ import { DatePipe } from '@angular/common';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
-import { FilterService } from '@data/services/filter.service';
-import { ComentariosService } from '@data/services/comentarios.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
-import { Seguidor } from '@core/models/seguidor';
 
 import { RowAnomData } from './anomalias-list/anomalias-list.component';
 
@@ -29,7 +25,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
   listOpened = true;
   infoOpened = false;
   vistaSelected: string;
-  private anomalias: Anomalia[];
   private anomsData: RowAnomData[];
   dataSource: MatTableDataSource<RowAnomData>;
   plantaFija: boolean;
@@ -39,8 +34,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private comentariosControlService: ComentariosControlService,
-    private filterService: FilterService,
-    private comentariosService: ComentariosService,
     private datePipe: DatePipe,
     private anomaliaInfoService: AnomaliaInfoService
   ) {}
@@ -89,6 +82,8 @@ export class CommentsComponent implements OnInit, OnDestroy {
           });
 
           this.dataSource = new MatTableDataSource(this.anomsData);
+
+          this.dataSource.filterPredicate = (data, filter: string): boolean => data.localizacion.includes(filter);
         });
       });
     });
