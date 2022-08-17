@@ -8,6 +8,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ViewCommentsService } from '@data/services/view-comments.service';
+import { PcService } from '@data/services/pc.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -42,8 +43,8 @@ export class AnomaliaInfoComponent implements OnInit, OnDestroy {
     private anomaliaInfoService: AnomaliaInfoService,
     private reportControlService: ReportControlService,
     private olMapService: OlMapService,
-    private anomaliasControlService: AnomaliasControlService,
-    private vbiewCommentsService: ViewCommentsService
+    private vbiewCommentsService: ViewCommentsService,
+    private pcService: PcService
   ) {
     this.buildForm();
   }
@@ -90,7 +91,11 @@ export class AnomaliaInfoComponent implements OnInit, OnDestroy {
     event.preventDefault();
     if (this.form.valid) {
       if (this.form.get('numeroSerie').value !== null) {
-        this.updateAnomalia(this.form.get('numeroSerie').value, 'numeroSerie');
+        if (this.reportControlService.plantaFija) {
+          this.updateAnomalia(this.form.get('numeroSerie').value, 'numeroSerie');
+        } else {
+          this.updatePc(this.form.get('numeroSerie').value, 'numeroSerie');
+        }
 
         // volvemos el input a no editable
         this.editInput = false;
@@ -103,6 +108,13 @@ export class AnomaliaInfoComponent implements OnInit, OnDestroy {
     this.anomaliaSelected[field] = value;
     // la actualizamos en la DB
     this.anomaliaService.updateAnomaliaField(this.anomaliaSelected.id, field, value);
+  }
+
+  updatePc(value: any, field: string) {
+    // la actualizamos en la anomalía local
+    this.anomaliaSelected[field] = value;
+    // la actualizamos en la DB
+    this.pcService.updatePcField(this.anomaliaSelected.id, field, value);
   }
 
   goToAnomMap() {
