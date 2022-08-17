@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject } from 'rxjs';
-
-import { ReportControlService } from './report-control.service';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
+import { switchMap } from 'rxjs/operators';
+import { FilterService } from './filter.service';
+import { ReportControlService } from './report-control.service';
+import { ComentariosService } from './comentarios.service';
 
 @Injectable({
   providedIn: 'root',
@@ -29,8 +31,65 @@ export class ComentariosControlService {
   private _vistaSelected = 'list';
   vistaSelected$ = new BehaviorSubject<string>(this._vistaSelected);
   tiposComentarios = ['anomalia', 'iv'];
+  private _anomalias: Anomalia[] = [];
+  anomalias$ = new BehaviorSubject<Anomalia[]>(this._anomalias);
+  private _seguidores: Seguidor[] = [];
+  seguidores$ = new BehaviorSubject<Seguidor[]>(this._seguidores);
 
-  constructor(private reportControlService: ReportControlService) {}
+  private subscriptions: Subscription = new Subscription();
+
+  constructor(
+    private filterService: FilterService,
+    private reportControlService: ReportControlService,
+    private comentariosService: ComentariosService
+  ) {}
+
+  initService(): Promise<void> {
+    return new Promise((initService) => {
+      this.subscriptions.add(
+        this.filterService.filteredElements$
+          .pipe(
+            switchMap((elems) => {
+              this.anomalias = [];
+              if (this.reportControlService.plantaFija) {
+                this.anomalias = elems as Anomalia[];
+              } else {
+                this.seguidores = elems.filter((elem) => (elem as Seguidor).anomaliasCliente.length > 0) as Seguidor[];
+
+                elems.forEach((seg) => this.anomalias.push(...(seg as Seguidor).anomaliasCliente));
+              }
+
+              this.anomaliaSelected = this.anomalias[0];
+
+              return this.comentariosService.getComentariosInforme(this.anomalias[0].informeId);
+            })
+          )
+          .subscribe((comentarios) => {
+            if (this.reportControlService.plantaFija) {
+              const anomalias = this.anomalias;
+              anomalias.forEach((anom) => {
+                const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
+
+                anom.comentarios = comentariosAnom;
+              });
+              this.anomalias = anomalias;
+            } else {
+              const seguidores = this.seguidores;
+              seguidores.map((seg) => {
+                seg.anomaliasCliente.forEach((anom) => {
+                  const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
+
+                  anom.comentarios = comentariosAnom;
+                });
+              });
+              this.seguidores = seguidores;
+            }
+
+            initService();
+          })
+      );
+    });
+  }
 
   get listOpened(): boolean {
     return this._listOpened;
@@ -102,5 +161,23 @@ export class ComentariosControlService {
   set vistaSelected(value: string) {
     this._vistaSelected = value;
     this.vistaSelected$.next(value);
+  }
+
+  get anomalias(): Anomalia[] {
+    return this._anomalias;
+  }
+
+  set anomalias(value: Anomalia[]) {
+    this._anomalias = value;
+    this.anomalias$.next(value);
+  }
+
+  get seguidores(): Seguidor[] {
+    return this._seguidores;
+  }
+
+  set seguidores(value: Seguidor[]) {
+    this._seguidores = value;
+    this.seguidores$.next(value);
   }
 }

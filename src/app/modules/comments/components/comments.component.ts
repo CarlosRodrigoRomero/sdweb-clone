@@ -53,35 +53,20 @@ export class CommentsComponent implements OnInit, OnDestroy {
 
       this.comentariosControlService.dataLoaded = res;
 
-      this.subscriptions.add(
-        this.filterService.filteredElements$
-          .pipe(
-            switchMap((elems) => {
-              this.anomalias = [];
-              if (this.plantaFija) {
-                this.anomalias = elems as Anomalia[];
-              } else {
-                elems.forEach((seg) => this.anomalias.push(...(seg as Seguidor).anomaliasCliente));
-              }
-
-              this.comentariosControlService.anomaliaSelected = this.anomalias[0];
-
-              return this.comentariosService.getComentariosInforme(this.anomalias[0].informeId);
-            })
-          )
-          .subscribe((comentarios) => {
-            this.anomsData = [];
-            this.anomalias.forEach((anom) => {
-              const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
-              let fechaUltCom = null;
-              let horaUltCom = null;
-              if (comentariosAnom.length > 0) {
-                const ultimoComentario = comentariosAnom.sort((a, b) => b.datetime - a.datetime)[0];
+      this.comentariosControlService.initService().then(() => {
+        this.comentariosControlService.anomalias$.subscribe((anomalias) => {
+          this.anomsData = [];
+          anomalias.forEach((anom) => {
+            let fechaUltCom = null;
+            let horaUltCom = null;
+            if (anom.hasOwnProperty('comentarios')) {
+              if (anom.comentarios.length > 0) {
+                const ultimoComentario = anom.comentarios.sort((a, b) => b.datetime - a.datetime)[0];
                 fechaUltCom = this.datePipe.transform(ultimoComentario.datetime, 'dd/MM/yyyy');
                 horaUltCom = this.datePipe.transform(ultimoComentario.datetime, 'HH:mm');
               }
 
-              let numComs = comentariosAnom.length;
+              let numComs = anom.comentarios.length;
               if (numComs === 0) {
                 numComs = null;
               }
@@ -100,11 +85,12 @@ export class CommentsComponent implements OnInit, OnDestroy {
                 horaUltCom,
                 anomalia: anom,
               });
-            });
+            }
+          });
 
-            this.dataSource = new MatTableDataSource(this.anomsData);
-          })
-      );
+          this.dataSource = new MatTableDataSource(this.anomsData);
+        });
+      });
     });
 
     this.subscriptions.add(

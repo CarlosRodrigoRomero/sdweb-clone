@@ -4,12 +4,13 @@ import { Subscription } from 'rxjs';
 
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Feature } from 'ol';
 
 import { OlMapService } from './ol-map.service';
 import { ViewCommentsService } from './view-comments.service';
 import { FilterService } from './filter.service';
+import { ComentariosControlService } from './comentarios-control.service';
 
 import { Colors } from '@core/classes/colors';
 import { Seguidor } from '@core/models/seguidor';
@@ -28,7 +29,8 @@ export class SeguidoresControlCommentsService {
   constructor(
     private olMapService: OlMapService,
     private viewCommentsService: ViewCommentsService,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private comentariosControlService: ComentariosControlService
   ) {}
 
   initService(): Promise<void> {
@@ -58,8 +60,8 @@ export class SeguidoresControlCommentsService {
 
   mostrarSeguidores(): void {
     this.subscriptions.add(
-      this.filterService.filteredElements$.subscribe((elems) => {
-        this.listaSeguidores = elems as Seguidor[];
+      this.comentariosControlService.seguidores$.subscribe((segs) => {
+        this.listaSeguidores = segs;
 
         // dibujamos los seguidores
         this.dibujarSeguidores(this.listaSeguidores);
@@ -71,16 +73,24 @@ export class SeguidoresControlCommentsService {
     const source = this.seguidoresLayer.getSource();
     source.clear();
     seguidores.forEach((seg) => {
-      const feature = new Feature({
-        geometry: new Polygon([seg.featureCoords]),
-        properties: {
-          seguidorId: seg.id,
-          type: 'seguidores',
-          // checked: seg.revisada,
-        },
-      });
+      // solo añadimos los que tienen anomalías
+      if (seg.anomaliasCliente.length > 0) {
+        const anomsChecked = seg.anomaliasCliente.filter(
+          (anom) => anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0
+        );
 
-      source.addFeature(feature);
+        const feature = new Feature({
+          geometry: new Polygon([seg.featureCoords]),
+          properties: {
+            seguidorId: seg.id,
+            type: 'seguidores',
+            checked: anomsChecked.length === seg.anomaliasCliente.length,
+            label: seg.nombre + '\n' + anomsChecked.length + '/' + seg.anomaliasCliente.length,
+          },
+        });
+
+        source.addFeature(feature);
+      }
     });
   }
 
@@ -106,6 +116,7 @@ export class SeguidoresControlCommentsService {
                 ? 'rgba(0,0,0,0)'
                 : this.getColor(feature, 0.9),
           }),
+          text: this.getLabelSegStyle(feature),
         });
       }
     };
@@ -113,5 +124,19 @@ export class SeguidoresControlCommentsService {
 
   private getColor(feature: Feature, opacity: number): string {
     return Colors.getColorComentarios(feature.getProperties().properties.checked, opacity);
+  }
+
+  private getLabelSegStyle(feature: Feature) {
+    return new Text({
+      text: feature.getProperties().properties.label,
+      font: 'bold 14px Roboto',
+      fill: new Fill({
+        color: 'black',
+      }),
+      stroke: new Stroke({
+        color: 'white',
+        width: 4,
+      }),
+    });
   }
 }

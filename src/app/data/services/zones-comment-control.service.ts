@@ -7,6 +7,7 @@ import Polygon from 'ol/geom/Polygon';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
+import { Select } from 'ol/interaction';
 
 import { OlMapService } from './ol-map.service';
 import { FilterService } from './filter.service';
@@ -18,7 +19,6 @@ import { LocationAreaInterface } from '@core/models/location';
 import { FilterableElement } from '@core/models/filterableInterface';
 
 import { Colors } from '@core/classes/colors';
-import { Select } from 'ol/interaction';
 
 @Injectable({
   providedIn: 'root',

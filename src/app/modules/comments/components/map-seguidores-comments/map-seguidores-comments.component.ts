@@ -120,6 +120,7 @@ export class MapSeguidoresCommentsComponent implements OnInit {
       zoom: this.planta.zoom,
       minZoom: this.planta.zoom - 2,
       maxZoom: 24,
+      enableRotation: false,
     });
 
     this.subscriptions.add(

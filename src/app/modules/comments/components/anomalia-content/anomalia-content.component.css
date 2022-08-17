@@ -3,7 +3,6 @@
   height: calc(100vh - 86px);
   display: grid;
   grid-template-rows: min-content auto;
-  gap: 1rem;
   overflow: hidden;
 }
 

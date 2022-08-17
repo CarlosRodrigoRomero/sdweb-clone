@@ -77,7 +77,7 @@ export class AnomaliasControlCommentsService {
           anomaliaId: anom.id,
           informeId: anom.informeId,
           type: 'anomalia',
-          checked: anom.revisada,
+          checked: anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0,
         },
       });
 
@@ -117,7 +117,8 @@ export class AnomaliasControlCommentsService {
   }
 
   getExternalColor(anomalia: Anomalia, opacity: number): string {
-    return Colors.getColorComentarios(anomalia.revisada, opacity);
+    const anomChecked = anomalia.hasOwnProperty('comentarios') && anomalia.comentarios.length > 0;
+    return Colors.getColorComentarios(anomChecked, opacity);
   }
 
   resetService() {

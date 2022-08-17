@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
@@ -7,8 +7,12 @@ import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
+import { ViewCommentsService } from '@data/services/view-comments.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { Seguidor } from '@core/models/seguidor';
+import { Subscription } from 'rxjs';
+import { Coordinate } from 'ol/coordinate';
 
 interface AnomaliaInfo {
   numAnom: number;
@@ -21,12 +25,15 @@ interface AnomaliaInfo {
   templateUrl: './anomalia-info.component.html',
   styleUrls: ['./anomalia-info.component.css'],
 })
-export class AnomaliaInfoComponent implements OnInit {
+export class AnomaliaInfoComponent implements OnInit, OnDestroy {
   anomaliaSelected: Anomalia;
   anomaliaInfo: AnomaliaInfo = undefined;
   editInput = false;
   form: FormGroup;
   localizacion: string;
+  seguidorSelected: Seguidor;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private comentariosControlService: ComentariosControlService,
@@ -35,35 +42,42 @@ export class AnomaliaInfoComponent implements OnInit {
     private anomaliaInfoService: AnomaliaInfoService,
     private reportControlService: ReportControlService,
     private olMapService: OlMapService,
-    private anomaliasControlService: AnomaliasControlService
+    private anomaliasControlService: AnomaliasControlService,
+    private vbiewCommentsService: ViewCommentsService
   ) {
     this.buildForm();
   }
 
   ngOnInit(): void {
-    this.comentariosControlService.anomaliaSelected$.subscribe((anom) => {
-      this.anomaliaSelected = anom;
+    this.subscriptions.add(
+      this.comentariosControlService.anomaliaSelected$.subscribe((anom) => {
+        this.anomaliaSelected = anom;
 
-      // volvemos el input no editable al cambiar de anomalía
-      this.editInput = false;
+        // volvemos el input no editable al cambiar de anomalía
+        this.editInput = false;
 
-      if (this.anomaliaSelected !== undefined) {
-        this.anomaliaInfo = {
-          numAnom: this.anomaliaSelected.numAnom,
-          localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(
-            this.anomaliaSelected,
-            this.reportControlService.planta
-          ),
-          tipo: this.anomaliaInfoService.getTipoLabel(this.anomaliaSelected),
-        };
+        if (this.anomaliaSelected !== undefined) {
+          this.anomaliaInfo = {
+            numAnom: this.anomaliaSelected.numAnom,
+            localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(
+              this.anomaliaSelected,
+              this.reportControlService.planta
+            ),
+            tipo: this.anomaliaInfoService.getTipoLabel(this.anomaliaSelected),
+          };
 
-        if (this.anomaliaSelected.hasOwnProperty('numeroSerie')) {
-          this.form.patchValue({ numeroSerie: this.anomaliaSelected.numeroSerie });
-        } else {
-          this.form.patchValue({ numeroSerie: null });
+          if (this.anomaliaSelected.hasOwnProperty('numeroSerie')) {
+            this.form.patchValue({ numeroSerie: this.anomaliaSelected.numeroSerie });
+          } else {
+            this.form.patchValue({ numeroSerie: null });
+          }
         }
-      }
-    });
+      })
+    );
+
+    this.subscriptions.add(
+      this.comentariosControlService.seguidorSelected$.subscribe((seguidor) => (this.seguidorSelected = seguidor))
+    );
   }
 
   private buildForm() {
@@ -92,10 +106,24 @@ export class AnomaliaInfoComponent implements OnInit {
   }
 
   goToAnomMap() {
-    this.olMapService.setViewCenter(this.anomaliaSelected.featureCoords[0]);
-    this.olMapService.setViewZoom(this.anomaliasControlService.zoomChangeView);
+    let coords: Coordinate;
+    let zoom: number;
+    if (this.reportControlService.plantaFija) {
+      coords = this.anomaliaSelected.featureCoords[0];
+      zoom = this.vbiewCommentsService.zoomChangeAnomsView;
+    } else {
+      coords = this.seguidorSelected.featureCoords[0];
+      zoom = this.vbiewCommentsService.zoomShowAnoms;
+    }
+
+    this.olMapService.setViewCenter(coords);
+    this.olMapService.setViewZoom(zoom);
 
     this.comentariosControlService.infoOpened = false;
     this.comentariosControlService.listOpened = false;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
