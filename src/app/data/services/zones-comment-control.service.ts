@@ -14,11 +14,14 @@ import { FilterService } from './filter.service';
 import { ZonesControlService } from './zones-control.service';
 import { ViewCommentsService } from './view-comments.service';
 import { ReportControlService } from './report-control.service';
+import { ComentariosControlService } from './comentarios-control.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { FilterableElement } from '@core/models/filterableInterface';
 
 import { Colors } from '@core/classes/colors';
+import { Anomalia } from '@core/models/anomalia';
+import { Seguidor } from '@core/models/seguidor';
 
 @Injectable({
   providedIn: 'root',
@@ -34,7 +37,8 @@ export class ZonesCommentControlService {
     private filterService: FilterService,
     private zonesControlService: ZonesControlService,
     private viewCommentsService: ViewCommentsService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private comentariosControlService: ComentariosControlService
   ) {}
 
   initService(): Promise<boolean> {
@@ -71,11 +75,15 @@ export class ZonesCommentControlService {
   }
 
   mostrarSmallZones(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
-    this.subscriptions.add(
-      this.filterService.filteredElements$.subscribe((elems) => {
-        this.addSmallZones(zonas, layers, elems);
-      })
-    );
+    if (this.reportControlService.plantaFija) {
+      this.subscriptions.add(
+        this.comentariosControlService.anomalias$.subscribe((anoms) => this.addSmallZones(zonas, layers, anoms))
+      );
+    } else {
+      this.subscriptions.add(
+        this.comentariosControlService.seguidores$.subscribe((segs) => this.addSmallZones(zonas, layers, segs))
+      );
+    }
   }
 
   private addSmallZones(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
@@ -88,7 +96,22 @@ export class ZonesCommentControlService {
 
         // solo añadimos las zonas con anomalias
         if (elemsZona.length > 0) {
-          const elemsChecked = elemsZona.filter((elem) => elem.checked);
+          let elemsChecked;
+          if (this.reportControlService.plantaFija) {
+            const anomsZona = elemsZona as Anomalia[];
+            elemsChecked = anomsZona.filter(
+              (anom) => anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0
+            );
+          } else {
+            const segsZona = elemsZona as Seguidor[];
+            elemsChecked = segsZona.filter((seg) => {
+              const anomsChecked = seg.anomaliasCliente.filter(
+                (anom) => anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0
+              );
+
+              return anomsChecked.length === seg.anomaliasCliente.length;
+            });
+          }
 
           const coords = this.zonesControlService.pathToLonLat(zona.path);
 

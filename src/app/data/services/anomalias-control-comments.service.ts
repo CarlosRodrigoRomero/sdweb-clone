@@ -9,7 +9,7 @@ import Polygon from 'ol/geom/Polygon';
 
 import { OlMapService } from './ol-map.service';
 import { ViewCommentsService } from './view-comments.service';
-import { FilterService } from './filter.service';
+import { ComentariosControlService } from './comentarios-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -28,7 +28,7 @@ export class AnomaliasControlCommentsService {
   constructor(
     private olMapService: OlMapService,
     private viewCommentsService: ViewCommentsService,
-    private filterService: FilterService
+    private comentariosControlService: ComentariosControlService
   ) {}
 
   initService(): Promise<void> {
@@ -58,7 +58,7 @@ export class AnomaliasControlCommentsService {
 
   mostrarAnomalias(): void {
     this.subscriptions.add(
-      this.filterService.filteredElements$.subscribe((anomalias) => {
+      this.comentariosControlService.anomalias$.subscribe((anomalias) => {
         this.listaAnomalias = anomalias as Anomalia[];
 
         // dibujamos las anomalias del informe de comentarios

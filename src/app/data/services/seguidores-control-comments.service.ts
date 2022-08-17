@@ -9,7 +9,6 @@ import { Feature } from 'ol';
 
 import { OlMapService } from './ol-map.service';
 import { ViewCommentsService } from './view-comments.service';
-import { FilterService } from './filter.service';
 import { ComentariosControlService } from './comentarios-control.service';
 
 import { Colors } from '@core/classes/colors';
@@ -29,7 +28,6 @@ export class SeguidoresControlCommentsService {
   constructor(
     private olMapService: OlMapService,
     private viewCommentsService: ViewCommentsService,
-    private filterService: FilterService,
     private comentariosControlService: ComentariosControlService
   ) {}
 
@@ -101,18 +99,18 @@ export class SeguidoresControlCommentsService {
         return new Style({
           stroke: new Stroke({
             color:
-              this.currentZoom >= this.viewCommentsService.zoomChangeAnomsView
+              this.currentZoom >= this.viewCommentsService.zoomChangeSegsView
                 ? focused
                   ? 'white'
                   : this.getColor(feature, 1)
                 : focused
                 ? 'white'
                 : 'black',
-            width: this.currentZoom >= this.viewCommentsService.zoomChangeAnomsView ? 4 : focused ? 2 : 1,
+            width: this.currentZoom >= this.viewCommentsService.zoomChangeSegsView ? 4 : focused ? 2 : 1,
           }),
           fill: new Fill({
             color:
-              this.currentZoom >= this.viewCommentsService.zoomChangeAnomsView
+              this.currentZoom >= this.viewCommentsService.zoomChangeSegsView
                 ? 'rgba(0,0,0,0)'
                 : this.getColor(feature, 0.9),
           }),

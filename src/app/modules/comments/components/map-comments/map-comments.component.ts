@@ -151,7 +151,6 @@ export class MapCommentsComponent implements OnInit {
       minZoom: this.planta.zoom - 2,
       maxZoom: 24,
       enableRotation: false,
-
     });
 
     this.subscriptions.add(
