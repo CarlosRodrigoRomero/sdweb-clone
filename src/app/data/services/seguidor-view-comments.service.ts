@@ -24,7 +24,7 @@ export class SeguidorViewCommentsService {
   visualCanvas: any;
   thermalCanvas: any;
   anomsCanvas: any;
-  imagesWidth = 320;
+  imagesWidth = 400;
   imagesHeight = this.imagesWidth / 1.25;
 
   constructor(private storage: AngularFireStorage) {}
@@ -87,8 +87,11 @@ export class SeguidorViewCommentsService {
   }
 
   setImagesWidthAndHeight(): void {
-    this.imagesWidth = window.innerWidth - 16;
-    this.imagesHeight = this.imagesWidth / 1.25;
+    const width = window.innerWidth - 16;
+    if (width < this.imagesWidth) {
+      this.imagesWidth = width;
+      this.imagesHeight = this.imagesWidth / 1.25;
+    }
   }
 
   get thermalImageExist() {

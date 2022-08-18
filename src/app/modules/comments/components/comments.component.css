@@ -34,7 +34,8 @@
   display: flex;
   padding: 0.5rem;
   width: fit-content;
-  max-width: 450px;
+  max-width: 416px;
+  width: 416px;
 }
 
 app-thermal-slider {
