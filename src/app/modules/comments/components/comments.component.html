@@ -2,15 +2,7 @@
 <div *ngIf="anomaliasLoaded">
   <div class="content">
     <mat-sidenav-container class="main-container" [hasBackdrop]="false">
-      <mat-sidenav
-        #sidenavLista
-        [(opened)]="listOpened"
-        mode="over"
-        [fixedInViewport]="true"
-        class="list-sidenav"
-        [fixedTopGap]="70"
-        position="start"
-      >
+      <mat-sidenav #sidenavLista [(opened)]="listOpened" mode="over" class="list-sidenav" position="start">
         <app-anomalias-list
           [anomalias]="anomalias"
           [dataSource]="dataSource"
@@ -18,15 +10,7 @@
         ></app-anomalias-list>
       </mat-sidenav>
 
-      <mat-sidenav
-        #sidenavInfo
-        [(opened)]="infoOpened"
-        mode="over"
-        [fixedInViewport]="true"
-        class="list-sidenav"
-        [fixedTopGap]="70"
-        position="end"
-      >
+      <mat-sidenav #sidenavInfo [(opened)]="infoOpened" mode="over" class="list-sidenav" position="end">
         <app-anomalia-content></app-anomalia-content>
       </mat-sidenav>
 
