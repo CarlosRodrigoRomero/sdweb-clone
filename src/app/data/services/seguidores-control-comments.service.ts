@@ -6,6 +6,7 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Feature } from 'ol';
+import Polygon from 'ol/geom/Polygon';
 
 import { OlMapService } from './ol-map.service';
 import { ViewCommentsService } from './view-comments.service';
@@ -13,7 +14,6 @@ import { ComentariosControlService } from './comentarios-control.service';
 
 import { Colors } from '@core/classes/colors';
 import { Seguidor } from '@core/models/seguidor';
-import Polygon from 'ol/geom/Polygon';
 
 @Injectable({
   providedIn: 'root',

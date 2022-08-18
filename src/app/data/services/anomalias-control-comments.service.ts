@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Feature } from 'ol';
 import Polygon from 'ol/geom/Polygon';
 
@@ -78,6 +78,7 @@ export class AnomaliasControlCommentsService {
           informeId: anom.informeId,
           type: 'anomalia',
           checked: anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0,
+          label: anom.localX + '/' + anom.localY,
         },
       });
 
@@ -107,6 +108,7 @@ export class AnomaliasControlCommentsService {
                 ? 'rgba(0,0,0,0)'
                 : this.getColor(feature, 0.9),
           }),
+          text: this.getLabeAnomStyle(feature),
         });
       }
     };
@@ -119,6 +121,20 @@ export class AnomaliasControlCommentsService {
   getExternalColor(anomalia: Anomalia, opacity: number): string {
     const anomChecked = anomalia.hasOwnProperty('comentarios') && anomalia.comentarios.length > 0;
     return Colors.getColorComentarios(anomChecked, opacity);
+  }
+
+  private getLabeAnomStyle(feature: Feature) {
+    return new Text({
+      text: feature.getProperties().properties.label,
+      font: 'bold 14px Roboto',
+      fill: new Fill({
+        color: 'black',
+      }),
+      stroke: new Stroke({
+        color: 'white',
+        width: 4,
+      }),
+    });
   }
 
   resetService() {
