@@ -1,19 +1,18 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+import { Subscription } from 'rxjs';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
-import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ViewCommentsService } from '@data/services/view-comments.service';
 import { PcService } from '@data/services/pc.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
-import { Subscription } from 'rxjs';
-import { Coordinate } from 'ol/coordinate';
 
 interface AnomaliaInfo {
   numAnom: number;
@@ -26,13 +25,14 @@ interface AnomaliaInfo {
   templateUrl: './anomalia-info.component.html',
   styleUrls: ['./anomalia-info.component.css'],
 })
-export class AnomaliaInfoComponent implements OnInit, OnDestroy {
+export class AnomaliaInfoComponent implements OnInit, AfterViewInit, OnDestroy {
   anomaliaSelected: Anomalia;
   anomaliaInfo: AnomaliaInfo = undefined;
   editInput = false;
   form: FormGroup;
   localizacion: string;
   seguidorSelected: Seguidor;
+  plantaFija: boolean;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -43,13 +43,15 @@ export class AnomaliaInfoComponent implements OnInit, OnDestroy {
     private anomaliaInfoService: AnomaliaInfoService,
     private reportControlService: ReportControlService,
     private olMapService: OlMapService,
-    private vbiewCommentsService: ViewCommentsService,
+    private viewCommentsService: ViewCommentsService,
     private pcService: PcService
   ) {
     this.buildForm();
   }
 
   ngOnInit(): void {
+    this.plantaFija = this.reportControlService.plantaFija;
+
     this.subscriptions.add(
       this.comentariosControlService.anomaliaSelected$.subscribe((anom) => {
         this.anomaliaSelected = anom;
@@ -79,6 +81,15 @@ export class AnomaliaInfoComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.comentariosControlService.seguidorSelected$.subscribe((seguidor) => (this.seguidorSelected = seguidor))
     );
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.plantaFija) {
+      const position = document.getElementById('pos-map');
+      if (position) {
+        position.style.display = 'none';
+      }
+    }
   }
 
   private buildForm() {
@@ -118,15 +129,8 @@ export class AnomaliaInfoComponent implements OnInit, OnDestroy {
   }
 
   goToAnomMap() {
-    let coords: Coordinate;
-    let zoom: number;
-    if (this.reportControlService.plantaFija) {
-      coords = this.anomaliaSelected.featureCoords[0];
-      zoom = this.vbiewCommentsService.zoomChangeAnomsView;
-    } else {
-      coords = this.seguidorSelected.featureCoords[0];
-      zoom = this.vbiewCommentsService.zoomShowAnoms;
-    }
+    const coords = this.anomaliaSelected.featureCoords[0];
+    const zoom = this.viewCommentsService.zoomChangeAnomsView;
 
     this.olMapService.setViewCenter(coords);
     this.olMapService.setViewZoom(zoom);

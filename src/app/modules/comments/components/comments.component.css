@@ -2,7 +2,18 @@
   width: 100%;
 }
 
+:host ::ng-deep .info-sidenav .mat-drawer-inner-container {
+  overflow: hidden;
+}
+
 .list-sidenav {
+  display: flex;
+  padding: 0.5rem;
+  width: fit-content;
+  max-width: 450px;
+}
+
+.info-sidenav {
   display: flex;
   padding: 0.5rem;
   width: fit-content;
@@ -15,6 +26,10 @@ app-thermal-slider {
 
 @media (max-width: 768px) {
   .list-sidenav {
+    width: 100%;
+  }
+
+  .info-sidenav {
     width: 100%;
   }
 }

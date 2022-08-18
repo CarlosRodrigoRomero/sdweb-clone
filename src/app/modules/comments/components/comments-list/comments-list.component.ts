@@ -43,6 +43,13 @@ export class CommentsListComponent implements OnInit, OnDestroy {
     );
   }
 
+  ngAfterViewInit(): void {
+    const element = document.getElementById('comentarios');
+    if (element) {
+      element.style.height = '92px';
+    }
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }

@@ -9,6 +9,8 @@ declare let fabric;
 import { SeguidorViewCommentsService } from '@data/services/seguidor-view-comments.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { AnomaliasControlCommentsService } from '@data/services/anomalias-control-comments.service';
+import { ViewCommentsService } from '@data/services/view-comments.service';
+import { OlMapService } from '@data/services/ol-map.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { Anomalia } from '@core/models/anomalia';
@@ -20,7 +22,7 @@ import { PcInterface } from '@core/models/pc';
   styleUrls: ['./seguidor-info.component.css'],
 })
 export class SeguidorInfoComponent implements OnInit {
-  private seguidorSelected: Seguidor;
+  seguidorSelected: Seguidor;
   private imageVisual = new Image();
   private imageThermal = new Image();
   anomaliaSelected: Anomalia = undefined;
@@ -36,7 +38,9 @@ export class SeguidorInfoComponent implements OnInit {
   constructor(
     private seguidorViewCommentsService: SeguidorViewCommentsService,
     private comentariosControlService: ComentariosControlService,
-    private anomaliasControlCommentsService: AnomaliasControlCommentsService
+    private anomaliasControlCommentsService: AnomaliasControlCommentsService,
+    private olMapService: OlMapService,
+    private viewCommentsService: ViewCommentsService
   ) {}
 
   ngOnInit(): void {
@@ -67,6 +71,8 @@ export class SeguidorInfoComponent implements OnInit {
         .pipe(
           switchMap((seguidor) => {
             this.seguidorSelected = seguidor;
+
+            this.setImageButtons();
 
             if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
               // obtenemos imagen térmica
@@ -224,6 +230,25 @@ export class SeguidorInfoComponent implements OnInit {
 
     this.anomsCanvas.add(polygon);
     this.anomsCanvas.renderAll();
+  }
+
+  goToSegMap() {
+    const coords = this.seguidorSelected.featureCoords[0];
+    const zoom = this.viewCommentsService.zoomShowAnoms;
+
+    this.olMapService.setViewCenter(coords);
+    this.olMapService.setViewZoom(zoom);
+
+    this.comentariosControlService.infoOpened = false;
+    this.comentariosControlService.listOpened = false;
+  }
+
+  private setImageButtons() {
+    const mapBtn = document.getElementById('map-btn');
+    if (mapBtn) {
+      mapBtn.style.top = this.seguidorViewCommentsService.imagesHeight - 48 + 'px';
+      mapBtn.style.left = this.seguidorViewCommentsService.imagesWidth - 48 + 'px';
+    }
   }
 
   private getScaleCoords(coords: any[]): any[] {
