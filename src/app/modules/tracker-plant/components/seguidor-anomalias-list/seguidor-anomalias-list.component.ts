@@ -33,7 +33,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
   anomaliaSelected: Anomalia = undefined;
   viewSelected = 0;
   dataSource: MatTableDataSource<AnomaliaData>;
-  displayedColumns = ['colors', 'numAnom', 'tipo', 'perdidas', 'tempMax', 'gradiente'];
+  displayedColumns = ['colors', 'numAnom', 'tipo', 'perdidas', 'tempMax', 'gradiente', 'comentarios'];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -84,6 +84,10 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
               if (anom.gradienteNormalizado !== undefined) {
                 gradiente = anom.gradienteNormalizado + 'ºC';
               }
+              let numComs = null;
+              if (anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0) {
+                numComs = anom.comentarios.length;
+              }
 
               anomaliasTabla.push({
                 numAnom: anom.numAnom,
@@ -93,6 +97,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
                 gradiente,
                 colors: this.getAnomViewColors(anom),
                 anomalia: anom,
+                numComs,
               });
             });
 

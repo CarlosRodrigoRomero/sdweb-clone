@@ -1,7 +1,7 @@
 <form class="example-form" [formGroup]="form" (ngSubmit)="sendMessage($event)">
   <mat-form-field class="send-input" appearance="outline">
     <mat-label>Comentario</mat-label>
-    <input matInput placeholder="Comentario" formControlName="texto" />
+    <input matInput placeholder="Comentario" formControlName="texto" autocomplete="off" tabindex="-1" />
     <button mat-icon-button matSuffix type="submit">
       <mat-icon>send</mat-icon>
     </button>

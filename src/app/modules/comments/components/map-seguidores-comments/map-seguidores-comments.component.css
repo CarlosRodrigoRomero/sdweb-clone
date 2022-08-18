@@ -1,0 +1,21 @@
+.map {
+  height: calc(100vh - 70px);
+  width: 100%;
+}
+
+.btn-list {
+  position: absolute;
+  right: 0.7rem;
+  top: 0.7rem;
+  height: 60px;
+  padding: 0;
+  width: 60px;
+  min-width: unset !important;
+  z-index: 1;
+}
+
+#center-btn {
+  position: absolute;
+  top: 6rem;
+  left: 0.5rem;
+}

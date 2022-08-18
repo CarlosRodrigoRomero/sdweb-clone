@@ -1,0 +1,24 @@
+<div class="content">
+  <div *ngIf="!imagesLoaded" class="loading">
+    <app-spinner></app-spinner>
+  </div>
+
+  <div  class="seguidor-name" *ngIf="seguidorSelected">
+    <span>Seguidor {{ seguidorSelected.nombre }}</span>
+  </div>
+
+  <button id="map-btn"  class="map-btn" mat-raised-button (click)="goToSegMap()">
+    <mat-icon>place</mat-icon>
+  </button>
+
+  <div class="thermal-canvas">
+    <canvas id="thermal-canvas"> </canvas>
+  </div>
+  <div class="visual-canvas">
+    <canvas id="visual-canvas"> </canvas>
+  </div>
+
+  <div class="anomalias-canvas">
+    <canvas id="anomalias-canvas"></canvas>
+  </div>
+</div>

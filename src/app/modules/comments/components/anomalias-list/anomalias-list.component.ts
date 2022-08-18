@@ -1,25 +1,20 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
 
-import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-
-import { FilterService } from '@data/services/filter.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
-import { ComentariosService } from '@data/services/comentarios.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
+import { FilterService } from '@data/services/filter.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
-import { Coordinate } from 'ol/coordinate';
 
-interface RowAnomData {
+export interface RowAnomData {
   id: string;
   numAnom: number;
   numComs: number;
@@ -28,7 +23,8 @@ interface RowAnomData {
   posicion: string;
   fechaUltCom?: string;
   horaUltCom?: string;
-  coords?: Coordinate;
+  anomalia?: Anomalia;
+  fecha?: number;
 }
 
 @Component({
@@ -36,95 +32,69 @@ interface RowAnomData {
   templateUrl: './anomalias-list.component.html',
   styleUrls: ['./anomalias-list.component.css'],
   providers: [DatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AnomaliasListComponent implements OnInit, OnDestroy {
+export class AnomaliasListComponent implements OnInit, OnChanges {
   @ViewChild(MatSort) sort: MatSort;
-  dataSource: MatTableDataSource<RowAnomData>;
-  private anomalias: Anomalia[];
-  private anomsData: RowAnomData[];
-  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'map', 'numComs'];
-  anomaliaSelected: Anomalia;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @Input() dataSource: MatTableDataSource<RowAnomData>;
+  @Input() anomalias: Anomalia[];
+  @Input() anomsData: RowAnomData[];
+  @Input() anomaliaSelected: Anomalia;
+  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'numComs', 'map'];
   headerLocLabel = '';
-
-  private subscriptions: Subscription = new Subscription();
+  plantaFija;
 
   constructor(
-    private filterService: FilterService,
     private reportControlService: ReportControlService,
-    private anomaliaInfoService: AnomaliaInfoService,
     private comentariosControlService: ComentariosControlService,
-    private comentariosService: ComentariosService,
-    private datePipe: DatePipe,
     private olMapService: OlMapService,
-    private anomaliasControlService: AnomaliasControlService
+    private anomaliasControlService: AnomaliasControlService,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      this.filterService.filteredElements$
-        .pipe(
-          switchMap((elems) => {
-            this.anomalias = [];
-            if (this.reportControlService.plantaFija) {
-              this.anomalias = elems as Anomalia[];
-            } else {
-              elems.forEach((seg) => this.anomalias.push(...(seg as Seguidor).anomaliasCliente));
-            }
-
-            this.comentariosControlService.anomaliaSelected = this.anomalias[0];
-
-            return this.comentariosService.getComentariosInforme(this.anomalias[0].informeId);
-          })
-        )
-        .subscribe((comentarios) => {
-          this.anomsData = [];
-          this.anomalias.forEach((anom) => {
-            const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
-            let fechaUltCom = null;
-            let horaUltCom = null;
-            if (comentariosAnom.length > 0) {
-              const ultimoComentario = comentariosAnom.sort((a, b) => b.datetime - a.datetime)[0];
-              fechaUltCom = this.datePipe.transform(ultimoComentario.datetime, 'dd/MM/yyyy');
-              horaUltCom = this.datePipe.transform(ultimoComentario.datetime, 'HH:mm');
-            }
-
-            let numComs = comentariosAnom.length;
-            if (numComs === 0) {
-              numComs = null;
-            }
-
-            this.anomsData.push({
-              id: anom.id,
-              numAnom: anom.numAnom,
-              numComs,
-              tipo: this.anomaliaInfoService.getTipoLabel(anom),
-              localizacion: this.anomaliaInfoService.getLocalizacionReducLabel(anom, this.reportControlService.planta),
-              posicion: this.anomaliaInfoService.getPosicionReducLabel(anom),
-              fechaUltCom,
-              horaUltCom,
-              coords: anom.featureCoords[0],
-            });
-          });
-
-          this.dataSource = new MatTableDataSource(this.anomsData);
-          this.dataSource.sort = this.sort;
-        })
-    );
-
-    this.subscriptions.add(
-      this.comentariosControlService.anomaliaSelected$.subscribe((anom) => (this.anomaliaSelected = anom))
-    );
+    this.plantaFija = this.reportControlService.plantaFija;
 
     if (this.reportControlService.planta.hasOwnProperty('nombreGlobalCoords')) {
       this.headerLocLabel = '(' + this.reportControlService.planta.nombreGlobalCoords.join('.') + ')';
     }
   }
 
-  selectAnomalia(row: any) {
-    this.openInfo();
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.hasOwnProperty('anomaliaSelected')) {
+      this.anomaliaSelected = changes.anomaliaSelected.currentValue;
+    }
+    if (changes.hasOwnProperty('anomalias')) {
+      this.anomalias = changes.anomalias.currentValue;
+    }
+    if (changes.hasOwnProperty('dataSource') && changes.dataSource.currentValue != undefined) {
+      this.dataSource = changes.dataSource.currentValue;
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+    }
+  }
 
+  selectElems(row: any) {
     // seleccionamos la anomalia
-    this.comentariosControlService.anomaliaSelected = this.anomalias.find((anom) => anom.id === row.id);
+    this.comentariosControlService.anomaliaSelected = row.anomalia;
+
+    // si es una planta de seguidores seleccionamos el seguidor
+    if (!this.reportControlService.plantaFija) {
+      const seguidorAnom = this.filterService.filteredElements.find((seg) => {
+        const seguidor = seg as Seguidor;
+
+        if (seguidor.anomalias.includes(row.anomalia)) {
+          return true;
+        } else {
+          return false;
+        }
+      }) as Seguidor;
+
+      this.comentariosControlService.seguidorSelected = seguidorAnom;
+    }
+
+    this.openInfo();
   }
 
   openInfo() {
@@ -134,22 +104,15 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
   closeListAndInfo() {
     this.comentariosControlService.listOpened = false;
     this.comentariosControlService.infoOpened = false;
-
-    // this.comentariosControlService.vistaSelected = 'map';
   }
 
-  goToAnomMap(coords: Coordinate) {
-    this.olMapService.setViewCenter(coords);
+  goToAnomMap(anomalia: Anomalia) {
+    this.comentariosControlService.anomaliaSelected = anomalia;
+
+    this.olMapService.setViewCenter(anomalia.featureCoords[0]);
     this.olMapService.setViewZoom(this.anomaliasControlService.zoomChangeView);
 
     this.closeListAndInfo();
-  }
-
-  private closeSidenav() {
-    // cerramos el sidenav si estamos en mobile
-    if (window.screen.width < 768) {
-      this.comentariosControlService.listOpened = false;
-    }
   }
 
   applyFilter(event: Event) {
@@ -159,9 +122,5 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
   }
 }

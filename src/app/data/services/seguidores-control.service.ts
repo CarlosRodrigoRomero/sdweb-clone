@@ -19,13 +19,10 @@ import VectorSource from 'ol/source/Vector';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { FilterService } from '@data/services/filter.service';
-import { ZonesControlService } from '@data/services/zones-control.service';
 import { ViewReportService } from '@data/services/view-report.service';
-import { ZonesService } from '@data/services/zones.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { MathOperations } from '@core/classes/math-operations';
-import { LocationAreaInterface } from '@core/models/location';
 
 import { Colors } from '@core/classes/colors';
 import { COLOR } from '@data/constants/color';
@@ -73,9 +70,7 @@ export class SeguidoresControlService {
     private reportControlService: ReportControlService,
     private filterService: FilterService,
     private storage: AngularFireStorage,
-    private zonesControlService: ZonesControlService,
-    private viewReportService: ViewReportService,
-    private zonesService: ZonesService
+    private viewReportService: ViewReportService
   ) {}
 
   initService(): Promise<boolean> {
@@ -411,7 +406,7 @@ export class SeguidoresControlService {
     return [coordsList];
   }
 
-  public getImageSeguidor(folder: string) {
+  getImageSeguidor(folder: string) {
     if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
       // const imageName = this.seguidorSelected.imageName;
       let imageName = this.seguidorSelected.anomalias[0].archivoPublico;

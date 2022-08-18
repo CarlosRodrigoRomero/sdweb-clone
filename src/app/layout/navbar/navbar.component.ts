@@ -34,7 +34,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   isReport = false;
   isDemo = false;
-  dataLoaded = false;
+  tipoComentarios = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -139,7 +139,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     // comprobamos si es la planta demo
     this.isDemo = this.demoService.checkIsDemo();
 
-    this.subscriptions.add(this.comentariosControlService.dataLoaded$.subscribe((value) => (this.dataLoaded = value)));
+    this.subscriptions.add(this.comentariosControlService.dataLoaded$.subscribe((value) => (this.tipoComentarios = value)));
 
     // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
   }

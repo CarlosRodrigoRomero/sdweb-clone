@@ -1,6 +1,6 @@
 .content {
   width: 100%;
-  min-height: 150px;
+  margin-top: 76px;
 }
 
 .elem-info {
@@ -20,6 +20,7 @@
 }
 
 .subtitulo {
+  font-size: 18px;
   font-weight: 500;
 }
 

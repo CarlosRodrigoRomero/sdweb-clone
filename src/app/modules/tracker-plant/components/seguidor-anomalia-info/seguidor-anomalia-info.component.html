@@ -1,11 +1,19 @@
 <div class="anomalia-info" *ngIf="anomaliaSelected">
-  <h5 class="title">
+  <button *ngIf="!showComments" class="btn-comments" mat-icon-button (click)="showHideComments()">
+    <mat-icon matBadge="{{ anomaliaInfo.numComentarios }}" matBadgeColor="primary">message</mat-icon>
+  </button>
+  <button *ngIf="showComments" class="btn-comments" mat-icon-button (click)="showHideComments()">
+    <mat-icon>list</mat-icon>
+  </button>
+
+  <h5 *ngIf="!showComments" class="title">
     Anomalía <b>{{ anomaliaInfo.numAnom }}</b>
     <span *ngIf="anomaliaInfo.clase !== undefined" [ngStyle]="{ color: anomaliaInfo.claseColor }">
       ({{ anomaliaInfo.clase }})</span
     >
   </h5>
-  <div class="info">
+  <app-comments *ngIf="showComments" [anomalia]="anomaliaSelected"></app-comments>
+  <div *ngIf="!showComments" class="info">
     <div class="line-info">
       <div
         class="subtitle"

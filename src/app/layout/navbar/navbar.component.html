@@ -6,11 +6,11 @@
     <img src="../../../assets/images/favicon.png" height="30" class="d-inline-block align-top" alt="" />
   </a>
 
-  <div id="plant-summary" *ngIf="loadContent">
+  <div id="plant-summary" *ngIf="loadContent && !tipoComentarios">
     <app-plant-summary></app-plant-summary>
   </div>
 
-  <div *ngIf="dataLoaded">
+  <div *ngIf="tipoComentarios">
     <app-simple-plant-summary></app-simple-plant-summary>
   </div>
 

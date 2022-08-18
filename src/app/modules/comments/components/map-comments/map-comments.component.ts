@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -21,7 +21,8 @@ import { ComentariosControlService } from '@data/services/comentarios-control.se
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
-import { AnomaliasControlService } from '@data/services/anomalias-control.service';
+import { ViewCommentsService } from '@data/services/view-comments.service';
+import { AnomaliasControlCommentsService } from '@data/services/anomalias-control-comments.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -31,13 +32,15 @@ import { InformeInterface } from '@core/models/informe';
   templateUrl: './map-comments.component.html',
   styleUrls: ['./map-comments.component.css'],
 })
-export class MapCommentsComponent implements OnInit {
+export class MapCommentsComponent implements OnInit, OnDestroy {
   private map: Map;
   private planta: PlantaInterface;
   private informe: InformeInterface;
-  private thermalLayers: TileLayer[];
-  private anomaliaLayers: VectorLayer[];
-  private aerialLayers: TileLayer[];
+  private thermalLayer: TileLayer;
+  private anomaliaLayer: VectorLayer;
+  private aerialLayer: TileLayer;
+  private prevFeatureSelected: Feature;
+  thermalVisible = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -46,10 +49,11 @@ export class MapCommentsComponent implements OnInit {
     private olMapService: OlMapService,
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
-    private anomaliasControlService: AnomaliasControlService
+    private viewCommentsService: ViewCommentsService,
+    private anomaliasControlCommentsService: AnomaliasControlCommentsService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.planta = this.reportControlService.planta;
     this.informe = this.reportControlService.informes.find(
       (inf) => inf.id === this.reportControlService.selectedInformeId
@@ -67,13 +71,14 @@ export class MapCommentsComponent implements OnInit {
 
           thermalLayer.setProperties({
             informeId: this.informe.id,
+            visible: false,
           });
 
           this.olMapService.addThermalLayer(thermalLayer);
         }
 
         // creamos la capa de anomalías
-        this.olMapService.addAnomaliaLayer(this.anomaliasControlService.createCommentsAnomaliaLayers(this.informe.id));
+        this.olMapService.addAnomaliaLayer(this.anomaliasControlCommentsService.createCommentsAnomaliaLayers());
 
         // añadimos las ortofotos aereas de cada informe
         await this.olMapService.addAerialLayer(this.informe);
@@ -81,14 +86,46 @@ export class MapCommentsComponent implements OnInit {
         this.initMap();
 
         this.addSelectInteraction();
+        this.addClickOutFeatures();
         this.addGeoLocation();
+        this.addZoomEvent();
       });
 
-    this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayers = layers)));
+    this.subscriptions.add(this.olMapService.getThermalLayers().subscribe((layers) => (this.thermalLayer = layers[0])));
 
-    this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
+    this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayer = layers[0])));
 
-    this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
+    this.subscriptions.add(
+      this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayer = layers[0]))
+    );
+
+    this.subscriptions.add(
+      this.comentariosControlService.anomaliaSelected$.subscribe((anom) => {
+        if (this.prevFeatureSelected !== undefined) {
+          this.prevFeatureSelected.setStyle(this.anomaliasControlCommentsService.getStyleAnoms(false));
+        }
+
+        if (anom !== undefined) {
+          if (this.anomaliaLayer !== undefined) {
+            const anomaliaFeature = this.anomaliaLayer
+              .getSource()
+              .getFeatures()
+              .find((feature) => feature.getProperties().properties.anomaliaId === anom.id);
+
+            if (anomaliaFeature !== undefined) {
+              anomaliaFeature.setStyle(this.anomaliasControlCommentsService.getStyleAnoms(true));
+
+              // seleccionamos la anomalia para luego cambiar su estilo
+              this.prevFeatureSelected = anomaliaFeature;
+            }
+          }
+        }
+      })
+    );
+
+    this.subscriptions.add(
+      this.viewCommentsService.thermalLayerVisible$.subscribe((visible) => (this.thermalVisible = visible))
+    );
   }
 
   private initMap() {
@@ -107,13 +144,14 @@ export class MapCommentsComponent implements OnInit {
 
     geoLocLayer.setProperties({ type: 'geoLoc' });
 
-    const layers = [satelliteLayer, geoLocLayer, ...this.aerialLayers /* , ...this.thermalLayers */];
+    const layers = [satelliteLayer, this.aerialLayer, geoLocLayer, this.thermalLayer];
 
     const view = new View({
       center: fromLonLat([this.planta.longitud, this.planta.latitud]),
       zoom: this.planta.zoom,
-      // minZoom: this.planta.zoom - 2,
+      minZoom: this.planta.zoom - 2,
       maxZoom: 24,
+      enableRotation: false,
     });
 
     this.subscriptions.add(
@@ -122,24 +160,29 @@ export class MapCommentsComponent implements OnInit {
       })
     );
 
-    // añadimos las capas de anomalías al mapa
-    this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
+    // añadimos la capa de anomalías al mapa
+    this.map.addLayer(this.anomaliaLayer);
 
     // inicializamos el servicio que controla el comportamiento de las anomalias
-    this.anomaliasControlService.initService().then((value) => {
-      if (value) {
-        this.anomaliasControlService.mostrarAnomalias(true);
-      }
+    this.anomaliasControlCommentsService.initService().then(() => {
+      this.anomaliasControlCommentsService.mostrarAnomalias();
     });
   }
 
-  openList() {
-    this.comentariosControlService.listOpened = true;
+  openCloseList() {
+    this.comentariosControlService.listOpened = !this.comentariosControlService.listOpened;
   }
 
   private addSelectInteraction() {
     const select = new Select({
       condition: click,
+      layers: (l) => {
+        if (l.getProperties().hasOwnProperty('type') && l.getProperties().type === 'anomalias') {
+          return true;
+        } else {
+          return false;
+        }
+      },
     });
 
     select.setProperties({ id: 'selectAnomalia' });
@@ -159,7 +202,20 @@ export class MapCommentsComponent implements OnInit {
     });
   }
 
-  addGeoLocation() {
+  private addClickOutFeatures() {
+    this.map.on('click', async (event) => {
+      const feature = this.map
+        .getFeaturesAtPixel(event.pixel)
+        .filter((item) => item.getProperties().properties !== undefined);
+
+      if (feature.length === 0) {
+        this.comentariosControlService.infoOpened = false;
+        this.comentariosControlService.anomaliaSelected = undefined;
+      }
+    });
+  }
+
+  private addGeoLocation() {
     const geoLocLayer = this.map
       .getLayers()
       .getArray()
@@ -188,7 +244,7 @@ export class MapCommentsComponent implements OnInit {
     this.addCenterControl(geoLocSource);
   }
 
-  addCenterControl(source: VectorSource) {
+  private addCenterControl(source: VectorSource) {
     const centerControl = document.getElementById('center-btn');
 
     centerControl.className = 'ol-control ol-unselectable locate';
@@ -206,5 +262,28 @@ export class MapCommentsComponent implements OnInit {
         element: centerControl,
       })
     );
+  }
+
+  private addZoomEvent() {
+    this.map.on('moveend', () => {
+      this.olMapService.currentZoom = this.map.getView().getZoom();
+
+      this.map
+        .getLayers()
+        .getArray()
+        .forEach((layer) => {
+          if (layer.getProperties().type === 'smallZones' || layer.getProperties().type === 'anomalias') {
+            (layer as VectorLayer).getSource().changed();
+          }
+        });
+    });
+  }
+
+  setThermalVisibility() {
+    this.viewCommentsService.thermalLayerVisible = !this.viewCommentsService.thermalLayerVisible;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

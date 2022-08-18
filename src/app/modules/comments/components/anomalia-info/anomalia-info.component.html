@@ -3,12 +3,7 @@
     Anomalía {{ anomaliaInfo.numAnom }} <b>({{ anomaliaInfo.tipo }})</b>
   </h5>
 
-  <div class="images">
-    <img src="assets/images/thermal_image.png" height="100" alt="" />
-    <img src="assets/images/visual_image.png" height="100" alt="" />
-  </div>
-
-  <div class="elem-info">
+  <div *ngIf="plantaFija" class="elem-info">
     <span class="titulo">Localización</span>
     <span class="subtitulo">{{ anomaliaInfo.localizacion }}</span>
   </div>
@@ -32,7 +27,7 @@
     </form>
   </div>
 
-  <div class="elem-info">
+  <div id="pos-map" class="elem-info">
     <span class="titulo">Ir al mapa</span>
     <button mat-icon-button (click)="goToAnomMap()">
       <mat-icon>place</mat-icon>

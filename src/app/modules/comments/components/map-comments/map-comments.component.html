@@ -1,7 +1,20 @@
-<button mat-raised-button class="btn-list" (click)="openList()">
+<button mat-raised-button class="btn-list" (click)="openCloseList()">
   <mat-icon>list</mat-icon>
 </button>
 
 <div id="map" class="map"></div>
 
 <div id="center-btn"></div>
+
+<div class="thermal-btn">
+  <button mat-raised-button (click)="setThermalVisibility()">
+    <div *ngIf="!thermalVisible" class="thermal-btn-content">
+      <mat-icon>visibility</mat-icon>
+      <span>Mostrar térmica</span>
+    </div>
+    <div *ngIf="thermalVisible" class="thermal-btn-content">
+      <mat-icon>visibility_off</mat-icon>
+      <span>Ocultar térmica</span>
+    </div>
+  </button>
+</div>

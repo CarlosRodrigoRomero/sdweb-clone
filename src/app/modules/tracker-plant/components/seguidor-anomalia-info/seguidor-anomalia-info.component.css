@@ -1,3 +1,9 @@
+.btn-comments {
+  position: absolute;
+  right: 3rem;
+  z-index: 10;
+}
+
 .anomalia-info {
   margin-left: 0.5rem;
 }

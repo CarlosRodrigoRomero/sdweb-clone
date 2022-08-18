@@ -1,0 +1,69 @@
+.content {
+  position: absolute;
+}
+
+.seguidor-name {
+  position: absolute;
+  top: 0.5rem;
+  background: white;
+  z-index: 10;
+  left: 100px;
+  display: flex;
+  width: max-content;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+}
+
+.seguidor-name span {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.map-btn {
+  position: absolute;
+  top: 0.5rem;
+  left: 250px;
+  height: 40px;
+  padding: 0;
+  width: 40px;
+  min-width: unset !important;
+  z-index: 10;
+}
+
+.thermal-canvas {
+  z-index: 2;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.visual-canvas {
+  z-index: 1;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.anomalias-canvas {
+  z-index: 3;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.loading {
+  z-index: 10;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 320px;
+  height: 256px;
+  background: white;
+}
+
+app-spinner {
+  position: absolute;
+  top: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+}

@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { Comentario } from '@core/models/comentario';
+import { InformeInterface } from '@core/models/informe';
 
 @Injectable({
   providedIn: 'root',
@@ -43,6 +45,15 @@ export class ComentariosService {
     return this.afs
       .collection<Comentario>('comentarios', (ref) => ref.where('informeId', '==', informeId))
       .valueChanges();
+  }
+
+  getComentariosInformes(informes: InformeInterface[]): Observable<Comentario[]> {
+    const comentObsList = Array<Observable<Comentario[]>>();
+    informes.forEach((informe) => {
+      comentObsList.push(this.getComentariosInforme(informe.id));
+    });
+
+    return combineLatest(comentObsList).pipe(map((arr) => arr.flat()));
   }
 
   deleteComentario(comentarioId: string) {

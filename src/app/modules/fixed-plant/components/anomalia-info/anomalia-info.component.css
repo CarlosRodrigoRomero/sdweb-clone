@@ -17,6 +17,11 @@
   margin: 16px 24px;
 }
 
+.tab-comments {
+  margin: 0px 24px 16px 24px;
+  max-height: 300px;
+}
+
 .popup-hover {
   width: max-content;
 }

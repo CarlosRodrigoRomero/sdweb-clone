@@ -3,5 +3,12 @@
 }
 
 .send-input {
-  width: 100%;
+  width: 400px;
+  background: white;
+}
+
+@media (max-width: 768px) {
+  .send-input {
+    width: calc(100vw - 16px);
+  }
 }

@@ -54,13 +54,11 @@ export const routes: Routes = [
     path: 'comments-fixed-shared',
     component: SkeletonComponent,
     loadChildren: () => import('@modules/comments/comments.module').then((m) => m.CommentsModule),
-    canActivate: [AuthGuard],
   },
   {
     path: 'comments-tracker-shared',
     component: SkeletonComponent,
     loadChildren: () => import('@modules/comments/comments.module').then((m) => m.CommentsModule),
-    canActivate: [AuthGuard],
   },
   {
     path: 'clusters',

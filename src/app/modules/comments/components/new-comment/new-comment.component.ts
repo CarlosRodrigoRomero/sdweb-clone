@@ -52,6 +52,10 @@ export class NewCommentComponent implements OnInit, OnDestroy {
 
       this.comentariosService.addComentario(this.comentario);
 
+      const anomaliaSelected = this.comentariosControlService.anomaliaSelected;
+      anomaliaSelected.comentarios.push(this.comentario);
+      this.comentariosControlService.anomaliaSelected = anomaliaSelected;
+
       this.form.reset();
     }
   }

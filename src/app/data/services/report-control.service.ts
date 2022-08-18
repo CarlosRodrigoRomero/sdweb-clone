@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { WINDOW } from '../../window.providers';
 
 import { BehaviorSubject, combineLatest, from } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import { FilterService } from '@data/services/filter.service';
 import { ShareReportService } from '@data/services/share-report.service';
@@ -13,6 +13,8 @@ import { AnomaliaService } from '@data/services/anomalia.service';
 import { SeguidorService } from '@data/services/seguidor.service';
 import { PlantaService } from '@data/services/planta.service';
 import { AuthService } from '@data/services/auth.service';
+import { ZonesService } from './zones.service';
+import { ComentariosService } from './comentarios.service';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 import { FilterableElement } from '@core/models/filterableInterface';
@@ -20,12 +22,14 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { LocationAreaInterface } from '@core/models/location';
-import { GLOBAL } from '@data/constants/global';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
-import { ZonesService } from './zones.service';
+
+import { GLOBAL } from '@data/constants/global';
+
 import { Patches } from '@core/classes/patches';
+import { Comentario } from '@core/models/comentario';
 
 @Injectable({
   providedIn: 'root',
@@ -63,7 +67,6 @@ export class ReportControlService {
   private _noAnomsReport = false;
   noAnomsReport$ = new BehaviorSubject<boolean>(this._noAnomsReport);
   private user: UserInterface;
-  private zones: LocationAreaInterface[] = [];
 
   constructor(
     private router: Router,
@@ -75,7 +78,8 @@ export class ReportControlService {
     @Inject(WINDOW) private window: Window,
     private plantaService: PlantaService,
     private authService: AuthService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private comentariosService: ComentariosService
   ) {}
 
   initService(): Promise<boolean> {
@@ -148,27 +152,52 @@ export class ReportControlService {
                   return this.seguidorService.getSeguidoresPlanta$(this.planta, this.informes);
                 }
               }),
-              take(1)
-            )
-            .subscribe((elems) => {
-              if (this.plantaFija) {
-                this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
+              take(1),
+              switchMap((elems) => {
+                if (this.plantaFija) {
+                  this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
 
-                if (this.allFilterableElements.length === 0) {
-                  this.noAnomsReport = true;
+                  if (this.allFilterableElements.length === 0) {
+                    this.noAnomsReport = true;
+                  } else {
+                    this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
+                  }
+
+                  this.allAnomalias = this.allFilterableElements as Anomalia[];
                 } else {
-                  this.numFixedGlobalCoords = this.getNumGlobalCoords(this.allFilterableElements as Anomalia[]);
+                  this.allFilterableElements = elems;
+
+                  (this.allFilterableElements as Seguidor[]).forEach((seg) => {
+                    if (seg.anomaliasCliente.length > 0) {
+                      this.allAnomalias.push(...seg.anomaliasCliente);
+                    }
+                  });
                 }
 
-                this.allAnomalias = this.allFilterableElements as Anomalia[];
-              } else {
-                this.allFilterableElements = elems;
+                return this.comentariosService.getComentariosInformes(this.informes);
+              }),
+              take(1)
+            )
+            .subscribe((comentarios: Comentario[]) => {
+              // const coms = comentarios as Comentario[];
+              if (this.plantaFija) {
+                const anomsWithComentarios = this.allFilterableElements as Anomalia[];
+                anomsWithComentarios.forEach((anom) => {
+                  const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
 
-                (this.allFilterableElements as Seguidor[]).forEach((seg) => {
-                  if (seg.anomaliasCliente.length > 0) {
-                    this.allAnomalias.push(...seg.anomaliasCliente);
-                  }
+                  anom.comentarios = comentariosAnom;
                 });
+                this.allFilterableElements = anomsWithComentarios;
+              } else {
+                const segsWithComentarios = this.allFilterableElements as Seguidor[];
+                segsWithComentarios.map((seg) => {
+                  seg.anomaliasCliente.forEach((anom) => {
+                    const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
+
+                    anom.comentarios = comentariosAnom;
+                  });
+                });
+                this.allFilterableElements = segsWithComentarios;
               }
 
               // guardamos los datos de los diferentes recuentos de anomalias en el informe

@@ -2,14 +2,52 @@
   width: 100%;
 }
 
+.alert-internet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background: white;
+  padding: 1rem;
+  width: max-content;
+}
+
+.alert-internet span {
+  font-size: 24px;
+  color: red;
+  font-weight: 700;
+}
+
+:host ::ng-deep .info-sidenav .mat-drawer-inner-container {
+  overflow: hidden;
+}
+
 .list-sidenav {
   display: flex;
   padding: 0.5rem;
   width: fit-content;
+  max-width: 450px;
+}
+
+.info-sidenav {
+  display: flex;
+  padding: 0.5rem;
+  width: fit-content;
+  max-width: 416px;
+  width: 416px;
+}
+
+app-thermal-slider {
+  display: none;
 }
 
 @media (max-width: 768px) {
   .list-sidenav {
+    width: 100%;
+  }
+
+  .info-sidenav {
     width: 100%;
   }
 }

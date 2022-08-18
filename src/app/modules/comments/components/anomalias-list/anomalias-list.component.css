@@ -12,6 +12,7 @@
 }
 
 .btn-map {
+  display: none;
   height: 58px;
   padding: 0;
   width: 40px;
@@ -24,6 +25,10 @@
 
 :host ::ng-deep .buscar-input .mat-form-field-wrapper {
   padding-bottom: 6px;
+}
+
+:host ::ng-deep .mat-sort-header-container {
+  justify-content: center;
 }
 
 .tabla-container {
@@ -56,6 +61,10 @@ table {
   font-size: 10px;
 }
 
+.cell-content {
+  margin-left: 0.5rem;
+}
+
 .num-comentarios {
   width: 24px;
   height: 24px;
@@ -69,4 +78,10 @@ table {
 .num-comentarios span {
   color: white;
   font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .btn-map {
+    display: unset;
+  }
 }

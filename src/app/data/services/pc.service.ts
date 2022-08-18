@@ -308,6 +308,23 @@ export class PcService {
     return this.afs.doc('pcs/' + pc.id).update(pcObj);
   }
 
+  updatePcField(id: string, field: string, value: any) {
+    const pc = {};
+    pc[field] = value;
+
+    this.afs
+      .collection('pcs')
+      .doc(id)
+      .update(pc)
+      .then((res) => {
+        console.log('Campo ' + field + ' de anomalia con id ' + id + ' actualizado correctamente');
+      })
+      .catch((err) => {
+        console.log('Error al actualizar campo ' + field + ' de anomalia con id ' + id);
+        console.log(err);
+      });
+  }
+
   async delPc(pc: PcInterface) {
     return this.afs.doc('pcs/' + pc.id).delete();
   }

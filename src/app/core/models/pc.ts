@@ -4,6 +4,7 @@ import { LatLngLiteral } from '@agm/core';
 
 import { ModuloInterface } from '@core/models/modulo';
 import { ElementoPlantaInterface } from '@core/models/elementoPlanta';
+import { Comentario } from './comentario';
 
 export interface PcInterface {
   id?: string;
@@ -76,6 +77,7 @@ export interface PcInterface {
   FrameRate?: number;
   numAnom?: number;
   autoEstId?: string;
+  comentarios?: Comentario[];
 }
 
 export class Pc implements PcInterface, ElementoPlantaInterface {
@@ -149,6 +151,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   FrameRate?: number;
   numAnom?: number;
   autoEstId?: string;
+  comentarios?: Comentario[];
 
   constructor(pc: PcInterface) {
     Object.assign(this, pc);

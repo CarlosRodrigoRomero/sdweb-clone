@@ -27,7 +27,7 @@ import { Colors } from '@core/classes/colors';
 })
 export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy {
   viewSeleccionada = 0;
-  displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente'];
+  displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente', 'comentarios'];
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;
   public prevSelectedRow: any;
@@ -74,6 +74,11 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
             .forEach((elem) => {
               const anomalia = elem as Anomalia;
 
+              let numComentarios = null;
+              if (anomalia.hasOwnProperty('comentarios')) {
+                numComentarios = anomalia.comentarios.length;
+              }
+
               filteredElements.push({
                 id: anomalia.id,
                 tipoLabel: GLOBAL.labels_tipos[anomalia.tipo],
@@ -89,6 +94,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
                 hovered: false,
                 numAnom: anomalia.numAnom,
                 colors: this.getAnomViewColors(anomalia),
+                numComentarios,
               });
             });
 
