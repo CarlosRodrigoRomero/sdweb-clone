@@ -1,9 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 
 import { combineLatest, Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 
-import { ComentariosService } from '@data/services/comentarios.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 
 import { Comentario } from '@core/models/comentario';
@@ -13,33 +11,30 @@ import { Comentario } from '@core/models/comentario';
   templateUrl: './comments-list.component.html',
   styleUrls: ['./comments-list.component.css'],
 })
-export class CommentsListComponent implements OnInit, OnDestroy {
+export class CommentsListComponent implements OnInit, AfterViewInit, OnDestroy {
   comentariosAnomalia: Comentario[];
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(
-    private comentariosService: ComentariosService,
-    private comentariosControlService: ComentariosControlService
-  ) {}
+  constructor(private comentariosControlService: ComentariosControlService) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.comentariosControlService.anomaliaSelected$
-        .pipe(
-          switchMap((anom) =>
-            combineLatest([
-              this.comentariosService.getComentariosAnomalia(anom.id),
-              this.comentariosControlService.tipoComentarioSelected$,
-            ])
-          )
-        )
-        .subscribe(([coments, tipo]) => {
-          this.comentariosAnomalia = coments.filter((c) => c.tipo === tipo);
+      combineLatest([
+        this.comentariosControlService.anomaliaSelected$,
+        this.comentariosControlService.tipoComentarioSelected$,
+      ]).subscribe(([anomalia, tipo]) => {
+        if (anomalia) {
+          if (anomalia.hasOwnProperty('comentarios') && anomalia.comentarios.length > 0) {
+            const comentarios = anomalia.comentarios;
 
-          // los ordenamos de más reciente a más antiguo
-          this.comentariosAnomalia = this.comentariosAnomalia.sort((a, b) => a.datetime - b.datetime);
-        })
+            // filtramos por tipo y  ordenamos de más reciente a más antiguo
+            this.comentariosAnomalia = comentarios
+              .filter((com) => com.tipo === tipo)
+              .sort((a, b) => a.datetime - b.datetime);
+          }
+        }
+      })
     );
   }
 

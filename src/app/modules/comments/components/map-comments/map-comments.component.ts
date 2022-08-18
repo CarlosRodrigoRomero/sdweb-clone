@@ -86,6 +86,7 @@ export class MapCommentsComponent implements OnInit {
         this.initMap();
 
         this.addSelectInteraction();
+        this.addClickOutFeatures();
         this.addGeoLocation();
         this.addZoomEvent();
       });
@@ -201,7 +202,20 @@ export class MapCommentsComponent implements OnInit {
     });
   }
 
-  addGeoLocation() {
+  private addClickOutFeatures() {
+    this.map.on('click', async (event) => {
+      const feature = this.map
+        .getFeaturesAtPixel(event.pixel)
+        .filter((item) => item.getProperties().properties !== undefined);
+
+      if (feature.length === 0) {
+        this.comentariosControlService.infoOpened = false;
+        this.comentariosControlService.anomaliaSelected = undefined;
+      }
+    });
+  }
+
+  private addGeoLocation() {
     const geoLocLayer = this.map
       .getLayers()
       .getArray()
@@ -230,7 +244,7 @@ export class MapCommentsComponent implements OnInit {
     this.addCenterControl(geoLocSource);
   }
 
-  addCenterControl(source: VectorSource) {
+  private addCenterControl(source: VectorSource) {
     const centerControl = document.getElementById('center-btn');
 
     centerControl.className = 'ol-control ol-unselectable locate';

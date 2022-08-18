@@ -12,6 +12,7 @@
 }
 
 .btn-map {
+  display: none;
   height: 58px;
   padding: 0;
   width: 40px;
@@ -77,4 +78,10 @@ table {
 .num-comentarios span {
   color: white;
   font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .btn-map {
+    display: unset;
+  }
 }
