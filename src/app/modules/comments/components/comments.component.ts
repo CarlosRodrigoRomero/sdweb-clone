@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DatePipe } from '@angular/common';
 
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Subscription, fromEvent, merge, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
@@ -12,13 +12,11 @@ import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 import { Anomalia } from '@core/models/anomalia';
 
 import { RowAnomData } from './anomalias-list/anomalias-list.component';
-import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-comments',
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.css'],
-  providers: [DatePipe],
 })
 export class CommentsComponent implements OnInit, OnDestroy {
   anomaliaSelected: Anomalia;
@@ -37,7 +35,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private comentariosControlService: ComentariosControlService,
-    private datePipe: DatePipe,
     private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
@@ -54,12 +51,10 @@ export class CommentsComponent implements OnInit, OnDestroy {
           this.anomsData = [];
           anomalias.forEach((anom) => {
             let fechaUltCom = null;
-            let horaUltCom = null;
             if (anom.hasOwnProperty('comentarios')) {
               if (anom.comentarios.length > 0) {
                 const ultimoComentario = anom.comentarios.sort((a, b) => b.datetime - a.datetime)[0];
-                fechaUltCom = this.datePipe.transform(ultimoComentario.datetime, 'dd/MM/yyyy');
-                horaUltCom = this.datePipe.transform(ultimoComentario.datetime, 'HH:mm');
+                fechaUltCom = ultimoComentario.datetime;
               }
 
               let numComs = anom.comentarios.length;
@@ -77,9 +72,10 @@ export class CommentsComponent implements OnInit, OnDestroy {
                   this.reportControlService.planta
                 ),
                 posicion: this.anomaliaInfoService.getPosicionReducLabel(anom),
-                fechaUltCom,
-                horaUltCom,
+                // fechaUltCom,
+                // horaUltCom,
                 anomalia: anom,
+                fecha: fechaUltCom,
               });
             }
           });

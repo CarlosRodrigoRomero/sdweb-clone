@@ -30,15 +30,22 @@
       <!-- Tipo de anomalía -->
       <ng-container matColumnDef="tipo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
-        <td mat-cell (click)="selectElems(row)" *matCellDef="let row">{{ row.tipo }}</td>
+        <td mat-cell (click)="selectElems(row)" *matCellDef="let row">
+          <div class="cell-content">
+            {{ row.tipo }}
+          </div>
+        </td>
       </ng-container>
 
       <!-- Localización -->
       <ng-container matColumnDef="localizacion">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          <div class="loc-header">
+          <div *ngIf="plantaFija" class="loc-header">
             <span>Localización</span>
             <span>{{ headerLocLabel }}</span>
+          </div>
+          <div *ngIf="!plantaFija" class="loc-header">
+            <span>Seguidor</span>
           </div>
         </th>
         <td mat-cell (click)="selectElems(row)" *matCellDef="let row">
@@ -53,9 +60,9 @@
       <ng-container matColumnDef="fecha">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Último comentario</th>
         <td mat-cell (click)="selectElems(row)" *matCellDef="let row">
-          <div class="row-data">
-            <span>{{ row.horaUltCom }}</span>
-            <span class="small-data">{{ row.fechaUltCom }}</span>
+          <div *ngIf="row.fecha !== null" class="row-data">
+            <span>{{ row.fecha | date: 'HH:mm' }}</span>
+            <span class="small-data">{{ row.fecha | date: 'dd/MM/yyyy' }}</span>
           </div>
         </td>
       </ng-container>

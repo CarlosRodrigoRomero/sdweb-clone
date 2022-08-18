@@ -26,6 +26,10 @@
   padding-bottom: 6px;
 }
 
+:host ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}
+
 .tabla-container {
   margin: 4px;
   position: relative;
@@ -54,6 +58,10 @@ table {
 
 .small-data {
   font-size: 10px;
+}
+
+.cell-content {
+  margin-left: 0.5rem;
 }
 
 .num-comentarios {

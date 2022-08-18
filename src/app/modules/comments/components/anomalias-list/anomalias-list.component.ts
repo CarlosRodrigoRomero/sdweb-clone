@@ -35,6 +35,7 @@ export interface RowAnomData {
   fechaUltCom?: string;
   horaUltCom?: string;
   anomalia?: Anomalia;
+  fecha?: number;
 }
 
 @Component({
@@ -53,6 +54,7 @@ export class AnomaliasListComponent implements OnInit, OnChanges, OnDestroy {
   @Input() anomaliaSelected: Anomalia;
   displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'numComs', 'map'];
   headerLocLabel = '';
+  plantaFija;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -65,6 +67,8 @@ export class AnomaliasListComponent implements OnInit, OnChanges, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.plantaFija = this.reportControlService.plantaFija;
+
     if (this.reportControlService.planta.hasOwnProperty('nombreGlobalCoords')) {
       this.headerLocLabel = '(' + this.reportControlService.planta.nombreGlobalCoords.join('.') + ')';
     }

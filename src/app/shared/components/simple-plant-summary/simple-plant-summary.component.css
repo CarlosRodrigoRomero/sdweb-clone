@@ -1,4 +1,4 @@
-.grupo1 {
+.navbar {
   display: flex;
   width: max-content;
   align-items: center;
@@ -21,7 +21,16 @@
 }
 
 @media (max-width: 768px) {
+  .titulo {
+    font-size: 18px;
+  }
+
   .subtitulo {
+    font-size: 18px;
     display: none;
+  }
+
+  .fecha {
+    font-size: 20px;
   }
 }
