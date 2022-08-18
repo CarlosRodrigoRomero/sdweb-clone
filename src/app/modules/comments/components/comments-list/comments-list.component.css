@@ -8,5 +8,5 @@
   flex-direction: column;
   justify-content: flex-end;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin: 0.5rem 0px;
 }

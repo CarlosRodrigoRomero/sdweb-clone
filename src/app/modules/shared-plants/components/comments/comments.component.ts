@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ComentariosService } from '@data/services/comentarios.service';
@@ -12,7 +12,7 @@ import { Comentario } from '@core/models/comentario';
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.css'],
 })
-export class CommentsComponent implements OnInit, OnChanges {
+export class CommentsComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() anomalia: Anomalia;
   tipoComentario = 'anomalia';
   comentariosAnom: Comentario[];
@@ -31,6 +31,13 @@ export class CommentsComponent implements OnInit, OnChanges {
     this.buildForm();
   }
 
+  ngAfterViewInit(): void {
+    const element = document.getElementById('comentarios-list');
+    if (element) {
+      element.style.height = window.innerHeight - 800 + 'px';
+    }
+  }
+
   private buildForm() {
     this.form = this.formBuilder.group({
       texto: [, [Validators.required]],
@@ -39,8 +46,12 @@ export class CommentsComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.anomalia.hasOwnProperty('comentarios')) {
-      this.comentariosAnom = this.anomalia.comentarios.filter((com) => com.tipo === 'anomalia');
-      this.comentariosIV = this.anomalia.comentarios.filter((com) => com.tipo === 'iv');
+      this.comentariosAnom = this.anomalia.comentarios
+        .filter((com) => com.tipo === 'anomalia')
+        .sort((a, b) => b.datetime - a.datetime);
+      this.comentariosIV = this.anomalia.comentarios
+        .filter((com) => com.tipo === 'iv')
+        .sort((a, b) => b.datetime - a.datetime);
     }
   }
 
@@ -59,8 +70,10 @@ export class CommentsComponent implements OnInit, OnChanges {
 
       if (this.tipoComentario === 'anomalia') {
         this.comentariosAnom.push(this.comentario);
+        this.comentariosAnom = this.comentariosAnom.sort((a, b) => b.datetime - a.datetime);
       } else if (this.tipoComentario === 'iv') {
         this.comentariosIV.push(this.comentario);
+        this.comentariosIV = this.comentariosIV.sort((a, b) => b.datetime - a.datetime);
       }
 
       this.form.reset();

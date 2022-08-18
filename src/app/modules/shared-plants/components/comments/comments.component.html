@@ -2,7 +2,7 @@
   <mat-tab-group mat-align-tabs="center" (selectedTabChange)="setTipoComentario($event)">
     <mat-tab label="Comentarios">
       <div class="tab-content">
-        <div class="comentarios-list">
+        <div id="comentarios-list" class="comentarios-list">
           <div class="comentarios">
             <div *ngFor="let comAnom of comentariosAnom">
               <app-comment [comentario]="comAnom"></app-comment>

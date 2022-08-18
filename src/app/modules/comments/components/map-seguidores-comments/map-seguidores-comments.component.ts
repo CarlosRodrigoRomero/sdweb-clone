@@ -77,7 +77,7 @@ export class MapSeguidoresCommentsComponent implements OnInit {
             const seguidorFeature = this.seguidoresLayer
               .getSource()
               .getFeatures()
-              .find((feature) => feature.getProperties().properties.anomaliaId === seg.id);
+              .find((feature) => feature.getProperties().properties.seguidorId === seg.id);
 
             if (seguidorFeature !== undefined) {
               seguidorFeature.setStyle(this.seguidoresControlCommentsService.getStyleSegs(true));

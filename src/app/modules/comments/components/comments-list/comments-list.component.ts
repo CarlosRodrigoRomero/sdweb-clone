@@ -31,7 +31,7 @@ export class CommentsListComponent implements OnInit, AfterViewInit, OnDestroy {
             // filtramos por tipo y  ordenamos de más reciente a más antiguo
             this.comentariosAnomalia = comentarios
               .filter((com) => com.tipo === tipo)
-              .sort((a, b) => a.datetime - b.datetime);
+              .sort((a, b) => b.datetime - a.datetime);
           }
         }
       })
@@ -41,7 +41,7 @@ export class CommentsListComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     const element = document.getElementById('comentarios');
     if (element) {
-      element.style.height = '92px';
+      element.style.height = window.innerHeight - 616 + 'px';
     }
   }
 
