@@ -1,5 +1,9 @@
 <app-loading *ngIf="!anomaliasLoaded"></app-loading>
 <div *ngIf="anomaliasLoaded">
+  <div *ngIf="!networkStatus" class="alert-internet" role="alert">
+    <span>SIN INTERNET</span>
+  </div>
+
   <div class="content">
     <mat-sidenav-container class="main-container" [hasBackdrop]="false">
       <mat-sidenav #sidenavLista [(opened)]="listOpened" mode="over" class="list-sidenav" position="start">

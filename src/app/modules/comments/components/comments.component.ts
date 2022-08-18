@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 
 import { MatTableDataSource } from '@angular/material/table';
 
-import { Subscription } from 'rxjs';
+import { Subscription, fromEvent, merge, of } from 'rxjs';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
@@ -12,6 +12,7 @@ import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 import { Anomalia } from '@core/models/anomalia';
 
 import { RowAnomData } from './anomalias-list/anomalias-list.component';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-comments',
@@ -28,6 +29,8 @@ export class CommentsComponent implements OnInit, OnDestroy {
   private anomsData: RowAnomData[];
   dataSource: MatTableDataSource<RowAnomData>;
   plantaFija: boolean;
+  networkStatus: boolean;
+  networkStatus$: Subscription = Subscription.EMPTY;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -103,11 +106,27 @@ export class CommentsComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.comentariosControlService.vistaSelected$.subscribe((vista) => (this.vistaSelected = vista))
     );
+
+    // checkeamos las conexiones a internet
+    this.checkNetworkStatus();
+  }
+
+  // To check internet connection stability
+  checkNetworkStatus() {
+    this.networkStatus = navigator.onLine;
+    this.networkStatus$ = merge(of(null), fromEvent(window, 'online'), fromEvent(window, 'offline'))
+      .pipe(map(() => navigator.onLine))
+      .subscribe((status) => {
+        console.log('status', status);
+        this.networkStatus = status;
+      });
   }
 
   ngOnDestroy(): void {
     this.comentariosControlService.dataLoaded = false;
 
     this.subscriptions.unsubscribe();
+
+    this.networkStatus$.unsubscribe();
   }
 }
