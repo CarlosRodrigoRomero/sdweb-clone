@@ -10,5 +10,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  /* height: calc(100vh - 347px); */
+  overflow: hidden;
+}
+
+app-new-comment {
+  position: fixed;
+  bottom: 0.5rem;
 }

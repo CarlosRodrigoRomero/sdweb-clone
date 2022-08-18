@@ -3,5 +3,6 @@
 }
 
 .send-input {
-  width: 100%;
+  width: calc(100vw - 16px);
+  background: white;
 }

@@ -21,8 +21,8 @@
 }
 
 .thermal-btn {
-  position: absolute;
-  bottom: 0.5rem;
+  position: fixed;
+  bottom: 1rem;
   left: 50%;
   transform: translateX(-50%);
 }
