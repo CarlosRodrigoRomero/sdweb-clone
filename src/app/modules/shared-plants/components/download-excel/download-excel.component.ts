@@ -50,6 +50,8 @@ interface Fila {
   camaraModelo?: string;
   camaraSN?: number;
   modulo?: string;
+  numeroSerie?: string;
+  comentarios?: string;
 }
 
 @Component({
@@ -247,6 +249,8 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     }
 
     this.columnas[4].push(this.translation.t('Módulo'));
+    this.columnas[4].push(this.translation.t('Nº de serie'));
+    this.columnas[4].push(this.translation.t('O&M'));
   }
 
   private getRowData(anomalia: Anomalia, index: number) {
@@ -321,6 +325,10 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     }
 
     row.modulo = this.anomaliaInfoService.getModuloLabel(anomalia);
+
+    row.numeroSerie = this.anomaliaInfoService.getNumeroSerie(anomalia);
+
+    row.comentarios = this.anomaliaInfoService.getComentariosString(anomalia);
 
     if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
       this.storage

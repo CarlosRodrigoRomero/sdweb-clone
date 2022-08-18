@@ -399,6 +399,33 @@ export class AnomaliaInfoService {
     return GLOBAL.nombreLocalYFija;
   }
 
+  getNumeroSerie(anomalia: Anomalia): string {
+    let numeroSerie = '';
+    if (anomalia.hasOwnProperty('numeroSerie')) {
+      numeroSerie = anomalia.numeroSerie;
+    }
+    return numeroSerie;
+  }
+
+  getComentariosString(anomalia: Anomalia): string {
+    let stringComentarios = '';
+    if (anomalia.hasOwnProperty('comentarios') && anomalia.comentarios.length > 0) {
+      stringComentarios = anomalia.comentarios
+        .map(
+          (com) =>
+            'Comentario: ' +
+            com.texto +
+            ' - Fecha: ' +
+            formatDate(com.datetime, 'dd/MM/yyyy HH:mm', this.locale) +
+            ' - Tipo: ' +
+            com.tipo
+        )
+        .join(' ; ');
+    }
+
+    return stringComentarios;
+  }
+
   resetService() {
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();

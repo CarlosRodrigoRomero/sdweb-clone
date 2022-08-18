@@ -105,9 +105,9 @@ export class ExcelService {
     });
 
     // centramos texto filas datos
-    worksheet.getRows(2, worksheet.rowCount).forEach((row) => {
-      row.alignment = { horizontal: 'center' };
-    });
+    // worksheet.getRows(2, worksheet.rowCount).forEach((row) => {
+    //   row.alignment = { horizontal: 'center' };
+    // });
 
     // aplicamos estilos a los links
     if (columnasLink !== undefined) {
