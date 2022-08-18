@@ -278,6 +278,9 @@ export class ZonesCommentControlService {
   }
 
   resetService() {
+    this.map = undefined;
+    this.currentZoom = undefined;
+
     this.subscriptions.unsubscribe();
   }
 }

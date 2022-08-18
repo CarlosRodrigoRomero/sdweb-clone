@@ -137,4 +137,12 @@ export class SeguidoresControlCommentsService {
       }),
     });
   }
+
+  resetService() {
+    this.currentZoom = undefined;
+    this.seguidoresLayer = undefined;
+    this.listaSeguidores = undefined;
+
+    this.subscriptions.unsubscribe();
+  }
 }

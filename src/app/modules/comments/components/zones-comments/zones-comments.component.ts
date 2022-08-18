@@ -1,13 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { Feature, Map } from 'ol';
+import { Map } from 'ol';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import Polygon from 'ol/geom/Polygon';
-import { Fill, Stroke, Style, Text } from 'ol/style';
-
 import { OlMapService } from '@data/services/ol-map.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -21,7 +18,7 @@ import { InformeInterface } from '@core/models/informe';
   templateUrl: './zones-comments.component.html',
   styleUrls: ['./zones-comments.component.css'],
 })
-export class ZonesCommentsComponent implements OnInit {
+export class ZonesCommentsComponent implements OnInit, OnDestroy {
   private smallZones: LocationAreaInterface[] = [];
   private bigZones: LocationAreaInterface[][] = [];
   private zonesLayers: VectorLayer[];
@@ -60,12 +57,18 @@ export class ZonesCommentsComponent implements OnInit {
 
     this.olMapService.addZoneLayer(this.zonesCommentControlService.createSmallZonesLayer(this.informe.id));
 
-    this.olMapService.map$.subscribe((map) => {
-      if (map !== undefined) {
-        this.map = map;
+    this.subscriptions.add(
+      this.olMapService.map$.subscribe((map) => {
+        if (map !== undefined) {
+          this.map = map;
 
-        this.zonesLayers.forEach((l) => this.map.addLayer(l));
-      }
-    });
+          this.zonesLayers.forEach((l) => this.map.addLayer(l));
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

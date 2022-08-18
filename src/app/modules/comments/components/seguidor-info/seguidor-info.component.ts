@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { switchMap } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
@@ -21,7 +21,7 @@ import { PcInterface } from '@core/models/pc';
   templateUrl: './seguidor-info.component.html',
   styleUrls: ['./seguidor-info.component.css'],
 })
-export class SeguidorInfoComponent implements OnInit {
+export class SeguidorInfoComponent implements OnInit, OnDestroy {
   seguidorSelected: Seguidor;
   private imageVisual = new Image();
   private imageThermal = new Image();
@@ -280,5 +280,9 @@ export class SeguidorInfoComponent implements OnInit {
         polygon.set({ stroke: this.anomaliasControlCommentsService.getExternalColor(anomalia, 1), strokeWidth: 2 });
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

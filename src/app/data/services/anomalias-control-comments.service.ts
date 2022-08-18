@@ -138,6 +138,10 @@ export class AnomaliasControlCommentsService {
   }
 
   resetService() {
+    this.currentZoom = undefined;
+    this.listaAnomalias = [];
+    this.anomaliaLayer = undefined;
+
     this.subscriptions.unsubscribe();
   }
 }

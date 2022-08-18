@@ -23,6 +23,12 @@ import { PortfolioControlService } from '@data/services/portfolio-control.servic
 import { ImageProcessService } from '@data/services/image-process.service';
 import { ImagesLoadService } from '@data/services/images-load.service';
 import { ImagesTilesService } from '@data/services/images-tiles.service';
+import { AnomaliasControlCommentsService } from '@data/services/anomalias-control-comments.service';
+import { ComentariosControlService } from './comentarios-control.service';
+import { SeguidorViewCommentsService } from './seguidor-view-comments.service';
+import { SeguidoresControlCommentsService } from './seguidores-control-comments.service';
+import { ViewCommentsService } from './view-comments.service';
+import { ZonesCommentControlService } from './zones-comment-control.service';
 
 @Injectable({
   providedIn: 'root',
@@ -51,7 +57,13 @@ export class ResetServices {
     private portfolioControlService: PortfolioControlService,
     private imageProcessService: ImageProcessService,
     private imagesLoadService: ImagesLoadService,
-    private imagesTilesService: ImagesTilesService
+    private imagesTilesService: ImagesTilesService,
+    private anomaliasControlCommentsService: AnomaliasControlCommentsService,
+    private comentariosControlService: ComentariosControlService,
+    private seguidorViewCommentsService: SeguidorViewCommentsService,
+    private seguidoresControlCommentsService: SeguidoresControlCommentsService,
+    private viewCommentsService: ViewCommentsService,
+    private zonesCommentControlService: ZonesCommentControlService
   ) {}
 
   resetServices() {
@@ -78,5 +90,11 @@ export class ResetServices {
     this.imageProcessService.resetService();
     this.imagesLoadService.resetService();
     this.imagesTilesService.resetService();
+    this.anomaliasControlCommentsService.resetService();
+    this.comentariosControlService.resetService();
+    this.seguidorViewCommentsService.resetService();
+    this.seguidoresControlCommentsService.resetService();
+    this.viewCommentsService.resetService();
+    this.zonesCommentControlService.resetService();
   }
 }

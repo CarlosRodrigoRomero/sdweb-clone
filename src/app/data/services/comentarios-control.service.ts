@@ -97,6 +97,23 @@ export class ComentariosControlService {
     });
   }
 
+  resetService() {
+    this.listOpened = false;
+    this.infoOpened = false;
+    this.anomaliaSelected = undefined;
+    this.prevAnomaliaSelected = undefined;
+    this.seguidorSelected = undefined;
+    this.dataLoaded = false;
+    this.tipoComentarioSelected = 'anomalia';
+    this.vistas = ['map', 'list'];
+    this.vistaSelected = 'list';
+    this.tiposComentarios = ['anomalia', 'iv'];
+    this.anomalias = [];
+    this.seguidores = [];
+
+    this.subscriptions.unsubscribe();
+  }
+
   get listOpened(): boolean {
     return this._listOpened;
   }

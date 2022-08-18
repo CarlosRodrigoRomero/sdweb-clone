@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -32,7 +32,7 @@ import { InformeInterface } from '@core/models/informe';
   templateUrl: './map-comments.component.html',
   styleUrls: ['./map-comments.component.css'],
 })
-export class MapCommentsComponent implements OnInit {
+export class MapCommentsComponent implements OnInit, OnDestroy {
   private map: Map;
   private planta: PlantaInterface;
   private informe: InformeInterface;
@@ -281,5 +281,9 @@ export class MapCommentsComponent implements OnInit {
 
   setThermalVisibility() {
     this.viewCommentsService.thermalLayerVisible = !this.viewCommentsService.thermalLayerVisible;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

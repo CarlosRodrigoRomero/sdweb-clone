@@ -15,6 +15,14 @@ export class ViewCommentsService {
 
   constructor() {}
 
+  resetService() {
+    this.zoomShowAnoms = 18;
+    this.zoomChangeAnomsView = 22;
+    this.zoomChangeSegsView = 20;
+    this.zoomShowSmallZones = 16;
+    this.thermalLayerVisible = false;
+  }
+
   get thermalLayerVisible() {
     return this._thermalLayerVisible;
   }

@@ -8,6 +8,7 @@ import { map } from 'rxjs/operators';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
+import { ResetServices } from '@data/services/reset-services.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -35,7 +36,8 @@ export class CommentsComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private comentariosControlService: ComentariosControlService,
-    private anomaliaInfoService: AnomaliaInfoService
+    private anomaliaInfoService: AnomaliaInfoService,
+    private resetServices: ResetServices
   ) {}
 
   ngOnInit(): void {
@@ -47,43 +49,45 @@ export class CommentsComponent implements OnInit, OnDestroy {
       this.comentariosControlService.dataLoaded = res;
 
       this.comentariosControlService.initService().then(() => {
-        this.comentariosControlService.anomalias$.subscribe((anomalias) => {
-          this.anomsData = [];
-          anomalias.forEach((anom) => {
-            let fechaUltCom = null;
-            if (anom.hasOwnProperty('comentarios')) {
-              if (anom.comentarios.length > 0) {
-                const ultimoComentario = anom.comentarios.sort((a, b) => b.datetime - a.datetime)[0];
-                fechaUltCom = ultimoComentario.datetime;
+        this.subscriptions.add(
+          this.comentariosControlService.anomalias$.subscribe((anomalias) => {
+            this.anomsData = [];
+            anomalias.forEach((anom) => {
+              let fechaUltCom = null;
+              if (anom.hasOwnProperty('comentarios')) {
+                if (anom.comentarios.length > 0) {
+                  const ultimoComentario = anom.comentarios.sort((a, b) => b.datetime - a.datetime)[0];
+                  fechaUltCom = ultimoComentario.datetime;
+                }
+
+                let numComs = anom.comentarios.length;
+                if (numComs === 0) {
+                  numComs = null;
+                }
+
+                this.anomsData.push({
+                  id: anom.id,
+                  numAnom: anom.numAnom,
+                  numComs,
+                  tipo: this.anomaliaInfoService.getTipoLabel(anom),
+                  localizacion: this.anomaliaInfoService.getLocalizacionReducLabel(
+                    anom,
+                    this.reportControlService.planta
+                  ),
+                  posicion: this.anomaliaInfoService.getPosicionReducLabel(anom),
+                  // fechaUltCom,
+                  // horaUltCom,
+                  anomalia: anom,
+                  fecha: fechaUltCom,
+                });
               }
+            });
 
-              let numComs = anom.comentarios.length;
-              if (numComs === 0) {
-                numComs = null;
-              }
+            this.dataSource = new MatTableDataSource(this.anomsData);
 
-              this.anomsData.push({
-                id: anom.id,
-                numAnom: anom.numAnom,
-                numComs,
-                tipo: this.anomaliaInfoService.getTipoLabel(anom),
-                localizacion: this.anomaliaInfoService.getLocalizacionReducLabel(
-                  anom,
-                  this.reportControlService.planta
-                ),
-                posicion: this.anomaliaInfoService.getPosicionReducLabel(anom),
-                // fechaUltCom,
-                // horaUltCom,
-                anomalia: anom,
-                fecha: fechaUltCom,
-              });
-            }
-          });
-
-          this.dataSource = new MatTableDataSource(this.anomsData);
-
-          this.dataSource.filterPredicate = (data, filter: string): boolean => data.localizacion.includes(filter);
-        });
+            this.dataSource.filterPredicate = (data, filter: string): boolean => data.localizacion.includes(filter);
+          })
+        );
       });
     });
 
@@ -124,5 +128,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
 
     this.networkStatus$.unsubscribe();
+
+    this.resetServices.resetServices();
   }
 }

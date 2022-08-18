@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -30,7 +30,7 @@ import Point from 'ol/geom/Point';
   templateUrl: './map-seguidores-comments.component.html',
   styleUrls: ['./map-seguidores-comments.component.css'],
 })
-export class MapSeguidoresCommentsComponent implements OnInit {
+export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
   private map: Map;
   private planta: PlantaInterface;
   private informe: InformeInterface;
@@ -252,5 +252,9 @@ export class MapSeguidoresCommentsComponent implements OnInit {
 
   openCloseList() {
     this.comentariosControlService.listOpened = !this.comentariosControlService.listOpened;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

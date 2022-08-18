@@ -1,20 +1,9 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
-
-import { Subscription } from 'rxjs';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
@@ -45,7 +34,7 @@ export interface RowAnomData {
   providers: [DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AnomaliasListComponent implements OnInit, OnChanges, OnDestroy {
+export class AnomaliasListComponent implements OnInit, OnChanges {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @Input() dataSource: MatTableDataSource<RowAnomData>;
@@ -55,8 +44,6 @@ export class AnomaliasListComponent implements OnInit, OnChanges, OnDestroy {
   displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'numComs', 'map'];
   headerLocLabel = '';
   plantaFija;
-
-  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private reportControlService: ReportControlService,
@@ -128,13 +115,6 @@ export class AnomaliasListComponent implements OnInit, OnChanges, OnDestroy {
     this.closeListAndInfo();
   }
 
-  private closeSidenav() {
-    // cerramos el sidenav si estamos en mobile
-    if (window.screen.width < 768) {
-      this.comentariosControlService.listOpened = false;
-    }
-  }
-
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
@@ -142,9 +122,5 @@ export class AnomaliasListComponent implements OnInit, OnChanges, OnDestroy {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
   }
 }

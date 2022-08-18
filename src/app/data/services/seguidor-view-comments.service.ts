@@ -94,6 +94,20 @@ export class SeguidorViewCommentsService {
     }
   }
 
+  resetService() {
+    this.thermalImageExist = true;
+    this.visualImageExist = true;
+    this.urlVisualImageSeguidor = undefined;
+    this.urlThermalImageSeguidor = undefined;
+    this.imagesLoaded = false;
+
+    this.visualCanvas = undefined;
+    this.thermalCanvas = undefined;
+    this.anomsCanvas = undefined;
+    this.imagesWidth = 400;
+    this.imagesHeight = this.imagesWidth / 1.25;
+  }
+
   get thermalImageExist() {
     return this._thermalImageExist;
   }
