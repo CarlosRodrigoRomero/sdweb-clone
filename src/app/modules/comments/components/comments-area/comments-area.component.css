@@ -16,4 +16,5 @@
 app-new-comment {
   position: fixed;
   bottom: 0.5rem;
+  z-index: 11;
 }
