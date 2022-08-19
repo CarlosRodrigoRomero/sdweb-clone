@@ -32,6 +32,8 @@ export class CommentsListComponent implements OnInit, AfterViewInit, OnDestroy {
             this.comentariosAnomalia = comentarios
               .filter((com) => com.tipo === tipo)
               .sort((a, b) => b.datetime - a.datetime);
+          } else {
+            this.comentariosAnomalia = [];
           }
         }
       })
