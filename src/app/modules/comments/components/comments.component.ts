@@ -85,7 +85,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
 
             this.dataSource = new MatTableDataSource(this.anomsData);
 
-            this.dataSource.filterPredicate = (data, filter: string): boolean => data.localizacion.includes(filter);
+            this.dataSource.filterPredicate = (data, filter: string): boolean => {
+              return data.localizacion.toLowerCase().includes(filter);
+            };
           })
         );
       });
