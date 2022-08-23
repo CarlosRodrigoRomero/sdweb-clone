@@ -10,6 +10,7 @@ import { ComentariosControlService } from '@data/services/comentarios-control.se
 import { OlMapService } from '@data/services/ol-map.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { FilterService } from '@data/services/filter.service';
+import { ViewCommentsService } from '@data/services/view-comments.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -50,7 +51,8 @@ export class AnomaliasListComponent implements OnInit, OnChanges {
     private comentariosControlService: ComentariosControlService,
     private olMapService: OlMapService,
     private anomaliasControlService: AnomaliasControlService,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private viewCommentsService: ViewCommentsService
   ) {}
 
   ngOnInit(): void {
@@ -106,11 +108,21 @@ export class AnomaliasListComponent implements OnInit, OnChanges {
     this.comentariosControlService.infoOpened = false;
   }
 
-  goToAnomMap(anomalia: Anomalia) {
-    this.comentariosControlService.anomaliaSelected = anomalia;
+  goToAnomMap(row: any) {
+    this.selectElems(row);
 
-    this.olMapService.setViewCenter(anomalia.featureCoords[0]);
-    this.olMapService.setViewZoom(this.anomaliasControlService.zoomChangeView);
+    let coords;
+    let zoom;
+    if (this.reportControlService.plantaFija) {
+      coords = row.anomalia.featureCoords[0];
+      zoom = this.viewCommentsService.zoomChangeAnomsView;
+    } else {
+      coords = this.olMapService.getCentroid(this.comentariosControlService.seguidorSelected.featureCoords);
+      zoom = this.viewCommentsService.zoomChangeSegsView;
+    }
+
+    this.olMapService.setViewCenter(coords);
+    this.olMapService.setViewZoom(zoom);
 
     this.closeListAndInfo();
   }
