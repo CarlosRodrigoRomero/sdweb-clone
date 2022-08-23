@@ -36,6 +36,7 @@ export class ShareReportComponent {
   private getShareLink(): string {
     // primero guarda los params en la DB
     this.shareReportService.setSelectedInformeId(this.reportControlService.selectedInformeId);
+    this.shareReportService.setCreatedDate();
     this.shareReportService.saveParams();
 
     // luego recibimos el ID donde se han guardado

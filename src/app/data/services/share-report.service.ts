@@ -34,10 +34,18 @@ export class ShareReportService {
     this.subscriptions.add(
       this.afs
         .collection('share')
-        .doc(id)
+        .doc<ParamsFilterShare>(id)
         .get()
         .subscribe((params) => {
           this.params = params.data();
+          this.params.id = params.id;
+
+          // guardamos la fecha de acceso
+          this.setLastAccess();
+
+          // actualizamos el numero de accesos
+          this.updateNumAccess();
+
           this.params$.next(this.params);
         })
     );
@@ -51,6 +59,41 @@ export class ShareReportService {
   setSelectedInformeId(informeId: string) {
     this.params.informeId = informeId;
     this.params$.next(this.params);
+  }
+
+  setCreatedDate() {
+    const date = new Date();
+    this.params.fechaCreacion = date.getTime();
+    this.params$.next(this.params);
+  }
+
+  setLastAccess() {
+    const date = new Date();
+    this.params.ultimoAcceso = date.getTime();
+
+    this.afs
+      .collection('share')
+      .doc(this.params.id)
+      .update(this.params)
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  updateNumAccess() {
+    if (this.params.hasOwnProperty('numAccesos')) {
+      this.params.numAccesos = this.params.numAccesos + 1;
+    } else {
+      this.params.numAccesos = 1;
+    }
+
+    this.afs
+      .collection('share')
+      .doc(this.params.id)
+      .update(this.params)
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   setParams(filter: FilterInterface) {
