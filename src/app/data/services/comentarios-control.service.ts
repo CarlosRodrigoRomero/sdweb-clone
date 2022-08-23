@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -49,6 +50,7 @@ export class ComentariosControlService {
       this.subscriptions.add(
         this.filterService.filteredElements$
           .pipe(
+            take(2),
             switchMap((elems) => {
               this.anomalias = [];
               if (this.reportControlService.plantaFija) {

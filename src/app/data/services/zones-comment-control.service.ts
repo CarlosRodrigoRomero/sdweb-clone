@@ -93,7 +93,6 @@ export class ZonesCommentControlService {
       source.clear();
       zonas.forEach((zona) => {
         const elemsZona = this.zonesControlService.getElemsZona(zona, elems);
-        console.log(zona, elemsZona.length);
 
         // solo añadimos las zonas con anomalias
         if (elemsZona.length > 0) {
