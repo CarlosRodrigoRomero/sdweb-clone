@@ -1,0 +1,32 @@
+<div class="content">
+  <div class="tabla-container">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <!-- Planta informe -->
+      <ng-container matColumnDef="planta">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Planta</th>
+        <td mat-cell *matCellDef="let element">{{ element.planta }}</td>
+      </ng-container>
+
+      <!-- Fecha de creación -->
+      <ng-container matColumnDef="fechaCreacion">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha Creación</th>
+        <td mat-cell *matCellDef="let element">{{ element.fechaCreacion | date: 'dd/MM/yyyy' }}</td>
+      </ng-container>
+
+      <!-- Fecha ultimo acceso -->
+      <ng-container matColumnDef="ultimoAcceso">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Último Acceso</th>
+        <td mat-cell *matCellDef="let element">{{ element.ultimoAcceso | date: 'dd/MM/yyyy' }}</td>
+      </ng-container>
+
+      <!-- Nº de accesos -->
+      <ng-container matColumnDef="numAccesos">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nº Accesos</th>
+        <td mat-cell *matCellDef="let element">{{ element.numAccesos > 0 ? element.numAccesos : 0 }}</td>
+      </ng-container>
+    </table>
+  </div>
+</div>

@@ -17,6 +17,8 @@ import { PlantsComponent } from './components/plants/plants.component';
 import { PlantCreateComponent } from './components/plant-create/plant-create.component';
 import { PlantEditComponent } from './components/plant-edit/plant-edit.component';
 
+import { ReportsSharedComponent } from './components/reports-shared/reports-shared.component';
+
 const routes: Routes = [
   {
     path: '',
@@ -62,6 +64,10 @@ const routes: Routes = [
       {
         path: 'plants/create',
         component: PlantCreateComponent,
+      },
+      {
+        path: 'shared',
+        component: ReportsSharedComponent,
       },
     ],
   },

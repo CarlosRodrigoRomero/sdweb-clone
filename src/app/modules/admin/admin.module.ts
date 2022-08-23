@@ -18,6 +18,7 @@ import { ThermalLayerCreateComponent } from './components/thermal-layer-create/t
 import { PlantsComponent } from './components/plants/plants.component';
 import { PlantCreateComponent } from './components/plant-create/plant-create.component';
 import { PlantEditComponent } from './components/plant-edit/plant-edit.component';
+import { ReportsSharedComponent } from './components/reports-shared/reports-shared.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { PlantEditComponent } from './components/plant-edit/plant-edit.component
     PlantsComponent,
     PlantCreateComponent,
     PlantEditComponent,
+    ReportsSharedComponent,
   ],
   imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule, LayoutModule],
 })
