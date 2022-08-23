@@ -73,16 +73,22 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
   loadElems() {
     if (this.thereAreZones) {
       const selectedTaskZones = this.zones.filter((zone) => zone.completed);
-      const selectedZones = this.largestZones.filter((zone) => selectedTaskZones.find((t) => t.id === zone.id));
-
-      this.loadRawModules(selectedZones);
-      this.loadModuleGroups();
-      this.loadNormModules(selectedZones);
+      if (selectedTaskZones.length < this.zones.length) {
+        const selectedZones = this.largestZones.filter((zone) => selectedTaskZones.find((t) => t.id === zone.id));
+        this.loadRawModules(selectedZones);
+        this.loadNormModules(selectedZones);
+      } else {
+        // cargamos todos los modulos cuando seleccionamos todas las zonas
+        this.loadRawModules();
+        this.loadNormModules();
+      }
     } else {
+      // cargamos todos los modulos cuando no hay zonas
       this.loadRawModules();
-      this.loadModuleGroups();
       this.loadNormModules();
     }
+    // cargamos todos los grupos siempre
+    this.loadModuleGroups();
   }
 
   private loadRawModules(zones?: LocationAreaInterface[]) {
