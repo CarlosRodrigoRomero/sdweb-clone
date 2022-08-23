@@ -320,6 +320,10 @@ export class ShareReportService {
     return filters$.asObservable();
   }
 
+  getSharedReports(): Observable<ParamsFilterShare[]> {
+    return this.afs.collection('share').valueChanges();
+  }
+
   resetService() {
     this.params = {};
     this.idDB = undefined;
