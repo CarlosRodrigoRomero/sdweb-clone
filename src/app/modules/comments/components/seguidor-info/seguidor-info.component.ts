@@ -233,8 +233,8 @@ export class SeguidorInfoComponent implements OnInit, OnDestroy {
   }
 
   goToSegMap() {
-    const coords = this.seguidorSelected.featureCoords[0];
-    const zoom = this.viewCommentsService.zoomShowAnoms;
+    const coords = this.olMapService.getCentroid(this.seguidorSelected.featureCoords);
+    const zoom = this.viewCommentsService.zoomChangeSegsView;
 
     this.olMapService.setViewCenter(coords);
     this.olMapService.setViewZoom(zoom);

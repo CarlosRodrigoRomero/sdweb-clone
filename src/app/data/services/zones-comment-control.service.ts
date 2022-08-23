@@ -119,11 +119,7 @@ export class ZonesCommentControlService {
           const feature = new Feature({
             geometry: new Polygon(coords),
             properties: {
-              // id: this.getGlobalsLabel(zona.globalCoords),
-              // informeId,
               centroid: this.olMapService.getCentroid(coords[0]),
-              // type: 'zone',
-              // area: this.getArea(coords),
               numElems: elemsZona.length,
               numChecked: elemsChecked.length,
               label: this.getSmallGlobal(zona.globalCoords) + '\n\n' + elemsChecked.length + '/' + elemsZona.length,

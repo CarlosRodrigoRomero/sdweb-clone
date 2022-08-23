@@ -50,7 +50,7 @@ export class ComentariosControlService {
       this.subscriptions.add(
         this.filterService.filteredElements$
           .pipe(
-            take(1),
+            take(2),
             switchMap((elems) => {
               this.anomalias = [];
               if (this.reportControlService.plantaFija) {
