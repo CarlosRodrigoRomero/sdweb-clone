@@ -105,6 +105,8 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
                 colors: this.getColorsViewSeguidor(seguidor),
                 seguidor,
                 numComentarios,
+                hovered: false,
+                selected: false,
               });
             });
 
@@ -156,16 +158,13 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
 
   hoverSeguidor(row: any) {
     if (this.seguidorSelected === undefined) {
-      this.seguidoresControlService.seguidorHovered = row.seguidor;
-      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, true);
+      if (row.hovered) {
+        this.seguidoresControlService.seguidorHovered = row.seguidor;
+      } else {
+        this.seguidoresControlService.seguidorHovered = undefined;
+      }
+      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, row.hovered);
       this.seguidoresControlService.setPopupPosition(row.seguidor.featureCoords[0]);
-    }
-  }
-
-  unhoverSeguidor(row: any) {
-    if (this.seguidorSelected === undefined) {
-      this.seguidoresControlService.seguidorHovered = undefined;
-      this.seguidoresControlService.setExternalStyleSeguidor(row.seguidor.id, false);
     }
   }
 

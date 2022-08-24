@@ -120,9 +120,9 @@ table {
 }
 
 .mat-row.selected {
-  background-color: lightgrey;
+  background-color: rgb(187, 187, 187);
 }
 
 .mat-row.hovered {
-  background-color: whitesmoke;
+  background-color: lightgrey;
 }

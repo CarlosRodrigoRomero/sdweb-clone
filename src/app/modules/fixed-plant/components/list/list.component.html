@@ -74,12 +74,12 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr
         class="table-row"
+        mat-row
         (mouseover)="hoverRow(row, true)"
         (mouseleave)="hoverRow(row, false)"
         (click)="selectRow(row, false)"
         (dblclick)="selectRow(row, true)"
-        mat-row
-        [ngClass]="{ selected: row.anomalia === anomaliaSelect, hovered: row.anomalia === anomaliaHover }"
+        [ngClass]="{ selected: row.anomalia === anomaliaSelected, hovered: row.anomalia === anomaliaHovered }"
         *matRowDef="let row; columns: displayedColumns"
       ></tr>
 

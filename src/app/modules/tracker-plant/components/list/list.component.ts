@@ -1,23 +1,20 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { Anomalia } from '@core/models/anomalia';
+import { Seguidor } from '@core/models/seguidor';
 
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListComponent {
   @Input() viewSeleccionada: number;
   @Input() dataSource: MatTableDataSource<any>;
-  @Input() anomaliaHovered: Anomalia;
-  @Input() anomaliaSelected: Anomalia;
+  @Input() displayedColumns: string[];
+  @Input() seguidorHovered: Seguidor;
+  @Input() seguidorSelected: Seguidor;
   @Output() rowHovered = new EventEmitter<any>();
   @Output() rowSelected = new EventEmitter<any>();
-
-  displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente', 'comentarios'];
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -33,8 +30,7 @@ export class ListComponent {
     this.rowHovered.emit(row);
   }
 
-  selectRow(row: any, zoom: boolean) {
-    row.zoom = zoom;
+  selectRow(row: any) {
     this.rowSelected.emit(row);
   }
 }

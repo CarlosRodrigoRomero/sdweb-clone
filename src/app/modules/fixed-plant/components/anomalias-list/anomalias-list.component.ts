@@ -28,10 +28,10 @@ import { Colors } from '@core/classes/colors';
 export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy {
   viewSeleccionada = 0;
   dataSource: MatTableDataSource<any>;
-  public selectedRow: string;
-  public prevSelectedRow: any;
-  public anomaliaHover;
-  public anomaliaSelect;
+  selectedRow: string;
+  prevSelectedRow: any;
+  anomaliaHovered;
+  anomaliaSelected;
   private map: Map;
   private selectedInformeId: string;
 
@@ -106,10 +106,10 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
     );
 
     this.subscriptions.add(
-      this.anomaliasControlService.anomaliaHover$.subscribe((anomHov) => (this.anomaliaHover = anomHov))
+      this.anomaliasControlService.anomaliaHover$.subscribe((anomHov) => (this.anomaliaHovered = anomHov))
     );
     this.subscriptions.add(
-      this.anomaliasControlService.anomaliaSelect$.subscribe((anomSel) => (this.anomaliaSelect = anomSel))
+      this.anomaliasControlService.anomaliaSelect$.subscribe((anomSel) => (this.anomaliaSelected = anomSel))
     );
   }
 
