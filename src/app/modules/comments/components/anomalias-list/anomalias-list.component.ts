@@ -68,7 +68,7 @@ export class AnomaliasListComponent implements OnInit, OnChanges {
     if (changes.hasOwnProperty('anomalias')) {
       this.anomalias = changes.anomalias.currentValue;
     }
-    if (changes.hasOwnProperty('dataSource') && changes.dataSource.currentValue != undefined) {
+    if (changes.hasOwnProperty('dataSource') && changes.dataSource.currentValue !== undefined) {
       this.dataSource = changes.dataSource.currentValue;
       this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
