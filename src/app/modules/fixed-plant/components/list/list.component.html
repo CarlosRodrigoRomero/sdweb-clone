@@ -5,7 +5,7 @@
   </mat-form-field>
 
   <div class="tabla-container mat-elevation-z4">
-    <table mat-table [dataSource]="dataSource" matSort matSortActive="numAnom" matSortDirection="asc">
+    <table mat-table [dataSource]="dataSource" matSort>
       <!-- COLOR -->
       <ng-container matColumnDef="colors" class="col-anomalia">
         <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
@@ -74,10 +74,10 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr
         class="table-row"
-        (mouseover)="hoverAnomalia(row)"
-        (mouseleave)="unhoverAnomalia(row)"
-        (click)="selectAnomalia(row, false)"
-        (dblclick)="selectAnomalia(row, true)"
+        (mouseover)="hoverRow(row, true)"
+        (mouseleave)="hoverRow(row, false)"
+        (click)="selectRow(row, false)"
+        (dblclick)="selectRow(row, true)"
         mat-row
         [ngClass]="{ selected: row.anomalia === anomaliaSelect, hovered: row.anomalia === anomaliaHover }"
         *matRowDef="let row; columns: displayedColumns"

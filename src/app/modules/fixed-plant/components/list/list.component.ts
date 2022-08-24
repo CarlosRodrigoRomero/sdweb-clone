@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { MatTableDataSource } from '@angular/material/table';
-import { Anomalia } from '@core/models/anomalia';
 
 @Component({
   selector: 'app-list',
@@ -10,9 +9,10 @@ import { Anomalia } from '@core/models/anomalia';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListComponent implements OnInit {
+  @Input() viewSeleccionada: number;
   @Input() dataSource: MatTableDataSource<any>;
-
-  // @Output() anomaliaHovered = new EventEmitter<Anomalia>();
+  @Output() rowHovered = new EventEmitter<any>();
+  @Output() rowSelected = new EventEmitter<any>();
 
   displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente', 'comentarios'];
 
@@ -29,7 +29,13 @@ export class ListComponent implements OnInit {
     }
   }
 
-  // hoverAnomalia(row: any) {
-  //   this.anomaliaHovered.emit(row.anomalia);
-  // }
+  hoverRow(row: any, hovered: boolean) {
+    row.hovered = hovered;
+    this.rowHovered.emit(row);
+  }
+
+  selectRow(row: any, zoom: boolean) {
+    row.zoom = zoom;
+    this.rowSelected.emit(row);
+  }
 }

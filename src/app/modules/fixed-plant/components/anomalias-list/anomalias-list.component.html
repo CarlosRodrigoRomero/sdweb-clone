@@ -1,1 +1,6 @@
-<app-list [dataSource]="dataSource"></app-list>
+<app-list
+  [viewSeleccionada]="viewSeleccionada"
+  [dataSource]="dataSource"
+  (rowHovered)="hoverAnomalia($event)"
+  (rowSelected)="selectAnomalia($event)"
+></app-list>
