@@ -215,9 +215,11 @@ export class FilterService {
     if (viewSelected === 1) {
       this.prevAllFilterableElems = this.allFiltrableElements;
       this.allFiltrableElements = this.allFiltrableElements.filter((elem) => elem.tipo == 8 || elem.tipo == 9);
+      this.allFiltrableElements = this.allFiltrableElements.sort((a, b) => a.numAnom - b.numAnom);
       this.processFilters();
     } else if (this.prevAllFilterableElems !== undefined) {
       this.allFiltrableElements = this.prevAllFilterableElems;
+      this.allFiltrableElements = this.allFiltrableElements.sort((a, b) => a.numAnom - b.numAnom);
       this.processFilters();
       this.prevAllFilterableElems = undefined;
     }
