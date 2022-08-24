@@ -8,7 +8,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
-import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { FilterService } from '@data/services/filter.service';
 import { ViewCommentsService } from '@data/services/view-comments.service';
 
@@ -50,7 +49,6 @@ export class AnomaliasListComponent implements OnInit, OnChanges {
     private reportControlService: ReportControlService,
     private comentariosControlService: ComentariosControlService,
     private olMapService: OlMapService,
-    private anomaliasControlService: AnomaliasControlService,
     private filterService: FilterService,
     private viewCommentsService: ViewCommentsService
   ) {}

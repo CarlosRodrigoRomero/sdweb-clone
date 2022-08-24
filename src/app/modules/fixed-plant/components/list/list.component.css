@@ -1,0 +1,128 @@
+.lista {
+  margin: 5px;
+}
+
+.buscar-input {
+  width: 100%;
+}
+
+:host ::ng-deep .buscar-input .mat-form-field-wrapper {
+  padding-bottom: 6px;
+}
+
+:host ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}
+
+:host ::ng-deep .mat-sort-header-content {
+  width: max-content;
+}
+
+:host ::ng-deep td.mat-cell:first-of-type {
+  padding-left: 0px;
+}
+
+table {
+  width: 100%;
+}
+
+.tabla-container {
+  position: relative;
+  height: calc(100vh - 280px);
+  overflow: auto;
+}
+
+.label-tipo {
+  display: inline-flex;
+  margin-top: 0.5rem;
+}
+
+.label-tipo mat-icon {
+  margin-right: 0.5rem;
+}
+
+.mat-row {
+  cursor: pointer;
+}
+
+.row-data {
+  display: flex;
+  justify-content: center;
+}
+
+.color-row {
+  width: 10px;
+  height: 48px;
+}
+
+.mat-column-tipo {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 40% !important;
+  width: 40% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  /* word-break: break-word; */
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-perdidas {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 18% !important;
+  width: 18% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  /* word-break: break-word; */
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-temp {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 20% !important;
+  width: 20% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  /* word-break: break-word; */
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-gradiente {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 22% !important;
+  width: 22% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  /* word-break: break-word; */
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-row.selected {
+  background-color: lightgrey;
+}
+
+.mat-row.hovered {
+  background-color: whitesmoke;
+}

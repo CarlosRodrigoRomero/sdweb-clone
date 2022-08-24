@@ -27,7 +27,6 @@ import { Colors } from '@core/classes/colors';
 })
 export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy {
   viewSeleccionada = 0;
-  displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente', 'comentarios'];
   dataSource: MatTableDataSource<any>;
   public selectedRow: string;
   public prevSelectedRow: any;
@@ -122,15 +121,6 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
     const colorCCs = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
     const colorGradNormMax = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
     return [colorPerdidas, colorCCs, colorGradNormMax];
-  }
-
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
   }
 
   hoverAnomalia(row: any) {
