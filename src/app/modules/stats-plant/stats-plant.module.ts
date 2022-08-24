@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 
+import { StatsPlantRoutingModule } from './stats-plant-routing.module';
 import { SharedModule } from '@shared/shared.module';
 
 import { PlantaStatsComponent } from './components/planta-stats.component';
@@ -29,7 +30,7 @@ import { ChartSankeyPotenciaComponent } from './components/chart-sankey-potencia
     ChartSankeyComponent,
     ChartSankeyPotenciaComponent,
   ],
-  imports: [CommonModule, SharedModule, NgApexchartsModule],
+  imports: [CommonModule, StatsPlantRoutingModule, SharedModule, NgApexchartsModule],
   exports: [PlantaStatsComponent],
 })
 export class StatsPlantModule {}

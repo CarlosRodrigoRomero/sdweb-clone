@@ -99,7 +99,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadStats() {
-    this.statsService.loadStats = true;
+    // this.statsService.loadStats = true;
   }
 
   resetSeguidorView() {

@@ -1,4 +1,4 @@
-import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
+import { Routes, RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 
 import { AuthGuard } from '@core/guards/auth.guard';
@@ -91,7 +91,6 @@ export const routes: Routes = [
   providers: [],
   imports: [
     RouterModule.forRoot(routes, {
-      preloadingStrategy: PreloadAllModules,
       relativeLinkResolution: 'legacy',
     }),
   ],

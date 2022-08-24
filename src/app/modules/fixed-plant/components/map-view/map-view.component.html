@@ -3,15 +3,20 @@
   *ngIf="anomaliasLoaded"
   class="stats-container"
   [hasBackdrop]="true"
-  (backdropClick)="sidenavStats.toggle()"
+  (backdropClick)="closeStats()"
 >
   <!-- SIDENAV STATS -->
   <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end">
-    <app-planta-stats></app-planta-stats>
+    <!-- boton para cerrar el sidenav -->
+    <button mat-icon-button class="btn-close-sidenav-stats close-stats" (click)="closeStats()">
+      <mat-icon class="close-stats">close</mat-icon>
+    </button>
+    <!-- cargamos el modulo Stats -->
+    <router-outlet></router-outlet>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <mat-sidenav-container class="main-container" [hasBackdrop]="false" (backdropClick)="sidenavStats.close()">
+    <mat-sidenav-container class="main-container">
       <!-- SIDENAV FILTROS -->
       <mat-sidenav
         *ngIf="showFilters"
@@ -101,7 +106,7 @@
             *ngIf="notSharedReport || completeView"
             mat-raised-button
             class="btn-right-stats stats"
-            (click)="sidenavStats.toggle(); loadStats()"
+            (click)="loadStats(); sidenavStats.toggle()"
             matTooltip="Estadísticas"
             matTooltipClass="tooltip-style"
             [disabled]="noAnomsReport"

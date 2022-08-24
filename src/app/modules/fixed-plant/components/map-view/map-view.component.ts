@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
@@ -42,7 +43,9 @@ export class MapViewComponent implements OnInit, OnDestroy {
     private statsService: StatsService,
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
-    private resetServicesService: ResetServices
+    private resetServicesService: ResetServices,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -97,7 +100,12 @@ export class MapViewComponent implements OnInit, OnDestroy {
   }
 
   loadStats() {
-    this.statsService.loadStats = true;
+    this.router.navigate(['stats'], { relativeTo: this.activatedRoute });
+  }
+
+  closeStats() {
+    this.router.navigate(['./'], { relativeTo: this.activatedRoute });
+    this.sidenavStats.toggle();
   }
 
   ngOnDestroy(): void {
