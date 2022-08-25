@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Subscription } from 'rxjs';
@@ -29,7 +28,7 @@ interface SeguidorData {
   templateUrl: './seguidores-list.component.html',
   styleUrls: ['./seguidores-list.component.css'],
 })
-export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy {
+export class SeguidoresListComponent implements OnInit, OnDestroy {
   viewSeleccionada = 0;
   displayedColumns: string[] = [];
   dataSource: MatTableDataSource<SeguidorData>;
@@ -38,8 +37,6 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
   private selectedInformeId: string;
 
   private subscriptions: Subscription = new Subscription();
-
-  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
     public filterService: FilterService,
@@ -111,7 +108,6 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
             });
 
           this.dataSource = new MatTableDataSource(filteredElements);
-          this.dataSource.sort = this.sort;
         })
     );
 
@@ -121,12 +117,6 @@ export class SeguidoresListComponent implements OnInit, AfterViewInit, OnDestroy
     this.subscriptions.add(
       this.seguidoresControlService.seguidorSelected$.subscribe((segSel) => (this.seguidorSelected = segSel))
     );
-  }
-
-  ngAfterViewInit(): void {
-    if (this.dataSource !== undefined) {
-      this.dataSource.sort = this.sort;
-    }
   }
 
   private getColorsViewSeguidor(seguidor: Seguidor): string[] {

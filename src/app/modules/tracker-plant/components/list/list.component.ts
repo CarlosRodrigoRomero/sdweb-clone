@@ -1,6 +1,13 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
@@ -10,10 +17,9 @@ import { Seguidor } from '@core/models/seguidor';
   selector: 'app-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListComponent implements OnChanges {
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+export class ListComponent implements AfterViewInit {
   @Input() viewSeleccionada: number;
   @Input() dataSource: MatTableDataSource<any>;
   @Input() displayedColumns: string[];
@@ -21,14 +27,10 @@ export class ListComponent implements OnChanges {
   @Input() seguidorSelected: Seguidor;
   @Output() rowHovered = new EventEmitter<any>();
   @Output() rowSelected = new EventEmitter<any>();
+  @ViewChild(MatSort) sort: MatSort;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.hasOwnProperty('dataSource') && changes.dataSource.currentValue !== undefined) {
-      console.log(changes);
-      this.dataSource = changes.dataSource.currentValue;
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
-    }
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
   }
 
   applyFilter(event: Event) {

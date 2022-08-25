@@ -1,14 +1,12 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
-  OnChanges,
   Output,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 
 import { MatTableDataSource } from '@angular/material/table';
@@ -20,7 +18,7 @@ import { Anomalia } from '@core/models/anomalia';
   styleUrls: ['./list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListComponent implements OnChanges {
+export class ListComponent implements AfterViewInit {
   @Input() viewSeleccionada: number;
   @Input() dataSource: MatTableDataSource<any>;
   @Input() anomaliaHovered: Anomalia;
@@ -28,16 +26,11 @@ export class ListComponent implements OnChanges {
   @Output() rowHovered = new EventEmitter<any>();
   @Output() rowSelected = new EventEmitter<any>();
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente', 'comentarios'];
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.hasOwnProperty('dataSource') && changes.dataSource.currentValue !== undefined) {
-      this.dataSource = changes.dataSource.currentValue;
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
-    }
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
   }
 
   applyFilter(event: Event) {

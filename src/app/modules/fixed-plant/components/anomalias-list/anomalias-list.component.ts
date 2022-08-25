@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Map } from 'ol';
@@ -25,7 +24,7 @@ import { Colors } from '@core/classes/colors';
   templateUrl: './anomalias-list.component.html',
   styleUrls: ['./anomalias-list.component.css'],
 })
-export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AnomaliasListComponent implements OnInit, OnDestroy {
   viewSeleccionada = 0;
   dataSource: MatTableDataSource<any>;
   selectedRow: string;
@@ -34,8 +33,6 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
   anomaliaSelected;
   private map: Map;
   private selectedInformeId: string;
-
-  @ViewChild(MatSort) sort: MatSort;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -99,7 +96,6 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
             });
 
           this.dataSource = new MatTableDataSource(filteredElements);
-          this.dataSource.sort = this.sort;
 
           this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;
         })
@@ -111,10 +107,6 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
     this.subscriptions.add(
       this.anomaliasControlService.anomaliaSelect$.subscribe((anomSel) => (this.anomaliaSelected = anomSel))
     );
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
   }
 
   private getAnomViewColors(anomalia: Anomalia): string[] {
