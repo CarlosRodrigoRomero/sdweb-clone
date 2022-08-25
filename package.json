@@ -9,12 +9,13 @@
     "serve-mobile": "ng serve --host=0.0.0.0",
     "build": "ng build",
     "build:prod": "ng build --prod",
+    "build:analyzer": "ng build --prod --stats-json",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "deploy:dev": "firebase use dev && ng build --outputHashing=all && firebase deploy --only hosting",
     "deploy:prod": "firebase use prod && ng build --prod --outputHashing=all && firebase deploy --only hosting",
-    "analyzer": "webpack-bundle-analyzer dist/sdweb/stats-es2015.json"
+    "analyzer": "npx webpack-bundle-analyzer dist/sdweb/stats.json"
   },
   "private": true,
   "dependencies": {
