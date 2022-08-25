@@ -17,7 +17,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 })
 export class ShareReportComponent {
   items: Observable<any[]>;
-  onlyFiltered = false;
+  onlyFiltered = true;
   versionTecnicos = false;
 
   constructor(
