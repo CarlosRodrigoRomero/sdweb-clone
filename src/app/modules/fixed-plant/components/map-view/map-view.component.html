@@ -3,16 +3,12 @@
   *ngIf="anomaliasLoaded"
   class="stats-container"
   [hasBackdrop]="true"
-  (backdropClick)="closeStats()"
+  (backdropClick)="sidenavStats.toggle()"
 >
   <!-- SIDENAV STATS -->
   <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end">
-    <!-- boton para cerrar el sidenav -->
-    <button mat-icon-button class="btn-close-sidenav-stats close-stats" (click)="closeStats()">
-      <mat-icon class="close-stats">close</mat-icon>
-    </button>
     <!-- cargamos el modulo Stats -->
-    <router-outlet></router-outlet>
+    <ng-template appDynamicStats></ng-template>
   </mat-sidenav>
 
   <mat-sidenav-content>

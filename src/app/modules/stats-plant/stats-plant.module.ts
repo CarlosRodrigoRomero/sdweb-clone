@@ -17,6 +17,8 @@ import { ChartPctCelsComponent } from './components/chart-pct-cels/chart-pct-cel
 import { ChartSankeyComponent } from './components/chart-sankey/chart-sankey.component';
 import { ChartSankeyPotenciaComponent } from './components/chart-sankey-potencia/chart-sankey-potencia.component';
 
+import { DynamicStatsDirective } from './directives/dynamic-stats.directive';
+
 @NgModule({
   declarations: [
     PlantaStatsComponent,
@@ -29,8 +31,10 @@ import { ChartSankeyPotenciaComponent } from './components/chart-sankey-potencia
     ChartPctCelsComponent,
     ChartSankeyComponent,
     ChartSankeyPotenciaComponent,
+    DynamicStatsDirective,
   ],
+  entryComponents: [DynamicStatsDirective],
   imports: [CommonModule, StatsPlantRoutingModule, SharedModule, NgApexchartsModule],
-  exports: [PlantaStatsComponent],
+  exports: [PlantaStatsComponent, DynamicStatsDirective],
 })
 export class StatsPlantModule {}

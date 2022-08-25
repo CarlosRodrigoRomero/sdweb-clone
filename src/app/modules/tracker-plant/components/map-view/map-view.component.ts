@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ComponentFactoryResolver } from '@angular/core';
 
 import { MatSidenav } from '@angular/material/sidenav';
+
+import { Subscription } from 'rxjs';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
@@ -11,6 +12,10 @@ import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ResetServices } from '@data/services/reset-services.service';
+
+import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
+
+import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
 
 @Component({
   selector: 'app-map-view',
@@ -39,6 +44,8 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
   @ViewChild('sidenavSeguidorView') sidenavSeguidorView: MatSidenav;
 
+  @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
+
   constructor(
     private reportControlService: ReportControlService,
     private seguidoresControlService: SeguidoresControlService,
@@ -47,7 +54,8 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     private mapSeguidoresService: MapSeguidoresService,
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
-    private resetServices: ResetServices
+    private resetServices: ResetServices,
+    private componentFactoryResolver: ComponentFactoryResolver
   ) {}
 
   ngOnInit(): void {
@@ -99,7 +107,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadStats() {
-    // this.statsService.loadStats = true;
+    const component = this.componentFactoryResolver.resolveComponentFactory(PlantaStatsComponent);
+
+    this.dynamicStats.viewContainerRef.clear();
+    this.dynamicStats.viewContainerRef.createComponent(component);
   }
 
   resetSeguidorView() {

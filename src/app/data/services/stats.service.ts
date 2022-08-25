@@ -22,7 +22,6 @@ export class StatsService {
   }
 
   closeStatsSidenav() {
-    this.router.navigate(['../']);
     return this.sidenav.toggle();
   }
 

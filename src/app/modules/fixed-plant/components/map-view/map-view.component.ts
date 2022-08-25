@@ -1,5 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnDestroy, OnInit, ViewChild, ComponentFactoryResolver } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -10,6 +9,10 @@ import { StatsService } from '@data/services/stats.service';
 import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ResetServices } from '@data/services/reset-services.service';
+
+import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
+
+import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
 
 @Component({
   selector: 'app-map-view',
@@ -38,14 +41,15 @@ export class MapViewComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
 
+  @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
+
   constructor(
     private reportControlService: ReportControlService,
     private statsService: StatsService,
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
     private resetServicesService: ResetServices,
-    private router: Router,
-    private activatedRoute: ActivatedRoute
+    private componentFactoryResolver: ComponentFactoryResolver
   ) {}
 
   ngOnInit(): void {
@@ -100,12 +104,10 @@ export class MapViewComponent implements OnInit, OnDestroy {
   }
 
   loadStats() {
-    this.router.navigate(['stats'], { relativeTo: this.activatedRoute });
-  }
+    const component = this.componentFactoryResolver.resolveComponentFactory(PlantaStatsComponent);
 
-  closeStats() {
-    this.router.navigate(['./'], { relativeTo: this.activatedRoute });
-    this.sidenavStats.toggle();
+    this.dynamicStats.viewContainerRef.clear();
+    this.dynamicStats.viewContainerRef.createComponent(component);
   }
 
   ngOnDestroy(): void {
