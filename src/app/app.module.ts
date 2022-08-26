@@ -21,12 +21,13 @@ import { environment } from '../environments/environment';
 
 import { AppComponent } from './app.component';
 import { SkeletonComponent } from '@layout/skeleton/skeleton.component';
-import { NavbarComponent } from '@layout/navbar/navbar.component';
+import { NavbarViewComponent } from '@layout/navbar-view/navbar-view.component';
+import { NavbarComponent } from './layout/navbar/navbar.component';
 
 import { WINDOW_PROVIDERS } from './window.providers';
 
 @NgModule({
-  declarations: [AppComponent, SkeletonComponent, NavbarComponent],
+  declarations: [AppComponent, SkeletonComponent, NavbarViewComponent, NavbarComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

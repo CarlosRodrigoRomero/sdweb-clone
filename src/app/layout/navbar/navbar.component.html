@@ -1,51 +1,13 @@
-<mat-toolbar [class.mat-elevation-z2]="true" class="nb">
-  <a *ngIf="themeSelected === 'light-theme'" class="navbar-brand" (click)="navigateHome()">
-    <img src="../../../assets/images/logo_sd.png" height="50" class="d-inline-block align-top" alt="" />
-  </a>
-  <a *ngIf="themeSelected === 'light-theme'" class="navbar-brand-logo" (click)="navigateHome()" display="none">
-    <img src="../../../assets/images/favicon.png" height="30" class="d-inline-block align-top" alt="" />
-  </a>
-
-  <div id="plant-summary" *ngIf="loadContent && !tipoComentarios">
-    <app-plant-summary></app-plant-summary>
-  </div>
-
-  <div *ngIf="tipoComentarios">
-    <app-simple-plant-summary></app-simple-plant-summary>
-  </div>
-
-  <span class="example-spacer"></span>
-
-  <div class="right">
-    <!-- MENU ALERTAS INFORME TERMINADO ANTES DE ENTREGAR -->
-    <app-warnings-menu *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-warnings-menu>
-
-    <!-- MENU RECALCULAR MAE Y CC -->
-    <app-report-recalc *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-report-recalc>
-
-    <!-- BOTON NOTIFICACIONES PROVISIONAL -->
-    <button class="btn-notif" *ngIf="hasNotifications" mat-icon-button [matMenuTriggerFor]="notifMenu">
-      <mat-icon matBadge="{{ notifications.length }}" matBadgeColor="primary">notifications</mat-icon>
-    </button>
-    <mat-menu class="notif-menu" #notifMenu="matMenu">
-      <button mat-menu-item (click)="applyFilter(notification.filter)" *ngFor="let notification of notifications">
-        <div class="btn-content">
-          <mat-icon class="btn-icon">warning</mat-icon>
-          <span class="btn-label">{{ notification.content }}</span>
-        </div>
-      </button>
-    </mat-menu>
-
-    <!-- botón menu derecha -->
-    <button *ngIf="!isShared" mat-icon-button [matMenuTriggerFor]="endMenu">
-      <mat-icon>keyboard_arrow_down</mat-icon>
-    </button>
-    <mat-menu #endMenu="matMenu">
-      <button *ngIf="isAdmin" mat-menu-item routerLink="/admin">Admin</button>
-      <button *ngIf="isAdmin" mat-menu-item routerLink="/clientes">Web antigua</button>
-      <button mat-menu-item (click)="signOut()" routerLink="../auth">
-        <strong> Cerrar sesión </strong>
-      </button>
-    </mat-menu>
-  </div>
-</mat-toolbar>
+<app-navbar-view
+  [loadContent]="loadContent"
+  [tipoComentarios]="tipoComentarios"
+  [isAdmin]="isAdmin"
+  [isReport]="isReport"
+  [isDemo]="isDemo"
+  [isShared]="isShared"
+  [hasNotifications]="hasNotifications"
+  [notifications]="notifications"
+  (navigateHome)="navigateHome()"
+  (signOut)="signOut()"
+  (applyFilter)="applyFilter($event)"
+></app-navbar-view>
