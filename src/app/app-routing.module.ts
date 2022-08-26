@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 
 import { AuthGuard } from '@core/guards/auth.guard';
 
+import { SelectivePreloadingStrategyService } from '@data/services/selective-preloading-strategy.service';
+
 import { AvisoLegalComponent } from '@shared/components/aviso-legal/aviso-legal.component';
 import { SkeletonComponent } from '@layout/skeleton/skeleton.component';
 
@@ -12,6 +14,7 @@ export const routes: Routes = [
   {
     path: 'auth',
     loadChildren: () => import('@modules/auth/auth.module').then((m) => m.AuthenticationModule),
+    data: { preload: true },
   },
   {
     path: 'admin',
@@ -23,6 +26,7 @@ export const routes: Routes = [
     component: SkeletonComponent,
     loadChildren: () => import('@modules/clients/clients.module').then((m) => m.ClientsModule),
     canActivate: [AuthGuard],
+    data: { preload: true },
   },
   {
     path: 'clientes',
@@ -92,6 +96,8 @@ export const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes, {
       relativeLinkResolution: 'legacy',
+      enableTracing: true,
+      preloadingStrategy: SelectivePreloadingStrategyService,
     }),
   ],
   exports: [RouterModule],
