@@ -16,6 +16,7 @@ import { AutoNormModulesComponent } from './components/auto-norm-modules/auto-no
 import { RawModulesFiltersComponent } from './components/raw-modules-filters/raw-modules-filters.component';
 import { RefreshComponent } from './components/refresh/refresh.component';
 import { LoadElemsComponent } from './components/load-elems/load-elems.component';
+import { ListElemsComponent } from './components/list-elems/list-elems.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { LoadElemsComponent } from './components/load-elems/load-elems.component
     RawModulesFiltersComponent,
     RefreshComponent,
     LoadElemsComponent,
+    ListElemsComponent,
   ],
   imports: [CommonModule, StructuresRoutingModule, SharedModule, FiltersModule],
 })
