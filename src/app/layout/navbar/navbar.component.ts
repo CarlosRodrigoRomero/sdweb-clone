@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+
 import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
 import { AuthService } from '@data/services/auth.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { ThemeService } from '@data/services/theme.service';
 import { FilterService } from '@data/services/filter.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 
@@ -14,7 +14,7 @@ import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { GradientFilter } from '@core/models/gradientFilter';
 import { DemoService } from '@data/services/demo.service';
 
-interface Notification {
+export interface Notification {
   content: string;
   filter: string;
 }
@@ -43,7 +43,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     public authService: AuthService,
     private router: Router,
-    private themeService: ThemeService,
     private reportControlService: ReportControlService,
     private filterService: FilterService,
     private demoService: DemoService,
@@ -139,9 +138,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     // comprobamos si es la planta demo
     this.isDemo = this.demoService.checkIsDemo();
 
-    this.subscriptions.add(this.comentariosControlService.dataLoaded$.subscribe((value) => (this.tipoComentarios = value)));
-
-    // this.themeService.themeSelected$.subscribe((theme) => (this.themeSelected = theme));
+    this.subscriptions.add(
+      this.comentariosControlService.dataLoaded$.subscribe((value) => (this.tipoComentarios = value))
+    );
   }
 
   navigateHome() {
