@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Map } from 'ol';
@@ -25,18 +24,15 @@ import { Colors } from '@core/classes/colors';
   templateUrl: './anomalias-list.component.html',
   styleUrls: ['./anomalias-list.component.css'],
 })
-export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AnomaliasListComponent implements OnInit, OnDestroy {
   viewSeleccionada = 0;
-  displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente', 'comentarios'];
   dataSource: MatTableDataSource<any>;
-  public selectedRow: string;
-  public prevSelectedRow: any;
-  public anomaliaHover;
-  public anomaliaSelect;
+  selectedRow: string;
+  prevSelectedRow: any;
+  anomaliaHovered;
+  anomaliaSelected;
   private map: Map;
   private selectedInformeId: string;
-
-  @ViewChild(MatSort) sort: MatSort;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -90,8 +86,9 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
                 gradienteNormalizado: anomalia.gradienteNormalizado,
                 clase: anomalia.clase,
                 anomalia,
-                selected: false,
                 hovered: false,
+                selected: false,
+                zoom: false,
                 numAnom: anomalia.numAnom,
                 colors: this.getAnomViewColors(anomalia),
                 numComentarios,
@@ -99,22 +96,17 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
             });
 
           this.dataSource = new MatTableDataSource(filteredElements);
-          this.dataSource.sort = this.sort;
 
           this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;
         })
     );
 
     this.subscriptions.add(
-      this.anomaliasControlService.anomaliaHover$.subscribe((anomHov) => (this.anomaliaHover = anomHov))
+      this.anomaliasControlService.anomaliaHover$.subscribe((anomHov) => (this.anomaliaHovered = anomHov))
     );
     this.subscriptions.add(
-      this.anomaliasControlService.anomaliaSelect$.subscribe((anomSel) => (this.anomaliaSelect = anomSel))
+      this.anomaliasControlService.anomaliaSelect$.subscribe((anomSel) => (this.anomaliaSelected = anomSel))
     );
-  }
-
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
   }
 
   private getAnomViewColors(anomalia: Anomalia): string[] {
@@ -124,30 +116,18 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
     return [colorPerdidas, colorCCs, colorGradNormMax];
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-  }
-
   hoverAnomalia(row: any) {
     if (this.anomaliasControlService.anomaliaSelect === undefined) {
-      this.anomaliasControlService.anomaliaHover = row.anomalia;
-      this.anomaliasControlService.setExternalStyle(row.id, true);
+      if (row.hovered) {
+        this.anomaliasControlService.anomaliaHover = row.anomalia;
+      } else {
+        this.anomaliasControlService.anomaliaHover = undefined;
+      }
+      this.anomaliasControlService.setExternalStyle(row.id, row.hovered);
     }
   }
 
-  unhoverAnomalia(row: any) {
-    if (this.anomaliasControlService.anomaliaSelect === undefined) {
-      this.anomaliasControlService.anomaliaHover = undefined;
-      this.anomaliasControlService.setExternalStyle(row.id, false);
-    }
-  }
-
-  selectAnomalia(row: any, zoom: boolean) {
+  selectAnomalia(row: any) {
     // quitamos el hover de la anomalia
     this.anomaliasControlService.anomaliaHover = undefined;
 
@@ -161,7 +141,7 @@ export class AnomaliasListComponent implements OnInit, AfterViewInit, OnDestroy 
     this.anomaliasControlService.setExternalStyle(row.id, true);
 
     // centramos la vista al hacer click
-    this.centerView(row.anomalia, zoom);
+    this.centerView(row.anomalia, row.zoom);
   }
 
   private centerView(anomalia: Anomalia, zoom: boolean) {

@@ -23,6 +23,7 @@ import { SeguidorImageDownloadComponent } from './components/seguidor-image-down
 import { SeguidorViewNavbarComponent } from './components/seguidor-view-navbar/seguidor-view-navbar.component';
 import { SeguidorViewLeyendaComponent } from './components/seguidor-view-leyenda/seguidor-view-leyenda.component';
 import { SeguidorImageOriginComponent } from './components/seguidor-image-origin/seguidor-image-origin.component';
+import { ListComponent } from './components/list/list.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { SeguidorImageOriginComponent } from './components/seguidor-image-origin
     SeguidorViewNavbarComponent,
     SeguidorViewLeyendaComponent,
     SeguidorImageOriginComponent,
+    ListComponent,
   ],
   imports: [
     CommonModule,

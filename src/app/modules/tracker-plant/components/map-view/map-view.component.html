@@ -9,7 +9,8 @@
     <mat-sidenav-container *ngIf="seguidoresLoaded" class="stats-container">
       <!-- SIDENAV STATS -->
       <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end">
-        <app-planta-stats></app-planta-stats>
+        <!-- cargamos el modulo Stats -->
+        <ng-template appDynamicStats></ng-template>
       </mat-sidenav>
 
       <mat-sidenav-content>
@@ -105,7 +106,7 @@
                 *ngIf="notSharedReport || completeView"
                 mat-raised-button
                 class="btn-right-stats"
-                (click)="sidenavStats.toggle(); loadStats()"
+                (click)="loadStats(); sidenavStats.toggle()"
                 matTooltip="Estadísticas"
                 matTooltipClass="tooltip-style"
                 [disabled]="noAnomsReport"

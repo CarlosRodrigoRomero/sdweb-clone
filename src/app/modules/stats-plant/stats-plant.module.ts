@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 
+import { StatsPlantRoutingModule } from './stats-plant-routing.module';
 import { SharedModule } from '@shared/shared.module';
 
 import { PlantaStatsComponent } from './components/planta-stats.component';
@@ -16,6 +17,8 @@ import { ChartPctCelsComponent } from './components/chart-pct-cels/chart-pct-cel
 import { ChartSankeyComponent } from './components/chart-sankey/chart-sankey.component';
 import { ChartSankeyPotenciaComponent } from './components/chart-sankey-potencia/chart-sankey-potencia.component';
 
+import { DynamicStatsDirective } from './directives/dynamic-stats.directive';
+
 @NgModule({
   declarations: [
     PlantaStatsComponent,
@@ -28,8 +31,10 @@ import { ChartSankeyPotenciaComponent } from './components/chart-sankey-potencia
     ChartPctCelsComponent,
     ChartSankeyComponent,
     ChartSankeyPotenciaComponent,
+    DynamicStatsDirective,
   ],
-  imports: [CommonModule, SharedModule, NgApexchartsModule],
-  exports: [PlantaStatsComponent],
+  entryComponents: [DynamicStatsDirective],
+  imports: [CommonModule, StatsPlantRoutingModule, SharedModule, NgApexchartsModule],
+  exports: [PlantaStatsComponent, DynamicStatsDirective],
 })
 export class StatsPlantModule {}

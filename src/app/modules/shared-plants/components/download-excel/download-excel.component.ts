@@ -75,7 +75,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private translation: Translation;
   private language: string;
   private headersColors = ['FFE5E7E9', 'FFF5B7B1', 'FFD4EFDF', 'FFABD5FF', 'FFE5E7E9'];
-  private columnasLink;
+  private columnasLink = [10];
   private inicioFilters = 4;
 
   private subscriptions: Subscription = new Subscription();
@@ -118,7 +118,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
 
       if (!this.reportControlService.plantaFija) {
-        this.columnasLink = [2, 3];
+        this.columnasLink = [11];
       }
 
       this.inicioFilters = 7;
@@ -127,7 +127,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       this.json = new Array(this.anomaliasInforme.length);
 
       // reseteamos el contador de filas
-      this.linksCargados = 0;
+      // this.linksCargados = 0;
     });
   }
 
@@ -151,32 +151,34 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     this.anomaliasInforme.forEach((anom, index) => this.getRowData(anom, index));
 
+    this.downloadExcel();
+
     // incluimos urls de imagenes solo en seguidores y hasta cierto limite
-    if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
-      // con este contador impedimos que se descarge más de una vez debido a la suscripcion
-      let downloads = 0;
+    // if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
+    //   // con este contador impedimos que se descarge más de una vez debido a la suscripcion
+    //   let downloads = 0;
 
-      this.subscriptions.add(
-        this.linksCargados$.subscribe((linksCargados) => {
-          // indicamos el progreso en la barra de progreso
-          this.downloadReportService.progressBarValue = Math.round(
-            (linksCargados / this.anomaliasInforme.length) * 100
-          );
+    //   this.subscriptions.add(
+    //     this.linksCargados$.subscribe((linksCargados) => {
+    //       // indicamos el progreso en la barra de progreso
+    //       this.downloadReportService.progressBarValue = Math.round(
+    //         (linksCargados / this.anomaliasInforme.length) * 100
+    //       );
 
-          // cuando esten todas las filas cargadas descargamos el excel
-          if (linksCargados / 2 === this.anomaliasInforme.length && downloads === 0) {
-            this.downloadExcel();
+    //       // cuando esten todas las filas cargadas descargamos el excel
+    //       if (linksCargados / 2 === this.anomaliasInforme.length && downloads === 0) {
+    //         this.downloadExcel();
 
-            // reseteamos el contador de filas
-            this.linksCargados = 0;
+    //         // reseteamos el contador de filas
+    //         this.linksCargados = 0;
 
-            downloads++;
-          }
-        })
-      );
-    } else {
-      this.downloadExcel();
-    }
+    //         downloads++;
+    //       }
+    //     })
+    //   );
+    // } else {
+    //   this.downloadExcel();
+    // }
   }
 
   downloadExcel(): void {
@@ -194,15 +196,18 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     // ocultamos la barra de progreso
     this.downloadReportService.generatingDownload = false;
+
+    // vaciamos el contenido para la proxima descarga
+    this.clearData();
   }
 
   private getColumnas() {
     this.columnas[0].push(this.translation.t('# Anomalía'));
 
-    if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
-      this.columnas[0].push(this.translation.t('Imagen térmica'));
-      this.columnas[0].push(this.translation.t('Imagen visual'));
-    }
+    // if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
+    //   this.columnas[0].push(this.translation.t('Imagen térmica'));
+    //   this.columnas[0].push(this.translation.t('Imagen visual'));
+    // }
 
     if (!this.reportControlService.plantaFija) {
       this.columnas[1].push(this.translation.t('Temperatura referencia') + ' (ºC)');
@@ -264,10 +269,10 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     // }
     // row.localId = localId;
     row.numAnom = anomalia.numAnom;
-    if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
-      row.thermalImage = null;
-      row.visualImage = null;
-    }
+    // if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
+    //   row.thermalImage = null;
+    //   row.visualImage = null;
+    // }
     if (!this.reportControlService.plantaFija) {
       row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
     }
@@ -330,51 +335,58 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     row.comentarios = this.anomaliaInfoService.getComentariosString(anomalia);
 
-    if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
-      this.storage
-        .ref(`informes/${this.informeSelected.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
-        .getDownloadURL()
-        .toPromise()
-        .then((urlThermal) => {
-          row.thermalImage = urlThermal;
+    this.json[index] = row;
 
-          if (row.visualImage !== undefined) {
-            this.json[index] = row;
-          }
+    // if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
+    //   this.storage
+    //     .ref(`informes/${this.informeSelected.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
+    //     .getDownloadURL()
+    //     .toPromise()
+    //     .then((urlThermal) => {
+    //       row.thermalImage = urlThermal;
 
-          this.linksCargados++;
-        })
-        .catch((err) => {
-          row.thermalImage = null;
+    //       if (row.visualImage !== undefined) {
+    //         this.json[index] = row;
+    //       }
 
-          console.log(err);
+    //       this.linksCargados++;
+    //     })
+    //     .catch((err) => {
+    //       row.thermalImage = null;
 
-          this.linksCargados++;
-        });
+    //       console.log(err);
 
-      this.storage
-        .ref(`informes/${this.informeSelected.id}/jpgVisual/${(anomalia as PcInterface).archivoPublico}`)
-        .getDownloadURL()
-        .toPromise()
-        .then((urlVisual) => {
-          row.visualImage = urlVisual;
+    //       this.linksCargados++;
+    //     });
 
-          if (row.thermalImage !== undefined) {
-            this.json[index] = row;
-          }
+    //   this.storage
+    //     .ref(`informes/${this.informeSelected.id}/jpgVisual/${(anomalia as PcInterface).archivoPublico}`)
+    //     .getDownloadURL()
+    //     .toPromise()
+    //     .then((urlVisual) => {
+    //       row.visualImage = urlVisual;
 
-          this.linksCargados++;
-        })
-        .catch((err) => {
-          row.visualImage = null;
+    //       if (row.thermalImage !== undefined) {
+    //         this.json[index] = row;
+    //       }
 
-          console.log(err);
+    //       this.linksCargados++;
+    //     })
+    //     .catch((err) => {
+    //       row.visualImage = null;
 
-          this.linksCargados++;
-        });
-    } else {
-      this.json[index] = row;
-    }
+    //       console.log(err);
+
+    //       this.linksCargados++;
+    //     });
+    // } else {
+    //   this.json[index] = row;
+    // }
+  }
+
+  clearData() {
+    this.columnas = [[], [], [], [], []];
+    this.json = [];
   }
 
   ngOnDestroy(): void {
@@ -383,12 +395,12 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
   //////////////////////////////////////////////////////////////////////////////////////////////
 
-  get linksCargados(): number {
-    return this._linksCargados;
-  }
+  // get linksCargados(): number {
+  //   return this._linksCargados;
+  // }
 
-  set linksCargados(value: number) {
-    this._linksCargados = value;
-    this.linksCargados$.next(value);
-  }
+  // set linksCargados(value: number) {
+  //   this._linksCargados = value;
+  //   this.linksCargados$.next(value);
+  // }
 }

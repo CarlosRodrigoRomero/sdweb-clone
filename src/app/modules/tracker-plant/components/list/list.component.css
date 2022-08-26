@@ -1,0 +1,60 @@
+.lista {
+  margin: 5px;
+}
+
+.buscar-input {
+  width: 100%;
+}
+
+:host ::ng-deep .buscar-input .mat-form-field-wrapper {
+  padding-bottom: 6px;
+}
+
+:host ::ng-deep .mat-cell {
+  padding: 0 1rem 0 0;
+}
+
+:host ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}
+
+:host ::ng-deep td.mat-cell:first-of-type {
+  padding-left: 0px;
+}
+
+table {
+  width: 100%;
+}
+
+.tabla-container {
+  position: relative;
+  height: calc(100vh - 280px);
+  overflow: auto;
+  min-width: 350px;
+}
+
+.mat-row {
+  cursor: pointer;
+}
+
+.mat-row.selected {
+  background-color: rgb(187, 187, 187);
+}
+
+.mat-row.hovered {
+  background-color: lightgrey;
+}
+
+.row-content {
+  display: flex;
+  justify-content: center;
+}
+
+.row-content mat-icon {
+  margin-right: 0.5rem;
+}
+
+.color-row {
+  width: 10px;
+  height: 48px;
+}
