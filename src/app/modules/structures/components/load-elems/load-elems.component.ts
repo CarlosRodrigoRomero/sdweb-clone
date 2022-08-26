@@ -16,7 +16,7 @@ import { ModuleGroup } from '@core/models/moduleGroup';
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { LocationAreaInterface } from '@core/models/location';
 
-interface ZoneTask {
+export interface ZoneTask {
   id: string;
   completed: boolean;
   name: string;
@@ -30,7 +30,6 @@ interface ZoneTask {
 export class LoadElemsComponent implements OnInit, OnDestroy {
   zones: ZoneTask[] = [];
   private largestZones: LocationAreaInterface[] = [];
-  allComplete = false;
   thereAreZones = false;
   modulesLoaded = false;
 
@@ -193,21 +192,6 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
     }
 
     return nombreGlobalCoord + zone.globalCoords[0];
-  }
-
-  someComplete(): boolean {
-    if (this.zones === null) {
-      return false;
-    }
-    return this.zones.filter((t) => t.completed).length > 0 && !this.allComplete;
-  }
-
-  setAll(completed: boolean) {
-    this.allComplete = completed;
-    if (this.zones == null) {
-      return;
-    }
-    this.zones.forEach((t) => (t.completed = completed));
   }
 
   ngOnDestroy(): void {
