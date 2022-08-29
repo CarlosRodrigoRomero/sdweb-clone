@@ -1,5 +1,5 @@
 <div class="content">
-  <button mat-icon-button class="btn-sync" (click)="loadDataAndCheck(); offChecked()">
+  <button mat-icon-button class="btn-sync" (click)="offChecked(); loadDataAndCheck()">
     <mat-icon>sync</mat-icon>
   </button>
   <button *ngIf="warnings.length > 0" class="btn-notif" mat-icon-button [matMenuTriggerFor]="warningMenu">

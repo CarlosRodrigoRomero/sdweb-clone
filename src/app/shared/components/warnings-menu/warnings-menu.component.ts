@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { switchMap, take } from 'rxjs/operators';
@@ -59,7 +59,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private warningService: WarningService,
     private seguidorService: SeguidorService,
     private olMapService: OlMapService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -127,6 +128,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
               this.planta,
               this.locAreas
             );
+
+            // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
+            this.cdr.detectChanges();
           }
         });
     } else {
@@ -168,6 +172,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
               this.planta,
               this.locAreas
             );
+
+            // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
+            this.cdr.detectChanges();
           }
         });
     }
