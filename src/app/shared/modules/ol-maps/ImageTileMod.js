@@ -206,6 +206,11 @@ class ImageTileMod extends Tile {
     // Iterate through every pixel
     for (let i = 0; i < inputData.data.length; i += 4) {
       let pixel = [inputData.data[i + 0], inputData.data[i + 1], inputData.data[i + 2], inputData.data[i + 3]];
+
+      if (pixel.toString() == '0,0,0,255' || pixel.toString() == '255,255,255,255') {
+        pixel[3] = 0;
+      }
+
       if (pixel[3] == 0) {
         continue;
       }
