@@ -27,6 +27,12 @@ export class Patches {
       case 'AyKgsY6F3TqGQGYNaOUY':
         const zoomLevel = 20;
         return zoomLevel;
+      // Berenis 1 y 2 2022
+      case 'GjlYrwpyZizqXSw4sSTa' || 'b7LlgJYacx6CRyt0DIuF':
+        const dateBerenis = '16/08/2022 13:00:00';
+        return dateBerenis;
+      default:
+        return undefined;
     }
   }
 
