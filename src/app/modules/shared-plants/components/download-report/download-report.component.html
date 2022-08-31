@@ -14,6 +14,8 @@
 
     <app-download-pdf *ngIf="!plantaDemo"></app-download-pdf>
 
+    <app-pdf *ngIf="!plantaDemo"></app-pdf>
+
     <!-- PDF DEMO -->
     <a *ngIf="plantaDemo" mat-menu-item href="{{ pdfDemo }}" download="" [disabled]="!excelExist">
       <mat-icon>picture_as_pdf</mat-icon>
