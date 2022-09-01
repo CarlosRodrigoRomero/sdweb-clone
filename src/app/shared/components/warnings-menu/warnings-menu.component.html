@@ -1,8 +1,20 @@
 <div class="content">
-  <button mat-icon-button class="btn-sync" (click)="offChecked(); loadDataAndCheck()">
+  <button mat-icon-button class="btn-sync" (click)="timesChecked = timesChecked + 1; offChecked(); loadDataAndCheck()">
     <mat-icon>sync</mat-icon>
   </button>
-  <button *ngIf="warnings.length > 0" class="btn-notif" mat-icon-button [matMenuTriggerFor]="warningMenu">
+
+  <!-- ICONO NO CHECKEADO POR PRIMERA VEZ -->
+  <div class="icon-no-checked" *ngIf="timesChecked === 0">
+    <mat-icon matBadge="?">bug_report</mat-icon>
+  </div>
+
+  <!-- ICONO YA CHECKEADO CON WARNS -->
+  <button
+    *ngIf="timesChecked > 0 && warnings.length > 0"
+    class="btn-notif"
+    mat-icon-button
+    [matMenuTriggerFor]="warningMenu"
+  >
     <mat-icon matBadge="{{ warnings.length }}" matBadgeColor="primary">bug_report</mat-icon>
   </button>
   <mat-menu class="notif-menu" #warningMenu="matMenu">
@@ -22,7 +34,8 @@
     </div>
   </mat-menu>
 
-  <div class="icon-no-warnings" *ngIf="warnings.length === 0">
+  <!-- ICONO YA CHECKEADO SIN WARNS -->
+  <div class="icon-no-warnings" *ngIf="timesChecked > 0 && warnings.length === 0">
     <mat-icon matBadge="✓">bug_report</mat-icon>
   </div>
 </div>
