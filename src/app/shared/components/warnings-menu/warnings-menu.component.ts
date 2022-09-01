@@ -28,6 +28,7 @@ import { Warning } from './warnings';
 import { UserInterface } from '@core/models/user';
 
 import { GLOBAL } from '@data/constants/global';
+import { NoModulesFilter } from '@core/models/noModulesFilter';
 
 @Component({
   selector: 'app-warnings-menu',
@@ -81,6 +82,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         )
         .subscribe((warnings) => {
           this.warnings = warnings;
+
+          // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
+          this.cdr.detectChanges();
         })
     );
 
@@ -235,6 +239,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         window.open(urlPlantaEdit, '_blank');
         break;
       case 'modulosAnoms':
+        this.filterNoModulesAnoms();
+        break;
+      case 'recalcModulosAnoms':
         this.fixModulosAnoms();
         break;
       case 'irStorage':
@@ -280,6 +287,12 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
           this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGlobalCoords);
         });
       });
+  }
+
+  private filterNoModulesAnoms() {
+    const noModulesFilter = new NoModulesFilter('noModulesAnoms');
+
+    this.filterService.addFilter(noModulesFilter);
   }
 
   private fixNoGlobalCoordsAnoms() {
