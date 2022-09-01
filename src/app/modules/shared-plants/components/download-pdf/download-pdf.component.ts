@@ -16,6 +16,7 @@ import TileLayer from 'ol/layer/Tile';
 import { LocationAreaInterface } from '@core/models/location';
 
 import pdfMake from 'pdfmake/build/pdfmake.js';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 
 import { fabric } from 'fabric';
@@ -152,7 +153,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     private resetServices: ResetServices,
     private demoService: DemoService,
     private geoserverService: GeoserverService
-  ) {}
+  ) {
+    (window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;
+  }
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -429,9 +432,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         this.countAnomalias = 0;
         this.anomaliasInforme.forEach((anomalia, index) => {
           // if (index < 2) {
-            this.setImgAnomaliaCanvas(anomalia, 'thermal');
-            this.setImgAnomaliaCanvas(anomalia, 'visual');
-            this.countAnomalias++;
+          this.setImgAnomaliaCanvas(anomalia, 'thermal');
+          this.setImgAnomaliaCanvas(anomalia, 'visual');
+          this.countAnomalias++;
           // }
         });
 
