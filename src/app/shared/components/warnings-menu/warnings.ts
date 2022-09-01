@@ -278,6 +278,10 @@ export const warnings: Warning[] = [
     reportActions: [
       {
         name: 'modulosAnoms',
+        label: 'Filtrar',
+      },
+      {
+        name: 'recalcModulosAnoms',
         label: 'Corregir',
       },
     ],
