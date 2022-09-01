@@ -317,7 +317,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     anomsSinModulo.forEach((anom) => {
       let modulo: ModuloInterface;
       if (this.reportControlService.plantaFija) {
-        modulo = this.anomaliaService.getModule(anom.featureCoords[0], this.locAreas);
+        modulo = this.anomaliaService.getModule(this.olMapService.getCentroid(anom.featureCoords), this.locAreas);
 
         if (modulo !== null) {
           anom.modulo = modulo;
