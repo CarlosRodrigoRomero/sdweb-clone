@@ -46,6 +46,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private informes: InformeInterface[] = this.reportControlService.informes;
   checked = true;
   private user: UserInterface;
+  timesChecked = 0;
 
   private subscriptions: Subscription = new Subscription();
 
