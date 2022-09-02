@@ -7,13 +7,14 @@ import * as turf from '@turf/turf';
 
 import PointInPolygon from 'point-in-polygon';
 
+import Polygon from 'ol/geom/Polygon';
+
 import { PlantaService } from './planta.service';
 import { OlMapService } from './ol-map.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { PlantaInterface } from '@core/models/planta';
-import Polygon from 'ol/geom/Polygon';
-import { Coordinate } from 'ol/coordinate';
+import { Anomalia } from '@core/models/anomalia';
 
 @Injectable({
   providedIn: 'root',
@@ -254,6 +255,16 @@ export class ZonesService {
 
     // comprobamos si esta dentro de la largestZone
     return polygonLargestZone.intersectsCoordinate(centroidZone);
+  }
+
+  isAnomInsideZone(anom: Anomalia, zone: LocationAreaInterface): boolean {
+    const coordsZone = this.olMapService.pathToCoordinate(zone.path);
+    const polygonZone = new Polygon([coordsZone]);
+
+    const centroidAnom = this.olMapService.getCentroid(anom.featureCoords);
+
+    // comprobamos si esta dentro de la zone
+    return polygonZone.intersectsCoordinate(centroidAnom);
   }
 
   private getLocAreaCentroid(locArea: LocationAreaInterface): number[] {

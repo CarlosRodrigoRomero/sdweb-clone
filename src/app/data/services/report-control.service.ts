@@ -320,7 +320,7 @@ export class ReportControlService {
                       take(1),
                       // obtenemos los informes de la planta
                       switchMap((informes) => {
-                          // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
+                        // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
                         this.informes = this.informeService.getOnlyNewInfomesFijas(informes);
 
                         // evitamos cargar los informes dobles al navegar atras y volver

@@ -225,7 +225,7 @@ export class AnomaliaInfoService {
   getAlturaAnom(anomalia: Anomalia, planta: PlantaInterface): number {
     let localY = anomalia.localY;
     if (planta.alturaBajaPrimero) {
-      if (planta.tipo === 'seguidores' && anomalia.hasOwnProperty('tipoSeguidor')) {
+      if (anomalia.hasOwnProperty('tipoSeguidor')) {
         // si se cuenta por filas la altura es el nº de filas
         let altura = anomalia.tipoSeguidor.numModulos.length;
         // si se cuenta por columnas entonces la altura es idependiente por columna
@@ -233,7 +233,7 @@ export class AnomaliaInfoService {
           altura = anomalia.tipoSeguidor.numModulos[anomalia.localX - 1];
         }
         localY = altura - localY + 1;
-      } else if (planta.tipo !== 'seguidores') {
+      } else {
         // para fijas la altura se basa en el nº de filas de la planta
         localY = planta.filas - localY + 1;
       }
@@ -244,7 +244,7 @@ export class AnomaliaInfoService {
   getColumnaAnom(anomalia: Anomalia, planta: PlantaInterface): number {
     let localX = anomalia.localX;
     if (planta.hasOwnProperty('columnaDchaPrimero') && planta.columnaDchaPrimero) {
-      if (planta.tipo === 'seguidores' && anomalia.hasOwnProperty('tipoSeguidor')) {
+      if (anomalia.hasOwnProperty('tipoSeguidor')) {
         // si se cuenta por columnas el nº de columnas es equivalente al array
         let columnas = anomalia.tipoSeguidor.numModulos.length;
         // si se cuenta por filas la altura es el nº de filas

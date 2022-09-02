@@ -42,7 +42,7 @@ export class SeguidorService {
   getSeguidoresPlanta$(planta: PlantaInterface, informes: InformeInterface[]): Observable<Seguidor[]> {
     this.planta = planta;
 
-    this.getDifferentLocAreas(planta.id);
+    this.getDifferentLocAreas();
 
     const anomaliaObsList = Array<Observable<Seguidor[]>>();
     informes.forEach((informe) => {
@@ -145,11 +145,6 @@ export class SeguidorService {
               );
               seguidor.nombre = this.getSeguidorName(seguidor);
 
-              // si existe le añadimos el tipo seguidor
-              // if (tipoSeguidor !== undefined) {
-              //   seguidor.tipoSeguidor = tipoSeguidor;
-              // }
-
               // guardamos el nombre del seguidor en cada anomalia
               anomaliasSeguidor.forEach((anom) => (anom.nombreSeguidor = seguidor.nombre));
 
@@ -163,7 +158,7 @@ export class SeguidorService {
     );
   }
 
-  private getDifferentLocAreas(plantaId: string) {
+  private getDifferentLocAreas() {
     const locAreas = this.zonesService.locAreas;
     this.locAreaSeguidores = this.zonesService.locAreaSeguidores;
     this.zones = this.zonesService.zones;
