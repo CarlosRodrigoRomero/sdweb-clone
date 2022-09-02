@@ -161,7 +161,7 @@ export class WarningService {
     const ccChecked = this.checkCC(informe, warns);
     const filsColsPlantaChecked = this.checkFilsColsPlanta(planta, informe, warns);
     const filsColsAnomsChecked = this.checkFilsColsAnoms(planta, anomalias, informe, warns);
-    const filsColsAnomsTipo0Checked = this.checkFilsColsTipo0Anoms(planta, anomalias, informe, warns);
+    const filsColsAnomsTipo0Checked = this.checkFilsColsTipo0Anoms(anomalias, informe, warns);
     const zonesChecked = this.checkZonesWarnings(locAreas, informe, warns, planta, anomalias);
     const visualLayerChecked = this.checkVisualLayer(informe, warns);
     const imgPortadaChecked = this.checkImagePortada(informe.id, warns);
@@ -421,12 +421,7 @@ export class WarningService {
     return true;
   }
 
-  checkFilsColsTipo0Anoms(
-    planta: PlantaInterface,
-    anomalias: Anomalia[],
-    informe: InformeInterface,
-    warns: Warning[]
-  ): boolean {
+  checkFilsColsTipo0Anoms(anomalias: Anomalia[], informe: InformeInterface, warns: Warning[]): boolean {
     const differentFilColAnoms = anomalias.filter((anom) => anom.localX == 0 || anom.localY == 0);
 
     if (differentFilColAnoms.length > 0) {
@@ -461,15 +456,15 @@ export class WarningService {
       const zonesNamesChecked = this.checkZonesNames(planta, warns, informe.id);
       const zonesRepeatChecked = this.checkZonesRepeat(planta, locAreas, warns, informe.id);
       const modulosChecked = this.checkModulosWarnings(locAreas, warns, informe.id, anomalias);
-      const tiposSeguidorChecked = this.checkTiposSeguidorWarnings(locAreas, warns, informe.id, planta);
+      // const tiposSeguidorChecked = this.checkTiposSeguidorWarnings(locAreas, warns, informe.id, planta);
 
       if (
         wrongLocAnomsChecked &&
         noGlobalCoordsAnomsChecked &&
         zonesNamesChecked &&
         zonesRepeatChecked &&
-        modulosChecked &&
-        tiposSeguidorChecked
+        modulosChecked /* &&
+        tiposSeguidorChecked */
       ) {
         return true;
       }

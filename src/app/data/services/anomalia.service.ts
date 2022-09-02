@@ -13,6 +13,7 @@ import { PlantaService } from '@data/services/planta.service';
 import { AdminService } from '@data/services/admin.service';
 import { OlMapService } from './ol-map.service';
 import { AnomaliaInfoService } from './anomalia-info.service';
+import { ZonesService } from './zones.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { CritCoA } from '@core/models/critCoA';
@@ -22,6 +23,7 @@ import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 import { LocationAreaInterface } from '@core/models/location';
 import { ModuloInterface } from '@core/models/modulo';
+import { TipoSeguidor } from '@core/models/tipoSeguidor';
 
 import { GLOBAL } from '@data/constants/global';
 
@@ -38,6 +40,7 @@ export class AnomaliaService {
   private _hasCriticidad = false;
   public hasCriticidad$ = new BehaviorSubject<boolean>(this._hasCriticidad);
   private planta: PlantaInterface;
+  private locAreasTipoSeguidor: LocationAreaInterface[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -47,7 +50,8 @@ export class AnomaliaService {
     private plantaService: PlantaService,
     private adminService: AdminService,
     private olMapService: OlMapService,
-    private anomaliaInfoService: AnomaliaInfoService
+    private anomaliaInfoService: AnomaliaInfoService,
+    private zonesService: ZonesService
   ) {}
 
   initService(plantaId: string): Promise<void> {
@@ -112,6 +116,8 @@ export class AnomaliaService {
     if (this.planta === undefined) {
       this.planta = planta;
     }
+
+    this.getLocAreasTipoSeguidor();
 
     const anomaliaObsList = Array<Observable<Anomalia[]>>();
     informes.forEach((informe) => {
@@ -194,11 +200,19 @@ export class AnomaliaService {
                 }
               }
               data.localId = this.getLocalId(data, this.planta);
-            }
-
-            // Convertimos el objeto en un array
-            if (data.hasOwnProperty('featureCoords')) {
+            } else {
+              // Convertimos el objeto en un array
               data.featureCoords = Object.values(data.featureCoords);
+
+              // comprobamos si hay zonas tipoSeguidor
+              if (this.locAreasTipoSeguidor.length > 0) {
+                const zonaTipoSeguidor = this.getZonaTipoSeguidor(data);
+                let tipoSeguidor: TipoSeguidor;
+                if (zonaTipoSeguidor !== undefined) {
+                  tipoSeguidor = zonaTipoSeguidor.tipoSeguidor;
+                  data.tipoSeguidor = tipoSeguidor;
+                }
+              }
             }
 
             return data;
@@ -225,6 +239,19 @@ export class AnomaliaService {
     realAnomalias = realAnomalias.filter((anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo));
 
     return realAnomalias;
+  }
+
+  private getZonaTipoSeguidor(anom: Anomalia) {
+    const zonaTipoSeguidor = this.locAreasTipoSeguidor.find((locA) => this.zonesService.isAnomInsideZone(anom, locA));
+
+    return zonaTipoSeguidor;
+  }
+
+  private getLocAreasTipoSeguidor() {
+    const locAreas = this.zonesService.locAreas;
+
+    // guardamos las zonas con tipoSeguidor
+    this.locAreasTipoSeguidor = locAreas.filter((locArea) => locArea.tipoSeguidor !== undefined);
   }
 
   private getRightDatetime(datetime: number) {
