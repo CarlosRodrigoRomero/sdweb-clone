@@ -697,9 +697,8 @@ export class WarningService {
       .pipe(
         take(1),
         catchError((error) => {
-          console.log(error);
           // no recibimos respuesta del servidor porque no existe
-          if (error.status === 0) {
+          if (error.status === 0 || error.status === 504) {
             const warning: Warning = {
               type: 'visualLayer',
               visible: true,
@@ -732,7 +731,7 @@ export class WarningService {
         catchError((error) => {
           console.log(error);
           // no recibimos respuesta del servidor porque no existe
-          if (error.status === 0) {
+          if (error.status === 0 || error.status === 504) {
             const warning: Warning = {
               type: 'thermalLayer',
               visible: true,
