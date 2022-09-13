@@ -114,6 +114,23 @@ export class PortfolioControlService {
             plantasEmpresa.forEach((planta) => {
               let informesPlanta = informes.filter((inf) => inf.plantaId === planta.id);
 
+              // obtenemos los informes dentro de la interface si los tiene
+              if (planta.hasOwnProperty('informes') && planta.informes.length > 0) {
+                planta.informes.forEach((informe) => {
+                  if (!informesPlanta.map((inf) => inf.id).includes(informe.id)) {
+                    if (
+                      informe.mae !== undefined &&
+                      informe.mae !== Infinity &&
+                      !isNaN(informe.mae) &&
+                      informe.mae !== null &&
+                      informe.disponible === true
+                    ) {
+                      informesPlanta.push(informe);
+                    }
+                  }
+                });
+              }
+
               // aplicamos parche para plantas compradas por Plenium a RIOS
               informesPlanta = Patches.plantsTwoClients(planta.id, this.user.uid, informesPlanta);
 
@@ -148,34 +165,6 @@ export class PortfolioControlService {
                       // incrementamos conteo de plantas y suma de potencia
                       this.numPlantas++;
                       this.potenciaTotal += planta.potencia;
-                    }
-                  }
-                });
-              }
-
-              // obtenemos la plantas que tiene informes dentro de su interface
-              if (planta.informes !== undefined && planta.informes.length > 0) {
-                planta.informes.forEach((informe) => {
-                  // comprobamos que no estubiese ya añadido
-                  if (!this.listaInformes.map((inf) => inf.id).includes(informe.id)) {
-                    // comprobamos que el informe tiene "mae" y que esta "disponible"
-                    if (
-                      informe.mae !== undefined &&
-                      informe.mae !== Infinity &&
-                      !isNaN(informe.mae) &&
-                      informe.mae !== null &&
-                      informe.disponible === true
-                    ) {
-                      // añadimos el informe a la lista
-                      this.listaInformes.push(informe);
-
-                      if (!this.listaPlantas.map((pl) => pl.id).includes(planta.id)) {
-                        // añadimos la planta si no estaba ya añadida
-                        this.listaPlantas.push(planta);
-                        // incrementamos conteo de plantas y suma de potencia
-                        this.numPlantas++;
-                        this.potenciaTotal += planta.potencia;
-                      }
                     }
                   }
                 });

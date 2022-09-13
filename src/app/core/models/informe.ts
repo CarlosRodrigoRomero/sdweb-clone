@@ -36,5 +36,5 @@ export interface InformeInterface {
   numsCoA?: number[];
   numsCriticidad?: number[];
   servidorCapas?: string;
-  empresaId?: string;
+  empresaId?: string[];
 }
