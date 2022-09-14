@@ -429,9 +429,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         this.countAnomalias = 0;
         this.anomaliasInforme.forEach((anomalia, index) => {
           // if (index < 2) {
-            this.setImgAnomaliaCanvas(anomalia, 'thermal');
-            this.setImgAnomaliaCanvas(anomalia, 'visual');
-            this.countAnomalias++;
+          this.setImgAnomaliaCanvas(anomalia, 'thermal');
+          this.setImgAnomaliaCanvas(anomalia, 'visual');
+          this.countAnomalias++;
           // }
         });
 
@@ -931,8 +931,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
           url = `${this.demoService.demoGIS}${tileCoord[0]}/${tileCoord[1]}/${tileCoord[2]}.png`;
         }
       }
-
-      console.log(url);
 
       const left = (index % lado) * width;
       const top = Math.trunc(index / lado) * height;

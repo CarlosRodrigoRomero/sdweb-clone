@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { AngularFireStorage } from '@angular/fire/storage';
 
 import { ReportControlService } from '@data/services/report-control.service';
+import { AnomaliaService } from '@data/services/anomalia.service';
 
 @Component({
   selector: 'app-pdf',
@@ -14,7 +15,8 @@ export class PdfComponent implements OnInit {
   constructor(
     private storage: AngularFireStorage,
     private reportControlService: ReportControlService,
-    private http: HttpClient
+    private http: HttpClient,
+    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit(): void {}
@@ -30,7 +32,10 @@ export class PdfComponent implements OnInit {
     const informe = this.reportControlService.informes.find(
       (inf) => inf.id === this.reportControlService.selectedInformeId
     );
-    const anomalias = Object.assign({}, this.reportControlService.allAnomalias);
+    const anomalias = Object.assign(
+      {},
+      this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informe.id)
+    );
 
     json['informe'] = informe;
     json['anomalias'] = anomalias;
@@ -50,6 +55,7 @@ export class PdfComponent implements OnInit {
       'resultadosCatergoria',
       'resultadosPosicion',
     ];
+    json['criterioCriticidad'] = this.anomaliaService.criterioCriticidad;
 
     return json;
   }
@@ -57,9 +63,7 @@ export class PdfComponent implements OnInit {
   saveJson(json: any) {
     const jsonString = JSON.stringify(json);
     const blob = new Blob([jsonString], { type: 'application/json' });
-    const ref = this.storage
-      .ref('')
-      .child('informes/' + this.reportControlService.selectedInformeId + '/data.json');
+    const ref = this.storage.ref('').child('informes/' + this.reportControlService.selectedInformeId + '/data.json');
     ref.put(blob).then(() => {
       console.log('Archivo subido');
 
