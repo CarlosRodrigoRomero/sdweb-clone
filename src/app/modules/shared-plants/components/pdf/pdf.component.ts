@@ -5,6 +5,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
+import { Seguidor } from '@core/models/seguidor';
 
 @Component({
   selector: 'app-pdf',
@@ -32,13 +33,8 @@ export class PdfComponent implements OnInit {
     const informe = this.reportControlService.informes.find(
       (inf) => inf.id === this.reportControlService.selectedInformeId
     );
-    const anomalias = Object.assign(
-      {},
-      this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informe.id)
-    );
 
     json['informe'] = informe;
-    json['anomalias'] = anomalias;
     json['planta'] = this.reportControlService.planta;
     json['apartados'] = [
       'introduccion',
@@ -54,8 +50,32 @@ export class PdfComponent implements OnInit {
       'resultadosClase',
       'resultadosCatergoria',
       'resultadosPosicion',
+      // 'anexoLista',
+      'anexoAnomalias',
+      // 'anexoSeguidores',
+      // 'anexoSegsNoAnoms'
     ];
     json['criterioCriticidad'] = this.anomaliaService.criterioCriticidad;
+
+    if (this.reportControlService.plantaFija) {
+      const anomalias = Object.assign(
+        {},
+        this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informe.id)
+      );
+      json['anomalias'] = anomalias;
+    } else {
+      const seguidores = Object.assign(
+        {},
+        (this.reportControlService.allFilterableElements as Seguidor[]).filter((seg) => seg.informeId === informe.id)
+      );
+      json['seguidores'] = seguidores;
+    }
+
+    if (informe.hasOwnProperty('servidorCapas')) {
+      json['servidorCapas'] = informe.servidorCapas;
+    } else {
+      json['servidorCapas'] = 'old';
+    }
 
     return json;
   }
