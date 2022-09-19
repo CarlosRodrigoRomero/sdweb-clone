@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
 
 import { AngularFireStorage } from '@angular/fire/storage';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
+import { PdfService } from '@data/services/pdf.service';
+import { DownloadReportService } from '@data/services/download-report.service';
+
 import { Seguidor } from '@core/models/seguidor';
+
+import { PdfDialogComponent } from '../pdf-dialog/pdf-dialog.component';
 
 @Component({
   selector: 'app-pdf',
@@ -13,14 +19,36 @@ import { Seguidor } from '@core/models/seguidor';
   styleUrls: ['./pdf.component.css'],
 })
 export class PdfComponent implements OnInit {
+  private apartadosInforme: string[] = [];
+
   constructor(
     private storage: AngularFireStorage,
     private reportControlService: ReportControlService,
     private http: HttpClient,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    public dialog: MatDialog,
+    private pdfService: PdfService,
+    private downloadReportService: DownloadReportService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.pdfService.apartadosInforme$.subscribe((apt) => {
+      this.apartadosInforme = apt;
+    });
+
+    this.pdfService.generatePdf$.subscribe((gen) => {
+      if (gen) {
+        this.download();
+      }
+    });
+  }
+
+  openDialog() {
+    this.dialog.open(PdfDialogComponent);
+
+    // reseteamos el valor de generatePdf
+    this.pdfService.generatePdf = false;
+  }
 
   download() {
     const json = this.generateJson();
@@ -30,31 +58,19 @@ export class PdfComponent implements OnInit {
 
   generateJson(): any {
     const json = { idioma: 'es' };
+    if (this.downloadReportService.englishLang) {
+      json.idioma = 'en';
+    }
+
     const informe = this.reportControlService.informes.find(
       (inf) => inf.id === this.reportControlService.selectedInformeId
     );
-
     json['informe'] = informe;
+
     json['planta'] = this.reportControlService.planta;
-    json['apartados'] = [
-      'introduccion',
-      'criterios',
-      'normalizacion',
-      'datosVuelo',
-      'irradiancia',
-      'paramsTermicos',
-      'perdidaPR',
-      'clasificacion',
-      'planoTermico',
-      'planoVisual',
-      'resultadosClase',
-      'resultadosCatergoria',
-      'resultadosPosicion',
-      // 'anexoLista',
-      'anexoAnomalias',
-      // 'anexoSeguidores',
-      // 'anexoSegsNoAnoms'
-    ];
+
+    json['apartados'] = this.apartadosInforme;
+
     json['criterioCriticidad'] = this.anomaliaService.criterioCriticidad;
 
     if (this.reportControlService.plantaFija) {
@@ -87,7 +103,7 @@ export class PdfComponent implements OnInit {
     ref.put(blob).then(() => {
       console.log('Archivo subido');
 
-      this.downloadPdf();
+      // this.downloadPdf();
     });
   }
 

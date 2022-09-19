@@ -1,0 +1,63 @@
+<mat-dialog-content class="dialog-content">
+  <span class="titulo-principal">Configura el PDF como necesites</span>
+  <div>
+    <span class="titulo">Introducción</span>
+    <li *ngFor="let elem of elemsIntroduccion">
+      <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
+        <span style="font-size: 15px">
+          {{ elem.label }}
+        </span>
+      </mat-checkbox>
+    </li>
+  </div>
+  <mat-checkbox
+    *ngIf="elemsOrtofotos.length == 1"
+    [checked]="elemsOrtofotos[0].completed"
+    (change)="elemsOrtofotos[0].completed = !elemsOrtofotos[0].completed"
+  >
+    <span class="checkbox-titulo">{{ elemsOrtofotos[0].label }}</span>
+  </mat-checkbox>
+  <div *ngIf="elemsOrtofotos.length > 1">
+    <span class="titulo">Ortofotos</span>
+    <li *ngFor="let elem of elemsOrtofotos">
+      <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
+        <span style="font-size: 15px">
+          {{ elem.label }}
+        </span>
+      </mat-checkbox>
+    </li>
+  </div>
+  <div>
+    <span class="titulo">Resultados termografía</span>
+    <li *ngFor="let elem of elemsResultados">
+      <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
+        <span style="font-size: 15px">
+          {{ elem.label }}
+        </span>
+      </mat-checkbox>
+    </li>
+  </div>
+  <mat-checkbox [checked]="anexoLista.completed" (change)="anexoLista.completed = !anexoLista.completed">
+    <span class="checkbox-titulo">{{ anexoLista.label }}</span>
+  </mat-checkbox>
+  <mat-checkbox
+    *ngIf="anexoAnomalias"
+    [checked]="anexoAnomalias.completed"
+    (change)="anexoAnomalias.completed = !anexoAnomalias.completed"
+  >
+    <span class="checkbox-titulo">{{ anexoAnomalias.label }}</span>
+  </mat-checkbox>
+  <div *ngIf="anexoSeguidores">
+    <span class="titulo">Apartado seguidores</span>
+    <li *ngFor="let elem of anexoSeguidores">
+      <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
+        <span style="font-size: 15px">
+          {{ elem.label }}
+        </span>
+      </mat-checkbox>
+    </li>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions class="btns" align="center">
+  <button mat-stroked-button mat-dialog-close (click)="generate()">Generar</button>
+</mat-dialog-actions>

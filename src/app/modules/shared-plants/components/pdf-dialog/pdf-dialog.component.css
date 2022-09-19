@@ -1,0 +1,28 @@
+.dialog-content {
+  max-height: unset;
+  overflow: unset;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.titulo-principal {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.titulo {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.checkbox-titulo {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+li {
+  list-style-type: none;
+  margin-left: 10px;
+  margin-right: 10px;
+}

@@ -19,6 +19,7 @@ import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { CommentsComponent } from './components/comments/comments.component';
 import { CommentComponent } from './components/comment/comment.component';
 import { PdfComponent } from './components/pdf/pdf.component';
+import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { PdfComponent } from './components/pdf/pdf.component';
     CommentsComponent,
     CommentComponent,
     PdfComponent,
+    PdfDialogComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
