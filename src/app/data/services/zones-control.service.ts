@@ -24,6 +24,7 @@ import { FilterableElement } from '@core/models/filterableInterface';
 import { COLOR } from '@data/constants/color';
 import { Select } from 'ol/interaction';
 import { Colors } from '@core/classes/colors';
+import { Patches } from '@core/classes/patches';
 
 @Injectable({
   providedIn: 'root',
@@ -50,6 +51,11 @@ export class ZonesControlService {
     return new Promise((initService) => {
       if (this.reportControlService.plantaFija) {
         this.zoomChangeView = 20;
+      }
+
+      // Parches Eco1, Eco2, Eco3 y Logrosan
+      if (Patches.checkId(this.reportControlService.planta.id)) {
+        this.zoomChangeView = Patches.applyPatches(this.reportControlService.planta.id);
       }
 
       this.subscriptions.add(

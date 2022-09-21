@@ -132,7 +132,7 @@ export class PortfolioControlService {
               }
 
               // aplicamos parche para plantas compradas por Plenium a RIOS
-              informesPlanta = Patches.plantsTwoClients(planta.id, this.user.uid, informesPlanta);
+              informesPlanta = Patches.plantsTwoClients(this.user.uid, informesPlanta);
 
               if (informesPlanta.length > 0) {
                 informesPlanta.forEach((informe) => {
