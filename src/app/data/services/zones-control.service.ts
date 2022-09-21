@@ -24,6 +24,7 @@ import { FilterableElement } from '@core/models/filterableInterface';
 import { COLOR } from '@data/constants/color';
 import { Select } from 'ol/interaction';
 import { Colors } from '@core/classes/colors';
+import { Patches } from '@core/classes/patches';
 
 @Injectable({
   providedIn: 'root',
@@ -48,7 +49,9 @@ export class ZonesControlService {
 
   initService(): Promise<boolean> {
     return new Promise((initService) => {
-      if (this.reportControlService.plantaFija) {
+      if (this.reportControlService.planta.hasOwnProperty('zoomCambioVista')) {
+        this.zoomChangeView = this.reportControlService.planta.zoomCambioVista;
+      } else if (this.reportControlService.plantaFija) {
         this.zoomChangeView = 20;
       }
 
