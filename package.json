@@ -14,7 +14,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "deploy:dev": "firebase use dev && ng build --outputHashing=all && firebase deploy --only hosting",
-    "deploy:prod": "firebase use prod && ng build --prod --outputHashing=all && firebase deploy --only hosting",
+    "deploy": "firebase use prod && ng build --prod --outputHashing=all && firebase deploy --only hosting",
     "analyzer": "npx webpack-bundle-analyzer dist/sdweb/stats.json"
   },
   "private": true,

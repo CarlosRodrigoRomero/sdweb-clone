@@ -6,10 +6,6 @@ export class Patches {
     const informesIds: string[] = ['cAX7f55nKEQBzx7RcROI'];
     const plantasIds: string[] = [
       'AyKgsY6F3TqGQGYNaOUY', // Logrosan
-      'sXxGiOAlC2Gd5NGjTB0a', // Ecoinversion 1
-      '5ie3jpW3vTZsWu4XuHP7', // Ecoinversion 2
-      '0BLkUW2AKGXMoHn7WcTi', // Ecoinversion 3
-      '84MscR4CrY1hHKAqhoZO', // Coronil (segs)
     ];
 
     if (informesIds.includes(id) || plantasIds.includes(id)) {
@@ -40,18 +36,6 @@ export class Patches {
       case 'b7LlgJYacx6CRyt0DIuF':
         const dateBerenis2 = '16/08/2022 13:00:00';
         return dateBerenis2;
-      case 'sXxGiOAlC2Gd5NGjTB0a': // Ecoinversion 1
-        const zoomEco1 = 17;
-        return zoomEco1;
-      case '5ie3jpW3vTZsWu4XuHP7': // Ecoinversion 2
-        const zoomEco2 = 17;
-        return zoomEco2;
-      case '0BLkUW2AKGXMoHn7WcTi': // Ecoinversion 3
-        const zoomEco3 = 17;
-        return zoomEco3;
-      case '84MscR4CrY1hHKAqhoZO': // Coronil (segs)
-        const zoomCoronil = 17;
-        return zoomCoronil;
       default:
         return undefined;
     }

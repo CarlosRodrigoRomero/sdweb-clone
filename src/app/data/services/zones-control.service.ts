@@ -49,13 +49,10 @@ export class ZonesControlService {
 
   initService(): Promise<boolean> {
     return new Promise((initService) => {
-      if (this.reportControlService.plantaFija) {
+      if (this.reportControlService.planta.hasOwnProperty('zoomCambioVista')) {
+        this.zoomChangeView = this.reportControlService.planta.zoomCambioVista;
+      } else if (this.reportControlService.plantaFija) {
         this.zoomChangeView = 20;
-      }
-
-      // Parches Eco1, Eco2, Eco3 y Logrosan
-      if (Patches.checkId(this.reportControlService.planta.id)) {
-        this.zoomChangeView = Patches.applyPatches(this.reportControlService.planta.id);
       }
 
       this.subscriptions.add(
