@@ -8,6 +8,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PdfService } from '@data/services/pdf.service';
 import { DownloadReportService } from '@data/services/download-report.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { Seguidor } from '@core/models/seguidor';
 
@@ -28,7 +29,8 @@ export class PdfComponent implements OnInit {
     private anomaliaService: AnomaliaService,
     public dialog: MatDialog,
     private pdfService: PdfService,
-    private downloadReportService: DownloadReportService
+    private downloadReportService: DownloadReportService,
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
@@ -72,6 +74,8 @@ export class PdfComponent implements OnInit {
     json['apartados'] = this.apartadosInforme;
 
     json['criterioCriticidad'] = this.anomaliaService.criterioCriticidad;
+
+    json['locAreas'] = Object.assign({}, this.zonesService.zonesBySize[0]);
 
     if (this.reportControlService.plantaFija) {
       const anomalias = Object.assign(
