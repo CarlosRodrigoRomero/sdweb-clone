@@ -4,7 +4,9 @@ import { InformeInterface } from '@core/models/informe';
 export class Patches {
   static checkId(id: string): boolean {
     const informesIds: string[] = ['cAX7f55nKEQBzx7RcROI'];
-    const plantasIds: string[] = ['AyKgsY6F3TqGQGYNaOUY'];
+    const plantasIds: string[] = [
+      'AyKgsY6F3TqGQGYNaOUY', // Logrosan
+    ];
 
     if (informesIds.includes(id) || plantasIds.includes(id)) {
       return true;
@@ -39,7 +41,7 @@ export class Patches {
     }
   }
 
-  static plantsTwoClients(plantaId: string, userId: string, informes: InformeInterface[]): InformeInterface[] {
+  static plantsTwoClients(userId: string, informes: InformeInterface[]): InformeInterface[] {
     const empresasPlantasCompradas = informes
       .filter((informe) => informe.hasOwnProperty('empresaId'))
       .map((informe) => informe.empresaId)
