@@ -30,13 +30,13 @@
         <div class="line-sub-content" *ngIf="anomaliaInfo.temperaturaMax !== undefined">
           <span>T. Máx:</span>
           <span
-            ><b>{{ anomaliaInfo.temperaturaMax }}ºC</b></span
+            ><b>{{ anomaliaInfo.temperaturaMax | number: '1.0-1' }}ºC</b></span
           >
         </div>
         <div class="line-sub-content" *ngIf="anomaliaInfo.temperaturaRef !== undefined" style="color: blue">
           <span>T. Ref: </span>
           <span
-            ><b>{{ anomaliaInfo.temperaturaRef }}ºC</b></span
+            ><b>{{ anomaliaInfo.temperaturaRef | number: '1.0-1' }}ºC</b></span
           >
         </div>
         <div class="line-sub-content" *ngIf="anomaliaInfo.gradienteNormalizado !== undefined" style="color: red">
