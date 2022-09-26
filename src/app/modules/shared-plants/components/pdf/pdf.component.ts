@@ -9,6 +9,7 @@ import { AnomaliaService } from '@data/services/anomalia.service';
 import { PdfService } from '@data/services/pdf.service';
 import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
+import { ThermalService } from '@data/services/thermal.service';
 
 import { Seguidor } from '@core/models/seguidor';
 
@@ -30,7 +31,8 @@ export class PdfComponent implements OnInit {
     public dialog: MatDialog,
     private pdfService: PdfService,
     private downloadReportService: DownloadReportService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private thermalService: ThermalService
   ) {}
 
   ngOnInit(): void {
@@ -64,9 +66,13 @@ export class PdfComponent implements OnInit {
       json.idioma = 'en';
     }
 
-    const informe = this.reportControlService.informes.find(
-      (inf) => inf.id === this.reportControlService.selectedInformeId
-    );
+    let indexInforme = 0;
+    const informe = this.reportControlService.informes.find((inf, index) => {
+      if (inf.id === this.reportControlService.selectedInformeId) {
+        indexInforme = index;
+        return true;
+      }
+    });
     json['informe'] = informe;
 
     json['planta'] = this.reportControlService.planta;
@@ -76,6 +82,9 @@ export class PdfComponent implements OnInit {
     json['criterioCriticidad'] = this.anomaliaService.criterioCriticidad;
 
     json['locAreas'] = Object.assign({}, this.zonesService.zonesBySize[0]);
+
+    json['sliderMin'] = this.thermalService.sliderMin[indexInforme];
+    json['sliderMax'] = this.thermalService.sliderMax[indexInforme];
 
     if (this.reportControlService.plantaFija) {
       const anomalias = Object.assign(
