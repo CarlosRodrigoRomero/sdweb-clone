@@ -229,6 +229,11 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
       tempMin = 35;
       tempMax = 70;
     }
+    // PARCHE LAS CABEZAS NOVIEMBRE 2021
+    if (informeId === '1Ki3mmSzeh93S5PRGzQo') {
+      tempMin = 30;
+      tempMax = 50;
+    }
 
     return [tempMin, tempMax];
   }
