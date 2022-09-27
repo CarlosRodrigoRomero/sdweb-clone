@@ -1,63 +1,103 @@
 <mat-dialog-content class="dialog-content">
-  <span class="titulo-principal">Configura el PDF como necesites</span>
-  <div>
-    <span class="titulo">Introducción</span>
-    <li *ngFor="let elem of elemsIntroduccion">
-      <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
-        <span style="font-size: 15px">
-          {{ elem.label }}
-        </span>
-      </mat-checkbox>
-    </li>
-  </div>
-  <mat-checkbox
-    *ngIf="elemsOrtofotos.length == 1"
-    [checked]="elemsOrtofotos[0].completed"
-    (change)="elemsOrtofotos[0].completed = !elemsOrtofotos[0].completed"
-  >
-    <span class="checkbox-titulo">{{ elemsOrtofotos[0].label }}</span>
-  </mat-checkbox>
-  <div *ngIf="elemsOrtofotos.length > 1">
-    <span class="titulo">Ortofotos</span>
-    <li *ngFor="let elem of elemsOrtofotos">
-      <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
-        <span style="font-size: 15px">
-          {{ elem.label }}
-        </span>
-      </mat-checkbox>
-    </li>
-  </div>
-  <div>
-    <span class="titulo">Resultados termografía</span>
-    <li *ngFor="let elem of elemsResultados">
-      <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
-        <span style="font-size: 15px">
-          {{ elem.label }}
-        </span>
-      </mat-checkbox>
-    </li>
-  </div>
-  <mat-checkbox [checked]="anexoLista.completed" (change)="anexoLista.completed = !anexoLista.completed">
-    <span class="checkbox-titulo">{{ anexoLista.label }}</span>
-  </mat-checkbox>
-  <mat-checkbox
-    *ngIf="anexoAnomalias"
-    [checked]="anexoAnomalias.completed"
-    (change)="anexoAnomalias.completed = !anexoAnomalias.completed"
-  >
-    <span class="checkbox-titulo">{{ anexoAnomalias.label }}</span>
-  </mat-checkbox>
-  <div *ngIf="anexoSeguidores">
-    <span class="titulo">Apartado seguidores</span>
-    <li *ngFor="let elem of anexoSeguidores">
-      <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
-        <span style="font-size: 15px">
-          {{ elem.label }}
-        </span>
-      </mat-checkbox>
-    </li>
-  </div>
+  <mat-horizontal-stepper #stepper>
+    <mat-step>
+      <div class="step-content">
+        <span class="titulo-principal">Configura el PDF como prefieras</span>
+        <div>
+          <span class="titulo">Introducción</span>
+          <li *ngFor="let elem of elemsIntroduccion">
+            <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
+              <span style="font-size: 15px">
+                {{ elem.label }}
+              </span>
+            </mat-checkbox>
+          </li>
+        </div>
+        <mat-checkbox
+          *ngIf="elemsOrtofotos.length == 1"
+          [checked]="elemsOrtofotos[0].completed"
+          (change)="elemsOrtofotos[0].completed = !elemsOrtofotos[0].completed"
+        >
+          <span class="checkbox-titulo">{{ elemsOrtofotos[0].label }}</span>
+        </mat-checkbox>
+        <div *ngIf="elemsOrtofotos.length > 1">
+          <span class="titulo">Ortofotos</span>
+          <li *ngFor="let elem of elemsOrtofotos">
+            <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
+              <span style="font-size: 15px">
+                {{ elem.label }}
+              </span>
+            </mat-checkbox>
+          </li>
+        </div>
+        <div>
+          <span class="titulo">Resultados termografía</span>
+          <li *ngFor="let elem of elemsResultados">
+            <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
+              <span style="font-size: 15px">
+                {{ elem.label }}
+              </span>
+            </mat-checkbox>
+          </li>
+        </div>
+        <mat-checkbox [checked]="anexoLista.completed" (change)="anexoLista.completed = !anexoLista.completed">
+          <span class="checkbox-titulo">{{ anexoLista.label }}</span>
+        </mat-checkbox>
+        <mat-checkbox
+          *ngIf="anexoAnomalias"
+          [checked]="anexoAnomalias.completed"
+          (change)="anexoAnomalias.completed = !anexoAnomalias.completed"
+        >
+          <span class="checkbox-titulo">{{ anexoAnomalias.label }}</span>
+        </mat-checkbox>
+        <div *ngIf="anexoSeguidores">
+          <span class="titulo">Apartado seguidores</span>
+          <li *ngFor="let elem of anexoSeguidores">
+            <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
+              <span style="font-size: 15px">
+                {{ elem.label }}
+              </span>
+            </mat-checkbox>
+          </li>
+        </div>
+        <button mat-stroked-button matStepperNext>Siguiente</button>
+      </div>
+    </mat-step>
+    <mat-step>
+      <div class="step-content">
+        <span class="titulo-principal">Selecciona destino</span>
+        <div class="text-explain">
+          <span
+            >Tras solicitar el PDF, cuando esté generado te llegará un correo al email con el que has iniciado
+            sesión.</span
+          >
+          <span
+            ><b>( {{ emailUser }} )</b>
+          </span>
+          <span
+            >Si prefieres que te llegue a otro email, activa la siguiente casilla en introduce el que prefieras.</span
+          >
+        </div>
+        <mat-checkbox id="check-select-email" [checked]="selectEmail" (change)="selectEmail = !selectEmail">
+          <span class="checkbox-titulo">Elegir otro email</span>
+        </mat-checkbox>
+        <form *ngIf="selectEmail" [formGroup]="form" (ngSubmit)="onSubmit($event)">
+          <mat-form-field appearance="fill">
+            <mat-label>Introduce email</mat-label>
+            <input matInput formControlName="email" />
+          </mat-form-field>
+          <div class="btns">
+            <button mat-stroked-button matStepperPrevious>Volver atrás</button>
+            <button mat-stroked-button class="btn-generate" [disabled]="form.invalid" mat-dialog-close type="submit">
+              Solicitar PDF
+            </button>
+          </div>
+        </form>
+        <div class="btns" *ngIf="!selectEmail">
+          <button mat-stroked-button matStepperPrevious>Volver atrás</button>
+          <button mat-stroked-button class="btn-generate" mat-dialog-close (click)="generate()">Solicitar PDF</button>
+        </div>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
 </mat-dialog-content>
-<mat-dialog-actions class="btns" align="center">
-  <button mat-stroked-button mat-dialog-close (click)="generate()">Generar</button>
-</mat-dialog-actions>

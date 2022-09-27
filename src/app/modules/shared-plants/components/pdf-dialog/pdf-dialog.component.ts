@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { PdfService } from '@data/services/pdf.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -35,7 +36,16 @@ export class PdfDialogComponent implements OnInit {
   anexoAnomalias: any = undefined;
   anexoSeguidores: any = undefined;
 
-  constructor(private pdfService: PdfService, private reportControlService: ReportControlService) {}
+  form: FormGroup;
+  selectEmail = false;
+  emailUser = this.reportControlService.user.email;
+  emailSelected: string;
+
+  constructor(
+    private pdfService: PdfService,
+    private reportControlService: ReportControlService,
+    private formBuilder: FormBuilder
+  ) {}
 
   ngOnInit(): void {
     if (this.reportControlService.plantaFija) {
@@ -47,14 +57,32 @@ export class PdfDialogComponent implements OnInit {
         { id: 'anexoSegsNoAnoms', label: 'Apartado seguidores sin anomalías', completed: true },
       ];
     }
+
+    this.buildForm();
+  }
+
+  private buildForm() {
+    this.form = this.formBuilder.group({
+      email: [, [Validators.required, Validators.email]],
+    });
+  }
+
+  onSubmit(event: Event) {
+    event.preventDefault();
+    if (this.form.valid) {
+      this.emailSelected = this.form.value.email;
+
+      this.generate();
+    }
   }
 
   generate() {
     this.setApartadosPDF();
+    this.setEmail();
     this.pdfService.generatePdf = true;
   }
 
-  setApartadosPDF() {
+  private setApartadosPDF() {
     const allSecciones = [...this.elemsIntroduccion, ...this.elemsOrtofotos, ...this.elemsResultados, this.anexoLista];
     if (this.reportControlService.plantaFija) {
       allSecciones.push(this.anexoAnomalias);
@@ -65,5 +93,13 @@ export class PdfDialogComponent implements OnInit {
     const apartadosSelected = allSecciones.filter((apt) => apt.completed);
 
     this.pdfService.apartadosInforme = apartadosSelected.map((apt) => apt.id);
+  }
+
+  private setEmail() {
+    if (this.emailSelected === undefined) {
+      this.emailSelected = this.emailUser;
+    }
+
+    this.pdfService.emailSelected = this.emailSelected;
   }
 }

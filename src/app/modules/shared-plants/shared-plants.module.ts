@@ -20,6 +20,7 @@ import { CommentsComponent } from './components/comments/comments.component';
 import { CommentComponent } from './components/comment/comment.component';
 import { PdfComponent } from './components/pdf/pdf.component';
 import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component';
+import { PdfEmailSelectComponent } from './components/pdf-email-select/pdf-email-select.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component
     CommentComponent,
     PdfComponent,
     PdfDialogComponent,
+    PdfEmailSelectComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [

@@ -22,6 +22,7 @@ import { PdfDialogComponent } from '../pdf-dialog/pdf-dialog.component';
 })
 export class PdfComponent implements OnInit {
   private apartadosInforme: string[] = [];
+  private emailSelected: string;
 
   constructor(
     private storage: AngularFireStorage,
@@ -36,9 +37,8 @@ export class PdfComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.pdfService.apartadosInforme$.subscribe((apt) => {
-      this.apartadosInforme = apt;
-    });
+    this.pdfService.apartadosInforme$.subscribe((apt) => (this.apartadosInforme = apt));
+    this.pdfService.emailSelected$.subscribe((email) => (this.emailSelected = email));
 
     this.pdfService.generatePdf$.subscribe((gen) => {
       if (gen) {
@@ -85,6 +85,8 @@ export class PdfComponent implements OnInit {
 
     json['sliderMin'] = this.thermalService.sliderMin[indexInforme];
     json['sliderMax'] = this.thermalService.sliderMax[indexInforme];
+
+    json['email'] = this.emailSelected;
 
     if (this.reportControlService.plantaFija) {
       const anomalias = Object.assign(
