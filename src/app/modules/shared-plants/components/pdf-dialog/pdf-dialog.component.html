@@ -4,9 +4,16 @@
       <div class="step-content">
         <span class="titulo-principal">Configura el PDF como prefieras</span>
         <div>
-          <span class="titulo">Introducción</span>
-          <li *ngFor="let elem of elemsIntroduccion">
-            <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
+          <mat-checkbox
+            [checked]="allElemsIntroCompleted"
+            [indeterminate]="someComplete(elemIntroduccion.id)"
+            (change)="setAll($event.checked, elemIntroduccion.id)"
+          >
+            <span class="titulo">{{ elemIntroduccion.label }}</span>
+          </mat-checkbox>
+
+          <li *ngFor="let elem of elemIntroduccion.elems">
+            <mat-checkbox [(ngModel)]="elem.completed" (ngModelChange)="updateAllComplete(elemIntroduccion.id)">
               <span style="font-size: 15px">
                 {{ elem.label }}
               </span>
@@ -14,16 +21,23 @@
           </li>
         </div>
         <mat-checkbox
-          *ngIf="elemsOrtofotos.length == 1"
-          [checked]="elemsOrtofotos[0].completed"
-          (change)="elemsOrtofotos[0].completed = !elemsOrtofotos[0].completed"
+          *ngIf="elemOrtofotos.elems.length == 1"
+          [checked]="elemOrtofotos.elems[0].completed"
+          (change)="elemOrtofotos.elems[0].completed = !elemOrtofotos.elems[0].completed"
         >
-          <span class="checkbox-titulo">{{ elemsOrtofotos[0].label }}</span>
+          <span class="checkbox-titulo">{{ elemOrtofotos.elems[0].label }}</span>
         </mat-checkbox>
-        <div *ngIf="elemsOrtofotos.length > 1">
-          <span class="titulo">Ortofotos</span>
-          <li *ngFor="let elem of elemsOrtofotos">
-            <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
+        <div *ngIf="elemOrtofotos.elems.length > 1">
+          <mat-checkbox
+            [checked]="allElemsOrtoCompleted"
+            [indeterminate]="someComplete(elemOrtofotos.id)"
+            (change)="setAll($event.checked, elemOrtofotos.id)"
+          >
+            <span class="titulo">{{ elemOrtofotos.label }}</span>
+          </mat-checkbox>
+
+          <li *ngFor="let elem of elemOrtofotos.elems">
+            <mat-checkbox [(ngModel)]="elem.completed" (ngModelChange)="updateAllComplete(elemOrtofotos.id)">
               <span style="font-size: 15px">
                 {{ elem.label }}
               </span>
@@ -31,8 +45,14 @@
           </li>
         </div>
         <div>
-          <span class="titulo">Resultados termografía</span>
-          <li *ngFor="let elem of elemsResultados">
+          <mat-checkbox
+            [checked]="allElemsResultadosCompleted"
+            [indeterminate]="someComplete(elemResultados.id)"
+            (change)="setAll($event.checked, elemResultados.id)"
+          >
+            <span class="titulo">{{ elemResultados.label }}</span>
+          </mat-checkbox>
+          <li *ngFor="let elem of elemResultados.elems">
             <mat-checkbox [checked]="elem.completed" (change)="elem.completed = !elem.completed">
               <span style="font-size: 15px">
                 {{ elem.label }}
