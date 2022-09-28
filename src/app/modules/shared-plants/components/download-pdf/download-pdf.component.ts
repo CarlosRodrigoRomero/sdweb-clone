@@ -2344,7 +2344,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${this.translation.t(
             'La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. En el caso de células calientes, sólo se incluyen aquellas con gradientes mayores a'
-          )} ${this.currentFiltroGradiente} ºC`,
+          )} ${this.currentFiltroGradiente} ºC. ${this.translation.t('Se muestran los porcentajes respecto al número de anomalías del informe y respecto al número total de módulos de la planta.')}`,
           style: 'p',
         },
 
@@ -2372,7 +2372,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                     },
 
                     {
-                      text: this.translation.t('Porcentaje %'),
+                      text: this.translation.t('% Nº anomalías'),
+                      style: 'tableHeaderBlue',
+                    },
+
+                    {
+                      text: this.translation.t('% Total módulos'),
                       style: 'tableHeaderBlue',
                     },
                   ],
@@ -2390,6 +2395,14 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
                       },
                       {
                         text: '100%',
+                        style: 'bold',
+                      },
+                      {
+                        text:
+                          this.decimalPipe.transform(
+                            (this.anomaliasInforme.length / this.getNumeroModulosInforme()) * 100,
+                            '1.0-2'
+                          ) + '%',
                         style: 'bold',
                       },
                     ],
@@ -3736,9 +3749,15 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
             },
             {
               text:
-                this.decimalPipe
-                  .transform((this.countCategoria[i - 1] / this.anomaliasInforme.length) * 100, '1.0-1')
-                  .toString() + ' %',
+                this.decimalPipe.transform((this.countCategoria[i - 1] / this.anomaliasInforme.length) * 100, '1.0-2') +
+                ' %',
+            },
+            {
+              text:
+                this.decimalPipe.transform(
+                  (this.countCategoria[i - 1] / this.getNumeroModulosInforme()) * 100,
+                  '1.0-2'
+                ) + ' %',
             }
           )
         );
@@ -3746,6 +3765,17 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     }
 
     return array;
+  }
+
+  private getNumeroModulosInforme() {
+    if (this.reportControlService.plantaFija) {
+      return this.selectedInforme.numeroModulos;
+    } else {
+      const numSeguidores = this.reportControlService.allFilterableElements.filter(
+        (elem) => elem.informeId === this.selectedInforme.id
+      ).length;
+      return numSeguidores * this.planta.filas * this.planta.columnas;
+    }
   }
 
   private getLocalId(anomalia: Anomalia): string {
