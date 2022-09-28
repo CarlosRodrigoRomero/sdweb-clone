@@ -108,6 +108,7 @@
   "son de clase": "are class",
   "Resultados por categoría de la anomalía": "Results by abnormality category",
   "La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. En el caso de células calientes, sólo se incluyen aquellas con gradientes mayores a": "The following table shows the number of thermal abnormalities by category. In the case of hot cells, only those with gradients greater than",
+  "Se muestran los porcentajes respecto al número de anomalías del informe y respecto al número total de módulos de la planta.": "The percentages are shown with respect to the number of abnormalities in the report and with respect to the total number of modules in the plant.",
   "Categoría": "Category",
   "Cantidad": "Amount",
   "Porcentaje %": "Percentage %",
@@ -253,6 +254,8 @@
   "Pérdidas": "Losses",
   "Fecha y hora captura": "Capture date and time",
   "Tª Máx": "T Max",
-  "Grad Tª Norm": "Norm T Grad", 
-  "# Anomalía": "# Abnormality"
+  "Grad Tª Norm": "Norm T Grad",
+  "# Anomalía": "# Abnormality",
+  "% Nº anomalías": "% # Abnormalities",
+  "% Total módulos": "% Total modules"
 }
