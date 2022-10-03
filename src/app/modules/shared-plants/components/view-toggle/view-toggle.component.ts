@@ -20,7 +20,7 @@ export class ViewToggleComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view)));
   }
 
-  onToggleChange(value) {
+  onToggleChange(value: string) {
     this.viewReportService.reportViewSelected = Number(value);
   }
 

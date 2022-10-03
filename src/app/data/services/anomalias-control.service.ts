@@ -143,6 +143,18 @@ export class AnomaliasControlService {
     });
     anomaliasLayers.push(gradNormMaxLayer);
 
+    const tiposLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleTipos(false),
+      visible: false,
+    });
+    tiposLayer.setProperties({
+      informeId,
+      type: 'anomalias',
+      view: 3,
+    });
+    anomaliasLayers.push(tiposLayer);
+
     return anomaliasLayers;
   }
 
@@ -334,14 +346,14 @@ export class AnomaliasControlService {
   }
 
   private addClickOutFeatures() {
-    this.map.on('click', async (event) => {
+    this.map.on('click', (event) => {
       const feature = this.map
         .getFeaturesAtPixel(event.pixel)
         .filter((item) => item.getProperties().properties !== undefined)
         .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
       if (feature.length === 0) {
         if (this.anomaliaSelect !== undefined) {
-          await this.setExternalStyle(this.anomaliaSelect.id, false);
+          this.setExternalStyle(this.anomaliaSelect.id, false);
 
           this.anomaliaSelect = undefined;
         }
@@ -419,6 +431,7 @@ export class AnomaliasControlService {
       this.getStylePerdidas(focus),
       this.getStyleCelsCalientes(focus),
       this.getStyleGradienteNormMax(focus),
+      this.getStyleTipos(focus),
     ];
 
     return estilosView[this.toggleViewSelected];
@@ -521,23 +534,12 @@ export class AnomaliasControlService {
   }
 
   // ESTILO POR TIPOS
-  getStyleAnomaliasMapa(selected = false) {
+  private getStyleTipos(focused: boolean) {
     return (feature) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        if (selected) {
-          return new Style({
-            stroke: new Stroke({
-              color: 'white',
-              width: 8,
-            }),
-            fill: new Fill({
-              color: 'rgba(0, 0, 255, 0)',
-            }),
-          });
-        }
         return new Style({
           stroke: new Stroke({
-            color: this.getColorAnomalia(feature),
+            color: focused ? 'white' : this.getColorTipo(feature),
             width: 4,
           }),
           fill: new Fill({
@@ -548,32 +550,12 @@ export class AnomaliasControlService {
     };
   }
 
-  private getColorAnomalia(feature: Feature) {
+  private getColorTipo(feature: Feature) {
     if (feature !== undefined) {
-      const tipo = parseInt(feature.getProperties().properties.tipo);
+      const tipo = Number(feature.getProperties().properties.tipo);
 
       return COLOR.colores_tipos[tipo];
     }
-  }
-
-  getLayerViewAnomalias(anomaliaId: string) {
-    const layersInforme = this.anomaliaLayers.filter(
-      (layer) => layer.getProperties().informeId === this.selectedInformeId
-    );
-
-    const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
-
-    let layerViewAnomalia: VectorLayer;
-    layersView.forEach((layer) => {
-      const featuresLayer = layer.getSource().getFeatures();
-      featuresLayer.forEach((f) => {
-        if (f.getProperties().properties.anomaliaId === anomaliaId) {
-          layerViewAnomalia = layer;
-        }
-      });
-    });
-
-    return layerViewAnomalia;
   }
 
   setExternalStyle(anomaliaId: string, focused: boolean) {

@@ -135,14 +135,19 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private setAnomaliaLayersVisibility(informeId: string) {
     this.anomaliaLayers.forEach((layer) => {
       if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
-        if (this.zonesService.thereAreZones) {
-          if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
-            layer.setVisible(true);
-          } else {
-            layer.setVisible(false);
-          }
-        } else {
+        // vista tipo anomalías
+        if (layer.getProperties().view === 3) {
           layer.setVisible(true);
+        } else {
+          if (this.zonesService.thereAreZones) {
+            if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
+              layer.setVisible(true);
+            } else {
+              layer.setVisible(false);
+            }
+          } else {
+            layer.setVisible(true);
+          }
         }
       } else {
         layer.setVisible(false);

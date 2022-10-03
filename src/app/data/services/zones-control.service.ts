@@ -10,6 +10,7 @@ import { fromLonLat } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Map } from 'ol';
+import { Select } from 'ol/interaction';
 
 import { OlMapService } from './ol-map.service';
 import { FilterService } from './filter.service';
@@ -22,9 +23,8 @@ import { Seguidor } from '@core/models/seguidor';
 import { FilterableElement } from '@core/models/filterableInterface';
 
 import { COLOR } from '@data/constants/color';
-import { Select } from 'ol/interaction';
+
 import { Colors } from '@core/classes/colors';
-import { Patches } from '@core/classes/patches';
 
 @Injectable({
   providedIn: 'root',
@@ -112,8 +112,18 @@ export class ZonesControlService {
       view: 2,
       type: 'zonas',
     });
+    const tipoLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: null,
+      visible: false,
+    });
+    tipoLayer.setProperties({
+      informeId,
+      view: 3,
+      type: 'zonas',
+    });
 
-    return [maeLayer, ccLayer, gradLayer];
+    return [maeLayer, ccLayer, gradLayer, tipoLayer];
   }
 
   mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
@@ -128,37 +138,39 @@ export class ZonesControlService {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
       const view = l.getProperties().view;
-      const informeId = l.getProperties().informeId;
-      const elemsInforme = this.reportControlService.allFilterableElements.filter(
-        (elem) => elem.informeId === informeId
-      );
-      const elemsFilteredInforme = elems.filter((elem) => elem.informeId === informeId);
-      const source = l.getSource();
-      source.clear();
-      zonas.forEach((zona) => {
-        const elemsFilteredZona = this.getElemsZona(zona, elemsFilteredInforme);
+      if (view !== 3) {
+        const informeId = l.getProperties().informeId;
+        const elemsInforme = this.reportControlService.allFilterableElements.filter(
+          (elem) => elem.informeId === informeId
+        );
+        const elemsFilteredInforme = elems.filter((elem) => elem.informeId === informeId);
+        const source = l.getSource();
+        source.clear();
+        zonas.forEach((zona) => {
+          const elemsFilteredZona = this.getElemsZona(zona, elemsFilteredInforme);
 
-        const allElemsZona = this.getElemsZona(zona, elemsInforme);
-        const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
+          const allElemsZona = this.getElemsZona(zona, elemsInforme);
+          const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
 
-        const coords = this.pathToLonLat(zona.path);
+          const coords = this.pathToLonLat(zona.path);
 
-        // crea poligono seguidor
-        const feature = new Feature({
-          geometry: new Polygon(coords),
-          properties: {
-            id: this.getGlobalsLabel(zona.globalCoords),
-            informeId,
-            centroid: this.olMapService.getCentroid(coords[0]),
-            type: 'zone',
-            area: this.getArea(coords),
-            numElems: elemsFilteredZona.length,
-            name: this.getSmallGlobal(zona.globalCoords),
-            [property.type]: property.value,
-          },
+          // crea poligono seguidor
+          const feature = new Feature({
+            geometry: new Polygon(coords),
+            properties: {
+              id: this.getGlobalsLabel(zona.globalCoords),
+              informeId,
+              centroid: this.olMapService.getCentroid(coords[0]),
+              type: 'zone',
+              area: this.getArea(coords),
+              numElems: elemsFilteredZona.length,
+              name: this.getSmallGlobal(zona.globalCoords),
+              [property.type]: property.value,
+            },
+          });
+          source.addFeature(feature);
         });
-        source.addFeature(feature);
-      });
+      }
     });
   }
 
@@ -179,6 +191,7 @@ export class ZonesControlService {
     zonas: LocationAreaInterface[],
     allElemsZona: FilterableElement[]
   ): any {
+    // console.log(view, informeId, zona, zonas.length, allElemsZona.length);
     switch (view) {
       case 0:
         let mae = 0;
@@ -201,6 +214,8 @@ export class ZonesControlService {
       case 2:
         const grad = this.getGradNormMaxZona(allElemsZona);
         return { type: 'gradienteNormalizado', value: grad };
+      case 3:
+        return { type: 'tipo', value: null };
     }
   }
 
