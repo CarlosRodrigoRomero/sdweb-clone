@@ -2,5 +2,5 @@
   <mat-button-toggle value="0" (change)="onToggleChange($event.value)">MAE</mat-button-toggle>
   <mat-button-toggle value="1" (change)="onToggleChange($event.value)">Cels. Calientes</mat-button-toggle>
   <mat-button-toggle value="2" (change)="onToggleChange($event.value)">&Delta;T Max (norm)</mat-button-toggle>
-  <mat-button-toggle value="3" (change)="onToggleChange($event.value)">Tipo</mat-button-toggle>
+  <mat-button-toggle *ngIf="plantaFija" value="3" (change)="onToggleChange($event.value)">Tipo</mat-button-toggle>
 </mat-button-toggle-group>

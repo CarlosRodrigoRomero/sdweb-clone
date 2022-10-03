@@ -47,3 +47,13 @@ mat-card-content {
 li {
   list-style-type: none;
 }
+
+.label-tipo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.label-tipo span {
+  font-size: medium;
+}
