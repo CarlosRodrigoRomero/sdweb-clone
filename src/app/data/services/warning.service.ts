@@ -17,6 +17,7 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
+import { Seguidor } from '@core/models/seguidor';
 
 @Injectable({
   providedIn: 'root',
@@ -149,7 +150,8 @@ export class WarningService {
     anomalias: Anomalia[],
     warns: Warning[],
     planta: PlantaInterface,
-    locAreas: LocationAreaInterface[]
+    locAreas: LocationAreaInterface[],
+    seguidores?: Seguidor[]
   ): boolean {
     // reseteamos las alertas añadidas
     this.warningsAdded = warns.map((warn) => warn.type);
@@ -161,17 +163,25 @@ export class WarningService {
     const ccChecked = this.checkCC(informe, warns);
     const filsColsPlantaChecked = this.checkFilsColsPlanta(planta, informe, warns);
     const filsColsAnomsChecked = this.checkFilsColsAnoms(planta, anomalias, informe, warns);
-    const filsColsAnomsTipo0Checked = this.checkFilsColsTipo0Anoms(planta, anomalias, informe, warns);
+    const filsColsAnomsTipo0Checked = this.checkFilsColsTipo0Anoms(anomalias, informe, warns);
     const zonesChecked = this.checkZonesWarnings(locAreas, informe, warns, planta, anomalias);
     const visualLayerChecked = this.checkVisualLayer(informe, warns);
     const imgPortadaChecked = this.checkImagePortada(informe.id, warns);
     const imgSuciedadChecked = this.checkImageSuciedad(informe.id, warns);
     const tempMaxAnomsChecked = this.checkTempMaxAnomsError(anomalias, warns, informe.id);
+
     let thermalLayerChecked = false;
     if (planta.tipo === 'seguidores') {
       thermalLayerChecked = true;
     } else {
       thermalLayerChecked = this.checkThermalLayer(informe, warns);
+    }
+
+    let segsMismoNombreChecked = false;
+    if (seguidores) {
+      segsMismoNombreChecked = this.checkSegsRepeatName(seguidores, warns, informe.id);
+    } else {
+      segsMismoNombreChecked = true;
     }
 
     if (
@@ -421,12 +431,7 @@ export class WarningService {
     return true;
   }
 
-  checkFilsColsTipo0Anoms(
-    planta: PlantaInterface,
-    anomalias: Anomalia[],
-    informe: InformeInterface,
-    warns: Warning[]
-  ): boolean {
+  checkFilsColsTipo0Anoms(anomalias: Anomalia[], informe: InformeInterface, warns: Warning[]): boolean {
     const differentFilColAnoms = anomalias.filter((anom) => anom.localX == 0 || anom.localY == 0);
 
     if (differentFilColAnoms.length > 0) {
@@ -694,7 +699,7 @@ export class WarningService {
     return true;
   }
 
-  checkVisualLayer(informe: InformeInterface, warns: Warning[]): boolean {
+  private checkVisualLayer(informe: InformeInterface, warns: Warning[]): boolean {
     const url = this.geoserverService.getGeoserverUrl(informe, 'visual', true);
 
     this.http
@@ -727,7 +732,7 @@ export class WarningService {
     return true;
   }
 
-  checkThermalLayer(informe: InformeInterface, warns: Warning[]): boolean {
+  private checkThermalLayer(informe: InformeInterface, warns: Warning[]): boolean {
     const url = this.geoserverService.getGeoserverUrl(informe, 'thermal', true);
 
     this.http
@@ -760,7 +765,7 @@ export class WarningService {
     return true;
   }
 
-  checkImagePortada(informeId: string, warns: Warning[]): boolean {
+  private checkImagePortada(informeId: string, warns: Warning[]): boolean {
     this.storage
       .ref(`informes/${informeId}/portada.jpg`)
       .getDownloadURL()
@@ -782,7 +787,7 @@ export class WarningService {
     return true;
   }
 
-  checkImageSuciedad(informeId: string, warns: Warning[]): boolean {
+  private checkImageSuciedad(informeId: string, warns: Warning[]): boolean {
     this.storage
       .ref(`informes/${informeId}/suciedad.jpg`)
       .getDownloadURL()
@@ -804,7 +809,7 @@ export class WarningService {
     return true;
   }
 
-  checkTempMaxAnomsError(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
+  private checkTempMaxAnomsError(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
     if (anomalias.length > 0) {
       const highestTemp = anomalias.sort((a, b) => b.temperaturaMax - a.temperaturaMax)[0].temperaturaMax;
 
@@ -825,6 +830,27 @@ export class WarningService {
     } else {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarnings('tempMaxAnoms', warns, informeId);
+    }
+
+    // confirmamos que ha sido checkeado
+    return true;
+  }
+
+  checkSegsRepeatName(segs: Seguidor[], warns: Warning[], informeId: string) {
+    const repeatNameSegs = UtilitiesService.findDuplicates(segs.map((seg) => seg.nombre));
+
+    if (repeatNameSegs.length > 0) {
+      console.log('Seguidores con el mismo nombre: ' + repeatNameSegs.join(' | '));
+
+      const warning: Warning = {
+        type: 'segsRepeatName',
+        visible: true,
+      };
+
+      this.checkAddWarning(warning, warns, informeId);
+    } else {
+      // eliminamos la alerta antigua si la hubiera
+      this.checkOldWarnings('zonasRepeat', warns, informeId);
     }
 
     // confirmamos que ha sido checkeado
