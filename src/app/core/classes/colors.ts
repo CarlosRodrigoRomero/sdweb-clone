@@ -46,11 +46,15 @@ export class Colors {
     }
   }
 
+  static getColorTipo(tipo: number): string {
+    return COLOR.colores_tipos[tipo];
+  }
+
   static getColorComentarios(checked: boolean, opacity: number): string {
     if (checked) {
-      return Colors.hexToRgb(COLOR.colores_comentarios[0], opacity);
+      return this.hexToRgb(COLOR.colores_comentarios[0], opacity);
     } else {
-      return Colors.hexToRgb(COLOR.colores_comentarios[1], opacity);
+      return this.hexToRgb(COLOR.colores_comentarios[1], opacity);
     }
   }
 }
