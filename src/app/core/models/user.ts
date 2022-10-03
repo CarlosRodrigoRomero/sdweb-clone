@@ -8,4 +8,5 @@ export interface UserInterface {
   photoURL?: string;
   emailVerified?: boolean;
   criterioId?: string;
+  preferredView?: number;
 }
