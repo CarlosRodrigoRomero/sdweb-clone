@@ -43,3 +43,7 @@ mat-card-content {
 .leyenda-icon {
   width: 24px;
 }
+
+li {
+  list-style-type: none;
+}

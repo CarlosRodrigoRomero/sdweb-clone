@@ -1,6 +1,6 @@
 <mat-card>
   <mat-card-content>
-    <div *ngIf="!plantaFija || (plantaFija && viewSelected != 1)" class="lines">
+    <div *ngIf="!plantaFija || (plantaFija && viewSelected != 1 && viewSelected != 3)" class="lines">
       <div class="line">
         <img class="leyenda-icon" src="assets/icons/leyenda-grave.png" alt="" />
         <span> {{ viewsLabels[viewSelected][2] }}</span>
@@ -70,6 +70,20 @@
           <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
           <span> {{ viewsCCsLabels[0] }}</span>
         </div>
+      </div>
+    </div>
+
+    <div *ngIf="plantaFija && viewSelected == 3" class="leyenda-block">
+      <div class="lines">
+        <span class="lines-tittle">Tipo de anomalía</span>
+        <li *ngFor="let tipo of tipos">
+          <div class="label-tipo">
+            <mat-icon [ngStyle]="{ color: tipo.color }" class="icon">crop_16_9</mat-icon>
+            <span style="font-size: 15px">
+              {{ tipo.label }}
+            </span>
+          </div>
+        </li>
       </div>
     </div>
   </mat-card-content>

@@ -375,6 +375,7 @@ export class ZonesControlService {
       this.getStyleMae(focus),
       this.getStyleCelsCalientes(focus),
       this.getStyleGradienteNormMax(focus),
+      null,
     ];
 
     return estilosView[this.toggleViewSelected];
