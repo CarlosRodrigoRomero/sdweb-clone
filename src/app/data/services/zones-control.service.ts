@@ -33,7 +33,7 @@ export class ZonesControlService {
   private map: Map;
   zoomChangeView = 18;
   private selectedInformeId: string;
-  private toggleViewSelected: number;
+  private toggleViewSelected: string;
   private featureHovered: Feature;
   private prevFeatureHovered: Feature;
   private currentZoom: number;
@@ -82,36 +82,6 @@ export class ZonesControlService {
   }
 
   createZonasLayers(informeId: string): VectorLayer[] {
-    const maeLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleMae(false),
-      visible: false,
-    });
-    maeLayer.setProperties({
-      informeId,
-      view: 0,
-      type: 'zonas',
-    });
-    const ccLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleCelsCalientes(false),
-      visible: false,
-    });
-    ccLayer.setProperties({
-      informeId,
-      view: 1,
-      type: 'zonas',
-    });
-    const gradLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleGradienteNormMax(false),
-      visible: false,
-    });
-    gradLayer.setProperties({
-      informeId,
-      view: 2,
-      type: 'zonas',
-    });
     const tipoLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleTipo(false),
@@ -119,11 +89,44 @@ export class ZonesControlService {
     });
     tipoLayer.setProperties({
       informeId,
-      view: 3,
+      view: 'tipo',
       type: 'zonas',
     });
 
-    return [maeLayer, ccLayer, gradLayer, tipoLayer];
+    const maeLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleMae(false),
+      visible: false,
+    });
+    maeLayer.setProperties({
+      informeId,
+      view: 'mae',
+      type: 'zonas',
+    });
+
+    const ccLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleCelsCalientes(false),
+      visible: false,
+    });
+    ccLayer.setProperties({
+      informeId,
+      view: 'cc',
+      type: 'zonas',
+    });
+
+    const gradLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleGradienteNormMax(false),
+      visible: false,
+    });
+    gradLayer.setProperties({
+      informeId,
+      view: 'grad',
+      type: 'zonas',
+    });
+
+    return [tipoLayer, maeLayer, ccLayer, gradLayer];
   }
 
   mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
@@ -183,7 +186,7 @@ export class ZonesControlService {
   }
 
   private getPropertyView(
-    view: number,
+    view: string,
     informeId: string,
     zona: LocationAreaInterface,
     zonas: LocationAreaInterface[],
@@ -191,7 +194,7 @@ export class ZonesControlService {
   ): any {
     // console.log(view, informeId, zona, zonas.length, allElemsZona.length);
     switch (view) {
-      case 0:
+      case 'mae':
         let mae = 0;
         // para anomalías enviamos el numero de zonas para calcular el MAE
         if (this.reportControlService.plantaFija) {
@@ -200,7 +203,7 @@ export class ZonesControlService {
           mae = this.getMaeZona(allElemsZona, informeId);
         }
         return { type: 'mae', value: mae };
-      case 1:
+      case 'cc':
         let celsCalientes = 0;
         // para anomalías enviamos el numero de zonas para calcular el CC
         if (this.reportControlService.plantaFija) {
@@ -209,10 +212,10 @@ export class ZonesControlService {
           celsCalientes = this.getCCZona(allElemsZona, informeId);
         }
         return { type: 'celsCalientes', value: celsCalientes };
-      case 2:
+      case 'grad':
         const grad = this.getGradNormMaxZona(allElemsZona);
         return { type: 'gradienteNormalizado', value: grad };
-      case 3:
+      case 'tipo':
         return { type: 'tipo', value: null };
     }
   }

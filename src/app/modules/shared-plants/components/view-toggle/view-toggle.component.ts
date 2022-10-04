@@ -11,7 +11,7 @@ import { ReportControlService } from '@data/services/report-control.service';
   styleUrls: ['./view-toggle.component.css'],
 })
 export class ViewToggleComponent implements OnInit, OnDestroy {
-  viewSelected: number;
+  viewSelected: string;
   plantaFija: boolean;
 
   private subscriptions: Subscription = new Subscription();
@@ -21,16 +21,15 @@ export class ViewToggleComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.plantaFija = this.reportControlService.plantaFija;
 
-    const user = this.reportControlService.user;
-    if (user.hasOwnProperty('preferredView') && this.reportControlService.plantaFija) {
-      this.viewReportService.reportViewSelected = user.preferredView;
-    }
-
     this.subscriptions.add(this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view)));
   }
 
-  onToggleChange(value: string) {
-    this.viewReportService.reportViewSelected = Number(value);
+  onToggleChange(view: string) {
+    this.viewReportService.reportViewSelected = view;
+
+    if (view === 'tipo') {
+      this.viewReportService.simplifiedView = false;
+    }
   }
 
   ngOnDestroy(): void {

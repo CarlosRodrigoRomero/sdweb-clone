@@ -31,7 +31,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
   seguidorSelected: Seguidor = undefined;
   anomaliaHovered: Anomalia = undefined;
   anomaliaSelected: Anomalia = undefined;
-  viewSelected = 0;
+  viewSelected: string;
   dataSource: MatTableDataSource<AnomaliaData>;
   displayedColumns = ['colors', 'numAnom', 'tipo', 'perdidas', 'tempMax', 'gradiente', 'comentarios'];
 
@@ -55,8 +55,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
 
         if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
           let anomalias;
-          // tslint:disable-next-line: triple-equals
-          if (this.viewSelected != 1) {
+          if (this.viewSelected !== 'cc') {
             anomalias = seguidor.anomaliasCliente;
           } else {
             // tslint:disable-next-line: triple-equals

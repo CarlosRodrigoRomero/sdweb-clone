@@ -24,7 +24,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private seguidorLayers: VectorLayer[];
   private zonesLayers: VectorLayer[];
   public selectedInformeId: string;
-  private reportViewSelected: number;
+  private reportViewSelected: string;
   private currentZoom: number;
   private viewZones: boolean;
 

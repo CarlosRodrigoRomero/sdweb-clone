@@ -11,7 +11,7 @@ import { SeguidorViewService } from '../../services/seguidor-view.service';
   styleUrls: ['./seguidor-view-toggle.component.css'],
 })
 export class SeguidorViewToggleComponent implements OnInit, OnDestroy {
-  viewSelected: number;
+  viewSelected: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -21,9 +21,9 @@ export class SeguidorViewToggleComponent implements OnInit, OnDestroy {
     this.viewSelected = this.viewReportService.reportViewSelected;
   }
 
-  onToggleChange(value) {
-    this.viewSelected = Number(value);
-    this.seguidorViewService.seguidorViewSelected = Number(value);
+  onToggleChange(view: string) {
+    this.viewSelected = view;
+    this.seguidorViewService.seguidorViewSelected = view;
   }
 
   ngOnDestroy(): void {

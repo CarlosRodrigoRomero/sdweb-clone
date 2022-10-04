@@ -26,8 +26,8 @@ export class SeguidorViewService {
   public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
   private _sliderTemporalSelected: number = 100;
   public sliderTemporalSelected$ = new BehaviorSubject<number>(this._sliderTemporalSelected);
-  private _seguidorViewSelected = 0;
-  public seguidorViewSelected$ = new BehaviorSubject<number>(this._seguidorViewSelected);
+  private _seguidorViewSelected = 'tipo';
+  public seguidorViewSelected$ = new BehaviorSubject<string>(this._seguidorViewSelected);
   private _selectedInformeId: string = undefined;
   public selectedInformeId$ = new BehaviorSubject<string>(this._selectedInformeId);
   private _visualCanvas: any = undefined;
@@ -35,7 +35,7 @@ export class SeguidorViewService {
   private _anomsCanvas: any = undefined;
   private _imagesLoaded = false;
   public imagesLoaded$ = new BehaviorSubject<boolean>(this._imagesLoaded);
-  private localViewSelected = 0;
+  private localViewSelected = 'tipo';
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
@@ -51,25 +51,15 @@ export class SeguidorViewService {
 
   getAnomaliaColor(anomalia: Anomalia): string {
     switch (this.localViewSelected) {
-      case 0:
+      case 'mae':
         return this.seguidorService.getPerdidasAnomColor(anomalia);
-      case 1:
+      case 'cc':
         return this.seguidorService.getCelsCalientesAnomColor(anomalia);
-      case 2:
+      case 'grad':
         return this.seguidorService.getGradienteAnomColor(anomalia);
-      case 3:
+      case 'tipo':
         return this.seguidorService.getTipoAnomColor(anomalia);
     }
-
-    // // tslint:disable-next-line: triple-equals
-    // if (this.localViewSelected == 0) {
-    //   return this.seguidorService.getPerdidasAnomColor(anomalia);
-    //   // tslint:disable-next-line: triple-equals
-    // } else if (this.localViewSelected == 1) {
-    //   return this.seguidorService.getCelsCalientesAnomColor(anomalia);
-    // } else {
-    //   return this.seguidorService.getGradienteAnomColor(anomalia);
-    // }
   }
 
   setAnomaliaHoveredStyle(anomalia: Anomalia, hovered: boolean) {
@@ -166,7 +156,7 @@ export class SeguidorViewService {
     return this._seguidorViewSelected;
   }
 
-  set seguidorViewSelected(selected: number) {
+  set seguidorViewSelected(selected: string) {
     this._seguidorViewSelected = selected;
     this.seguidorViewSelected$.next(selected);
   }

@@ -16,7 +16,7 @@ import { GLOBAL } from '@data/constants/global';
   styleUrls: ['./seguidor-view-leyenda.component.css'],
 })
 export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
-  viewSelected: number;
+  viewSelected: string;
   private seguidorSelected: Seguidor;
   viewsTitle: string[] = ['Pérdidas', 'Cels. Calientes', 'ΔT Max (norm)'];
   viewsLabels: string[][];

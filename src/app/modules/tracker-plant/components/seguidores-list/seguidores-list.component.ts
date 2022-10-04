@@ -29,7 +29,7 @@ interface SeguidorData {
   styleUrls: ['./seguidores-list.component.css'],
 })
 export class SeguidoresListComponent implements OnInit, OnDestroy {
-  viewSeleccionada = 0;
+  viewSeleccionada: string;
   displayedColumns: string[] = [];
   dataSource: MatTableDataSource<SeguidorData>;
   seguidorHovered: Seguidor = undefined;
@@ -47,18 +47,18 @@ export class SeguidoresListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.viewReportService.reportViewSelected$.subscribe((sel) => {
-        this.viewSeleccionada = Number(sel);
+      this.viewReportService.reportViewSelected$.subscribe((view) => {
+        this.viewSeleccionada = view;
 
         // cambiammos la ultima columna con la vista seleccionada
         switch (this.viewSeleccionada) {
-          case 0:
+          case 'mae':
             this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'mae', 'comentarios'];
             break;
-          case 1:
+          case 'cc':
             this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'celsCalientes', 'comentarios'];
             break;
-          case 2:
+          case 'grad':
             this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'gradiente', 'comentarios'];
             break;
         }

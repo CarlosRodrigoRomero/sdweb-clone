@@ -42,8 +42,7 @@ export class AnomaliasControlService {
   public listaAnomalias: Anomalia[];
   private anomaliaLayers: VectorLayer[];
   private sharedReportNoFilters = false;
-  private toggleViewSelected: number;
-  private currentZoom: number;
+  private toggleViewSelected: string;
   private _coordsPointer: Coordinate = undefined;
   public coordsPointer$ = new BehaviorSubject<Coordinate>(this._coordsPointer);
   zoomChangeView = 22;
@@ -98,8 +97,6 @@ export class AnomaliasControlService {
         })
       );
 
-      this.subscriptions.add(this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom)));
-
       initService(true);
     });
   }
@@ -115,7 +112,7 @@ export class AnomaliasControlService {
     perdidasLayer.setProperties({
       informeId,
       type: 'anomalias',
-      view: 0,
+      view: 'mae',
     });
     anomaliasLayers.push(perdidasLayer);
 
@@ -127,7 +124,7 @@ export class AnomaliasControlService {
     celsCalientesLayer.setProperties({
       informeId,
       type: 'anomalias',
-      view: 1,
+      view: 'cc',
     });
     anomaliasLayers.push(celsCalientesLayer);
 
@@ -139,7 +136,7 @@ export class AnomaliasControlService {
     gradNormMaxLayer.setProperties({
       informeId,
       type: 'anomalias',
-      view: 2,
+      view: 'grad',
     });
     anomaliasLayers.push(gradNormMaxLayer);
 
@@ -151,7 +148,7 @@ export class AnomaliasControlService {
     tiposLayer.setProperties({
       informeId,
       type: 'anomalias',
-      view: 3,
+      view: 'tipo',
     });
     anomaliasLayers.push(tiposLayer);
 
@@ -560,7 +557,6 @@ export class AnomaliasControlService {
     this.anomaliaLayers = [];
     this.sharedReportNoFilters = false;
     this.toggleViewSelected = undefined;
-    this.currentZoom = undefined;
     this.coordsPointer = undefined;
 
     this.subscriptions.unsubscribe();

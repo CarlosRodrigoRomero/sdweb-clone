@@ -43,7 +43,7 @@ export class SeguidoresControlService {
   private sharedReportNoFilters = false;
   private seguidorLayers: VectorLayer[];
   private prevFeatureHover: Feature;
-  private toggleViewSelected: number;
+  private toggleViewSelected: string;
   private _seguidorViewOpened = false;
   public seguidorViewOpened$ = new BehaviorSubject<boolean>(this._seguidorViewOpened);
   private _urlVisualImageSeguidor: string = undefined;
@@ -128,7 +128,7 @@ export class SeguidoresControlService {
     });
     maeLayer.setProperties({
       informeId,
-      view: 0,
+      view: 'mae',
       type: 'seguidores',
     });
     seguidoresLayers.push(maeLayer);
@@ -140,7 +140,7 @@ export class SeguidoresControlService {
     });
     celsCalientesLayer.setProperties({
       informeId,
-      view: 1,
+      view: 'cc',
       type: 'seguidores',
     });
     seguidoresLayers.push(celsCalientesLayer);
@@ -152,7 +152,7 @@ export class SeguidoresControlService {
     });
     gradNormMaxLayer.setProperties({
       informeId,
-      view: 2,
+      view: 'grad',
       type: 'seguidores',
     });
     seguidoresLayers.push(gradNormMaxLayer);

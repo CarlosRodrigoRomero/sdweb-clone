@@ -25,7 +25,7 @@ import { Colors } from '@core/classes/colors';
   styleUrls: ['./anomalias-list.component.css'],
 })
 export class AnomaliasListComponent implements OnInit, OnDestroy {
-  viewSeleccionada = 0;
+  viewSeleccionada: string;
   dataSource: MatTableDataSource<any>;
   selectedRow: string;
   prevSelectedRow: any;
@@ -48,9 +48,7 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
     this.subscriptions.add(
-      this.viewReportService.reportViewSelected$.subscribe((sel) => {
-        this.viewSeleccionada = Number(sel);
-      })
+      this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSeleccionada = view))
     );
 
     this.subscriptions.add(

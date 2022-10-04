@@ -16,7 +16,24 @@ import { GLOBAL } from '@data/constants/global';
 })
 export class LeyendaComponent implements OnInit, OnDestroy {
   colors = [COLOR.colores_severity, COLOR.colores_severity, COLOR.colores_severity, COLOR.colores_tipos];
-  viewSelected: number;
+  viewSelected: string;
+  viewsData = {
+    mae: {
+      labels: ['Bueno', 'Medio', 'Alto'],
+      title: 'MAE por seguidor',
+      color: COLOR.colores_severity,
+    },
+    cc: {
+      labels: ['Bueno', 'Medio', 'Alto'],
+      title: 'Cels. Calientes por seguidor',
+      color: COLOR.colores_severity,
+    },
+    grad: {
+      labels: ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
+      title: 'ΔT Max (norm) por seguidor',
+      color: COLOR.colores_severity,
+    },
+  };
   viewsLabels: string[][];
   viewsTitle: string[] = ['MAE por seguidor', 'Cels. Calientes por seguidor', 'ΔT Max (norm) por seguidor'];
   viewsCCsLabels: string[] = ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'];

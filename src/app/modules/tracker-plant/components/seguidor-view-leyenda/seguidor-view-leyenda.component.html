@@ -1,6 +1,6 @@
 <mat-card>
   <mat-card-content>
-    <div *ngIf="viewSelected != 1 && viewSelected != 3">
+    <div *ngIf="viewSelected != 'cc' && viewSelected != 'tipo'">
       <span class="titulo">{{ viewsTitle[viewSelected] }}</span>
       <div class="line">
         <mat-icon [ngStyle]="{ color: colors[2] }">crop_5_4</mat-icon>
@@ -15,7 +15,7 @@
         <span> {{ viewsLabels[viewSelected][0] }}</span>
       </div>
     </div>
-    <div *ngIf="viewSelected == 1">
+    <div *ngIf="viewSelected == 'cc'">
       <span class="cc-label" *ngIf="numCelsCalientes === 0">Ningún módulo con celulas calientes</span>
       <div *ngIf="numCelsCalientes > 0">
         <span class="titulo">{{ viewsTitle[viewSelected] }}</span>
@@ -33,7 +33,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="viewSelected == 3">
+    <div *ngIf="viewSelected == 'tipo'">
       <div class="lines">
         <li *ngFor="let tipo of tipos">
           <div class="label-tipo">

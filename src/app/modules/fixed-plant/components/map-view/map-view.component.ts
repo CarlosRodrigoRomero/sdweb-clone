@@ -35,7 +35,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   generatingDownload = false;
   selectedInformeId: string;
   numInformes = 1;
-  viewSelected: number;
+  viewSelected: string;
 
   private subscriptions: Subscription = new Subscription();
 
