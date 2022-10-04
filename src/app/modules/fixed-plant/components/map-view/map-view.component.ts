@@ -9,6 +9,7 @@ import { StatsService } from '@data/services/stats.service';
 import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ResetServices } from '@data/services/reset-services.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
 
@@ -34,6 +35,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   generatingDownload = false;
   selectedInformeId: string;
   numInformes = 1;
+  viewSelected: number;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -49,7 +51,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
     private resetServicesService: ResetServices,
-    private componentFactoryResolver: ComponentFactoryResolver
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private viewReportService: ViewReportService
   ) {}
 
   ngOnInit(): void {
@@ -92,6 +95,10 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+    );
+
+    this.subscriptions.add(
+      this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.viewSelected = viewSel))
     );
   }
 

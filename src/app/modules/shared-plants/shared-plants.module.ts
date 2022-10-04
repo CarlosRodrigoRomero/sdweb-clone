@@ -18,7 +18,7 @@ import { ViewToggleComponent } from './components/view-toggle/view-toggle.compon
 import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { CommentsComponent } from './components/comments/comments.component';
 import { CommentComponent } from './components/comment/comment.component';
-import { ShowHideZonesComponent } from './components/show-hide-zones/show-hide-zones.component';
+import { SimplifiedViewComponent } from './components/simplified-view/simplified-view.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +37,7 @@ import { ShowHideZonesComponent } from './components/show-hide-zones/show-hide-z
     LeyendaComponent,
     CommentsComponent,
     CommentComponent,
-    ShowHideZonesComponent,
+    SimplifiedViewComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -52,7 +52,7 @@ import { ShowHideZonesComponent } from './components/show-hide-zones/show-hide-z
     ViewToggleComponent,
     LeyendaComponent,
     CommentsComponent,
-    ShowHideZonesComponent,
+    SimplifiedViewComponent,
   ],
 })
 export class SharedPlantsModule {}

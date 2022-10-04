@@ -9,11 +9,11 @@ export class ViewReportService {
   private _reportViewSelected = 0;
   reportViewSelected$ = new BehaviorSubject<number>(this._reportViewSelected);
 
-  private _sliderTemporal: number = 100;
+  private _sliderTemporal = 100;
   sliderTemporal$ = new BehaviorSubject<number>(this._sliderTemporal);
 
-  private _viewZones: boolean = true;
-  viewZones$ = new BehaviorSubject<boolean>(this._viewZones);
+  private _simplifiedView = false;
+  simplifiedView$ = new BehaviorSubject<boolean>(this._simplifiedView);
 
   constructor() {}
 
@@ -39,11 +39,11 @@ export class ViewReportService {
     this.sliderTemporal$.next(value);
   }
 
-  get viewZones() {
-    return this._viewZones;
+  get simplifiedView() {
+    return this._simplifiedView;
   }
-  set viewZones(value: boolean) {
-    this._viewZones = value;
-    this.viewZones$.next(value);
+  set simplifiedView(value: boolean) {
+    this._simplifiedView = value;
+    this.simplifiedView$.next(value);
   }
 }

@@ -86,7 +86,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
 
     // checkbox ver u ocultar zonas
     this.subscriptions.add(
-      this.viewReportService.viewZones$.subscribe((view) => {
+      this.viewReportService.simplifiedView$.subscribe((view) => {
         this.viewZones = view;
 
         this.setLayersVisibility(this.selectedInformeId);
