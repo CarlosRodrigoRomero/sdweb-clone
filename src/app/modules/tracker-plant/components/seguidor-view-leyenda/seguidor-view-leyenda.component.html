@@ -1,6 +1,6 @@
 <mat-card>
   <mat-card-content>
-    <div *ngIf="viewSelected != 1">
+    <div *ngIf="viewSelected != 1 && viewSelected != 3">
       <span class="titulo">{{ viewsTitle[viewSelected] }}</span>
       <div class="line">
         <mat-icon [ngStyle]="{ color: colors[2] }">crop_5_4</mat-icon>
@@ -31,6 +31,16 @@
           <mat-icon [ngStyle]="{ color: colors[0] }">crop_5_4</mat-icon>
           <span> {{ viewsLabels[viewSelected][0] }}</span>
         </div>
+      </div>
+    </div>
+    <div *ngIf="viewSelected == 3">
+      <div class="lines">
+        <li *ngFor="let tipo of tipos">
+          <div class="label-tipo">
+            <mat-icon [ngStyle]="{ color: tipo.color }" class="icon">crop_16_9</mat-icon>
+            <span>{{ tipo.label }}</span>
+          </div>
+        </li>
       </div>
     </div>
   </mat-card-content>

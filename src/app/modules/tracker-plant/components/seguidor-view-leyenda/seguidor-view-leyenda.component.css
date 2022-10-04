@@ -27,3 +27,17 @@ mat-card-content {
   font-size: medium;
   font-weight: 500;
 }
+
+li {
+  list-style-type: none;
+}
+
+.label-tipo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.label-tipo span {
+  font-size: medium;
+}

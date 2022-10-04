@@ -16,6 +16,14 @@ export class Colors {
     );
   }
 
+  static rgbToHex(rgb: string) {
+    return `#${rgb
+      .match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/)
+      .slice(1)
+      .map((n) => parseInt(n, 10).toString(16).padStart(2, '0'))
+      .join('')}`;
+  }
+
   static getColor(value: number, range: number[], opacity: number): string {
     if (value < range[0]) {
       return Colors.hexToRgb(COLOR.colores_severity[0], opacity);

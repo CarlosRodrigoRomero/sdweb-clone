@@ -50,15 +50,26 @@ export class SeguidorViewService {
   }
 
   getAnomaliaColor(anomalia: Anomalia): string {
-    // tslint:disable-next-line: triple-equals
-    if (this.localViewSelected == 0) {
-      return this.seguidorService.getPerdidasAnomColor(anomalia);
-      // tslint:disable-next-line: triple-equals
-    } else if (this.localViewSelected == 1) {
-      return this.seguidorService.getCelsCalientesAnomColor(anomalia);
-    } else {
-      return this.seguidorService.getGradienteAnomColor(anomalia);
+    switch (this.localViewSelected) {
+      case 0:
+        return this.seguidorService.getPerdidasAnomColor(anomalia);
+      case 1:
+        return this.seguidorService.getCelsCalientesAnomColor(anomalia);
+      case 2:
+        return this.seguidorService.getGradienteAnomColor(anomalia);
+      case 3:
+        return this.seguidorService.getTipoAnomColor(anomalia);
     }
+
+    // // tslint:disable-next-line: triple-equals
+    // if (this.localViewSelected == 0) {
+    //   return this.seguidorService.getPerdidasAnomColor(anomalia);
+    //   // tslint:disable-next-line: triple-equals
+    // } else if (this.localViewSelected == 1) {
+    //   return this.seguidorService.getCelsCalientesAnomColor(anomalia);
+    // } else {
+    //   return this.seguidorService.getGradienteAnomColor(anomalia);
+    // }
   }
 
   setAnomaliaHoveredStyle(anomalia: Anomalia, hovered: boolean) {

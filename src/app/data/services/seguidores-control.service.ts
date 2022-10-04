@@ -42,7 +42,6 @@ export class SeguidoresControlService {
   public prevSeguidorSelected: Seguidor;
   private sharedReportNoFilters = false;
   private seguidorLayers: VectorLayer[];
-  private zonasLayers: VectorLayer[];
   private prevFeatureHover: Feature;
   private toggleViewSelected: number;
   private _seguidorViewOpened = false;
@@ -679,7 +678,6 @@ export class SeguidoresControlService {
     this.prevSeguidorSelected = undefined;
     this.sharedReportNoFilters = false;
     this.seguidorLayers = undefined;
-    this.zonasLayers = undefined;
     this.prevFeatureHover = undefined;
     this.toggleViewSelected = undefined;
     this.seguidorViewOpened = undefined;
