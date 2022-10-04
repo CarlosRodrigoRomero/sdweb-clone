@@ -119,8 +119,8 @@ export class SeguidoresListComponent implements OnInit, OnDestroy {
     );
   }
 
-  private getColorsViewSeguidor(seguidor: Seguidor): string[] {
-    let colors: string[] = [];
+  private getColorsViewSeguidor(seguidor: Seguidor): any {
+    let colors: any = {};
     if (seguidor.anomaliasCliente.length > 0) {
       const colorMae = this.seguidoresControlService.getColorSeguidorMae(seguidor.mae, 1);
       const colorCCs = this.seguidoresControlService.getColorSeguidorGradienteNormMax(seguidor.gradienteNormalizado, 1);
@@ -129,9 +129,17 @@ export class SeguidoresListComponent implements OnInit, OnDestroy {
         1
       );
 
-      colors = [colorMae, colorCCs, colorGradNormMax];
+      colors = {
+        mae: colorMae,
+        cc: colorCCs,
+        grad: colorGradNormMax,
+      };
     } else {
-      colors = [COLOR.color_no_anoms, COLOR.color_no_anoms, COLOR.color_no_anoms];
+      colors = {
+        mae: COLOR.color_no_anoms,
+        cc: COLOR.color_no_anoms,
+        grad: COLOR.color_no_anoms,
+      };
     }
 
     return colors;

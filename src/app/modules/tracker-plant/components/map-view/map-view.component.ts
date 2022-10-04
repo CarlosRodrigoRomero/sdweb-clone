@@ -12,6 +12,7 @@ import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ResetServices } from '@data/services/reset-services.service';
+import { ViewReportService } from '@data/services/view-report.service';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
 
@@ -55,7 +56,8 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
     private resetServices: ResetServices,
-    private componentFactoryResolver: ComponentFactoryResolver
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private viewReportService: ViewReportService
   ) {}
 
   ngOnInit(): void {

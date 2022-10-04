@@ -15,6 +15,7 @@ import { PlantaService } from '@data/services/planta.service';
 import { AuthService } from '@data/services/auth.service';
 import { ZonesService } from './zones.service';
 import { ComentariosService } from './comentarios.service';
+import { ViewReportService } from './view-report.service';
 
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 import { FilterableElement } from '@core/models/filterableInterface';
@@ -79,7 +80,8 @@ export class ReportControlService {
     private plantaService: PlantaService,
     private authService: AuthService,
     private zonesService: ZonesService,
-    private comentariosService: ComentariosService
+    private comentariosService: ComentariosService,
+    private viewReportService: ViewReportService
   ) {}
 
   initService(): Promise<boolean> {

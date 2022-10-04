@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class ViewReportService {
-  private _reportViewSelected = 'tipo';
+  private _reportViewSelected = 'mae';
   reportViewSelected$ = new BehaviorSubject<string>(this._reportViewSelected);
 
   private _sliderTemporal = 100;
@@ -18,7 +18,7 @@ export class ViewReportService {
   constructor() {}
 
   resetService() {
-    this.reportViewSelected = 'tipo';
+    this.reportViewSelected = 'mae';
     this.sliderTemporal = 100;
   }
 
