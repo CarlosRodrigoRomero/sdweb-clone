@@ -126,7 +126,8 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
     const colorPerdidas = Colors.getColorPerdidas(anomalia.perdidas, 1);
     const colorCCs = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
     const colorGradNormMax = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
-    return [colorPerdidas, colorCCs, colorGradNormMax];
+    const colorTipo = Colors.getColorTipo(anomalia.tipo);
+    return [colorPerdidas, colorCCs, colorGradNormMax, colorTipo];
   }
 
   hoverAnomalia(row: any) {
