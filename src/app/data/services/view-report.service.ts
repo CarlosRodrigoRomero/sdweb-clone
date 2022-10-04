@@ -12,6 +12,9 @@ export class ViewReportService {
   private _sliderTemporal: number = 100;
   sliderTemporal$ = new BehaviorSubject<number>(this._sliderTemporal);
 
+  private _viewZones: boolean = true;
+  viewZones$ = new BehaviorSubject<boolean>(this._viewZones);
+
   constructor() {}
 
   resetService() {
@@ -22,7 +25,6 @@ export class ViewReportService {
   get reportViewSelected() {
     return this._reportViewSelected;
   }
-
   set reportViewSelected(selected: number) {
     this._reportViewSelected = selected;
     this.reportViewSelected$.next(selected);
@@ -35,5 +37,13 @@ export class ViewReportService {
     this._sliderTemporal = value;
 
     this.sliderTemporal$.next(value);
+  }
+
+  get viewZones() {
+    return this._viewZones;
+  }
+  set viewZones(value: boolean) {
+    this._viewZones = value;
+    this.viewZones$.next(value);
   }
 }

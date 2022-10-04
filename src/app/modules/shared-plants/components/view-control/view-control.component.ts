@@ -26,6 +26,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   public selectedInformeId: string;
   private reportViewSelected: number;
   private currentZoom: number;
+  private viewZones: boolean;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -83,6 +84,15 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       );
     }
 
+    // checkbox ver u ocultar zonas
+    this.subscriptions.add(
+      this.viewReportService.viewZones$.subscribe((view) => {
+        this.viewZones = view;
+
+        this.setLayersVisibility(this.selectedInformeId);
+      })
+    );
+
     // establecemos las visibilidades de inicio cuando el mapa ha cargado
     this.subscriptions.add(
       this.reportControlService.mapLoaded$.subscribe((loaded) => {
@@ -139,7 +149,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
         if (layer.getProperties().view === 3) {
           layer.setVisible(true);
         } else {
-          if (this.zonesService.thereAreZones) {
+          if (this.zonesService.thereAreZones && this.viewZones) {
             if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
               layer.setVisible(true);
             } else {
@@ -176,7 +186,11 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private setZonesLayersVisibility(informeId: string) {
     if (this.zonesLayers.length) {
       this.zonesLayers.forEach((layer) => {
-        if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
+        if (
+          layer.getProperties().informeId === informeId &&
+          layer.getProperties().view === this.reportViewSelected &&
+          this.viewZones
+        ) {
           layer.setVisible(true);
         } else {
           layer.setVisible(false);
