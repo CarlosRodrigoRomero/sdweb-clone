@@ -114,7 +114,7 @@ export class ZonesControlService {
     });
     const tipoLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
-      style: null,
+      style: this.getStyleTipo(false),
       visible: false,
     });
     tipoLayer.setProperties({
@@ -138,39 +138,37 @@ export class ZonesControlService {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
       const view = l.getProperties().view;
-      if (view !== 3) {
-        const informeId = l.getProperties().informeId;
-        const elemsInforme = this.reportControlService.allFilterableElements.filter(
-          (elem) => elem.informeId === informeId
-        );
-        const elemsFilteredInforme = elems.filter((elem) => elem.informeId === informeId);
-        const source = l.getSource();
-        source.clear();
-        zonas.forEach((zona) => {
-          const elemsFilteredZona = this.getElemsZona(zona, elemsFilteredInforme);
+      const informeId = l.getProperties().informeId;
+      const elemsInforme = this.reportControlService.allFilterableElements.filter(
+        (elem) => elem.informeId === informeId
+      );
+      const elemsFilteredInforme = elems.filter((elem) => elem.informeId === informeId);
+      const source = l.getSource();
+      source.clear();
+      zonas.forEach((zona) => {
+        const elemsFilteredZona = this.getElemsZona(zona, elemsFilteredInforme);
 
-          const allElemsZona = this.getElemsZona(zona, elemsInforme);
-          const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
+        const allElemsZona = this.getElemsZona(zona, elemsInforme);
+        const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
 
-          const coords = this.pathToLonLat(zona.path);
+        const coords = this.pathToLonLat(zona.path);
 
-          // crea poligono seguidor
-          const feature = new Feature({
-            geometry: new Polygon(coords),
-            properties: {
-              id: this.getGlobalsLabel(zona.globalCoords),
-              informeId,
-              centroid: this.olMapService.getCentroid(coords[0]),
-              type: 'zone',
-              area: this.getArea(coords),
-              numElems: elemsFilteredZona.length,
-              name: this.getSmallGlobal(zona.globalCoords),
-              [property.type]: property.value,
-            },
-          });
-          source.addFeature(feature);
+        // crea poligono seguidor
+        const feature = new Feature({
+          geometry: new Polygon(coords),
+          properties: {
+            id: this.getGlobalsLabel(zona.globalCoords),
+            informeId,
+            centroid: this.olMapService.getCentroid(coords[0]),
+            type: 'zone',
+            area: this.getArea(coords),
+            numElems: elemsFilteredZona.length,
+            name: this.getSmallGlobal(zona.globalCoords),
+            [property.type]: property.value,
+          },
         });
-      }
+        source.addFeature(feature);
+      });
     });
   }
 
@@ -406,7 +404,7 @@ export class ZonesControlService {
             : focused
             ? 'white'
             : 'black',
-        width: 1,
+        width: focused ? 2 : 1,
       }),
       fill:
         this.currentZoom >= this.zoomChangeView
@@ -427,7 +425,7 @@ export class ZonesControlService {
             stroke: new Stroke({
               color:
                 this.currentZoom >= this.zoomChangeView ? this.getColorMae(feature, 1) : focused ? 'white' : 'black',
-              width: 1,
+              width: focused ? 2 : 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -469,7 +467,7 @@ export class ZonesControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: 1,
+              width: focused ? 2 : 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -511,7 +509,7 @@ export class ZonesControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: 1,
+              width: focused ? 2 : 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -538,6 +536,22 @@ export class ZonesControlService {
     } else {
       return COLOR.colores_severity_rgb[2].replace(',1)', ',' + opacity + ')');
     }
+  }
+
+  // ESTILOS TIPO ANOMALÍA
+  private getStyleTipo(focused: boolean) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          stroke: new Stroke({
+            color: focused ? 'white' : 'black',
+            width: focused ? 2 : 1,
+          }),
+          fill: null,
+          text: this.getLabelStyle(feature),
+        });
+      }
+    };
   }
 
   getLabelStyle(feature: Feature) {
