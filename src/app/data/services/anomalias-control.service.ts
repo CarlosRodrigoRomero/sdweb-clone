@@ -443,18 +443,11 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color:
-              this.currentZoom >= this.zoomChangeView
-                ? focused
-                  ? 'white'
-                  : this.getColorMae(feature, 1)
-                : focused
-                ? 'white'
-                : 'black',
-            width: this.currentZoom >= this.zoomChangeView ? 4 : focused ? 2 : 1,
+            color: focused ? 'white' : this.getColorMae(feature, 1),
+            width: 4,
           }),
           fill: new Fill({
-            color: this.currentZoom >= this.zoomChangeView ? 'rgba(255,255,255, 0)' : this.getColorMae(feature, 0.9),
+            color: 'rgba(255,255,255, 0)',
           }),
         });
       }
@@ -473,21 +466,11 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color:
-              this.currentZoom >= this.zoomChangeView
-                ? focused
-                  ? 'white'
-                  : this.getColorCelsCalientes(feature, 1)
-                : focused
-                ? 'white'
-                : 'black',
-            width: this.currentZoom >= this.zoomChangeView ? 4 : focused ? 2 : 1,
+            color: focused ? 'white' : this.getColorCelsCalientes(feature, 1),
+            width: 4,
           }),
           fill: new Fill({
-            color:
-              this.currentZoom >= this.zoomChangeView
-                ? 'rgba(255,255,255, 0)'
-                : this.getColorCelsCalientes(feature, 0.9),
+            color: 'rgba(255,255,255, 0)',
           }),
         });
       }
@@ -506,21 +489,11 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           stroke: new Stroke({
-            color:
-              this.currentZoom >= this.zoomChangeView
-                ? focused
-                  ? 'white'
-                  : this.getColorGradienteNormMax(feature, 1)
-                : focused
-                ? 'white'
-                : 'black',
-            width: this.currentZoom >= this.zoomChangeView ? 4 : focused ? 2 : 1,
+            color: focused ? 'white' : this.getColorGradienteNormMax(feature, 1),
+            width: 4,
           }),
           fill: new Fill({
-            color:
-              this.currentZoom >= this.zoomChangeView
-                ? 'rgba(255,255,255, 0)'
-                : this.getColorGradienteNormMax(feature, 0.9),
+            color: 'rgba(255,255,255, 0)',
           }),
         });
       }

@@ -406,7 +406,7 @@ export class ZonesControlService {
             : focused
             ? 'white'
             : 'black',
-        width: 2,
+        width: 1,
       }),
       fill:
         this.currentZoom >= this.zoomChangeView
@@ -427,7 +427,7 @@ export class ZonesControlService {
             stroke: new Stroke({
               color:
                 this.currentZoom >= this.zoomChangeView ? this.getColorMae(feature, 1) : focused ? 'white' : 'black',
-              width: 2,
+              width: 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -469,7 +469,7 @@ export class ZonesControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: 2,
+              width: 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -511,7 +511,7 @@ export class ZonesControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: 2,
+              width: 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -549,7 +549,7 @@ export class ZonesControlService {
       }),
       stroke: new Stroke({
         color: 'white',
-        width: 4,
+        width: 2,
       }),
     });
   }
