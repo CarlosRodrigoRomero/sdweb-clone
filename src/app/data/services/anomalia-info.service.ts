@@ -285,6 +285,33 @@ export class AnomaliaInfoService {
       return planta.etiquetasLocalXY[altura][localX - 1];
     }
 
+    if (planta.hasOwnProperty('posicionModulo') && planta.posicionModulo === true) {
+      const anom = elem as Anomalia;
+      if (anom.hasOwnProperty('tipoSeguidor')) {
+        if (anom.tipoSeguidor.tipoFila) {
+          let numeroModulo = 0;
+          anom.tipoSeguidor.numModulos.forEach((num, index) => {
+            if (index < altura - 1) {
+              numeroModulo += num;
+            } else if (index === altura - 1) {
+              numeroModulo += localX;
+            }
+          });
+          return numeroModulo.toString();
+        } else {
+          let numeroModulo = 0;
+          anom.tipoSeguidor.numModulos.forEach((num, index) => {
+            if (index < localX - 1) {
+              numeroModulo += num;
+            } else if (index === localX - 1) {
+              numeroModulo += altura;
+            }
+          });
+          return numeroModulo.toString();
+        }
+      }
+    }
+
     return this.getEtiquetaLocalX(planta, elem, type).concat('/').concat(this.getEtiquetaLocalY(planta, elem, type));
   }
 
