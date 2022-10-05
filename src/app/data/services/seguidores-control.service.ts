@@ -508,7 +508,7 @@ export class SeguidoresControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: focused ? 4 : 2,
+              width: focused ? 2 : 1,
             }),
             fill: new Fill({
               color:
@@ -536,7 +536,7 @@ export class SeguidoresControlService {
             : focused
             ? 'white'
             : 'black',
-        width: focused ? 4 : 2,
+        width: focused ? 2 : 1,
       }),
       fill: new Fill({
         color:

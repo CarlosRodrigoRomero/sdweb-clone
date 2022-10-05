@@ -37,6 +37,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   generatingDownload = false;
   numInformes = 1;
   thereAreLargestZones = false;
+  viewSelected: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -101,6 +102,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.subscriptions.add(
       this.downloadReportService.generatingDownload$.subscribe((value) => (this.generatingDownload = value))
+    );
+
+    this.subscriptions.add(
+      this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.viewSelected = viewSel))
     );
   }
 

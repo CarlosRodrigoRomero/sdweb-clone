@@ -146,7 +146,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
     this.anomaliaLayers.forEach((layer) => {
       if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
         // vista tipo anomalías
-        if (layer.getProperties().view === 3) {
+        if (layer.getProperties().view === 'tipo') {
           layer.setVisible(true);
         } else {
           if (this.zonesService.thereAreZones && this.viewZones) {
@@ -168,7 +168,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private setSeguidorLayersVisibility(informeId: string) {
     this.seguidorLayers.forEach((layer) => {
       if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
-        if (this.zonesService.thereAreZones) {
+        if (this.zonesService.thereAreZones && this.viewZones) {
           if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
             layer.setVisible(true);
           } else {
