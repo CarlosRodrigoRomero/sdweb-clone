@@ -18,6 +18,23 @@ import { GLOBAL } from '@data/constants/global';
 export class SeguidorViewLeyendaComponent implements OnInit, OnDestroy {
   viewSelected: string;
   private seguidorSelected: Seguidor;
+  viewsData = {
+    mae: {
+      labels: ['Bajas', 'Medias', 'Altas'],
+      title: 'Pérdidas',
+      color: COLOR.colores_severity,
+    },
+    cc: {
+      labels: ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
+      title: 'Cels. Calientes',
+      color: COLOR.colores_severity,
+    },
+    grad: {
+      labels: ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
+      title: 'ΔT Max (norm)',
+      color: COLOR.colores_severity,
+    },
+  };
   viewsTitle: string[] = ['Pérdidas', 'Cels. Calientes', 'ΔT Max (norm)'];
   viewsLabels: string[][];
   numCelsCalientes = 0;

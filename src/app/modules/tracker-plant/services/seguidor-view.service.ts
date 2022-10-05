@@ -35,7 +35,6 @@ export class SeguidorViewService {
   private _anomsCanvas: any = undefined;
   private _imagesLoaded = false;
   public imagesLoaded$ = new BehaviorSubject<boolean>(this._imagesLoaded);
-  private localViewSelected = 'tipo';
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
@@ -43,14 +42,11 @@ export class SeguidorViewService {
     private reportControlService: ReportControlService,
     private viewReportService: ViewReportService
   ) {
-    this.seguidorViewSelected$.subscribe((view) => (this.localViewSelected = view));
-    this.viewReportService.reportViewSelected$.subscribe((viewSelected) => (this.seguidorViewSelected = viewSelected));
-
     this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
   }
 
   getAnomaliaColor(anomalia: Anomalia): string {
-    switch (this.localViewSelected) {
+    switch (this.seguidorViewSelected) {
       case 'mae':
         return this.seguidorService.getPerdidasAnomColor(anomalia);
       case 'cc':

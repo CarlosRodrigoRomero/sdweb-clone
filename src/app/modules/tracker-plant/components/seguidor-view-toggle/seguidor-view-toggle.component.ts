@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { ViewReportService } from '@data/services/view-report.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
 
 @Component({
@@ -15,10 +14,10 @@ export class SeguidorViewToggleComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private viewReportService: ViewReportService, private seguidorViewService: SeguidorViewService) {}
+  constructor(private seguidorViewService: SeguidorViewService) {}
 
   ngOnInit(): void {
-    this.viewSelected = this.viewReportService.reportViewSelected;
+    this.viewSelected = this.seguidorViewService.seguidorViewSelected;
   }
 
   onToggleChange(view: string) {
