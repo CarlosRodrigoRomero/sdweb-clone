@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { ViewReportService } from '@data/services/view-report.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesService } from '@data/services/zones.service';
+import { OlMapService } from '@data/services/ol-map.service';
+import { ZonesControlService } from '@data/services/zones-control.service';
 
 import { COLOR } from '@data/constants/color';
 import { GLOBAL } from '@data/constants/global';
@@ -19,44 +21,49 @@ export class LeyendaComponent implements OnInit, OnDestroy {
   viewSelected: string;
   viewsData = {
     mae: {
-      labels: ['Bueno', 'Medio', 'Alto'],
-      title: 'MAE por seguidor',
+      labelsZone: ['Bueno', 'Medio', 'Alto'],
+      labelsAnoms: ['Bajas', 'Medias', 'Altas'],
+      titleZone: 'MAE',
+      titleAnoms: 'Pérdidas',
       color: COLOR.colores_severity,
     },
     cc: {
-      labels: ['Bueno', 'Medio', 'Alto'],
-      title: 'Cels. Calientes por seguidor',
+      labelsZone: ['Bueno', 'Medio', 'Alto'],
+      labelsAnoms: ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
+      titleZone: ' % Cels. Calientes',
+      titleAnoms: 'Clasificación por ΔTª Max (norm)',
       color: COLOR.colores_severity,
     },
     grad: {
-      labels: ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
-      title: 'ΔT Max (norm) por seguidor',
+      labelsZone: ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
+      labelsAnoms: ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
+      titleZone: 'ΔTª Max (norm)',
+      titleAnoms: 'ΔTª Max (norm)',
       color: COLOR.colores_severity,
     },
   };
-  viewsLabels: string[][];
-  viewsTitle: string[] = ['MAE por seguidor', 'Cels. Calientes por seguidor', 'ΔT Max (norm) por seguidor'];
-  viewsCCsLabels: string[] = ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'];
   plantaFija: boolean;
   thereAreZones: boolean;
   tipos: any[] = [];
+  simplifiedView: boolean;
+  currentZoom: number;
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private viewReportService: ViewReportService,
     private reportControlService: ReportControlService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private olMapService: OlMapService,
+    public zonesControlService: ZonesControlService
   ) {}
 
   ngOnInit(): void {
-    this.viewsLabels = [
-      ['Bueno', 'Medio', 'Alto'],
-      ['Bueno', 'Medio', 'Alto'],
-      ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
-    ];
-
     this.subscriptions.add(this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view)));
+
+    this.subscriptions.add(
+      this.viewReportService.simplifiedView$.subscribe((simplifiedView) => (this.simplifiedView = simplifiedView))
+    );
 
     this.plantaFija = this.reportControlService.plantaFija;
     this.thereAreZones = this.zonesService.thereAreZones;
@@ -75,6 +82,8 @@ export class LeyendaComponent implements OnInit, OnDestroy {
         }
       });
     });
+
+    this.subscriptions.add(this.olMapService.currentZoom$.subscribe((zoom) => (this.currentZoom = zoom)));
   }
 
   ngOnDestroy(): void {

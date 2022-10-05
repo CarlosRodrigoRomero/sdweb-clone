@@ -1,17 +1,24 @@
 <mat-card>
   <mat-card-content>
-    <div *ngIf="!plantaFija || (plantaFija && viewSelected != 'cc' && viewSelected != 'tipo')" class="lines">
+    <div
+      *ngIf="
+        !plantaFija ||
+        (plantaFija && viewSelected != 'tipo' && simplifiedView && currentZoom < zonesControlService.zoomChangeView)
+      "
+      class="lines"
+    >
+      <span class="titulo">{{ viewsData[viewSelected].titleZone }}</span>
       <div class="line">
         <img class="leyenda-icon" src="assets/icons/leyenda-grave.png" alt="" />
-        <span> {{ viewsData[viewSelected].labels[2] }}</span>
+        <span> {{ viewsData[viewSelected].labelsZone[2] }}</span>
       </div>
       <div class="line">
         <img class="leyenda-icon" src="assets/icons/leyenda-medio.png" alt="" />
-        <span>{{ viewsData[viewSelected].labels[1] }}</span>
+        <span>{{ viewsData[viewSelected].labelsZone[1] }}</span>
       </div>
       <div class="line">
         <img class="leyenda-icon" src="assets/icons/leyenda-leve.png" alt="" />
-        <span> {{ viewsData[viewSelected].labels[0] }}</span>
+        <span> {{ viewsData[viewSelected].labelsZone[0] }}</span>
       </div>
       <div class="line">
         <img class="leyenda-icon" src="assets/icons/leyenda-no-anoms.png" alt="" />
@@ -19,61 +26,29 @@
       </div>
     </div>
 
-    <div *ngIf="plantaFija && viewSelected == 'cc'" class="leyenda-block">
-      <div *ngIf="thereAreZones" class="view-1">
-        <div class="lines">
-          <span class="lines-tittle">{{ viewsData[viewSelected].title }}</span>
-          <div class="line">
-            <img class="leyenda-icon" src="assets/icons/leyenda-grave.png" alt="" />
-            <span> {{ viewsData[viewSelected].labels[2] }}</span>
-          </div>
-          <div class="line">
-            <img class="leyenda-icon" src="assets/icons/leyenda-medio.png" alt="" />
-            <span>{{ viewsData[viewSelected].labels[1] }}</span>
-          </div>
-          <div class="line">
-            <img class="leyenda-icon" src="assets/icons/leyenda-leve.png" alt="" />
-            <span> {{ viewsData[viewSelected].labels[0] }}</span>
-          </div>
-          <div class="line">
-            <img class="leyenda-icon" src="assets/icons/leyenda-no-anoms.png" alt="" />
-            <span> Sin anomalías</span>
-          </div>
-        </div>
-        <div class="lines">
-          <span class="lines-tittle">Anomalías</span>
-          <div class="line">
-            <mat-icon [ngStyle]="{ color: viewsData[viewSelected].color[2] }">crop_5_4</mat-icon>
-            <span> {{ viewsCCsLabels[2] }}</span>
-          </div>
-          <div class="line">
-            <mat-icon [ngStyle]="{ color: viewsData[viewSelected].color[1] }">crop_5_4</mat-icon>
-            <span>{{ viewsCCsLabels[1] }}</span>
-          </div>
-          <div class="line">
-            <mat-icon [ngStyle]="{ color: viewsData[viewSelected].color[0] }">crop_5_4</mat-icon>
-            <span> {{ viewsCCsLabels[0] }}</span>
-          </div>
-        </div>
+    <div
+      *ngIf="
+        (plantaFija && viewSelected != 'tipo' && !simplifiedView) ||
+        (viewSelected != 'tipo' && simplifiedView && currentZoom >= zonesControlService.zoomChangeView)
+      "
+      class="lines"
+    >
+      <span class="titulo">{{ viewsData[viewSelected].titleAnoms }}</span>
+      <div class="line">
+        <mat-icon [ngStyle]="{ color: viewsData[viewSelected].color[2] }">crop_5_4</mat-icon>
+        <span> {{ viewsData[viewSelected].labelsAnoms[2] }}</span>
       </div>
-
-      <div *ngIf="!thereAreZones" class="lines">
-        <div class="line">
-          <mat-icon [ngStyle]="{ color: colors[viewSelected][2] }">crop_5_4</mat-icon>
-          <span> {{ viewsCCsLabels[2] }}</span>
-        </div>
-        <div class="line">
-          <mat-icon [ngStyle]="{ color: colors[viewSelected][1] }">crop_5_4</mat-icon>
-          <span>{{ viewsCCsLabels[1] }}</span>
-        </div>
-        <div class="line">
-          <mat-icon [ngStyle]="{ color: colors[viewSelected][0] }">crop_5_4</mat-icon>
-          <span> {{ viewsCCsLabels[0] }}</span>
-        </div>
+      <div class="line">
+        <mat-icon [ngStyle]="{ color: viewsData[viewSelected].color[1] }">crop_5_4</mat-icon>
+        <span>{{ viewsData[viewSelected].labelsAnoms[1] }}</span>
+      </div>
+      <div class="line">
+        <mat-icon [ngStyle]="{ color: viewsData[viewSelected].color[0] }">crop_5_4</mat-icon>
+        <span> {{ viewsData[viewSelected].labelsAnoms[0] }}</span>
       </div>
     </div>
 
-    <div *ngIf="plantaFija && viewSelected == 'tipo'" class="leyenda-block">
+    <div *ngIf="plantaFija && viewSelected == 'tipo'" class="lines">
       <div class="lines">
         <li *ngFor="let tipo of tipos">
           <div class="label-tipo">

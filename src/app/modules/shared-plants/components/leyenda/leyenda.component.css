@@ -7,16 +7,10 @@ mat-card-content {
   gap: 1rem;
 }
 
-.leyenda-block {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.lines-tittle {
-  font-size: medium;
+.titulo {
+  font-size: 17px;
   font-weight: 500;
-  margin-left: 1rem;
+  margin-bottom: 0.1rem;
 }
 
 .lines {
