@@ -104,6 +104,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
       this.downloadReportService.generatingDownload$.subscribe((value) => (this.generatingDownload = value))
     );
 
+    // para S2E vista simplificada siempre
+    this.viewReportService.simplifiedView = true;
+    // para S2E vista MAE de inicio
+    this.viewReportService.reportViewSelected = 'mae';
     this.subscriptions.add(
       this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.viewSelected = viewSel))
     );

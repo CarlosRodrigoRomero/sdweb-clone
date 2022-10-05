@@ -387,12 +387,12 @@ export class ZonesControlService {
   }
 
   private getStyleZonas(focus: boolean) {
-    const estilosView = [
-      this.getStyleMae(focus),
-      this.getStyleCelsCalientes(focus),
-      this.getStyleGradienteNormMax(focus),
-      null,
-    ];
+    const estilosView = {
+      mae: this.getStyleMae(focus),
+      cc: this.getStyleCelsCalientes(focus),
+      grad: this.getStyleGradienteNormMax(focus),
+      tipo: null,
+    };
 
     return estilosView[this.toggleViewSelected];
   }
@@ -407,7 +407,7 @@ export class ZonesControlService {
             : focused
             ? 'white'
             : 'black',
-        width: focused ? 2 : 1,
+        width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
       }),
       fill:
         this.currentZoom >= this.zoomChangeView
@@ -428,7 +428,7 @@ export class ZonesControlService {
             stroke: new Stroke({
               color:
                 this.currentZoom >= this.zoomChangeView ? this.getColorMae(feature, 1) : focused ? 'white' : 'black',
-              width: focused ? 2 : 1,
+              width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -470,7 +470,7 @@ export class ZonesControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: focused ? 2 : 1,
+              width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -512,7 +512,7 @@ export class ZonesControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: focused ? 2 : 1,
+              width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView

@@ -424,12 +424,12 @@ export class AnomaliasControlService {
   }
 
   private getStyleAnomalias(focus: boolean) {
-    const estilosView = [
-      this.getStylePerdidas(focus),
-      this.getStyleCelsCalientes(focus),
-      this.getStyleGradienteNormMax(focus),
-      this.getStyleTipos(focus),
-    ];
+    const estilosView = {
+      mae: this.getStylePerdidas(focus),
+      cc: this.getStyleCelsCalientes(focus),
+      grad: this.getStyleGradienteNormMax(focus),
+      tipo: this.getStyleTipos(focus),
+    };
 
     return estilosView[this.toggleViewSelected];
   }
