@@ -121,12 +121,12 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
     }
   }
 
-  private getAnomViewColors(anomalia: Anomalia): string[] {
+  private getAnomViewColors(anomalia: Anomalia): any {
     const colorPerdidas = Colors.getColorPerdidas(anomalia.perdidas, 1);
     const colorCCs = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
     const colorGradNormMax = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
     const colorTipo = Colors.getColorTipo(anomalia.tipo);
-    return [colorPerdidas, colorCCs, colorGradNormMax, colorTipo];
+    return { mae: colorPerdidas, cc: colorCCs, grad: colorGradNormMax, tipo: colorTipo };
   }
 
   hoverAnomalia(row: any) {
