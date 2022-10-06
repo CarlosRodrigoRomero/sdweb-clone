@@ -296,7 +296,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     }
 
     if (this.planta.hasOwnProperty('etiquetasLocalXY') || this.planta.hasOwnProperty('posicionModulo')) {
-      row.numeroModulo = this.anomaliaInfoService.getNumeroModulo(anomalia, this.planta, 'anomalia');
+      row.numeroModulo = this.anomaliaInfoService.getNumeroModulo(anomalia, this.planta);
     } else {
       row.localY = this.anomaliaInfoService.getAlturaAnom(anomalia, this.planta);
       row.localX = this.anomaliaInfoService.getColumnaAnom(anomalia, this.planta);

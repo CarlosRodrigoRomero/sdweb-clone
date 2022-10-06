@@ -158,15 +158,13 @@ export class AnomaliaInfoService {
       }
     });
 
-    const numModulo = this.getNumeroModulo(anomalia, planta, 'anomalia');
-    if (numModulo !== undefined) {
-      if (!isNaN(Number(numModulo))) {
-        elems.push(`${this.translation.t('Nº módulo')}: ${numModulo}`);
-      } else {
-        const altura = this.getAlturaAnom(anomalia, planta);
-        const columna = this.getColumnaAnom(anomalia, planta);
-        elems.push(`${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`);
-      }
+    const numModulo = this.getNumeroModulo(anomalia, planta);
+    if (numModulo !== null) {
+      elems.push(`${this.translation.t('Nº módulo')}: ${numModulo}`);
+    } else {
+      const altura = this.getAlturaAnom(anomalia, planta);
+      const columna = this.getColumnaAnom(anomalia, planta);
+      elems.push(`${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`);
     }
 
     return elems;
@@ -187,15 +185,13 @@ export class AnomaliaInfoService {
       }
     });
 
-    const numModulo = this.getNumeroModulo(anomalia, planta, 'anomalia');
-    if (numModulo !== undefined) {
-      if (!isNaN(Number(numModulo))) {
-        label += `${this.translation.t('Nº módulo')}: ${numModulo}`;
-      } else {
-        const altura = this.getAlturaAnom(anomalia, planta);
-        const columna = this.getColumnaAnom(anomalia, planta);
-        label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`;
-      }
+    const numModulo = this.getNumeroModulo(anomalia, planta);
+    if (numModulo !== null) {
+      label += `${this.translation.t('Nº módulo')}: ${numModulo.toString()}`;
+    } else {
+      const altura = this.getAlturaAnom(anomalia, planta);
+      const columna = this.getColumnaAnom(anomalia, planta);
+      label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`;
     }
 
     return label;
@@ -267,10 +263,10 @@ export class AnomaliaInfoService {
     }
   }
 
-  getNumeroModulo(elem: PcInterface | Anomalia, planta: PlantaInterface, type?: string): number {
+  getNumeroModulo(elem: PcInterface | Anomalia, planta: PlantaInterface): number {
     let localX = (elem as PcInterface).local_x;
     let localY = (elem as PcInterface).local_y;
-    if (type === 'anomalia') {
+    if (localX === undefined || localY === undefined) {
       localX = (elem as Anomalia).localX;
       localY = (elem as Anomalia).localY;
     }
@@ -315,9 +311,13 @@ export class AnomaliaInfoService {
     return null;
   }
 
-  getEtiquetaLocalX(planta: PlantaInterface, elem: PcInterface | Anomalia, type?: string): string {
+  getLabelLocalXY(elem: PcInterface | Anomalia, planta: PlantaInterface) {
+    return this.getEtiquetaLocalX(planta, elem).concat('/').concat(this.getEtiquetaLocalY(planta, elem));
+  }
+
+  getEtiquetaLocalX(planta: PlantaInterface, elem: PcInterface | Anomalia): string {
     let localX = (elem as PcInterface).local_x;
-    if (type === 'anomalia') {
+    if (localX === undefined) {
       localX = (elem as Anomalia).localX;
     }
 
@@ -331,9 +331,9 @@ export class AnomaliaInfoService {
     return localX.toString();
   }
 
-  getEtiquetaLocalY(planta: PlantaInterface, elem: PcInterface | Anomalia, type?: string): string {
+  getEtiquetaLocalY(planta: PlantaInterface, elem: PcInterface | Anomalia): string {
     let localY = (elem as PcInterface).local_y;
-    if (type === 'anomalia') {
+    if (localY === undefined) {
       localY = (elem as Anomalia).localY;
     }
 

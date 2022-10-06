@@ -344,12 +344,9 @@ export class AnomaliaService {
       }
     });
 
-    let numeroModulo = this.anomaliaInfoService.getNumeroModulo(anomalia, planta, 'anomalia');
-    if (isNaN(Number(numeroModulo))) {
-      numeroModulo = undefined;
-    }
+    const numeroModulo = this.anomaliaInfoService.getNumeroModulo(anomalia, planta);
 
-    if (numeroModulo !== undefined) {
+    if (numeroModulo !== null) {
       parts.push(numeroModulo.toString());
     } else {
       parts.push(anomalia.localX.toString());
