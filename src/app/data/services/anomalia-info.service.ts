@@ -267,7 +267,7 @@ export class AnomaliaInfoService {
     }
   }
 
-  getNumeroModulo(elem: PcInterface | Anomalia, planta: PlantaInterface, type?: string): string {
+  getNumeroModulo(elem: PcInterface | Anomalia, planta: PlantaInterface, type?: string): number {
     let localX = (elem as PcInterface).local_x;
     let localY = (elem as PcInterface).local_y;
     if (type === 'anomalia') {
@@ -282,7 +282,7 @@ export class AnomaliaInfoService {
       planta.etiquetasLocalXY[altura] !== undefined &&
       planta.etiquetasLocalXY[altura][localX - 1] !== undefined
     ) {
-      return planta.etiquetasLocalXY[altura][localX - 1];
+      return Number(planta.etiquetasLocalXY[altura][localX - 1]);
     }
 
     if (planta.hasOwnProperty('posicionModulo') && planta.posicionModulo === true) {
@@ -297,7 +297,7 @@ export class AnomaliaInfoService {
               numeroModulo += localX;
             }
           });
-          return numeroModulo.toString();
+          return numeroModulo;
         } else {
           let numeroModulo = 0;
           anom.tipoSeguidor.numModulos.forEach((num, index) => {
@@ -307,12 +307,12 @@ export class AnomaliaInfoService {
               numeroModulo += altura;
             }
           });
-          return numeroModulo.toString();
+          return numeroModulo;
         }
       }
     }
 
-    return this.getEtiquetaLocalX(planta, elem, type).concat('/').concat(this.getEtiquetaLocalY(planta, elem, type));
+    return null;
   }
 
   getEtiquetaLocalX(planta: PlantaInterface, elem: PcInterface | Anomalia, type?: string): string {

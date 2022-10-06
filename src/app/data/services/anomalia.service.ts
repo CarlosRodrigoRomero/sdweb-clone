@@ -350,7 +350,7 @@ export class AnomaliaService {
     }
 
     if (numeroModulo !== undefined) {
-      parts.push(numeroModulo);
+      parts.push(numeroModulo.toString());
     } else {
       parts.push(anomalia.localX.toString());
       parts.push(anomalia.localY.toString());
