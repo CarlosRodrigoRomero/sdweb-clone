@@ -85,17 +85,26 @@ export class ImagesLoadService {
         fabric.util.loadImage(
           url,
           (img) => {
-            const canvas = document.createElement('canvas');
-            const width =
-              this.widthIrradiancia * this.imgQuality > img.width ? img.width : this.widthIrradiancia * this.imgQuality;
-            const scaleFactor = width / img.width;
-            canvas.width = width;
-            canvas.height = img.height * scaleFactor;
-            const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-            this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            // indicamos que la imagen se ha cargado
-            this.loadedChangingImages++;
+            if (img !== null) {
+              const canvas = document.createElement('canvas');
+              const width =
+                this.widthIrradiancia * this.imgQuality > img.width
+                  ? img.width
+                  : this.widthIrradiancia * this.imgQuality;
+              const scaleFactor = width / img.width;
+              canvas.width = width;
+              canvas.height = img.height * scaleFactor;
+              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+              this.imgIrradianciaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              // indicamos que la imagen se ha cargado
+              this.loadedChangingImages++;
+            } else {
+              const canvas = document.createElement('canvas');
+              this.imgSuciedadBase64 = canvas.toDataURL('png');
+              // indicamos que la imagen se ha cargado
+              this.loadedChangingImages++;
+            }
           },
           null,
           { crossOrigin: 'anonymous' }
@@ -119,17 +128,24 @@ export class ImagesLoadService {
         fabric.util.loadImage(
           url,
           (img) => {
-            const canvas = document.createElement('canvas');
-            const width =
-              this.widthSuciedad * this.imgQuality > img.width ? img.width : this.widthSuciedad * this.imgQuality;
-            const scaleFactor = width / img.width;
-            canvas.width = width;
-            canvas.height = img.height * scaleFactor;
-            const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-            this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            // indicamos que la imagen se ha cargado
-            this.loadedChangingImages++;
+            if (img !== null) {
+              const canvas = document.createElement('canvas');
+              const width =
+                this.widthSuciedad * this.imgQuality > img.width ? img.width : this.widthSuciedad * this.imgQuality;
+              const scaleFactor = width / img.width;
+              canvas.width = width;
+              canvas.height = img.height * scaleFactor;
+              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+              this.imgSuciedadBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              // indicamos que la imagen se ha cargado
+              this.loadedChangingImages++;
+            } else {
+              const canvas = document.createElement('canvas');
+              this.imgSuciedadBase64 = canvas.toDataURL('png');
+              // indicamos que la imagen se ha cargado
+              this.loadedChangingImages++;
+            }
           },
           null,
           { crossOrigin: 'anonymous' }
@@ -153,31 +169,38 @@ export class ImagesLoadService {
         fabric.util.loadImage(
           url,
           (img) => {
-            const canvas = new fabric.Canvas('canvas');
-            const width =
-              this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
-            const scaleFactor = width / img.width;
-            canvas.width = width;
+            if (img !== null) {
+              const canvas = new fabric.Canvas('canvas');
+              const width =
+                this.widthPortada * this.imgQuality > img.width ? img.width : this.widthPortada * this.imgQuality;
+              const scaleFactor = width / img.width;
+              canvas.width = width;
 
-            let height = img.height * scaleFactor;
-            if (height > (width * 9) / 16) {
-              height = (width * 9) / 16;
+              let height = img.height * scaleFactor;
+              if (height > (width * 9) / 16) {
+                height = (width * 9) / 16;
+              }
+
+              canvas.height = height;
+
+              const image = new fabric.Image(img, {
+                top: height,
+                originY: 'bottom',
+                scaleX: scaleFactor,
+                scaleY: scaleFactor,
+              });
+
+              canvas.add(image);
+
+              this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              // indicamos que la imagen se ha cargado
+              this.loadedChangingImages++;
+            } else {
+              const canvas = document.createElement('canvas');
+              this.imgSuciedadBase64 = canvas.toDataURL('png');
+              // indicamos que la imagen se ha cargado
+              this.loadedChangingImages++;
             }
-
-            canvas.height = height;
-
-            const image = new fabric.Image(img, {
-              top: height,
-              originY: 'bottom',
-              scaleX: scaleFactor,
-              scaleY: scaleFactor,
-            });
-
-            canvas.add(image);
-
-            this.imgPortadaBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            // indicamos que la imagen se ha cargado
-            this.loadedChangingImages++;
           },
           null,
           { crossOrigin: 'anonymous' }
@@ -206,28 +229,35 @@ export class ImagesLoadService {
     fabric.util.loadImage(
       `../../../assets/images/${archivoLogo}.png`,
       (img) => {
-        const canvas = new fabric.Canvas('canvas');
-        const newWidth =
-          this.widthImgSolardroneTech * this.imgQuality > img.width
-            ? img.width
-            : this.widthImgSolardroneTech * this.imgQuality;
+        if (img !== null) {
+          const canvas = new fabric.Canvas('canvas');
+          const newWidth =
+            this.widthImgSolardroneTech * this.imgQuality > img.width
+              ? img.width
+              : this.widthImgSolardroneTech * this.imgQuality;
 
-        const scaleFactor = newWidth / img.width;
-        const newHeight = img.height * scaleFactor;
+          const scaleFactor = newWidth / img.width;
+          const newHeight = img.height * scaleFactor;
 
-        canvas.width = newWidth;
-        canvas.height = newHeight;
+          canvas.width = newWidth;
+          canvas.height = newHeight;
 
-        const image = new fabric.Image(img, {
-          scaleX: scaleFactor,
-          scaleY: scaleFactor,
-        });
+          const image = new fabric.Image(img, {
+            scaleX: scaleFactor,
+            scaleY: scaleFactor,
+          });
 
-        canvas.add(image);
+          canvas.add(image);
 
-        this.imgSolardroneBase64 = canvas.toDataURL('png');
-        // indicamos que la imagen se ha cargado
-        this.loadedChangingImages++;
+          this.imgSolardroneBase64 = canvas.toDataURL('png');
+          // indicamos que la imagen se ha cargado
+          this.loadedChangingImages++;
+        } else {
+          const canvas = document.createElement('canvas');
+          this.imgSuciedadBase64 = canvas.toDataURL('png');
+          // indicamos que la imagen se ha cargado
+          this.loadedChangingImages++;
+        }
       },
       null,
       { crossOrigin: 'anonymous' }
@@ -243,21 +273,30 @@ export class ImagesLoadService {
         fabric.util.loadImage(
           url,
           (img) => {
-            const canvas = document.createElement('canvas');
-            const newWidth =
-              this.widthLogoEmpresa * this.imgQuality > img.width ? img.width : this.widthLogoEmpresa * this.imgQuality;
+            if (img !== null) {
+              const canvas = document.createElement('canvas');
+              const newWidth =
+                this.widthLogoEmpresa * this.imgQuality > img.width
+                  ? img.width
+                  : this.widthLogoEmpresa * this.imgQuality;
 
-            const scaleFactor = newWidth / img.width;
-            const newHeight = img.height * scaleFactor;
-            this.heightLogoEmpresa = newHeight;
-            canvas.width = newWidth;
-            canvas.height = newHeight;
-            this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
-            const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, newWidth, newHeight);
-            this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-            // indicamos que la imagen se ha cargado
-            this.loadedFixedImages++;
+              const scaleFactor = newWidth / img.width;
+              const newHeight = img.height * scaleFactor;
+              this.heightLogoEmpresa = newHeight;
+              canvas.width = newWidth;
+              canvas.height = newHeight;
+              this.scaleImgLogoHeader = this.heightLogoHeader / newHeight;
+              const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, newWidth, newHeight);
+              this.imgLogoBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+              // indicamos que la imagen se ha cargado
+              this.loadedFixedImages++;
+            } else {
+              const canvas = document.createElement('canvas');
+              this.imgSuciedadBase64 = canvas.toDataURL('png');
+              // indicamos que la imagen se ha cargado
+              this.loadedChangingImages++;
+            }
           },
           null,
           { crossOrigin: 'anonymous' }
@@ -277,17 +316,24 @@ export class ImagesLoadService {
     fabric.util.loadImage(
       '../../../assets/images/maeCurva.png',
       (img) => {
-        const canvas = document.createElement('canvas');
-        const width =
-          this.widthCurvaMae * this.imgQuality > img.width ? img.width : this.widthCurvaMae * this.imgQuality;
-        const scaleFactor = width / img.width;
-        canvas.width = width;
-        canvas.height = img.height * scaleFactor;
-        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-        this.imgCurvaMaeBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-        // indicamos que la imagen se ha cargado
-        this.loadedFixedImages++;
+        if (img !== null) {
+          const canvas = document.createElement('canvas');
+          const width =
+            this.widthCurvaMae * this.imgQuality > img.width ? img.width : this.widthCurvaMae * this.imgQuality;
+          const scaleFactor = width / img.width;
+          canvas.width = width;
+          canvas.height = img.height * scaleFactor;
+          const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+          this.imgCurvaMaeBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+          // indicamos que la imagen se ha cargado
+          this.loadedFixedImages++;
+        } else {
+          const canvas = document.createElement('canvas');
+          this.imgSuciedadBase64 = canvas.toDataURL('png');
+          // indicamos que la imagen se ha cargado
+          this.loadedChangingImages++;
+        }
       },
       null,
       { crossOrigin: 'anonymous' }
@@ -297,17 +343,24 @@ export class ImagesLoadService {
     fabric.util.loadImage(
       '../../../assets/images/formula_mae.png',
       (img) => {
-        const canvas = document.createElement('canvas');
-        const width =
-          this.widthFormulaMae * this.imgQuality > img.width ? img.width : this.widthFormulaMae * this.imgQuality;
-        const scaleFactor = width / img.width;
-        canvas.width = width;
-        canvas.height = img.height * scaleFactor;
-        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-        this.imgFormulaMaeBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
-        // indicamos que la imagen se ha cargado
-        this.loadedFixedImages++;
+        if (img !== null) {
+          const canvas = document.createElement('canvas');
+          const width =
+            this.widthFormulaMae * this.imgQuality > img.width ? img.width : this.widthFormulaMae * this.imgQuality;
+          const scaleFactor = width / img.width;
+          canvas.width = width;
+          canvas.height = img.height * scaleFactor;
+          const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+          this.imgFormulaMaeBase64 = canvas.toDataURL('image/jpeg', this.jpgQuality);
+          // indicamos que la imagen se ha cargado
+          this.loadedFixedImages++;
+        } else {
+          const canvas = document.createElement('canvas');
+          this.imgSuciedadBase64 = canvas.toDataURL('png');
+          // indicamos que la imagen se ha cargado
+          this.loadedChangingImages++;
+        }
       },
       null,
       { crossOrigin: 'anonymous' }
@@ -317,26 +370,35 @@ export class ImagesLoadService {
     fabric.util.loadImage(
       `../../../assets/images/logo_sd.png`,
       (img) => {
-        const canvas = new fabric.Canvas('canvas');
-        const newWidth =
-          this.widthImgLogoFooter * this.imgQuality > img.width ? img.width : this.widthImgLogoFooter * this.imgQuality;
+        if (img !== null) {
+          const canvas = new fabric.Canvas('canvas');
+          const newWidth =
+            this.widthImgLogoFooter * this.imgQuality > img.width
+              ? img.width
+              : this.widthImgLogoFooter * this.imgQuality;
 
-        const scaleFactor = newWidth / img.width;
-        const newHeight = img.height * scaleFactor;
+          const scaleFactor = newWidth / img.width;
+          const newHeight = img.height * scaleFactor;
 
-        canvas.width = newWidth;
-        canvas.height = newHeight;
+          canvas.width = newWidth;
+          canvas.height = newHeight;
 
-        const image = new fabric.Image(img, {
-          scaleX: scaleFactor,
-          scaleY: scaleFactor,
-        });
+          const image = new fabric.Image(img, {
+            scaleX: scaleFactor,
+            scaleY: scaleFactor,
+          });
 
-        canvas.add(image);
+          canvas.add(image);
 
-        this.imgLogoFooterBase64 = canvas.toDataURL('png');
-        // indicamos que la imagen se ha cargado
-        this.loadedFixedImages++;
+          this.imgLogoFooterBase64 = canvas.toDataURL('png');
+          // indicamos que la imagen se ha cargado
+          this.loadedFixedImages++;
+        } else {
+          const canvas = document.createElement('canvas');
+          this.imgSuciedadBase64 = canvas.toDataURL('png');
+          // indicamos que la imagen se ha cargado
+          this.loadedChangingImages++;
+        }
       },
       null,
       { crossOrigin: 'anonymous' }

@@ -2344,7 +2344,9 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         {
           text: `${this.translation.t(
             'La siguiente tabla muestra la cantidad de anomalías térmicas por categoría. En el caso de células calientes, sólo se incluyen aquellas con gradientes mayores a'
-          )} ${this.currentFiltroGradiente} ºC. ${this.translation.t('Se muestran los porcentajes respecto al número de anomalías del informe y respecto al número total de módulos de la planta.')}`,
+          )} ${this.currentFiltroGradiente} ºC. ${this.translation.t(
+            'Se muestran los porcentajes respecto al número de anomalías del informe y respecto al número total de módulos de la planta.'
+          )}`,
           style: 'p',
         },
 
@@ -3683,7 +3685,7 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
   private getEncabezadoTablaSeguidor(columna: any) {
     if (columna.nombre === 'local_xy') {
-      if (this.planta.hasOwnProperty('etiquetasLocalXY')) {
+      if (this.planta.hasOwnProperty('etiquetasLocalXY') || this.planta.hasOwnProperty('posicionModulo')) {
         return 'Nº Módulo';
       }
     }
@@ -3721,9 +3723,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         .concat(' ')
         .concat(this.datePipe.transform(anomalia.datetime * 1000, 'HH:mm:ss'));
     } else if (columnaNombre === 'local_xy') {
-      const altura = this.anomaliaInfoService.getAlturaAnom(anomalia, this.planta);
-      const columna = this.anomaliaInfoService.getColumnaAnom(anomalia, this.planta);
-      return this.downloadReportService.getPositionModulo(this.planta, altura, columna).toString();
+      if (this.planta.hasOwnProperty('etiquetasLocalXY') || this.planta.hasOwnProperty('posicionModulo')) {
+        return this.anomaliaInfoService.getNumeroModulo(anomalia, this.planta).toString();
+      } else {
+        return this.anomaliaInfoService.getLabelLocalXY(anomalia, this.planta);
+      }
     } else if (columnaNombre === 'severidad') {
       return anomalia.clase.toString();
     } else if (columnaNombre === 'criticidad') {
