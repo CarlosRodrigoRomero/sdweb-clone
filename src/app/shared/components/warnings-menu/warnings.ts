@@ -251,6 +251,22 @@ export const warnings: Warning[] = [
     ],
   },
   {
+    type: 'segsNamesRepeat',
+    message: 'Hay seguidores con el mismo nombre',
+    adminActions: [
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+  },
+  {
     type: 'modulosPlanta',
     message: 'Faltan los módulos de la planta',
     adminActions: [
