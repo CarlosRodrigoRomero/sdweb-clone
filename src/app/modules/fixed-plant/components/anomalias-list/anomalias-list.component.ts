@@ -25,7 +25,7 @@ import { Colors } from '@core/classes/colors';
   styleUrls: ['./anomalias-list.component.css'],
 })
 export class AnomaliasListComponent implements OnInit, OnDestroy {
-  viewSeleccionada = 0;
+  viewSeleccionada: string;
   dataSource: MatTableDataSource<any>;
   selectedRow: string;
   prevSelectedRow: any;
@@ -48,9 +48,7 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
 
     this.subscriptions.add(
-      this.viewReportService.reportViewSelected$.subscribe((sel) => {
-        this.viewSeleccionada = Number(sel);
-      })
+      this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSeleccionada = view))
     );
 
     this.subscriptions.add(
@@ -109,11 +107,17 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     );
   }
 
-  private getAnomViewColors(anomalia: Anomalia): string[] {
+  private getAnomViewColors(anomalia: Anomalia): any {
     const colorPerdidas = Colors.getColorPerdidas(anomalia.perdidas, 1);
     const colorCCs = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
     const colorGradNormMax = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
-    return [colorPerdidas, colorCCs, colorGradNormMax];
+    const colorTipo = Colors.getColorTipo(anomalia.tipo);
+    return {
+      mae: colorPerdidas,
+      cc: colorCCs,
+      grad: colorGradNormMax,
+      tipo: colorTipo,
+    };
   }
 
   hoverAnomalia(row: any) {

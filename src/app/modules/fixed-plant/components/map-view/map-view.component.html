@@ -48,6 +48,9 @@
               <!-- TOGGLE MAPAS -->
               <app-view-toggle></app-view-toggle>
 
+              <!-- MOSTRAR / OCULTAR VISTA ZONAS -->
+              <app-simplified-view *ngIf="viewSelected !== 'tipo'"></app-simplified-view>
+
               <!-- LEYENDA -->
               <app-leyenda></app-leyenda>
             </div>

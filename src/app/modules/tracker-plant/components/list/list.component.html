@@ -48,7 +48,7 @@
       </ng-container>
 
       <!-- MAE -->
-      <ng-container *ngIf="viewSeleccionada === 0" matColumnDef="mae">
+      <ng-container *ngIf="viewSeleccionada == 'mae'" matColumnDef="mae">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>MAE</th>
         <td mat-cell *matCellDef="let row">
           <div class="row-content">
@@ -58,7 +58,7 @@
       </ng-container>
 
       <!-- CC -->
-      <ng-container *ngIf="viewSeleccionada === 1" matColumnDef="celsCalientes">
+      <ng-container *ngIf="viewSeleccionada == 'cc'" matColumnDef="celsCalientes">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Cels. Calientes</th>
         <td mat-cell *matCellDef="let row">
           <div class="row-content">
@@ -68,7 +68,7 @@
       </ng-container>
 
       <!-- GRADIENTE NORMALIZADO -->
-      <ng-container *ngIf="viewSeleccionada === 2" matColumnDef="gradiente">
+      <ng-container *ngIf="viewSeleccionada == 'grad'" matColumnDef="gradiente">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>&nabla;T Norm.</th>
         <td mat-cell *matCellDef="let row">
           <div class="row-content">
