@@ -49,7 +49,7 @@
               <app-view-toggle></app-view-toggle>
 
               <!-- MOSTRAR / OCULTAR VISTA ZONAS -->
-              <app-simplified-view *ngIf="viewSelected !== 'tipo'"></app-simplified-view>
+              <app-simplified-view *ngIf="viewSelected !== 'tipo' && thereAreZones"></app-simplified-view>
 
               <!-- LEYENDA -->
               <app-leyenda></app-leyenda>
