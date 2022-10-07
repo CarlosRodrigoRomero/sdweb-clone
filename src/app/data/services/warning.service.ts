@@ -17,6 +17,7 @@ import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
 import { LocationAreaInterface } from '@core/models/location';
+import { Seguidor } from '@core/models/seguidor';
 
 @Injectable({
   providedIn: 'root',
@@ -149,7 +150,8 @@ export class WarningService {
     anomalias: Anomalia[],
     warns: Warning[],
     planta: PlantaInterface,
-    locAreas: LocationAreaInterface[]
+    locAreas: LocationAreaInterface[],
+    seguidores?: Seguidor[]
   ): boolean {
     // reseteamos las alertas añadidas
     this.warningsAdded = warns.map((warn) => warn.type);
@@ -174,6 +176,13 @@ export class WarningService {
       thermalLayerChecked = this.checkThermalLayer(informe, warns);
     }
 
+    let segsNamesDuplicatesChecked = false;
+    if (seguidores) {
+      segsNamesDuplicatesChecked = this.checkSegsNamesDuplicates(seguidores, warns, informe.id);
+    } else {
+      segsNamesDuplicatesChecked = true;
+    }
+
     if (
       tiposAnomsChecked &&
       numsCoAChecked &&
@@ -188,7 +197,8 @@ export class WarningService {
       thermalLayerChecked &&
       imgPortadaChecked &&
       imgSuciedadChecked &&
-      tempMaxAnomsChecked
+      tempMaxAnomsChecked &&
+      segsNamesDuplicatesChecked
     ) {
       // eliminamos posibles alertas que ya no sean necesarias
       this.checkUnusedWarnings(warns, informe.id);
@@ -819,6 +829,31 @@ export class WarningService {
     } else {
       // eliminamos la alerta antigua si la hubiera
       this.checkOldWarnings('tempMaxAnoms', warns, informeId);
+    }
+
+    // confirmamos que ha sido checkeado
+    return true;
+  }
+
+  private checkSegsNamesDuplicates(seguidores: Seguidor[], warns: Warning[], informeId: string) {
+    if (seguidores.length > 0) {
+      const segsNamesDuplicates = UtilitiesService.findDuplicates(
+        seguidores.filter((seg) => seg.informeId === informeId).map((seg) => seg.nombre)
+      );
+
+      if (segsNamesDuplicates.length > 0) {
+        console.log('Seguidores con el mismo nombre: ' + segsNamesDuplicates.join(' | '));
+
+        const warning: Warning = {
+          type: 'segsNamesRepeat',
+          visible: true,
+        };
+
+        this.checkAddWarning(warning, warns, informeId);
+      } else {
+        // eliminamos la alerta antigua si la hubiera
+        this.checkOldWarnings('segsNamesRepeat', warns, informeId);
+      }
     }
 
     // confirmamos que ha sido checkeado
