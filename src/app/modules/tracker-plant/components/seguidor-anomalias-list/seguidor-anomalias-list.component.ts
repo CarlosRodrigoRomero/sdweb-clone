@@ -31,7 +31,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
   seguidorSelected: Seguidor = undefined;
   anomaliaHovered: Anomalia = undefined;
   anomaliaSelected: Anomalia = undefined;
-  viewSelected = 0;
+  viewSelected: string;
   dataSource: MatTableDataSource<AnomaliaData>;
   displayedColumns = ['colors', 'numAnom', 'tipo', 'perdidas', 'tempMax', 'gradiente', 'comentarios'];
 
@@ -55,8 +55,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
 
         if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {
           let anomalias;
-          // tslint:disable-next-line: triple-equals
-          if (this.viewSelected != 1) {
+          if (this.viewSelected !== 'cc') {
             anomalias = seguidor.anomaliasCliente;
           } else {
             // tslint:disable-next-line: triple-equals
@@ -122,11 +121,12 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
     }
   }
 
-  private getAnomViewColors(anomalia: Anomalia): string[] {
+  private getAnomViewColors(anomalia: Anomalia): any {
     const colorPerdidas = Colors.getColorPerdidas(anomalia.perdidas, 1);
     const colorCCs = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
     const colorGradNormMax = Colors.getColorGradNormMax(anomalia.gradienteNormalizado, 1);
-    return [colorPerdidas, colorCCs, colorGradNormMax];
+    const colorTipo = Colors.getColorTipo(anomalia.tipo);
+    return { mae: colorPerdidas, cc: colorCCs, grad: colorGradNormMax, tipo: colorTipo };
   }
 
   hoverAnomalia(row: any) {

@@ -20,6 +20,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { COLOR } from '@data/constants/color';
 import { TipoSeguidor } from '@core/models/tipoSeguidor';
 import { PcInterface } from '@core/models/pc';
+import { Colors } from '@core/classes/colors';
 
 @Injectable({
   providedIn: 'root',
@@ -354,5 +355,12 @@ export class SeguidorService {
     } else {
       return COLOR.colores_severity[2];
     }
+  }
+
+  getTipoAnomColor(anomalia: Anomalia) {
+    const colorRGBA = COLOR.colores_tipos[anomalia.tipo];
+    const colorRGB = colorRGBA.replace('rgba', 'rgb').replace(', 1)', ')');
+    const colorHex = Colors.rgbToHex(colorRGB);
+    return colorHex;
   }
 }

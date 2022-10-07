@@ -42,9 +42,8 @@ export class SeguidoresControlService {
   public prevSeguidorSelected: Seguidor;
   private sharedReportNoFilters = false;
   private seguidorLayers: VectorLayer[];
-  private zonasLayers: VectorLayer[];
   private prevFeatureHover: Feature;
-  private toggleViewSelected: number;
+  private toggleViewSelected: string;
   private _seguidorViewOpened = false;
   public seguidorViewOpened$ = new BehaviorSubject<boolean>(this._seguidorViewOpened);
   private _urlVisualImageSeguidor: string = undefined;
@@ -129,7 +128,7 @@ export class SeguidoresControlService {
     });
     maeLayer.setProperties({
       informeId,
-      view: 0,
+      view: 'mae',
       type: 'seguidores',
     });
     seguidoresLayers.push(maeLayer);
@@ -141,7 +140,7 @@ export class SeguidoresControlService {
     });
     celsCalientesLayer.setProperties({
       informeId,
-      view: 1,
+      view: 'cc',
       type: 'seguidores',
     });
     seguidoresLayers.push(celsCalientesLayer);
@@ -153,7 +152,7 @@ export class SeguidoresControlService {
     });
     gradNormMaxLayer.setProperties({
       informeId,
-      view: 2,
+      view: 'grad',
       type: 'seguidores',
     });
     seguidoresLayers.push(gradNormMaxLayer);
@@ -234,16 +233,16 @@ export class SeguidoresControlService {
 
   private addOnHoverAction() {
     let currentFeatureHover;
-    const estilosViewFocused = [
-      this.getStyleSeguidoresMae(true),
-      this.getStyleSeguidoresCelsCalientes(true),
-      this.getStyleSeguidoresGradienteNormMax(true),
-    ];
-    const estilosViewUnfocused = [
-      this.getStyleSeguidoresMae(false),
-      this.getStyleSeguidoresCelsCalientes(false),
-      this.getStyleSeguidoresGradienteNormMax(false),
-    ];
+    const estilosViewFocused = {
+      mae: this.getStyleSeguidoresMae(true),
+      cc: this.getStyleSeguidoresCelsCalientes(true),
+      grad: this.getStyleSeguidoresGradienteNormMax(true),
+    };
+    const estilosViewUnfocused = {
+      mae: this.getStyleSeguidoresMae(false),
+      cc: this.getStyleSeguidoresCelsCalientes(false),
+      grad: this.getStyleSeguidoresGradienteNormMax(false),
+    };
 
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
@@ -355,11 +354,11 @@ export class SeguidoresControlService {
   }
 
   private getStyleSeguidores(focus: boolean) {
-    const estilosView = [
-      this.getStyleSeguidoresMae(focus),
-      this.getStyleSeguidoresCelsCalientes(focus),
-      this.getStyleSeguidoresGradienteNormMax(focus),
-    ];
+    const estilosView = {
+      mae: this.getStyleSeguidoresMae(focus),
+      cc: this.getStyleSeguidoresCelsCalientes(focus),
+      grad: this.getStyleSeguidoresGradienteNormMax(focus),
+    };
 
     return estilosView[this.toggleViewSelected];
   }
@@ -509,7 +508,7 @@ export class SeguidoresControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: focused ? 4 : 2,
+              width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
             }),
             fill: new Fill({
               color:
@@ -537,7 +536,7 @@ export class SeguidoresControlService {
             : focused
             ? 'white'
             : 'black',
-        width: focused ? 4 : 2,
+        width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
       }),
       fill: new Fill({
         color:
@@ -572,7 +571,7 @@ export class SeguidoresControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: focused ? 4 : 2,
+              width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
             }),
             fill: new Fill({
               color:
@@ -610,7 +609,7 @@ export class SeguidoresControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: focused ? 4 : 2,
+              width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
             }),
             fill: new Fill({
               color:
@@ -679,7 +678,6 @@ export class SeguidoresControlService {
     this.prevSeguidorSelected = undefined;
     this.sharedReportNoFilters = false;
     this.seguidorLayers = undefined;
-    this.zonasLayers = undefined;
     this.prevFeatureHover = undefined;
     this.toggleViewSelected = undefined;
     this.seguidorViewOpened = undefined;

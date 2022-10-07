@@ -28,7 +28,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
   imageSelected = 0;
   imagesLoaded: boolean;
   zoomSquare = 200;
-  viewSelected = 0;
+  viewSelected: string;
 
   imageSeguidor;
   visualCanvas;
@@ -185,7 +185,7 @@ export class SeguidorImagesComponent implements OnInit, OnDestroy {
     this.anomsCanvas.clear();
 
     // tslint:disable-next-line: triple-equals
-    if (this.viewSelected == 1) {
+    if (this.viewSelected == 'cc') {
       // en el view Cels. Calientes solo mostramos estas
       this.seguidorSelected.anomaliasCliente
         // tslint:disable-next-line: triple-equals
