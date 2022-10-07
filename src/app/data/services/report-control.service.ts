@@ -25,6 +25,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
+import { UtilitiesService } from './utilities.service';
 
 import { GLOBAL } from '@data/constants/global';
 

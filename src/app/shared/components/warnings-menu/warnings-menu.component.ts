@@ -169,13 +169,18 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
           this.selectedInforme = this.informes.find((informe) => informe.id === this.selectedInforme.id);
 
+          const seguidoresInforme = this.reportControlService.allFilterableElements.filter(
+            (segs) => segs.informeId === this.selectedInforme.id
+          ) as Seguidor[];
+
           if (this.selectedInforme !== undefined) {
             this.checked = this.warningService.checkWarnings(
               this.selectedInforme,
               this.anomaliasInforme,
               this.warnings,
               this.planta,
-              this.locAreas
+              this.locAreas,
+              seguidoresInforme
             );
 
             // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
