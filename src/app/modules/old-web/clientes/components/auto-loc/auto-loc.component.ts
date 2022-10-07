@@ -151,7 +151,7 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
     this.locAreaDataSource.sort = this.sort;
     this.locationAreaList$ = this.plantaService.getLocationsArea(this.plantaId);
     this.userAreaList$ = this.plantaService.getAllUserAreas(this.plantaId);
-    this.locationAreaList$.subscribe((list) => {
+    this.locationAreaList$.pipe(take(1)).subscribe((list) => {
       list.forEach((item) => {
         delete item.visible;
       });
@@ -243,6 +243,7 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
     if (isNew) {
       this.selectArea(area);
     }
+
     google.maps.event.addListener(polygon, 'mouseup', (event) => {
       this.selectArea(area);
       this.modifyArea(area);
@@ -260,9 +261,7 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
   }
 
   private modifyArea(area: AreaInterface) {
-    const polygon = this.polygonList.find((item) => {
-      return item.id === area.id;
-    });
+    const polygon = this.polygonList.find((item) => item.id === area.id);
     const vertices = polygon.getPath();
     // Iterate over the vertices.
     const newPath: LatLngLiteral[] = [];
@@ -274,7 +273,7 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
     this.updateArea(area);
   }
 
-  public selectArea(area: AreaInterface) {
+  selectArea(area: AreaInterface) {
     this.selectedLocationArea = undefined;
     this.selectedUserArea = undefined;
 
@@ -811,50 +810,50 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
     }
 
     // var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-    var swBound = new google.maps.LatLng(this.planta.latitud - 0.00004, this.planta.longitud - 0.0002);
-    var neBound = new google.maps.LatLng(this.planta.latitud + 0.00004, this.planta.longitud + 0.0002);
-    var bounds = new google.maps.LatLngBounds(swBound, neBound);
+    const swBound = new google.maps.LatLng(this.planta.latitud - 0.00004, this.planta.longitud - 0.0002);
+    const neBound = new google.maps.LatLng(this.planta.latitud + 0.00004, this.planta.longitud + 0.0002);
+    const bounds = new google.maps.LatLngBounds(swBound, neBound);
 
     const srcImage = 'https://solardrontech.es/mapa.png';
 
     const overlay = new DebugOverlay(bounds, srcImage, this.map);
 
-    var markerA = new google.maps.Marker({
+    const markerA = new google.maps.Marker({
       position: swBound,
       map: this.map,
       draggable: true,
     });
 
-    var markerB = new google.maps.Marker({
+    const markerB = new google.maps.Marker({
       position: neBound,
       map: this.map,
       draggable: true,
     });
 
-    google.maps.event.addListener(markerA, 'drag', function () {
-      var newPointA = markerA.getPosition();
-      var newPointB = markerB.getPosition();
-      var newBounds = new google.maps.LatLngBounds(newPointA, newPointB);
+    google.maps.event.addListener(markerA, 'drag', () => {
+      const newPointA = markerA.getPosition();
+      const newPointB = markerB.getPosition();
+      const newBounds = new google.maps.LatLngBounds(newPointA, newPointB);
       overlay.updateBounds(newBounds);
     });
 
-    google.maps.event.addListener(markerB, 'drag', function () {
-      var newPointA = markerA.getPosition();
-      var newPointB = markerB.getPosition();
-      var newBounds = new google.maps.LatLngBounds(newPointA, newPointB);
+    google.maps.event.addListener(markerB, 'drag', () => {
+      const newPointA = markerA.getPosition();
+      const newPointB = markerB.getPosition();
+      const newBounds = new google.maps.LatLngBounds(newPointA, newPointB);
       overlay.updateBounds(newBounds);
     });
 
-    google.maps.event.addListener(markerA, 'dragend', function () {
-      var newPointA = markerA.getPosition();
-      var newPointB = markerB.getPosition();
+    google.maps.event.addListener(markerA, 'dragend', () => {
+      const newPointA = markerA.getPosition();
+      const newPointB = markerB.getPosition();
       console.log('point1' + newPointA);
       console.log('point2' + newPointB);
     });
 
-    google.maps.event.addListener(markerB, 'dragend', function () {
-      var newPointA = markerA.getPosition();
-      var newPointB = markerB.getPosition();
+    google.maps.event.addListener(markerB, 'dragend', () => {
+      const newPointA = markerA.getPosition();
+      const newPointB = markerB.getPosition();
       console.log('point1' + newPointA);
       console.log('point2' + newPointB);
     });
@@ -863,15 +862,11 @@ export class AutoLocComponent implements OnInit, AfterViewInit {
   calculateGlobalCoords() {
     this.plantaService.setLocAreaListFromPlantaId(this.plantaId);
 
-    this.locationAreaList.forEach((locArea, index) => {
-      if (index < 10) {
-        console.log(locArea.globalCoords);
-        const coords = locArea.path[0];
-        let globalCoords;
-        let modulo;
-        [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(coords);
-        console.log(globalCoords);
-      }
+    this.locationAreaList.forEach((locArea) => {
+      const coords = locArea.path[0];
+      let globalCoords;
+      let modulo;
+      [globalCoords, modulo] = this.plantaService.getGlobalCoordsFromLocationArea(coords);
     });
   }
 }
