@@ -18,6 +18,7 @@ import { ViewToggleComponent } from './components/view-toggle/view-toggle.compon
 import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { CommentsComponent } from './components/comments/comments.component';
 import { CommentComponent } from './components/comment/comment.component';
+import { SimplifiedViewComponent } from './components/simplified-view/simplified-view.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { CommentComponent } from './components/comment/comment.component';
     LeyendaComponent,
     CommentsComponent,
     CommentComponent,
+    SimplifiedViewComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -50,6 +52,7 @@ import { CommentComponent } from './components/comment/comment.component';
     ViewToggleComponent,
     LeyendaComponent,
     CommentsComponent,
+    SimplifiedViewComponent,
   ],
 })
 export class SharedPlantsModule {}

@@ -21,7 +21,7 @@ import { Anomalia } from '@core/models/anomalia';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListComponent implements AfterViewInit {
-  @Input() viewSeleccionada: number;
+  @Input() viewSeleccionada: string;
   @Input() dataSource: MatTableDataSource<any>;
   @Input() anomaliaHovered: Anomalia;
   @Input() anomaliaSelected: Anomalia;

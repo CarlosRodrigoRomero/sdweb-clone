@@ -29,7 +29,7 @@ interface SeguidorData {
   styleUrls: ['./seguidores-list.component.css'],
 })
 export class SeguidoresListComponent implements OnInit, OnDestroy {
-  viewSeleccionada = 0;
+  viewSeleccionada: string;
   displayedColumns: string[] = [];
   dataSource: MatTableDataSource<SeguidorData>;
   seguidorHovered: Seguidor = undefined;
@@ -47,18 +47,18 @@ export class SeguidoresListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.viewReportService.reportViewSelected$.subscribe((sel) => {
-        this.viewSeleccionada = Number(sel);
+      this.viewReportService.reportViewSelected$.subscribe((view) => {
+        this.viewSeleccionada = view;
 
         // cambiammos la ultima columna con la vista seleccionada
         switch (this.viewSeleccionada) {
-          case 0:
+          case 'mae':
             this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'mae', 'comentarios'];
             break;
-          case 1:
+          case 'cc':
             this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'celsCalientes', 'comentarios'];
             break;
-          case 2:
+          case 'grad':
             this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'gradiente', 'comentarios'];
             break;
         }
@@ -119,8 +119,8 @@ export class SeguidoresListComponent implements OnInit, OnDestroy {
     );
   }
 
-  private getColorsViewSeguidor(seguidor: Seguidor): string[] {
-    let colors: string[] = [];
+  private getColorsViewSeguidor(seguidor: Seguidor): any {
+    let colors: any = {};
     if (seguidor.anomaliasCliente.length > 0) {
       const colorMae = this.seguidoresControlService.getColorSeguidorMae(seguidor.mae, 1);
       const colorCCs = this.seguidoresControlService.getColorSeguidorGradienteNormMax(seguidor.gradienteNormalizado, 1);
@@ -129,9 +129,17 @@ export class SeguidoresListComponent implements OnInit, OnDestroy {
         1
       );
 
-      colors = [colorMae, colorCCs, colorGradNormMax];
+      colors = {
+        mae: colorMae,
+        cc: colorCCs,
+        grad: colorGradNormMax,
+      };
     } else {
-      colors = [COLOR.color_no_anoms, COLOR.color_no_anoms, COLOR.color_no_anoms];
+      colors = {
+        mae: COLOR.color_no_anoms,
+        cc: COLOR.color_no_anoms,
+        grad: COLOR.color_no_anoms,
+      };
     }
 
     return colors;

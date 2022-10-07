@@ -21,7 +21,7 @@ import { Seguidor } from '@core/models/seguidor';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListComponent implements AfterViewInit {
-  @Input() viewSeleccionada: number;
+  @Input() viewSeleccionada: string;
   @Input() dataSource: MatTableDataSource<any>;
   @Input() displayedColumns: string[];
   @Input() seguidorHovered: Seguidor;

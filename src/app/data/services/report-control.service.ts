@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 import { WINDOW } from '../../window.providers';
 
-import { BehaviorSubject, combineLatest, from } from 'rxjs';
+import { BehaviorSubject, from } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
 import { FilterService } from '@data/services/filter.service';
@@ -66,7 +66,7 @@ export class ReportControlService {
   private _numFixedGlobalCoords: number = 3;
   private _noAnomsReport = false;
   noAnomsReport$ = new BehaviorSubject<boolean>(this._noAnomsReport);
-  private user: UserInterface;
+  user: UserInterface;
 
   constructor(
     private router: Router,

@@ -16,6 +16,14 @@ export class Colors {
     );
   }
 
+  static rgbToHex(rgb: string) {
+    return `#${rgb
+      .match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/)
+      .slice(1)
+      .map((n) => parseInt(n, 10).toString(16).padStart(2, '0'))
+      .join('')}`;
+  }
+
   static getColor(value: number, range: number[], opacity: number): string {
     if (value < range[0]) {
       return Colors.hexToRgb(COLOR.colores_severity[0], opacity);
@@ -46,11 +54,15 @@ export class Colors {
     }
   }
 
+  static getColorTipo(tipo: number): string {
+    return COLOR.colores_tipos[tipo];
+  }
+
   static getColorComentarios(checked: boolean, opacity: number): string {
     if (checked) {
-      return Colors.hexToRgb(COLOR.colores_comentarios[0], opacity);
+      return this.hexToRgb(COLOR.colores_comentarios[0], opacity);
     } else {
-      return Colors.hexToRgb(COLOR.colores_comentarios[1], opacity);
+      return this.hexToRgb(COLOR.colores_comentarios[1], opacity);
     }
   }
 }

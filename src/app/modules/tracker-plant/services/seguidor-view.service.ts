@@ -26,8 +26,8 @@ export class SeguidorViewService {
   public anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
   private _sliderTemporalSelected: number = 100;
   public sliderTemporalSelected$ = new BehaviorSubject<number>(this._sliderTemporalSelected);
-  private _seguidorViewSelected = 0;
-  public seguidorViewSelected$ = new BehaviorSubject<number>(this._seguidorViewSelected);
+  private _seguidorViewSelected = 'tipo';
+  public seguidorViewSelected$ = new BehaviorSubject<string>(this._seguidorViewSelected);
   private _selectedInformeId: string = undefined;
   public selectedInformeId$ = new BehaviorSubject<string>(this._selectedInformeId);
   private _visualCanvas: any = undefined;
@@ -35,7 +35,6 @@ export class SeguidorViewService {
   private _anomsCanvas: any = undefined;
   private _imagesLoaded = false;
   public imagesLoaded$ = new BehaviorSubject<boolean>(this._imagesLoaded);
-  private localViewSelected = 0;
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
@@ -43,21 +42,19 @@ export class SeguidorViewService {
     private reportControlService: ReportControlService,
     private viewReportService: ViewReportService
   ) {
-    this.seguidorViewSelected$.subscribe((view) => (this.localViewSelected = view));
-    this.viewReportService.reportViewSelected$.subscribe((viewSelected) => (this.seguidorViewSelected = viewSelected));
-
     this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId));
   }
 
   getAnomaliaColor(anomalia: Anomalia): string {
-    // tslint:disable-next-line: triple-equals
-    if (this.localViewSelected == 0) {
-      return this.seguidorService.getPerdidasAnomColor(anomalia);
-      // tslint:disable-next-line: triple-equals
-    } else if (this.localViewSelected == 1) {
-      return this.seguidorService.getCelsCalientesAnomColor(anomalia);
-    } else {
-      return this.seguidorService.getGradienteAnomColor(anomalia);
+    switch (this.seguidorViewSelected) {
+      case 'mae':
+        return this.seguidorService.getPerdidasAnomColor(anomalia);
+      case 'cc':
+        return this.seguidorService.getCelsCalientesAnomColor(anomalia);
+      case 'grad':
+        return this.seguidorService.getGradienteAnomColor(anomalia);
+      case 'tipo':
+        return this.seguidorService.getTipoAnomColor(anomalia);
     }
   }
 
@@ -155,7 +152,7 @@ export class SeguidorViewService {
     return this._seguidorViewSelected;
   }
 
-  set seguidorViewSelected(selected: number) {
+  set seguidorViewSelected(selected: string) {
     this._seguidorViewSelected = selected;
     this.seguidorViewSelected$.next(selected);
   }
