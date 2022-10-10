@@ -78,7 +78,6 @@ export class PdfComponent implements OnInit, OnDestroy {
 
   download() {
     const json = this.generateJson();
-    // console.log(json);
     this.saveJson(json);
   }
 
@@ -134,12 +133,13 @@ export class PdfComponent implements OnInit, OnDestroy {
     ref.put(blob).then(() => {
       console.log('Archivo subido');
 
-      // this.downloadPdf();
+      this.downloadPdf();
     });
   }
 
   downloadPdf() {
     const url = 'https://node-pdf-rcpywurt6q-uc.a.run.app';
+    // const url = 'http://localhost:8080';
 
     const params = new HttpParams().set('informeId', this.reportControlService.selectedInformeId);
 
