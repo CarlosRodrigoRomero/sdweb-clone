@@ -124,12 +124,6 @@ export class PdfComponent implements OnInit, OnDestroy {
       json['seguidores'] = seguidores;
     }
 
-    if (informe.hasOwnProperty('servidorCapas')) {
-      json['servidorCapas'] = informe.servidorCapas;
-    } else {
-      json['servidorCapas'] = 'old';
-    }
-
     return json;
   }
 
