@@ -10,6 +10,7 @@ import { fromLonLat } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Map } from 'ol';
+import { Select } from 'ol/interaction';
 
 import { OlMapService } from './ol-map.service';
 import { FilterService } from './filter.service';
@@ -22,7 +23,7 @@ import { Seguidor } from '@core/models/seguidor';
 import { FilterableElement } from '@core/models/filterableInterface';
 
 import { COLOR } from '@data/constants/color';
-import { Select } from 'ol/interaction';
+
 import { Colors } from '@core/classes/colors';
 
 @Injectable({
@@ -32,7 +33,7 @@ export class ZonesControlService {
   private map: Map;
   zoomChangeView = 18;
   private selectedInformeId: string;
-  private toggleViewSelected: number;
+  private toggleViewSelected: string;
   private featureHovered: Feature;
   private prevFeatureHovered: Feature;
   private currentZoom: number;
@@ -48,7 +49,9 @@ export class ZonesControlService {
 
   initService(): Promise<boolean> {
     return new Promise((initService) => {
-      if (this.reportControlService.plantaFija) {
+      if (this.reportControlService.planta.hasOwnProperty('zoomCambioVista')) {
+        this.zoomChangeView = this.reportControlService.planta.zoomCambioVista;
+      } else if (this.reportControlService.plantaFija) {
         this.zoomChangeView = 20;
       }
 
@@ -79,6 +82,17 @@ export class ZonesControlService {
   }
 
   createZonasLayers(informeId: string): VectorLayer[] {
+    const tipoLayer = new VectorLayer({
+      source: new VectorSource({ wrapX: false }),
+      style: this.getStyleTipo(false),
+      visible: false,
+    });
+    tipoLayer.setProperties({
+      informeId,
+      view: 'tipo',
+      type: 'zonas',
+    });
+
     const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleMae(false),
@@ -86,9 +100,10 @@ export class ZonesControlService {
     });
     maeLayer.setProperties({
       informeId,
-      view: 0,
+      view: 'mae',
       type: 'zonas',
     });
+
     const ccLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleCelsCalientes(false),
@@ -96,9 +111,10 @@ export class ZonesControlService {
     });
     ccLayer.setProperties({
       informeId,
-      view: 1,
+      view: 'cc',
       type: 'zonas',
     });
+
     const gradLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleGradienteNormMax(false),
@@ -106,11 +122,11 @@ export class ZonesControlService {
     });
     gradLayer.setProperties({
       informeId,
-      view: 2,
+      view: 'grad',
       type: 'zonas',
     });
 
-    return [maeLayer, ccLayer, gradLayer];
+    return [tipoLayer, maeLayer, ccLayer, gradLayer];
   }
 
   mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
@@ -170,14 +186,15 @@ export class ZonesControlService {
   }
 
   private getPropertyView(
-    view: number,
+    view: string,
     informeId: string,
     zona: LocationAreaInterface,
     zonas: LocationAreaInterface[],
     allElemsZona: FilterableElement[]
   ): any {
+    // console.log(view, informeId, zona, zonas.length, allElemsZona.length);
     switch (view) {
-      case 0:
+      case 'mae':
         let mae = 0;
         // para anomalías enviamos el numero de zonas para calcular el MAE
         if (this.reportControlService.plantaFija) {
@@ -186,7 +203,7 @@ export class ZonesControlService {
           mae = this.getMaeZona(allElemsZona, informeId);
         }
         return { type: 'mae', value: mae };
-      case 1:
+      case 'cc':
         let celsCalientes = 0;
         // para anomalías enviamos el numero de zonas para calcular el CC
         if (this.reportControlService.plantaFija) {
@@ -195,9 +212,11 @@ export class ZonesControlService {
           celsCalientes = this.getCCZona(allElemsZona, informeId);
         }
         return { type: 'celsCalientes', value: celsCalientes };
-      case 2:
+      case 'grad':
         const grad = this.getGradNormMaxZona(allElemsZona);
         return { type: 'gradienteNormalizado', value: grad };
+      case 'tipo':
+        return { type: 'tipo', value: null };
     }
   }
 
@@ -368,11 +387,12 @@ export class ZonesControlService {
   }
 
   private getStyleZonas(focus: boolean) {
-    const estilosView = [
-      this.getStyleMae(focus),
-      this.getStyleCelsCalientes(focus),
-      this.getStyleGradienteNormMax(focus),
-    ];
+    const estilosView = {
+      mae: this.getStyleMae(focus),
+      cc: this.getStyleCelsCalientes(focus),
+      grad: this.getStyleGradienteNormMax(focus),
+      tipo: null,
+    };
 
     return estilosView[this.toggleViewSelected];
   }
@@ -387,7 +407,7 @@ export class ZonesControlService {
             : focused
             ? 'white'
             : 'black',
-        width: 2,
+        width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
       }),
       fill:
         this.currentZoom >= this.zoomChangeView
@@ -408,7 +428,7 @@ export class ZonesControlService {
             stroke: new Stroke({
               color:
                 this.currentZoom >= this.zoomChangeView ? this.getColorMae(feature, 1) : focused ? 'white' : 'black',
-              width: 2,
+              width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -450,7 +470,7 @@ export class ZonesControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: 2,
+              width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -492,7 +512,7 @@ export class ZonesControlService {
                   : focused
                   ? 'white'
                   : 'black',
-              width: 2,
+              width: this.currentZoom >= this.zoomChangeView ? 2 : focused ? 2 : 1,
             }),
             fill:
               this.currentZoom >= this.zoomChangeView
@@ -521,6 +541,22 @@ export class ZonesControlService {
     }
   }
 
+  // ESTILOS TIPO ANOMALÍA
+  private getStyleTipo(focused: boolean) {
+    return (feature) => {
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          stroke: new Stroke({
+            color: focused ? 'white' : 'black',
+            width: focused ? 2 : 1,
+          }),
+          fill: null,
+          text: this.getLabelStyle(feature),
+        });
+      }
+    };
+  }
+
   getLabelStyle(feature: Feature) {
     return new Text({
       text: feature.getProperties().properties.name,
@@ -530,7 +566,7 @@ export class ZonesControlService {
       }),
       stroke: new Stroke({
         color: 'white',
-        width: 4,
+        width: 2,
       }),
     });
   }

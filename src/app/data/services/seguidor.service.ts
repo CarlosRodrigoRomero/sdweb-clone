@@ -20,6 +20,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { COLOR } from '@data/constants/color';
 import { TipoSeguidor } from '@core/models/tipoSeguidor';
 import { PcInterface } from '@core/models/pc';
+import { Colors } from '@core/classes/colors';
 
 @Injectable({
   providedIn: 'root',
@@ -42,7 +43,7 @@ export class SeguidorService {
   getSeguidoresPlanta$(planta: PlantaInterface, informes: InformeInterface[]): Observable<Seguidor[]> {
     this.planta = planta;
 
-    this.getDifferentLocAreas(planta.id);
+    this.getDifferentLocAreas();
 
     const anomaliaObsList = Array<Observable<Seguidor[]>>();
     informes.forEach((informe) => {
@@ -145,11 +146,6 @@ export class SeguidorService {
               );
               seguidor.nombre = this.getSeguidorName(seguidor);
 
-              // si existe le añadimos el tipo seguidor
-              // if (tipoSeguidor !== undefined) {
-              //   seguidor.tipoSeguidor = tipoSeguidor;
-              // }
-
               // guardamos el nombre del seguidor en cada anomalia
               anomaliasSeguidor.forEach((anom) => (anom.nombreSeguidor = seguidor.nombre));
 
@@ -163,7 +159,7 @@ export class SeguidorService {
     );
   }
 
-  private getDifferentLocAreas(plantaId: string) {
+  private getDifferentLocAreas() {
     const locAreas = this.zonesService.locAreas;
     this.locAreaSeguidores = this.zonesService.locAreaSeguidores;
     this.zones = this.zonesService.zones;
@@ -359,5 +355,12 @@ export class SeguidorService {
     } else {
       return COLOR.colores_severity[2];
     }
+  }
+
+  getTipoAnomColor(anomalia: Anomalia) {
+    const colorRGBA = COLOR.colores_tipos[anomalia.tipo];
+    const colorRGB = colorRGBA.replace('rgba', 'rgb').replace(', 1)', ')');
+    const colorHex = Colors.rgbToHex(colorRGB);
+    return colorHex;
   }
 }

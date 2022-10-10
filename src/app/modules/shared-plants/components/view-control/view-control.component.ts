@@ -24,8 +24,9 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private seguidorLayers: VectorLayer[];
   private zonesLayers: VectorLayer[];
   public selectedInformeId: string;
-  private reportViewSelected: number;
+  private reportViewSelected: string;
   private currentZoom: number;
+  private viewZones: boolean;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -83,6 +84,15 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       );
     }
 
+    // checkbox ver u ocultar zonas
+    this.subscriptions.add(
+      this.viewReportService.simplifiedView$.subscribe((view) => {
+        this.viewZones = view;
+
+        this.setLayersVisibility(this.selectedInformeId);
+      })
+    );
+
     // establecemos las visibilidades de inicio cuando el mapa ha cargado
     this.subscriptions.add(
       this.reportControlService.mapLoaded$.subscribe((loaded) => {
@@ -135,14 +145,19 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private setAnomaliaLayersVisibility(informeId: string) {
     this.anomaliaLayers.forEach((layer) => {
       if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
-        if (this.zonesService.thereAreZones) {
-          if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
-            layer.setVisible(true);
-          } else {
-            layer.setVisible(false);
-          }
-        } else {
+        // vista tipo anomalías
+        if (layer.getProperties().view === 'tipo') {
           layer.setVisible(true);
+        } else {
+          if (this.zonesService.thereAreZones && this.viewZones) {
+            if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
+              layer.setVisible(true);
+            } else {
+              layer.setVisible(false);
+            }
+          } else {
+            layer.setVisible(true);
+          }
         }
       } else {
         layer.setVisible(false);
@@ -153,7 +168,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private setSeguidorLayersVisibility(informeId: string) {
     this.seguidorLayers.forEach((layer) => {
       if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
-        if (this.zonesService.thereAreZones) {
+        if (this.zonesService.thereAreZones && this.viewZones) {
           if (this.currentZoom >= this.zonesControlService.zoomChangeView) {
             layer.setVisible(true);
           } else {
@@ -171,7 +186,11 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private setZonesLayersVisibility(informeId: string) {
     if (this.zonesLayers.length) {
       this.zonesLayers.forEach((layer) => {
-        if (layer.getProperties().informeId === informeId && layer.getProperties().view === this.reportViewSelected) {
+        if (
+          layer.getProperties().informeId === informeId &&
+          layer.getProperties().view === this.reportViewSelected &&
+          this.viewZones
+        ) {
           layer.setVisible(true);
         } else {
           layer.setVisible(false);

@@ -15,6 +15,7 @@ import { InformeService } from '@data/services/informe.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PlantaService } from '@data/services/planta.service';
 import { WarningService } from '@data/services/warning.service';
+import { OlMapService } from '@data/services/ol-map.service';
 
 import { NormalizedModule } from '@core/models/normalizedModule';
 import { Anomalia } from '@core/models/anomalia';
@@ -60,7 +61,8 @@ export class ClassificationComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private anomaliaService: AnomaliaService,
     private plantaService: PlantaService,
-    private warningService: WarningService
+    private warningService: WarningService,
+    private olMapService: OlMapService
   ) {}
 
   ngOnInit(): void {
@@ -245,7 +247,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
     }
 
     anomalias.forEach((anom) => {
-      const modulo = this.classificationService.getAnomModule(anom.featureCoords[0]);
+      const modulo = this.classificationService.getAnomModule(this.olMapService.getCentroid(anom.featureCoords));
       if (modulo !== undefined) {
         this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
 

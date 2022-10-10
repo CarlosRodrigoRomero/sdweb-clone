@@ -211,8 +211,8 @@ export class FilterService {
     }
   }
 
-  filterCCs(viewSelected: number) {
-    if (viewSelected === 1) {
+  filterCCs(viewSelected: string) {
+    if (viewSelected === 'cc') {
       this.prevAllFilterableElems = this.allFiltrableElements;
       this.allFiltrableElements = this.allFiltrableElements.filter((elem) => elem.tipo == 8 || elem.tipo == 9);
       this.allFiltrableElements = this.allFiltrableElements.sort((a, b) => a.numAnom - b.numAnom);

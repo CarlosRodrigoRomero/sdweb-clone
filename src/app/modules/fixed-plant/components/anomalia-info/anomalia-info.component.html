@@ -140,6 +140,26 @@
             </div>
           </div>
         </mat-tab>
+        <mat-tab label="Módulo" *ngIf="seccionModulo">
+          <div class="tab-content">
+            <div class="elemento" *ngIf="infoAdicional.modulo.marcaModulo">
+              <span class="titulo">Marca módulo</span>
+              <span class="subtitulo">{{ infoAdicional.modulo.marcaModulo }}</span>
+            </div>
+            <div class="elemento" *ngIf="infoAdicional.modulo.modeloModulo">
+              <span class="titulo">Modelo módulo</span>
+              <span class="subtitulo">{{ infoAdicional.modulo.modeloModulo }}</span>
+            </div>
+            <!-- <div class="elemento" *ngIf="infoAdicional.modulo.tipoPanelModulo !== undefined">
+            <span class="titulo">Tipo de panel</span>
+            <span class="subtitulo">{{ infoAdicional.modulo.tipoPanelModulo }}</span>
+          </div> -->
+            <div class="elemento" *ngIf="infoAdicional.modulo.potencia">
+              <span class="titulo">Potencia</span>
+              <span class="subtitulo">{{ infoAdicional.modulo.potencia }} W</span>
+            </div>
+          </div>
+        </mat-tab>
         <mat-tab label="O&M">
           <div class="tab-comments">
             <app-comments [anomalia]="anomaliaSelect"></app-comments>

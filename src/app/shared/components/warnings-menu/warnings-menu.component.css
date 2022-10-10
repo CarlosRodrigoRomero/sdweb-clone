@@ -14,6 +14,21 @@
   cursor: unset;
 }
 
+.icon-no-checked {
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-no-checked mat-icon {
+  vertical-align: bottom;
+}
+
+:host ::ng-deep .icon-no-checked mat-icon .mat-badge-content {
+  background: orangered;
+}
+
 .icon-no-warnings {
   width: 40px;
   display: flex;

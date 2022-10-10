@@ -88,7 +88,7 @@ export class ImagesTilesService {
     locAreas.forEach((locArea) => {
       const locAreaCoords = this.pathToCoordinate(locArea.path);
       allLocAreaCoords.push(...locAreaCoords);
-      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 16, map));
+      tileCoords.push(...this.getElemTiles(locAreaCoords, this.getElemExtent(locAreaCoords), 19, map));
     });
     tileCoords = this.getCompleteTiles(tileCoords);
 

@@ -158,15 +158,13 @@ export class AnomaliaInfoService {
       }
     });
 
-    const numModulo = this.getNumeroModulo(anomalia, planta, 'anomalia');
-    if (numModulo !== undefined) {
-      if (!isNaN(Number(numModulo))) {
-        elems.push(`${this.translation.t('Nº módulo')}: ${numModulo}`);
-      } else {
-        const altura = this.getAlturaAnom(anomalia, planta);
-        const columna = this.getColumnaAnom(anomalia, planta);
-        elems.push(`${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`);
-      }
+    const numModulo = this.getNumeroModulo(anomalia, planta);
+    if (numModulo !== null) {
+      elems.push(`${this.translation.t('Nº módulo')}: ${numModulo}`);
+    } else {
+      const altura = this.getAlturaAnom(anomalia, planta);
+      const columna = this.getColumnaAnom(anomalia, planta);
+      elems.push(`${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`);
     }
 
     return elems;
@@ -187,15 +185,13 @@ export class AnomaliaInfoService {
       }
     });
 
-    const numModulo = this.getNumeroModulo(anomalia, planta, 'anomalia');
-    if (numModulo !== undefined) {
-      if (!isNaN(Number(numModulo))) {
-        label += `${this.translation.t('Nº módulo')}: ${numModulo}`;
-      } else {
-        const altura = this.getAlturaAnom(anomalia, planta);
-        const columna = this.getColumnaAnom(anomalia, planta);
-        label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`;
-      }
+    const numModulo = this.getNumeroModulo(anomalia, planta);
+    if (numModulo !== null) {
+      label += `${this.translation.t('Nº módulo')}: ${numModulo.toString()}`;
+    } else {
+      const altura = this.getAlturaAnom(anomalia, planta);
+      const columna = this.getColumnaAnom(anomalia, planta);
+      label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`;
     }
 
     return label;
@@ -225,7 +221,7 @@ export class AnomaliaInfoService {
   getAlturaAnom(anomalia: Anomalia, planta: PlantaInterface): number {
     let localY = anomalia.localY;
     if (planta.alturaBajaPrimero) {
-      if (planta.tipo === 'seguidores' && anomalia.hasOwnProperty('tipoSeguidor')) {
+      if (anomalia.hasOwnProperty('tipoSeguidor')) {
         // si se cuenta por filas la altura es el nº de filas
         let altura = anomalia.tipoSeguidor.numModulos.length;
         // si se cuenta por columnas entonces la altura es idependiente por columna
@@ -233,7 +229,7 @@ export class AnomaliaInfoService {
           altura = anomalia.tipoSeguidor.numModulos[anomalia.localX - 1];
         }
         localY = altura - localY + 1;
-      } else if (planta.tipo !== 'seguidores') {
+      } else {
         // para fijas la altura se basa en el nº de filas de la planta
         localY = planta.filas - localY + 1;
       }
@@ -244,7 +240,7 @@ export class AnomaliaInfoService {
   getColumnaAnom(anomalia: Anomalia, planta: PlantaInterface): number {
     let localX = anomalia.localX;
     if (planta.hasOwnProperty('columnaDchaPrimero') && planta.columnaDchaPrimero) {
-      if (planta.tipo === 'seguidores' && anomalia.hasOwnProperty('tipoSeguidor')) {
+      if (anomalia.hasOwnProperty('tipoSeguidor')) {
         // si se cuenta por columnas el nº de columnas es equivalente al array
         let columnas = anomalia.tipoSeguidor.numModulos.length;
         // si se cuenta por filas la altura es el nº de filas
@@ -267,10 +263,10 @@ export class AnomaliaInfoService {
     }
   }
 
-  getNumeroModulo(elem: PcInterface | Anomalia, planta: PlantaInterface, type?: string): string {
+  getNumeroModulo(elem: PcInterface | Anomalia, planta: PlantaInterface): number {
     let localX = (elem as PcInterface).local_x;
     let localY = (elem as PcInterface).local_y;
-    if (type === 'anomalia') {
+    if (localX === undefined || localY === undefined) {
       localX = (elem as Anomalia).localX;
       localY = (elem as Anomalia).localY;
     }
@@ -282,15 +278,46 @@ export class AnomaliaInfoService {
       planta.etiquetasLocalXY[altura] !== undefined &&
       planta.etiquetasLocalXY[altura][localX - 1] !== undefined
     ) {
-      return planta.etiquetasLocalXY[altura][localX - 1];
+      return Number(planta.etiquetasLocalXY[altura][localX - 1]);
     }
 
-    return this.getEtiquetaLocalX(planta, elem, type).concat('/').concat(this.getEtiquetaLocalY(planta, elem, type));
+    if (planta.hasOwnProperty('posicionModulo') && planta.posicionModulo === true) {
+      const anom = elem as Anomalia;
+      if (anom.hasOwnProperty('tipoSeguidor')) {
+        if (anom.tipoSeguidor.tipoFila) {
+          let numeroModulo = 0;
+          anom.tipoSeguidor.numModulos.forEach((num, index) => {
+            if (index < altura - 1) {
+              numeroModulo += num;
+            } else if (index === altura - 1) {
+              numeroModulo += localX;
+            }
+          });
+          return numeroModulo;
+        } else {
+          let numeroModulo = 0;
+          anom.tipoSeguidor.numModulos.forEach((num, index) => {
+            if (index < localX - 1) {
+              numeroModulo += num;
+            } else if (index === localX - 1) {
+              numeroModulo += altura;
+            }
+          });
+          return numeroModulo;
+        }
+      }
+    }
+
+    return null;
   }
 
-  getEtiquetaLocalX(planta: PlantaInterface, elem: PcInterface | Anomalia, type?: string): string {
+  getLabelLocalXY(elem: PcInterface | Anomalia, planta: PlantaInterface) {
+    return this.getEtiquetaLocalX(planta, elem).concat('/').concat(this.getEtiquetaLocalY(planta, elem));
+  }
+
+  getEtiquetaLocalX(planta: PlantaInterface, elem: PcInterface | Anomalia): string {
     let localX = (elem as PcInterface).local_x;
-    if (type === 'anomalia') {
+    if (localX === undefined) {
       localX = (elem as Anomalia).localX;
     }
 
@@ -304,9 +331,9 @@ export class AnomaliaInfoService {
     return localX.toString();
   }
 
-  getEtiquetaLocalY(planta: PlantaInterface, elem: PcInterface | Anomalia, type?: string): string {
+  getEtiquetaLocalY(planta: PlantaInterface, elem: PcInterface | Anomalia): string {
     let localY = (elem as PcInterface).local_y;
-    if (type === 'anomalia') {
+    if (localY === undefined) {
       localY = (elem as Anomalia).localY;
     }
 

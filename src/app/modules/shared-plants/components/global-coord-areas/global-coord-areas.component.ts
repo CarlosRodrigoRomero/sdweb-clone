@@ -9,7 +9,6 @@ import { Fill, Stroke, Style, Text } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 import Feature from 'ol/Feature';
 
-
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesService } from '@data/services/zones.service';
@@ -53,16 +52,19 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.numAreas = this.zonesService.zonesBySize.length - 1;
+    this.numAreas = this.zonesService.zonesBySize.length;
 
     this.planta = this.reportControlService.planta;
 
     // comprobamos si tiene los nombres de las zonas
     if (this.reportControlService.planta.hasOwnProperty('nombreGlobalCoords')) {
-      // quitamos las más pequeñas porque ya se muestran por defecto
-      this.nombreGlobalCoords = this.planta.nombreGlobalCoords.filter(
-        (_, index, nombres) => index < nombres.length - 1
-      );
+      this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
+      // quitamos las más pequeñas en S2E porque ya se muestran por defecto
+      if (!this.reportControlService.plantaFija) {
+        this.nombreGlobalCoords = this.planta.nombreGlobalCoords.filter(
+          (_, index, nombres) => index < nombres.length - 1
+        );
+      }
     } else {
       for (let index = 0; index < this.numAreas; index++) {
         this.nombreGlobalCoords.push('Zona');
@@ -73,8 +75,11 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
       this.task.subtasks.push({ name: nombre, completed: false });
     });
 
+    this.zones = this.zonesService.zonesBySize;
     // quitamos las más pequeñas porque ya se muestran por defecto
-    this.zones = this.zonesService.zonesBySize.filter((_, index, allZones) => index < allZones.length - 1);
+    if (!this.reportControlService.plantaFija) {
+      this.zones = this.zonesService.zonesBySize.filter((_, index, allZones) => index < allZones.length - 1);
+    }
 
     this.subscriptions.add(
       this.olMapService.getMap().subscribe((map) => {
@@ -88,6 +93,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   }
 
   private addLocationAreas() {
+    console.log(this.zones);
     this.zones.forEach((zones, i) => {
       this.globalCoordAreasVectorSources[i] = new VectorSource();
 
@@ -119,7 +125,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
         return new Style({
           stroke: new Stroke({
             color: 'black',
-            width: 2,
+            width: 1,
             lineDash: [4],
           }),
           fill: null,
@@ -138,7 +144,7 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
       }),
       stroke: new Stroke({
         color: 'black',
-        width: 8,
+        width: 4,
       }),
     });
   }

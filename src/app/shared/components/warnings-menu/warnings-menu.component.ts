@@ -28,6 +28,7 @@ import { Warning } from './warnings';
 import { UserInterface } from '@core/models/user';
 
 import { GLOBAL } from '@data/constants/global';
+import { NoModulesFilter } from '@core/models/noModulesFilter';
 
 @Component({
   selector: 'app-warnings-menu',
@@ -45,6 +46,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   private informes: InformeInterface[] = this.reportControlService.informes;
   checked = true;
   private user: UserInterface;
+  timesChecked = 0;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -81,6 +83,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         )
         .subscribe((warnings) => {
           this.warnings = warnings;
+
+          // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
+          this.cdr.detectChanges();
         })
     );
 
@@ -164,13 +169,18 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
           this.selectedInforme = this.informes.find((informe) => informe.id === this.selectedInforme.id);
 
+          const seguidoresInforme = this.reportControlService.allFilterableElements.filter(
+            (segs) => segs.informeId === this.selectedInforme.id
+          ) as Seguidor[];
+
           if (this.selectedInforme !== undefined) {
             this.checked = this.warningService.checkWarnings(
               this.selectedInforme,
               this.anomaliasInforme,
               this.warnings,
               this.planta,
-              this.locAreas
+              this.locAreas,
+              seguidoresInforme
             );
 
             // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
@@ -235,6 +245,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         window.open(urlPlantaEdit, '_blank');
         break;
       case 'modulosAnoms':
+        this.filterNoModulesAnoms();
+        break;
+      case 'recalcModulosAnoms':
         this.fixModulosAnoms();
         break;
       case 'irStorage':
@@ -282,6 +295,12 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       });
   }
 
+  private filterNoModulesAnoms() {
+    const noModulesFilter = new NoModulesFilter('noModulesAnoms');
+
+    this.filterService.addFilter(noModulesFilter);
+  }
+
   private fixNoGlobalCoordsAnoms() {
     const noGlobalCoordsAnoms = this.anomaliasInforme.filter(
       (anom) => anom.globalCoords === null || anom.globalCoords === undefined || anom.globalCoords[0] === null
@@ -304,7 +323,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     anomsSinModulo.forEach((anom) => {
       let modulo: ModuloInterface;
       if (this.reportControlService.plantaFija) {
-        modulo = this.anomaliaService.getModule(anom.featureCoords[0], this.locAreas);
+        modulo = this.anomaliaService.getModule(this.olMapService.getCentroid(anom.featureCoords), this.locAreas);
 
         if (modulo !== null) {
           anom.modulo = modulo;

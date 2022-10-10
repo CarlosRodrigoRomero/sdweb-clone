@@ -52,7 +52,9 @@ export class ZonesComponent implements OnInit, OnDestroy {
     this.olMapService.map$.subscribe((map) => {
       if (map !== undefined) {
         this.map = map;
-        this.zonesLayers.forEach((l) => this.map.addLayer(l));
+        this.zonesLayers.forEach((l) => {
+          this.map.addLayer(l);
+        });
       }
     });
 

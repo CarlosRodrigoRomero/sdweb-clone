@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { ViewReportService } from '@data/services/view-report.service';
+import { ReportControlService } from '@data/services/report-control.service';
 
 @Component({
   selector: 'app-view-toggle',
@@ -10,18 +11,25 @@ import { ViewReportService } from '@data/services/view-report.service';
   styleUrls: ['./view-toggle.component.css'],
 })
 export class ViewToggleComponent implements OnInit, OnDestroy {
-  viewSelected: number;
+  viewSelected: string;
+  plantaFija: boolean;
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private viewReportService: ViewReportService) {}
+  constructor(private viewReportService: ViewReportService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
+    this.plantaFija = this.reportControlService.plantaFija;
+
     this.subscriptions.add(this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view)));
   }
 
-  onToggleChange(value) {
-    this.viewReportService.reportViewSelected = Number(value);
+  onToggleChange(view: string) {
+    this.viewReportService.reportViewSelected = view;
+
+    if (view === 'tipo') {
+      this.viewReportService.simplifiedView = false;
+    }
   }
 
   ngOnDestroy(): void {

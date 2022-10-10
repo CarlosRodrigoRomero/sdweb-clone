@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 import { WINDOW } from '../../window.providers';
 
-import { BehaviorSubject, combineLatest, from } from 'rxjs';
+import { BehaviorSubject, from } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
 import { FilterService } from '@data/services/filter.service';
@@ -25,6 +25,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
+import { UtilitiesService } from './utilities.service';
 
 import { GLOBAL } from '@data/constants/global';
 
@@ -125,7 +126,7 @@ export class ReportControlService {
               // obtenemos los informes de la planta
               switchMap((informes) => {
                 // parche plantas que compró Plenium a RIOS
-                this.informes = Patches.plantsTwoClients(this.planta.id, this.user.uid, informes);
+                this.informes = Patches.plantsTwoClients(this.user.uid, informes);
 
                 if (this.router.url.includes('fixed')) {
                   this.plantaFija = true;

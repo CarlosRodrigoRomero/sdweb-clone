@@ -146,7 +146,7 @@ export class OlMapService {
             let aerialLayer: TileLayer;
 
             // no recibimos respuesta del servidor porque no existe
-            if (error.status === 0) {
+            if (error.status === 0 || error.status === 504) {
               aerialLayer = new TileLayer({});
               aerialLayer.setProperties({
                 informeId: informe.id,

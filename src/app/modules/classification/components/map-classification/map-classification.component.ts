@@ -38,6 +38,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { COLOR } from '@data/constants/color';
 import { PALETTE } from '@data/constants/palette';
 import { InformeInterface } from '@core/models/informe';
+import { Patches } from '@core/classes/patches';
 
 @Component({
   selector: 'app-map-classification',
@@ -370,7 +371,11 @@ export class MapClassificationComponent implements OnInit {
   }
 
   private getDatetime(coords: Coordinate[]) {
-    const dateString = this.getClosestPoint(coords);
+    let dateString = Patches.applyPatches(this.classificationService.informeId);
+
+    if (dateString === undefined) {
+      dateString = this.getClosestPoint(coords);
+    }
 
     return this.dateStringToUnix(dateString);
   }

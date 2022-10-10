@@ -8,12 +8,14 @@ import { AnomaliaService } from '@data/services/anomalia.service';
 import { InformeService } from '@data/services/informe.service';
 import { PlantaService } from '@data/services/planta.service';
 import { WarningService } from '@data/services/warning.service';
+import { ReportControlService } from '@data/services/report-control.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
 import { Warning } from '@shared/components/warnings-menu/warnings';
+import { Seguidor } from '@core/models/seguidor';
 
 @Component({
   selector: 'app-check-warnings',
@@ -34,7 +36,8 @@ export class CheckWarningsComponent implements OnInit {
     private router: Router,
     private informeService: InformeService,
     private plantaService: PlantaService,
-    private warningService: WarningService
+    private warningService: WarningService,
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
@@ -71,13 +74,28 @@ export class CheckWarningsComponent implements OnInit {
             .subscribe((anoms) => {
               this.anomalias = this.anomaliaService.getRealAnomalias(anoms);
 
-              this.checked = this.warningService.checkWarnings(
-                this.informe,
-                this.anomalias,
-                this.warnings,
-                this.planta,
-                this.locAreas
-              );
+              if (this.reportControlService.plantaFija) {
+                this.checked = this.warningService.checkWarnings(
+                  this.informe,
+                  this.anomalias,
+                  this.warnings,
+                  this.planta,
+                  this.locAreas
+                );
+              } else {
+                const seguidoresInforme = this.reportControlService.allFilterableElements.filter(
+                  (segs) => segs.informeId === this.informe.id
+                ) as Seguidor[];
+
+                this.checked = this.warningService.checkWarnings(
+                  this.informe,
+                  this.anomalias,
+                  this.warnings,
+                  this.planta,
+                  this.locAreas,
+                  seguidoresInforme
+                );
+              }
             });
         });
       });

@@ -18,8 +18,10 @@ export interface PlantaInterface {
   num_modulos?: number;
   temp_limite?: number;
   zoom?: number;
+  zoomCambioVista?: number;
   alturaBajaPrimero?: boolean;
   columnaDchaPrimero?: boolean;
+  posicionModulo?: boolean;
   moduloPotencia?: number;
   informes?: InformeInterface[];
   modulos?: string[];

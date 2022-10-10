@@ -177,11 +177,11 @@ export class WarningService {
       thermalLayerChecked = this.checkThermalLayer(informe, warns);
     }
 
-    let segsMismoNombreChecked = false;
+    let segsNamesDuplicatesChecked = false;
     if (seguidores) {
-      segsMismoNombreChecked = this.checkSegsRepeatName(seguidores, warns, informe.id);
+      segsNamesDuplicatesChecked = this.checkSegsNamesDuplicates(seguidores, warns, informe.id);
     } else {
-      segsMismoNombreChecked = true;
+      segsNamesDuplicatesChecked = true;
     }
 
     if (
@@ -198,7 +198,8 @@ export class WarningService {
       thermalLayerChecked &&
       imgPortadaChecked &&
       imgSuciedadChecked &&
-      tempMaxAnomsChecked
+      tempMaxAnomsChecked &&
+      segsNamesDuplicatesChecked
     ) {
       // eliminamos posibles alertas que ya no sean necesarias
       this.checkUnusedWarnings(warns, informe.id);
@@ -466,15 +467,15 @@ export class WarningService {
       const zonesNamesChecked = this.checkZonesNames(planta, warns, informe.id);
       const zonesRepeatChecked = this.checkZonesRepeat(planta, locAreas, warns, informe.id);
       const modulosChecked = this.checkModulosWarnings(locAreas, warns, informe.id, anomalias);
-      const tiposSeguidorChecked = this.checkTiposSeguidorWarnings(locAreas, warns, informe.id, planta);
+      // const tiposSeguidorChecked = this.checkTiposSeguidorWarnings(locAreas, warns, informe.id, planta);
 
       if (
         wrongLocAnomsChecked &&
         noGlobalCoordsAnomsChecked &&
         zonesNamesChecked &&
         zonesRepeatChecked &&
-        modulosChecked &&
-        tiposSeguidorChecked
+        modulosChecked /* &&
+        tiposSeguidorChecked */
       ) {
         return true;
       }
@@ -707,9 +708,8 @@ export class WarningService {
       .pipe(
         take(1),
         catchError((error) => {
-          console.log(error);
           // no recibimos respuesta del servidor porque no existe
-          if (error.status === 0) {
+          if (error.status === 0 || error.status === 504) {
             const warning: Warning = {
               type: 'visualLayer',
               visible: true,
@@ -742,7 +742,7 @@ export class WarningService {
         catchError((error) => {
           console.log(error);
           // no recibimos respuesta del servidor porque no existe
-          if (error.status === 0) {
+          if (error.status === 0 || error.status === 504) {
             const warning: Warning = {
               type: 'thermalLayer',
               visible: true,
@@ -836,21 +836,25 @@ export class WarningService {
     return true;
   }
 
-  checkSegsRepeatName(segs: Seguidor[], warns: Warning[], informeId: string) {
-    const repeatNameSegs = UtilitiesService.findDuplicates(segs.map((seg) => seg.nombre));
+  private checkSegsNamesDuplicates(seguidores: Seguidor[], warns: Warning[], informeId: string) {
+    if (seguidores.length > 0) {
+      const segsNamesDuplicates = UtilitiesService.findDuplicates(
+        seguidores.filter((seg) => seg.informeId === informeId).map((seg) => seg.nombre)
+      );
 
-    if (repeatNameSegs.length > 0) {
-      console.log('Seguidores con el mismo nombre: ' + repeatNameSegs.join(' | '));
+      if (segsNamesDuplicates.length > 0) {
+        console.log('Seguidores con el mismo nombre: ' + segsNamesDuplicates.join(' | '));
 
-      const warning: Warning = {
-        type: 'segsRepeatName',
-        visible: true,
-      };
+        const warning: Warning = {
+          type: 'segsNamesRepeat',
+          visible: true,
+        };
 
-      this.checkAddWarning(warning, warns, informeId);
-    } else {
-      // eliminamos la alerta antigua si la hubiera
-      this.checkOldWarnings('zonasRepeat', warns, informeId);
+        this.checkAddWarning(warning, warns, informeId);
+      } else {
+        // eliminamos la alerta antigua si la hubiera
+        this.checkOldWarnings('segsNamesRepeat', warns, informeId);
+      }
     }
 
     // confirmamos que ha sido checkeado
