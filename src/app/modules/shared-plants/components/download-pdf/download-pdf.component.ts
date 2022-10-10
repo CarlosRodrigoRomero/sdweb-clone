@@ -127,7 +127,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private anomSeguidores1Eje: Anomalia[][] = [];
   private seguidores1ejeNoAnoms: LocationAreaInterface[] = [];
   private largestLocAreas: LocationAreaInterface[] = [];
-  simplePDF = false;
   private maxAnomsConImgs = 250;
 
   private subscriptions: Subscription = new Subscription();
@@ -177,8 +176,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       .map((_, i) => i + 1);
 
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
-
-    this.subscriptions.add(this.downloadReportService.simplePDF$.subscribe((value) => (this.simplePDF = value)));
 
     // suscripciones a las imagenes
     this.loadOtherImages();
@@ -319,26 +316,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => (this.downloadReportService.filteredPDF = undefined));
   }
 
-  setSimplePDF(checked: boolean) {
-    this.downloadReportService.simplePDF = checked;
-  }
-
-  private getImgsPlanos() {
-    if (this.selectedInforme.fecha > GLOBAL.newReportsDate) {
-      // imágenes planta completa
-      if (this.planta.tipo !== 'seguidores') {
-        this.imagesTilesService.setImgPlanoPlanta(
-          this.largestLocAreas,
-          'thermal',
-          this.selectedInforme,
-          this.map,
-          this.anomaliasInforme
-        );
-      }
-      this.imagesTilesService.setImgPlanoPlanta(this.largestLocAreas, 'visual', this.selectedInforme, this.map);
-    }
-  }
-
   selectDownloadType() {
     if (this.reportControlService.plantaFija) {
       if (this.reportPdfService.informeConImagenes) {
@@ -369,18 +346,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       });
   }
 
-  selectProgressBarMode() {
-    if (this.reportControlService.plantaFija) {
-      if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
-        this.downloadReportService.progressBarMode = 'determinate';
-      } else {
-        this.downloadReportService.progressBarMode = 'indeterminate';
-      }
-    } else {
-      this.downloadReportService.progressBarMode = 'determinate';
-    }
-  }
-
   private getPrefijoInforme() {
     let prefijo = this.selectedInforme.prefijo;
 
@@ -394,14 +359,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return prefijo;
   }
 
-  private downloadPDF() {
+  downloadPDF() {
     // cargamos los apartados del informe
     this.reportPdfService.loadApartadosInforme(this.planta, this.selectedInforme);
 
     this.filtroApartados = this.reportPdfService.apartadosInforme.map((element) => element.nombre);
-
-    // seleccionamos el modo de progressBar
-    this.selectProgressBarMode();
 
     this.downloadReportService.endingDownload = false;
     this.downloadReportService.generatingDownload = true;
@@ -410,182 +372,47 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     // cargamos imagenes que cambian con cada informe
     this.imagesLoadService.loadChangingImages(this.selectedInforme.id);
 
-    if (this.zonesService.thereAreZones) {
-      // reseteamos el contador de planos cargados en cada descarga
-      this.imagesTilesService.imagesPlantaLoaded = 0;
-      // cargamos las orto termica y visual de la planta
-      this.getImgsPlanos();
-    }
-
     this.countLoadedThermalImages = 0;
     this.countLoadedVisualImages = 0;
     this.countLoadedImagesSegs1EjeAnoms = 0;
     this.countLoadedImagesSegs1EjeNoAnoms = 0;
 
-    // PLANTAS FIJAS
-    if (this.reportControlService.plantaFija) {
+    // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
+    let downloads = 0;
+
+    // comprobamos que estan cargadas tb el resto de imagenes del PDF
+    this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
+      // comprobamos si se van a cargar imagenes de anomalias
       if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
-        // Imagenes anomalías
-        this.countAnomalias = 0;
-        this.anomaliasInforme.forEach((anomalia, index) => {
-          // if (index < 2) {
-          this.setImgAnomaliaCanvas(anomalia, 'thermal');
-          this.setImgAnomaliaCanvas(anomalia, 'visual');
-          this.countAnomalias++;
-          // }
-        });
+        // Cuando se carguen todas las imágenes
+        if (imagesLoaded && downloads === 0) {
+          this.calcularInforme();
 
-        // if (this.planta.tipo === '1 eje') {
-        //   // Imagenes S1E con anomalías
-        //   this.seguidores1ejeAnoms.forEach((seg, index) => {
-        //     // if (index < 2) {
-        //       this.setImgSeguidor1EjeCanvas(seg, index, this.anomSeguidores1Eje[index]);
-        //     // }
-        //   });
+          pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
+            this.downloadReportService.progressBarValue = 0;
 
-        //   // Imagenes S1E sin anomalías
-        //   this.seguidores1ejeNoAnoms.forEach((seg, index) => {
-        //     // if (index < 2 ) {
-        //     this.setImgSeguidor1EjeCanvas(seg, index);
-        //     // }
-        //   });
-
-        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-        let downloads = 0;
-
-        const subscription = combineLatest([
-          this.countLoadedThermalImages$,
-          this.countLoadedVisualImages$,
-          this.countLoadedImagesSegs1EjeAnoms$,
-          this.countLoadedImagesSegs1EjeNoAnoms$,
-        ]).subscribe(
-          ([
-            countLoadedThermalImgs,
-            countLoadedVisualImgs,
-            countLoadedImgSegs1EjeAnoms,
-            countLoadedImgSegs1EjeNoAnoms,
-          ]) => {
-            this.downloadReportService.progressBarValue = Math.round(
-              ((countLoadedThermalImgs +
-                countLoadedVisualImgs +
-                countLoadedImgSegs1EjeAnoms +
-                countLoadedImgSegs1EjeNoAnoms) /
-                (this.anomaliasInforme.length * 2 +
-                  this.seguidores1ejeAnoms.length +
-                  this.seguidores1ejeNoAnoms.length)) *
-                100
-            );
-
-            // comprobamos que estan cargados los planos de la planta
-            this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
-              // comprobamos que estan cargadas tb el resto de imagenes del PDF
-              this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-                // Cuando se carguen todas las imágenes
-                if (
-                  imagesLoaded &&
-                  countLoadedThermalImgs + countLoadedImgSegs1EjeAnoms + countLoadedImgSegs1EjeNoAnoms ===
-                    this.countAnomalias + this.seguidores1ejeAnoms.length + this.seguidores1ejeNoAnoms.length &&
-                  downloads === 0
-                ) {
-                  this.calcularInforme();
-
-                  pdfMake
-                    .createPdf(this.getDocDefinition(this.imageListBase64))
-                    .download(this.getPrefijoInforme(), () => {
-                      this.downloadReportService.progressBarValue = 0;
-
-                      this.downloadReportService.generatingDownload = false;
-
-                      subscription.unsubscribe();
-                    });
-                  this.downloadReportService.endingDownload = true;
-
-                  downloads++;
-                }
-              });
-            });
-          }
-        );
-      } else {
-        // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-        let downloads = 0;
-
-        // comprobamos que estan cargados los planos de la planta
-        this.imagesTilesService.checkImgsPlanosLoaded().then((planosLoaded) => {
-          // comprobamos que estan cargadas tb el resto de imagenes del PDF
-          this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-            // comprobamos si se van a cargar imagenes de anomalias
-            if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
-              // Cuando se carguen todas las imágenes
-              if (planosLoaded && imagesLoaded && downloads === 0) {
-                this.calcularInforme();
-
-                pdfMake
-                  .createPdf(this.getDocDefinition(this.imageListBase64))
-                  .download(this.getPrefijoInforme(), () => {
-                    this.downloadReportService.progressBarValue = 0;
-
-                    this.downloadReportService.generatingDownload = false;
-                  });
-                this.downloadReportService.endingDownload = true;
-
-                downloads++;
-              }
-            } else {
-              // Cuando se carguen todas las imágenes
-              if (planosLoaded && imagesLoaded && downloads === 0) {
-                this.calcularInforme();
-
-                pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
-                  this.downloadReportService.progressBarValue = 0;
-
-                  this.downloadReportService.generatingDownload = false;
-                });
-                this.downloadReportService.endingDownload = true;
-
-                downloads++;
-              }
-            }
+            this.downloadReportService.generatingDownload = false;
           });
-        });
+          this.downloadReportService.endingDownload = true;
+
+          downloads++;
+        }
+      } else {
+        // Cuando se carguen todas las imágenes
+        if (imagesLoaded && downloads === 0) {
+          this.calcularInforme();
+
+          pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
+            this.downloadReportService.progressBarValue = 0;
+
+            this.downloadReportService.generatingDownload = false;
+          });
+          this.downloadReportService.endingDownload = true;
+
+          downloads++;
+        }
       }
-    } else {
-      // PLANTAS SEGUIDORES
-      // Generar imagenes
-      this.countSeguidores = 0;
-      this.seguidoresInforme.forEach((seguidor, index) => {
-        this.setImgSeguidorCanvas(seguidor, false, 'jpg');
-        this.countSeguidores++;
-      });
-
-      // con este contador impedimos que se descarge más de una vez debido a la suscripcion a las imagenes
-      let downloads = 0;
-
-      const subscription = this.countLoadedThermalImages$.subscribe((countLoadedImgs) => {
-        this.downloadReportService.progressBarValue = Math.round(
-          (countLoadedImgs / this.seguidoresInforme.length) * 100
-        );
-
-        // comprobamos que estan cargadas tb el resto de imagenes del PDF
-        this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-          // Cuando se carguen todas las imágenes
-          if (imagesLoaded && countLoadedImgs === this.countSeguidores && downloads === 0) {
-            this.calcularInforme();
-
-            pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
-              this.downloadReportService.progressBarValue = 0;
-
-              this.downloadReportService.generatingDownload = false;
-
-              subscription.unsubscribe();
-            });
-            this.downloadReportService.endingDownload = true;
-
-            downloads++;
-          }
-        });
-      });
-    }
+    });
   }
 
   private calcularInforme() {
@@ -659,35 +486,12 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   getDocDefinition(images?: any): TDocumentDefinitions {
     const pages = this.getPagesPDF();
     let anexo1 = [];
-    let anexoAnomalias = [];
-    let anexoSeguidores1EjeAnoms = [];
-    let anexoSeguidores1EjeNoAnoms = [];
-    let anexoSeguidores = [];
-    let anexoSegsNoAnoms = [];
 
     let numAnexo = 'I';
 
     if (this.filtroApartados.includes('anexo1')) {
       anexo1 = this.getAnexoLista(numAnexo);
       numAnexo = 'II';
-    }
-    if (this.filtroApartados.includes('anexoAnomalias')) {
-      anexoAnomalias = this.getAnexoAnomalias(numAnexo);
-      numAnexo = 'III';
-    }
-    // if (this.filtroApartados.includes('anexoSeguidores1EjeAnoms')) {
-    //   anexoSeguidores1EjeAnoms = this.getAnexoSegs1EjeAnoms(numAnexo);
-    //   numAnexo = 'IV';
-    // }
-    // if (this.filtroApartados.includes('anexoSeguidores1EjeNoAnoms')) {
-    //   anexoSeguidores1EjeNoAnoms = this.getAnexoSegs1EjeNoAnoms(numAnexo);
-    // }
-    if (this.filtroApartados.includes('anexoSeguidores')) {
-      anexoSeguidores = this.getAnexoSeguidores(numAnexo);
-      numAnexo = 'III';
-    }
-    if (this.filtroApartados.includes('anexoSegsNoAnoms')) {
-      anexoSegsNoAnoms = this.getAnexoSeguidoresSinAnomalias(numAnexo);
     }
 
     return {
@@ -704,17 +508,11 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         }
       },
 
-      content: pages
-        .concat(anexo1)
-        .concat(anexoAnomalias)
-        .concat(anexoSeguidores1EjeAnoms)
-        .concat(anexoSeguidores1EjeNoAnoms)
-        .concat(anexoSeguidores)
-        .concat(anexoSegsNoAnoms),
+      content: pages.concat(anexo1),
 
       images,
 
-      footer: (currentPage, pageCount) => {
+      footer: (currentPage) => {
         if (currentPage > 1) {
           return {
             table: {
@@ -2239,42 +2037,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       ];
     };
 
-    const planoTermico = (index: string) => {
-      return [
-        // Imagen planta termica
-        {
-          text: `${index} - ${this.translation.t('Ortomosaico térmico')}`,
-          style: 'h2',
-          margin: [0, 10, 0, 40],
-          alignment: 'center',
-          pageBreak: 'before',
-        },
-        {
-          image: this.imagesPlantaCompleta['thermal'],
-          width: this.widthPlano,
-          alignment: 'center',
-        },
-      ];
-    };
-
-    const planoVisual = (index: string) => {
-      return [
-        // Imagen planta visual
-        {
-          text: `${index} - ${this.translation.t('Ortomosaico RGB')}`,
-          style: 'h2',
-          margin: [0, 10, 0, 40],
-          alignment: 'center',
-          pageBreak: 'before',
-        },
-        {
-          image: this.imagesPlantaCompleta['visual'],
-          width: this.widthPlano,
-          alignment: 'center',
-        },
-      ];
-    };
-
     const resultados = (index: string) => {
       return [
         {
@@ -2616,18 +2378,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
       subtitulo = subtitulo + 1;
     }
 
-    if (this.filtroApartados.includes('planoTermico')) {
-      titulo = titulo + 1;
-      apartado = titulo.toString();
-      result = result.concat(planoTermico(apartado));
-    }
-
-    if (this.filtroApartados.includes('planoVisual')) {
-      titulo = titulo + 1;
-      apartado = titulo.toString();
-      result = result.concat(planoVisual(apartado));
-    }
-
     titulo = titulo + 1;
     subtitulo = 1;
     apartado = titulo.toString();
@@ -2789,242 +2539,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     return allPagsAnexoLista.concat(tablaAnexo);
   }
 
-  private getAnexoAnomalias(numAnexo: string) {
-    const allPagsAnexo = [];
-    // tslint:disable-next-line:max-line-length
-    const pag1Anexo = {
-      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-        'Anomalías térmicas'
-      )}`,
-      style: 'h1',
-      alignment: 'center',
-      pageBreak: 'before',
-    };
-
-    allPagsAnexo.push(pag1Anexo);
-
-    for (let i = 0; i < this.anomaliasInforme.length; i++) {
-      const anom = this.anomaliasInforme[i];
-
-      const pagAnexo = [
-        {
-          text: `${this.translation.t('Anomalía')} ${i + 1}/${this.anomaliasInforme.length}`,
-          style: 'h2',
-          alignment: 'center',
-          pageBreak: 'before',
-        },
-        '\n',
-        {
-          columns: [
-            {
-              image: `imgCanvas_thermal_${anom.id}`,
-              width: this.widthImageAnomalia,
-              alignment: 'center',
-            },
-            {
-              image: `imgCanvas_visual_${anom.id}`,
-              width: this.widthImageAnomalia,
-              alignment: 'center',
-            },
-          ],
-          columnGap: 14,
-        },
-        {
-          columns: [
-            { text: this.translation.t('Tipo de anomalía'), width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getTipoLabel(anom), style: 'anomInfoValue' },
-          ],
-          margin: [0, 40, 0, 0],
-        },
-        {
-          columns: [
-            { text: this.translation.t('Causa'), width: 200, style: 'anomInfoTitle' },
-            {
-              text: this.anomaliaInfoService.getCausa(anom),
-              style: 'anomInfoValue',
-              margin: [0, 0, 0, 5],
-            },
-          ],
-        },
-        {
-          columns: [
-            { text: this.translation.t('Recomendación'), width: 200, style: 'anomInfoTitle' },
-            {
-              text: this.anomaliaInfoService.getRecomendacion(anom),
-              style: 'anomInfoValue',
-              margin: [0, 0, 0, 5],
-            },
-          ],
-        },
-        {
-          columns: [
-            { text: this.translation.t('Módulo'), width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getModuloLabel(anom), style: 'anomInfoValue' },
-          ],
-        },
-        {
-          columns: [
-            {
-              text:
-                this.translation.t('Criticidad') +
-                ' (' +
-                this.translation.t('Criterio') +
-                ' ' +
-                this.anomaliaService.criterioCriticidad.nombre +
-                ')',
-              width: 200,
-              style: 'anomInfoTitle',
-            },
-            {
-              text: this.anomaliaInfoService.getCriticidadLabel(anom, this.anomaliaService.criterioCriticidad),
-              style: 'anomInfoValue',
-            },
-          ],
-        },
-        {
-          columns: [
-            { text: this.translation.t('Clase'), width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getClaseLabel(anom), style: 'anomInfoValue' },
-          ],
-        },
-        {
-          columns: [
-            { text: this.translation.t('Pérdidas') + ' (beta)', width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getPerdidasLabel(anom), style: 'anomInfoValue' },
-          ],
-        },
-        {
-          columns: [
-            { text: this.translation.t('Temperatura máxima'), width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getTempMaxLabel(anom), style: 'anomInfoValue' },
-          ],
-        },
-        {
-          columns: [
-            { text: this.translation.t('Gradiente temp. Normalizado'), width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getGradNormLabel(anom), style: 'anomInfoValue' },
-          ],
-        },
-        {
-          columns: [
-            { text: this.translation.t('Fecha y hora captura'), width: 200, style: 'anomInfoTitle' },
-            {
-              text: this.anomaliaInfoService.getFechaHoraLabel(anom, this.selectedInforme),
-              style: 'anomInfoValue',
-            },
-          ],
-        },
-        {
-          columns: [
-            { text: this.translation.t('Localización'), width: 200, style: 'anomInfoTitle' },
-            { text: this.anomaliaInfoService.getLocalizacionCompleteLabel(anom, this.planta), style: 'anomInfoValue' },
-          ],
-        },
-        {
-          columns: [
-            { text: this.translation.t('Posición GPS'), width: 200, style: 'anomInfoTitle' },
-            {
-              text: 'link',
-              link: this.anomaliaInfoService.getGoogleMapsUrl(anom.featureCoords[0]),
-              style: 'linkAnomInfo',
-            },
-          ],
-        },
-      ];
-
-      allPagsAnexo.push(pagAnexo);
-    }
-
-    return allPagsAnexo;
-  }
-
-  private getAnexoSegs1EjeAnoms(numAnexo: string) {
-    const allPagsAnexo = [];
-    // tslint:disable-next-line:max-line-length
-    const pag1Anexo = {
-      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-        'Anomalías térmicas por seguidor'
-      )}`,
-      style: 'h1',
-      alignment: 'center',
-      pageBreak: 'before',
-    };
-
-    allPagsAnexo.push(pag1Anexo);
-
-    for (let i = 0; i < this.seguidores1ejeAnoms.length; i++) {
-      const segTable = this.getSeg1ejeTable();
-
-      const anoms = this.anomSeguidores1Eje[i];
-
-      const anomsTable = this.getPaginaSeguidor1EjeAnoms(anoms);
-
-      const pagAnexo = [
-        {
-          // text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
-          text: `${i + 1}/${this.seguidores1ejeAnoms.length} - ${this.translation.t(
-            'Seguidor'
-          )} ${this.downloadReportService.getNombreS1E(this.seguidores1ejeAnoms[i])}`,
-          style: 'h2',
-          alignment: 'center',
-          pageBreak: 'before',
-        },
-        '\n',
-        {
-          image: `imgCanvasSegAnoms${i}`,
-          width: this.widthImageAnomalia,
-          alignment: 'center',
-        },
-        '\n',
-        '\n',
-        {
-          columns: [
-            {
-              width: '*',
-              text: '',
-            },
-
-            {
-              width: 'auto',
-              table: segTable,
-            },
-
-            {
-              width: '*',
-              text: '',
-            },
-          ],
-        },
-
-        '\n',
-
-        {
-          columns: [
-            {
-              width: '*',
-              text: '',
-            },
-            {
-              width: 'auto',
-              table: {
-                headerRows: 1,
-                body: [anomsTable[0]].concat(anomsTable[1]),
-              },
-            },
-            {
-              width: '*',
-              text: '',
-            },
-          ],
-        },
-      ];
-
-      allPagsAnexo.push(pagAnexo);
-    }
-
-    return allPagsAnexo;
-  }
-
   private getSeg1ejeTable() {
     const segBodyTableHeader = [
       {
@@ -3129,479 +2643,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     }
 
     return segTable;
-  }
-
-  private globalCoordsLabel(globalCoords: string[]): string {
-    const coords: string[] = [];
-    globalCoords.forEach((coord, index) => {
-      if (coord !== undefined && coord !== null && coord !== '') {
-        coords.push(coord);
-      }
-    });
-    let label = '';
-    coords.forEach((coord, index) => {
-      label = label + coord;
-      if (index < coords.length - 1) {
-        label = label + '.';
-      }
-    });
-
-    return label;
-  }
-
-  private getPaginaSeguidor1EjeAnoms(anomalias: Anomalia[]) {
-    // Header
-    const cabecera = [];
-    const columnasAnexoSeguidor = this.columnasAnomalia.filter((col) => {
-      return !GLOBAL.columnasAnexoSeguidor.includes(col.nombre);
-    });
-    if (this.planta.hasOwnProperty('numerosSerie')) {
-      if (this.planta.numerosSerie) {
-        columnasAnexoSeguidor.push({ nombre: 'numeroSerie', descripcion: 'N/S' });
-      }
-    }
-
-    cabecera.push({
-      text: this.translation.t('Número'),
-      style: 'tableHeaderBlue',
-    });
-    for (const col of columnasAnexoSeguidor) {
-      cabecera.push({
-        text: this.translation.t(this.getEncabezadoTablaSeguidor(col)),
-        style: 'tableHeaderBlue',
-      });
-    }
-
-    // Body
-    const body = [];
-    let contadorAnoms = 0;
-    const totalAnomsSeguidor = anomalias.length;
-    for (const anom of anomalias) {
-      contadorAnoms += 1;
-      const row = [];
-      row.push({
-        text: `${contadorAnoms}/${totalAnomsSeguidor}`,
-        noWrap: true,
-        style: 'tableCellAnexo1',
-      });
-
-      for (const col of columnasAnexoSeguidor) {
-        row.push({
-          text: this.translation.t(this.getTextoColumnaAnomalia(anom, col.nombre)),
-          noWrap: true,
-          style: 'tableCellAnexo1',
-        });
-      }
-      body.push(row);
-    }
-    return [cabecera, body];
-  }
-
-  private getAnexoSegs1EjeNoAnoms(numAnexo: string) {
-    const allPagsAnexo = [];
-    // tslint:disable-next-line:max-line-length
-    const pag1Anexo = {
-      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-        'Seguidores sin anomalías'
-      )}`,
-      style: 'h1',
-      alignment: 'center',
-      pageBreak: 'before',
-    };
-
-    allPagsAnexo.push(pag1Anexo);
-
-    for (let i = 0; i < this.seguidores1ejeNoAnoms.length; i++) {
-      const seg = this.seguidores1ejeNoAnoms[i];
-
-      const segTable = this.getSeg1ejeTable();
-
-      const pagAnexo = [
-        {
-          // text: `${this.translation.t('Seguidor')} ${this.globalCoordsLabel(seg.globalCoords)}`,
-          text: `${i + 1}/${this.seguidores1ejeNoAnoms.length} - ${this.translation.t(
-            'Seguidor'
-          )} ${this.downloadReportService.getNombreS1E(this.seguidores1ejeNoAnoms[i])}`,
-          style: 'h2',
-          alignment: 'center',
-          pageBreak: 'before',
-        },
-        '\n',
-        {
-          image: `imgCanvasSegNoAnoms${i}`,
-          width: this.widthImageAnomalia,
-          alignment: 'center',
-        },
-        '\n',
-        '\n',
-        {
-          columns: [
-            {
-              width: '*',
-              text: '',
-            },
-
-            {
-              width: 'auto',
-              table: segTable,
-            },
-
-            {
-              width: '*',
-              text: '',
-            },
-          ],
-        },
-      ];
-
-      allPagsAnexo.push(pagAnexo);
-    }
-
-    return allPagsAnexo;
-  }
-
-  private getAnexoSeguidores(numAnexo: string) {
-    const allPagsAnexo = [];
-    // tslint:disable-next-line:max-line-length
-    const pag1Anexo = {
-      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-        'Anomalías térmicas por seguidor'
-      )}`,
-      style: 'h1',
-      alignment: 'center',
-      pageBreak: 'before',
-    };
-
-    allPagsAnexo.push(pag1Anexo);
-
-    for (const seg of this.seguidoresInforme) {
-      const table = this.getPaginaSeguidor(seg);
-
-      if (seg.anomaliasCliente.length > 0) {
-        const pagAnexo = [
-          {
-            text: `${this.translation.t('Seguidor')} ${seg.nombre}`,
-            style: 'h2',
-            alignment: 'center',
-            pageBreak: 'before',
-          },
-
-          '\n',
-
-          {
-            image: `imgCanvas${seg.nombre}`,
-            width: this.widthImageSeguidor,
-            alignment: 'center',
-          },
-
-          '\n',
-
-          {
-            columns: [
-              {
-                width: '*',
-                text: '',
-              },
-
-              {
-                width: 'auto',
-                table: {
-                  body: [
-                    [
-                      {
-                        text: this.translation.t('Posición GPS'),
-                        style: 'tableHeaderImageData',
-                      },
-                      {
-                        text: this.translation.t('Fecha/Hora'),
-                        style: 'tableHeaderImageData',
-                      },
-
-                      {
-                        text: this.translation.t('Irradiancia'),
-                        style: 'tableHeaderImageData',
-                      },
-
-                      {
-                        text: this.translation.t('Temp. aire'),
-                        style: 'tableHeaderImageData',
-                      },
-
-                      {
-                        text: this.translation.t('Viento') + ' (Beaufort)',
-                        style: 'tableHeaderImageData',
-                      },
-
-                      {
-                        text: this.translation.t('Emisividad'),
-                        style: 'tableHeaderImageData',
-                      },
-
-                      {
-                        text: this.translation.t('Temp. reflejada'),
-                        style: 'tableHeaderImageData',
-                      },
-                      {
-                        text: this.translation.t('Módulo'),
-                        style: 'tableHeaderImageData',
-                      },
-                    ],
-                    [
-                      {
-                        text: 'link',
-                        link: this.anomaliaInfoService.getGoogleMapsUrl(
-                          this.olMapService.getCentroid(seg.featureCoords)
-                        ),
-                        style: 'linkCellAnexo1',
-                        noWrap: true,
-                      },
-                      {
-                        text: this.datePipe
-                          .transform(this.selectedInforme.fecha * 1000, 'dd/MM/yyyy')
-                          .concat(' ')
-                          .concat(this.datePipe.transform(seg.anomaliasCliente[0].datetime * 1000, 'HH:mm:ss')),
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-
-                      {
-                        text: Math.round(seg.anomaliasCliente[0].irradiancia).toString().concat(' W/m2'),
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-                      {
-                        text: Math.round((seg.anomaliasCliente[0] as PcInterface).temperaturaAire)
-                          .toString()
-                          .concat(' ºC'),
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-
-                      {
-                        text: (seg.anomaliasCliente[0] as PcInterface).viento,
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-
-                      {
-                        text: (seg.anomaliasCliente[0] as PcInterface).emisividad,
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-
-                      {
-                        text: Math.round((seg.anomaliasCliente[0] as PcInterface).temperaturaReflejada)
-                          .toString()
-                          .concat(' ºC'),
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-
-                      {
-                        text: this.writeModulo(seg.anomaliasCliente[0]),
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-                    ],
-                  ],
-                },
-              },
-
-              {
-                width: '*',
-                text: '',
-              },
-            ],
-          },
-
-          '\n',
-
-          {
-            columns: [
-              {
-                width: '*',
-                text: '',
-              },
-              {
-                width: 'auto',
-                table: {
-                  headerRows: 1,
-                  body: [table[0]].concat(table[1]),
-                },
-              },
-              {
-                width: '*',
-                text: '',
-              },
-            ],
-          },
-        ];
-
-        allPagsAnexo.push(pagAnexo);
-      }
-    }
-
-    return allPagsAnexo;
-  }
-
-  private getAnexoSeguidoresSinAnomalias(numAnexo: string) {
-    const allPagsAnexo = [];
-    // tslint:disable-next-line:max-line-length
-    const pag1Anexo = {
-      text: `\n\n\n\n\n\n\n\n\n\n\n\n\n\n ${this.translation.t('Anexo')} ${numAnexo}: ${this.translation.t(
-        'Seguidores sin anomalías'
-      )}`,
-      style: 'h1',
-      alignment: 'center',
-      pageBreak: 'before',
-    };
-
-    allPagsAnexo.push(pag1Anexo);
-
-    for (const seg of this.seguidoresInforme) {
-      if (seg.anomaliasCliente.length === 0) {
-        const pagAnexo = [
-          {
-            text: `${this.translation.t('Seguidor')} ${seg.nombre}`,
-            style: 'h2',
-            alignment: 'center',
-            pageBreak: 'before',
-          },
-
-          '\n',
-
-          {
-            image: `imgCanvas${seg.nombre}`,
-            width: this.widthImageSeguidor,
-            alignment: 'center',
-          },
-
-          '\n',
-
-          {
-            columns: [
-              {
-                width: '*',
-                text: '',
-              },
-
-              {
-                width: 'auto',
-                table: {
-                  body: [
-                    [
-                      {
-                        text: this.translation.t('Posición GPS'),
-                        style: 'tableHeaderImageData',
-                      },
-                      {
-                        text: this.translation.t('Fecha/Hora'),
-                        style: 'tableHeaderImageData',
-                      },
-
-                      {
-                        text: this.translation.t('Irradiancia'),
-                        style: 'tableHeaderImageData',
-                      },
-
-                      {
-                        text: this.translation.t('Temp. aire'),
-                        style: 'tableHeaderImageData',
-                      },
-
-                      {
-                        text: this.translation.t('Viento') + ' (Beaufort)',
-                        style: 'tableHeaderImageData',
-                      },
-
-                      {
-                        text: this.translation.t('Emisividad'),
-                        style: 'tableHeaderImageData',
-                      },
-
-                      {
-                        text: this.translation.t('Temp. reflejada'),
-                        style: 'tableHeaderImageData',
-                      },
-                      {
-                        text: this.translation.t('Módulo'),
-                        style: 'tableHeaderImageData',
-                      },
-                    ],
-                    [
-                      {
-                        text: 'link',
-                        link: this.anomaliaInfoService.getGoogleMapsUrl(
-                          this.olMapService.getCentroid(seg.featureCoords)
-                        ),
-                        style: 'linkCellAnexo1',
-                        noWrap: true,
-                      },
-                      {
-                        text: this.datePipe
-                          .transform(this.selectedInforme.fecha * 1000, 'dd/MM/yyyy')
-                          .concat(' ')
-                          .concat(this.datePipe.transform(seg.anomalias[0].datetime * 1000, 'HH:mm:ss')),
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-
-                      {
-                        text: Math.round(seg.anomalias[0].irradiancia).toString().concat(' W/m2'),
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-                      {
-                        text: Math.round((seg.anomalias[0] as PcInterface).temperaturaAire)
-                          .toString()
-                          .concat(' ºC'),
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-
-                      {
-                        text: (seg.anomalias[0] as PcInterface).viento,
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-
-                      {
-                        text: (seg.anomalias[0] as PcInterface).emisividad,
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-
-                      {
-                        text: Math.round((seg.anomalias[0] as PcInterface).temperaturaReflejada)
-                          .toString()
-                          .concat(' ºC'),
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-
-                      {
-                        text: this.writeModulo(seg.anomalias[0]),
-                        style: 'tableCellAnexo1',
-                        noWrap: true,
-                      },
-                    ],
-                  ],
-                },
-              },
-
-              {
-                width: '*',
-                text: '',
-              },
-            ],
-          },
-        ];
-
-        allPagsAnexo.push(pagAnexo);
-      }
-    }
-
-    return allPagsAnexo;
   }
 
   writeModulo(anomalia: Anomalia) {

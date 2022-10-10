@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
-
 import { AngularFireStorage } from '@angular/fire/storage';
+
+import { Subscription } from 'rxjs';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
@@ -20,9 +21,12 @@ import { PdfDialogComponent } from '../pdf-dialog/pdf-dialog.component';
   templateUrl: './pdf.component.html',
   styleUrls: ['./pdf.component.css'],
 })
-export class PdfComponent implements OnInit {
+export class PdfComponent implements OnInit, OnDestroy {
   private apartadosInforme: string[] = [];
   private emailSelected: string;
+  oldPdf = false;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private storage: AngularFireStorage,
@@ -37,14 +41,32 @@ export class PdfComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.pdfService.apartadosInforme$.subscribe((apt) => (this.apartadosInforme = apt));
-    this.pdfService.emailSelected$.subscribe((email) => (this.emailSelected = email));
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+        const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
+        if (informe !== undefined) {
+          if (
+            (informe.hasOwnProperty('servidorCapas') && informe.servidorCapas === 'geoserver') ||
+            !this.reportControlService.plantaFija
+          ) {
+            this.oldPdf = false;
+          } else {
+            this.oldPdf = true;
+          }
+        }
+      })
+    );
 
-    this.pdfService.generatePdf$.subscribe((gen) => {
-      if (gen) {
-        this.download();
-      }
-    });
+    this.subscriptions.add(this.pdfService.apartadosInforme$.subscribe((apt) => (this.apartadosInforme = apt)));
+    this.subscriptions.add(this.pdfService.emailSelected$.subscribe((email) => (this.emailSelected = email)));
+
+    this.subscriptions.add(
+      this.pdfService.generatePdf$.subscribe((gen) => {
+        if (gen) {
+          this.download();
+        }
+      })
+    );
   }
 
   openDialog() {
@@ -136,5 +158,9 @@ export class PdfComponent implements OnInit {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

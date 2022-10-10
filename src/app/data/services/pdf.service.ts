@@ -12,6 +12,8 @@ export class PdfService {
   generatePdf$ = new BehaviorSubject<boolean>(this._generatePdf);
   private _emailSelected: string = '';
   emailSelected$ = new BehaviorSubject<string>(this._emailSelected);
+  private _generateSimplePdf = false;
+  generateSimplePdf$ = new BehaviorSubject<boolean>(this._generateSimplePdf);
 
   constructor() {}
 
@@ -40,5 +42,14 @@ export class PdfService {
   set emailSelected(value: string) {
     this._emailSelected = value;
     this.emailSelected$.next(this._emailSelected);
+  }
+
+  get generateSimplePdf(): boolean {
+    return this._generateSimplePdf;
+  }
+
+  set generateSimplePdf(value: boolean) {
+    this._generateSimplePdf = value;
+    this.generateSimplePdf$.next(this._generateSimplePdf);
   }
 }
