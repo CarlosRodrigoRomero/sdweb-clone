@@ -69,10 +69,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   countLoadedImagesSegs1EjeNoAnoms$ = new BehaviorSubject<number>(this._countLoadedImagesSegs1EjeNoAnoms);
   private _loadedImages = undefined;
   loadedImages$ = new BehaviorSubject<string>(this._loadedImages);
-  private countAnomalias: number;
-  private countSegs1EjeAnoms: number;
-  private countSegs1EjeNoAnoms: number;
-  private countSeguidores: number;
   private _seguidoresInforme: Seguidor[] = [];
   seguidoresInforme$ = new BehaviorSubject<Seguidor[]>(this._seguidoresInforme);
   private anomaliasInforme: Anomalia[] = []; // equivalente allAnomalias en fijas
@@ -82,7 +78,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private language: string; // antes lan
   private _columnasAnomalia: any[] = []; // antes pcColumnas
   columnasAnomalia$ = new BehaviorSubject<any[]>(this._columnasAnomalia); // equvalente a currentFilteredColumnas$
-  private filtroColumnas: string[];
   private layerInformeSelected: TileLayer;
   private alturaMax = 0;
 
@@ -95,39 +90,29 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
   private imgCurvaMaeBase64: string;
   private imgLogoFooterBase64: string;
 
-  private widthPlano: number;
-  private widthLogoOriginal: number;
   private imageListBase64 = {};
   private tileResolution = 256;
   private imgSolardroneBase64: string;
-  private imagesPlantaCompleta = {};
 
   private countCategoria;
   private countPosicion;
   private countCategoriaClase;
   private countClase;
-  private informeCalculado: boolean;
   private arrayFilas: Array<number>;
   private arrayColumnas: Array<number>;
   private irradianciaMedia: number;
-  private tempReflejada: number;
-  private emisividad: number;
   private numTipos: number[];
   private numClases: number[];
   private anomTipos = GLOBAL.labels_tipos; // antes pcDescripcion
-  private dataSource: MatTableDataSource<AnomsTable>;
   private filtroApartados: string[];
   private currentFiltroGradiente: number;
   private labelsCriticidad: string[];
-  private widthImageSeguidor: number;
-  private widthImageAnomalia: number;
   private hasUserArea: boolean;
   seguidoresLoaded = false;
   private map: Map;
   private seguidores1ejeAnoms: LocationAreaInterface[] = [];
   private anomSeguidores1Eje: Anomalia[][] = [];
   private seguidores1ejeNoAnoms: LocationAreaInterface[] = [];
-  private largestLocAreas: LocationAreaInterface[] = [];
   private maxAnomsConImgs = 250;
 
   private subscriptions: Subscription = new Subscription();
@@ -189,12 +174,8 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     this.columnasAnomalia = GLOBAL.columnasAnomPdf;
 
-    this.filtroColumnas = this.columnasAnomalia.map((element) => element.nombre);
-
     // cargamos las imagenes que no cambian al cambiar de informe
     this.imagesLoadService.loadFixedImages(this.planta.empresa);
-
-    this.largestLocAreas = this.zonesService.zonesBySize[0];
 
     this.subscriptions.add(
       combineLatest([this.reportControlService.selectedInformeId$, this.downloadReportService.filteredPDF$])
@@ -264,10 +245,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
         })
     );
 
-    this.widthPlano = 500;
-
-    this.widthImageSeguidor = 450;
-    this.widthImageAnomalia = 250;
     this.hasUserArea = false;
 
     this.subscriptions.add(
@@ -307,16 +284,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.imagesLoadService.imgLogoFooterBase64$.subscribe((img) => (this.imgLogoFooterBase64 = img))
     );
-
-    this.subscriptions.add(
-      this.imagesTilesService.imagesPlantaCompleta$.subscribe((imgs) => (this.imagesPlantaCompleta = imgs))
-    );
-  }
-
-  public selectFilteredPDF() {
-    const dialogRef = this.dialog.open(DialogFilteredReportComponent);
-
-    dialogRef.afterClosed().subscribe(() => (this.downloadReportService.filteredPDF = undefined));
   }
 
   selectDownloadType() {
@@ -385,35 +352,18 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
     // comprobamos que estan cargadas tb el resto de imagenes del PDF
     this.imagesLoadService.checkImagesLoaded().then((imagesLoaded) => {
-      // comprobamos si se van a cargar imagenes de anomalias
-      if (this.reportPdfService.informeConImagenes && this.reportPdfService.incluirImagenes) {
-        // Cuando se carguen todas las imágenes
-        if (imagesLoaded && downloads === 0) {
-          this.calcularInforme();
+      // Cuando se carguen todas las imágenes
+      if (imagesLoaded && downloads === 0) {
+        this.calcularInforme();
 
-          pdfMake.createPdf(this.getDocDefinition(this.imageListBase64)).download(this.getPrefijoInforme(), () => {
-            this.downloadReportService.progressBarValue = 0;
+        pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
+          this.downloadReportService.progressBarValue = 0;
 
-            this.downloadReportService.generatingDownload = false;
-          });
-          this.downloadReportService.endingDownload = true;
+          this.downloadReportService.generatingDownload = false;
+        });
+        this.downloadReportService.endingDownload = true;
 
-          downloads++;
-        }
-      } else {
-        // Cuando se carguen todas las imágenes
-        if (imagesLoaded && downloads === 0) {
-          this.calcularInforme();
-
-          pdfMake.createPdf(this.getDocDefinition()).download(this.getPrefijoInforme(), () => {
-            this.downloadReportService.progressBarValue = 0;
-
-            this.downloadReportService.generatingDownload = false;
-          });
-          this.downloadReportService.endingDownload = true;
-
-          downloads++;
-        }
+        downloads++;
       }
     });
   }
@@ -425,8 +375,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     this.countClase = Array();
     this.countPosicion = Array();
 
-    this.informeCalculado = false;
-
     const irradiancias: number[] = this.anomaliasInforme.map((anom) => anom.irradiancia);
 
     this.irradianciaMedia = irradiancias.sort((a, b) => a - b)[Math.round(irradiancias.length / 2)];
@@ -434,9 +382,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
     if (isNaN(this.irradianciaMedia)) {
       this.irradianciaMedia = 800;
     }
-
-    this.emisividad = this.selectedInforme.emisividad;
-    this.tempReflejada = this.selectedInforme.tempReflejada;
 
     // Calcular las alturas
     for (const y of this.arrayFilas) {
@@ -481,9 +426,6 @@ export class DownloadPdfComponent implements OnInit, OnDestroy {
 
       this.countClase.push(filtroClase.length);
     }
-
-    this.informeCalculado = true;
-    this.dataSource = new MatTableDataSource(this.countCategoriaClase);
   }
 
   getDocDefinition(images?: any): TDocumentDefinitions {
