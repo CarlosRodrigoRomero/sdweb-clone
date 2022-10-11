@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { PdfService } from '@data/services/pdf.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { Subscription } from 'rxjs';
 
 export interface DialogData {
   id: string;
@@ -16,7 +17,7 @@ export interface DialogData {
   templateUrl: './pdf-dialog.component.html',
   styleUrls: ['./pdf-dialog.component.css'],
 })
-export class PdfDialogComponent implements OnInit {
+export class PdfDialogComponent implements OnInit, OnDestroy {
   elemIntroduccion: DialogData = {
     id: 'introduccion',
     label: 'Introducción',
@@ -34,6 +35,7 @@ export class PdfDialogComponent implements OnInit {
   };
   allElemsIntroCompleted = true;
 
+  noOrtofotos = false;
   elemOrtofotos: DialogData = {
     id: 'ortofotos',
     label: 'Ortofotos',
@@ -63,6 +65,8 @@ export class PdfDialogComponent implements OnInit {
   emailUser = this.reportControlService.user.email;
   emailSelected: string;
 
+  private subscriptions = new Subscription();
+
   constructor(
     private pdfService: PdfService,
     private reportControlService: ReportControlService,
@@ -70,6 +74,17 @@ export class PdfDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+        const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
+
+        // para plantas de seguidores con servidor antiguo no permitimos el plano de la planta
+        if (!informe.hasOwnProperty('servidorCapas') || informe.servidorCapas === 'old') {
+          this.noOrtofotos = true;
+        }
+      })
+    );
+
     if (this.reportControlService.plantaFija) {
       this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Apartado anomalías', completed: true };
       this.elemOrtofotos.elems.push({ id: 'planoTermico', label: 'Ortofoto térmica', completed: true });
@@ -105,12 +120,11 @@ export class PdfDialogComponent implements OnInit {
   }
 
   private setApartadosPDF() {
-    const allSecciones = [
-      ...this.elemIntroduccion.elems,
-      ...this.elemOrtofotos.elems,
-      ...this.elemResultados.elems,
-      this.anexoLista,
-    ];
+    const allSecciones = [...this.elemIntroduccion.elems, ...this.elemResultados.elems, this.anexoLista];
+    if (!this.noOrtofotos) {
+      allSecciones.push(...this.elemOrtofotos.elems);
+    }
+
     if (this.reportControlService.plantaFija) {
       allSecciones.push(this.anexoAnomalias);
     } else {
@@ -193,5 +207,9 @@ export class PdfDialogComponent implements OnInit {
         this.elemResultados.elems.forEach((elem) => (elem.completed = completed));
         break;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

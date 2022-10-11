@@ -20,14 +20,15 @@
             </mat-checkbox>
           </li>
         </div>
+
         <mat-checkbox
-          *ngIf="elemOrtofotos.elems.length == 1"
+          *ngIf="elemOrtofotos.elems.length == 1 && !noOrtofotos"
           [checked]="elemOrtofotos.elems[0].completed"
           (change)="elemOrtofotos.elems[0].completed = !elemOrtofotos.elems[0].completed"
         >
           <span class="checkbox-titulo">{{ elemOrtofotos.elems[0].label }}</span>
         </mat-checkbox>
-        <div *ngIf="elemOrtofotos.elems.length > 1">
+        <div *ngIf="elemOrtofotos.elems.length > 1 && !noOrtofotos">
           <mat-checkbox
             [checked]="allElemsOrtoCompleted"
             [indeterminate]="someComplete(elemOrtofotos.id)"
