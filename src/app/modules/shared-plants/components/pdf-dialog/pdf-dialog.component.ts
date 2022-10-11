@@ -58,7 +58,8 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
 
   anexoLista = { id: 'anexoLista', label: 'Listado de anomalías', completed: true };
   anexoAnomalias: any = undefined;
-  anexoSeguidores: any = undefined;
+  elemAnexoSeguidores: DialogData = undefined;
+  allElemsSeguidoresCompleted = true;
 
   form: FormGroup;
   selectEmail = false;
@@ -89,10 +90,15 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
       this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Apartado anomalías', completed: true };
       this.elemOrtofotos.elems.push({ id: 'planoTermico', label: 'Ortofoto térmica', completed: true });
     } else {
-      this.anexoSeguidores = [
-        { id: 'anexoSeguidores', label: 'Apartado seguidores', completed: true },
-        { id: 'anexoSegsNoAnoms', label: 'Apartado seguidores sin anomalías', completed: true },
-      ];
+      this.elemAnexoSeguidores = {
+        id: 'seguidores',
+        label: 'Apartado seguidores',
+        completed: false,
+        elems: [
+          { id: 'anexoSeguidores', label: 'Apartado seguidores', completed: true },
+          { id: 'anexoSegsNoAnoms', label: 'Apartado seguidores sin anomalías', completed: true },
+        ],
+      };
     }
 
     this.buildForm();
@@ -128,7 +134,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
     if (this.reportControlService.plantaFija) {
       allSecciones.push(this.anexoAnomalias);
     } else {
-      allSecciones.push(...this.anexoSeguidores);
+      allSecciones.push(...this.elemAnexoSeguidores.elems);
     }
 
     const apartadosSelected = allSecciones.filter((apt) => apt.completed);
@@ -148,7 +154,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
     switch (id) {
       case 'introduccion':
         this.allElemsIntroCompleted =
-          this.elemIntroduccion.elems != null && this.elemIntroduccion.elems.every((elem) => elem.completed);
+          this.elemIntroduccion.elems !== null && this.elemIntroduccion.elems.every((elem) => elem.completed);
         break;
       case 'ortofotos':
         this.allElemsOrtoCompleted =
@@ -158,27 +164,39 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
         this.allElemsResultadosCompleted =
           this.elemResultados.elems !== null && this.elemResultados.elems.every((elem) => elem.completed);
         break;
+      case 'seguidores':
+        this.allElemsSeguidoresCompleted =
+          this.elemAnexoSeguidores.elems !== null && this.elemAnexoSeguidores.elems.every((elem) => elem.completed);
+        break;
     }
   }
 
   someComplete(id: string): boolean {
     switch (id) {
       case 'introduccion':
-        if (this.elemIntroduccion.elems == null) {
+        if (this.elemIntroduccion.elems === null) {
           return false;
         }
         return this.elemIntroduccion.elems.filter((elem) => elem.completed).length > 0 && !this.allElemsIntroCompleted;
       case 'ortofotos':
-        if (this.elemOrtofotos.elems == null) {
+        if (this.elemOrtofotos.elems === null) {
           return false;
         }
         return this.elemOrtofotos.elems.filter((elem) => elem.completed).length > 0 && !this.allElemsOrtoCompleted;
       case 'resultados':
-        if (this.elemResultados.elems == null) {
+        if (this.elemResultados.elems === null) {
           return false;
         }
         return (
           this.elemResultados.elems.filter((elem) => elem.completed).length > 0 && !this.allElemsResultadosCompleted
+        );
+      case 'seguidores':
+        if (this.elemAnexoSeguidores.elems === null) {
+          return false;
+        }
+        return (
+          this.elemAnexoSeguidores.elems.filter((elem) => elem.completed).length > 0 &&
+          !this.allElemsSeguidoresCompleted
         );
     }
   }
@@ -205,6 +223,13 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
           return;
         }
         this.elemResultados.elems.forEach((elem) => (elem.completed = completed));
+        break;
+      case 'seguidores':
+        this.allElemsSeguidoresCompleted = completed;
+        if (this.elemAnexoSeguidores.elems == null) {
+          return;
+        }
+        this.elemAnexoSeguidores.elems.forEach((elem) => (elem.completed = completed));
         break;
     }
   }
