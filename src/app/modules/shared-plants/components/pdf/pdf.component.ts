@@ -102,7 +102,11 @@ export class PdfComponent implements OnInit, OnDestroy {
 
     json['criterioCriticidad'] = this.anomaliaService.criterioCriticidad;
 
-    json['locAreas'] = Object.assign({}, this.zonesService.zonesBySize[0]);
+    let zonas = this.zonesService.zonesBySize[0];
+    if (zonas === undefined || zonas.length === 0) {
+      zonas = this.zonesService.locAreaSeguidores;
+    }
+    json['locAreas'] = Object.assign({}, zonas);
 
     json['sliderMin'] = this.thermalService.sliderMin[indexInforme];
     json['sliderMax'] = this.thermalService.sliderMax[indexInforme];

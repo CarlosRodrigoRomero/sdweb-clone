@@ -23,7 +23,6 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
     label: 'Introducción',
     completed: false,
     elems: [
-      { id: 'introduccion', label: 'Introducción', completed: true },
       { id: 'criterios', label: 'Criterios', completed: true },
       { id: 'normalizacion', label: 'Normalización', completed: true },
       { id: 'datosVuelo', label: 'Datos de vuelo', completed: true },

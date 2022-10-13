@@ -82,9 +82,8 @@
         </mat-checkbox>
 
         <!-- ANEXO SEGUIDORES -->
-        <div>
+        <div *ngIf="elemAnexoSeguidores">
           <mat-checkbox
-            *ngIf="elemAnexoSeguidores"
             [checked]="allElemsSeguidoresCompleted"
             [indeterminate]="someComplete(elemAnexoSeguidores.id)"
             (change)="setAll($event.checked, elemAnexoSeguidores.id)"
