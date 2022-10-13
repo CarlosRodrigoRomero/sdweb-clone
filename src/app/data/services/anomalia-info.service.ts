@@ -83,10 +83,10 @@ export class AnomaliaInfoService {
       correctHoraSrt = informe.correccHoraSrt;
     }
     const correctHoraSrtUnix = correctHoraSrt * 3600;
-    const fecha = formatDate((anomalia.datetime + correctHoraSrtUnix) * 1000, 'dd/MM/yyyy', this.locale);
-    const hora = formatDate((anomalia.datetime + correctHoraSrtUnix) * 1000, 'HH:mm:ss', this.locale);
 
-    return `${fecha} ${hora}`;
+    const date = new Date(anomalia.datetime + correctHoraSrtUnix * 1000);
+
+    return date.toLocaleString();
   }
 
   getModuloLabel(anomalia: Anomalia): string {
