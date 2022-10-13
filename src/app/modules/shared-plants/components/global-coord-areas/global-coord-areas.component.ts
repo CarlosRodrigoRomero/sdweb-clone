@@ -93,7 +93,6 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   }
 
   private addLocationAreas() {
-    console.log(this.zones);
     this.zones.forEach((zones, i) => {
       this.globalCoordAreasVectorSources[i] = new VectorSource();
 
