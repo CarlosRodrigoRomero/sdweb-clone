@@ -52,7 +52,12 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.numAreas = this.zonesService.zonesBySize.length;
+    // a las plantas de seguidores les quitamos las zonas más pequeñas porque ya se muestran por defecto
+    if (this.reportControlService.plantaFija) {
+      this.numAreas = this.zonesService.zonesBySize.length;
+    } else {
+      this.numAreas = this.zonesService.zonesBySize.length - 1;
+    }
 
     this.planta = this.reportControlService.planta;
 
