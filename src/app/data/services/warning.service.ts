@@ -708,7 +708,7 @@ export class WarningService {
         take(1),
         catchError((error) => {
           // no recibimos respuesta del servidor porque no existe
-          if (error.status === 0 || error.status === 504) {
+          if (error.status === 0 || error.status === 504 || error.status === 400) {
             const warning: Warning = {
               type: 'visualLayer',
               visible: true,
