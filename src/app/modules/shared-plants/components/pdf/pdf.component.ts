@@ -41,22 +41,6 @@ export class PdfComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-        const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
-        if (informe !== undefined) {
-          if (
-            (informe.hasOwnProperty('servidorCapas') && informe.servidorCapas === 'geoserver') ||
-            !this.reportControlService.plantaFija
-          ) {
-            this.oldPdf = false;
-          } else {
-            this.oldPdf = true;
-          }
-        }
-      })
-    );
-
     this.subscriptions.add(this.pdfService.apartadosInforme$.subscribe((apt) => (this.apartadosInforme = apt)));
     this.subscriptions.add(this.pdfService.emailSelected$.subscribe((email) => (this.emailSelected = email)));
 
@@ -64,6 +48,8 @@ export class PdfComponent implements OnInit, OnDestroy {
       this.pdfService.generatePdf$.subscribe((gen) => {
         if (gen) {
           this.download();
+
+          this.pdfService.generatePdf = false;
         }
       })
     );

@@ -29,6 +29,7 @@ import { SeguidorViewCommentsService } from './seguidor-view-comments.service';
 import { SeguidoresControlCommentsService } from './seguidores-control-comments.service';
 import { ViewCommentsService } from './view-comments.service';
 import { ZonesCommentControlService } from './zones-comment-control.service';
+import { PdfService } from './pdf.service';
 
 @Injectable({
   providedIn: 'root',
@@ -63,7 +64,8 @@ export class ResetServices {
     private seguidorViewCommentsService: SeguidorViewCommentsService,
     private seguidoresControlCommentsService: SeguidoresControlCommentsService,
     private viewCommentsService: ViewCommentsService,
-    private zonesCommentControlService: ZonesCommentControlService
+    private zonesCommentControlService: ZonesCommentControlService,
+    private pdfService: PdfService
   ) {}
 
   resetServices() {
@@ -96,5 +98,6 @@ export class ResetServices {
     this.seguidoresControlCommentsService.resetService();
     this.viewCommentsService.resetService();
     this.zonesCommentControlService.resetService();
+    this.pdfService.resetService();
   }
 }

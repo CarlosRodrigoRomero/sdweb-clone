@@ -17,6 +17,13 @@ export class PdfService {
 
   constructor() {}
 
+  resetService() {
+    this._apartados = [];
+    this._generatePdf = false;
+    this._emailSelected = '';
+    this._generateSimplePdf = false;
+  }
+
   get apartadosInforme(): string[] {
     return this._apartados;
   }
