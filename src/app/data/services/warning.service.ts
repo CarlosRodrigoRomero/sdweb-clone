@@ -741,7 +741,7 @@ export class WarningService {
         catchError((error) => {
           console.log(error);
           // no recibimos respuesta del servidor porque no existe
-          if (error.status === 0 || error.status === 504) {
+          if (error.status === 0 || error.status === 504 || error.status === 400) {
             const warning: Warning = {
               type: 'thermalLayer',
               visible: true,
