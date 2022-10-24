@@ -3,7 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { InformeOverviewComponent } from './components/overview/informe-overview.component';
 import { InformeViewComponent } from './components/informe-view/informe-view.component';
 import { PcListComponent } from './components/pc-list/pc-list.component';
-import { ExportComponent } from '../informe-export/components/export/export.component';
 
 const routes: Routes = [
   {
@@ -37,13 +36,13 @@ const routes: Routes = [
           shouldReuse: true,
         },
       },
-      {
-        path: 'informe-export',
-        component: ExportComponent,
-        data: {
-          shouldReuse: true,
-        },
-      },
+      // {
+      //   path: 'informe-export',
+      //   component: ExportComponent,
+      //   data: {
+      //     shouldReuse: true,
+      //   },
+      // },
       {
         path: 'informe-list',
         component: PcListComponent,
