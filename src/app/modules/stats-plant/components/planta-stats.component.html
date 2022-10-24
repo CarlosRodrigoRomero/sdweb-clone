@@ -22,7 +22,7 @@
     </div>
   </mat-tab>
 
-  <mat-tab class="mat-tab-stats" label="Células calientes (CC)">
+  <mat-tab *ngIf="thereAreCCs" class="mat-tab-stats" label="Células calientes (CC)">
     <div class="cc-grid">
       <div class="cc-content-izq">
         <!-- MODULOS CON CC -->
