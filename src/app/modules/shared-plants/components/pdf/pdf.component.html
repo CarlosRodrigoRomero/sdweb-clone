@@ -1,5 +1,4 @@
-<button *ngIf="!oldPdf" mat-menu-item (click)="openDialog()">
+<button mat-menu-item (click)="openDialog()">
   <mat-icon>picture_as_pdf</mat-icon>
   <span class="label">PDF</span>
 </button>
-<app-download-pdf *ngIf="oldPdf"></app-download-pdf>

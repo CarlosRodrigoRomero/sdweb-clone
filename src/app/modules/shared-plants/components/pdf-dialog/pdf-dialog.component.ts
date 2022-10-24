@@ -56,6 +56,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   allElemsResultadosCompleted = true;
 
   anexoLista = { id: 'anexoLista', label: 'Listado de anomalías', completed: true };
+  noAptAnoms = false;
   anexoAnomalias: any = undefined;
   elemAnexoSeguidores: DialogData = undefined;
   allElemsSeguidoresCompleted = true;
@@ -81,12 +82,14 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
         // para plantas de seguidores con servidor antiguo no permitimos el plano de la planta
         if (!informe.hasOwnProperty('servidorCapas') || informe.servidorCapas === 'old') {
           this.noOrtofotos = true;
+          this.anexoAnomalias = undefined;
+        } else if (this.reportControlService.plantaFija) {
+          this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Apartado anomalías', completed: true };
         }
       })
     );
 
     if (this.reportControlService.plantaFija) {
-      this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Apartado anomalías', completed: true };
       this.elemOrtofotos.elems.push({ id: 'planoTermico', label: 'Ortofoto térmica', completed: true });
     } else {
       this.elemAnexoSeguidores = {
@@ -131,7 +134,9 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
     }
 
     if (this.reportControlService.plantaFija) {
-      allSecciones.push(this.anexoAnomalias);
+      if (this.anexoAnomalias !== undefined) {
+        allSecciones.push(this.anexoAnomalias);
+      }
     } else {
       allSecciones.push(...this.elemAnexoSeguidores.elems);
     }
