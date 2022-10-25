@@ -3,7 +3,10 @@ import { InformeInterface } from '@core/models/informe';
 
 export class Patches {
   static checkId(id: string): boolean {
-    const informesIds: string[] = ['cAX7f55nKEQBzx7RcROI'];
+    const informesIds: string[] = [
+      'cAX7f55nKEQBzx7RcROI', // Casas de Don Pedro 2022
+      'RJh4Kfbg116FECvAMfgx', // Alqueva 2022
+    ];
     const plantasIds: string[] = [
       'AyKgsY6F3TqGQGYNaOUY', // Logrosan
     ];
@@ -15,15 +18,19 @@ export class Patches {
   }
 
   static applyPatches(id: string, data?: any): any {
+    const anomalia = data as Anomalia;
     switch (id) {
-      // Casas de Don Pedro 2022
+      // CasasdeDonPedro22
       case 'cAX7f55nKEQBzx7RcROI':
-        const anomalia = data as Anomalia;
         if (anomalia.temperaturaMax === 0) {
           anomalia.temperaturaMax = 53.4;
           anomalia.temperaturaRef = 45.8;
           anomalia.gradienteNormalizado = 7.6;
         }
+        return anomalia;
+      // Alqueva Jun22
+      case 'RJh4Kfbg116FECvAMfgx':
+        anomalia.irradiancia = 750;
         return anomalia;
       // Logrosan
       case 'AyKgsY6F3TqGQGYNaOUY':
@@ -36,6 +43,7 @@ export class Patches {
       case 'b7LlgJYacx6CRyt0DIuF':
         const dateBerenis2 = '16/08/2022 13:00:00';
         return dateBerenis2;
+
       default:
         return undefined;
     }
