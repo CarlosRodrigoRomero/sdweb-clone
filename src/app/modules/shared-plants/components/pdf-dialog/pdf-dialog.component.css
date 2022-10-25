@@ -59,10 +59,6 @@ li {
   font-size: 16px;
 }
 
-/* #select-email-form {
-  display: hidden;
+.email-input {
+  width: 300px;
 }
-
-#check-select-email:checked ~ #select-email-form {
-  display: unset;
-} */

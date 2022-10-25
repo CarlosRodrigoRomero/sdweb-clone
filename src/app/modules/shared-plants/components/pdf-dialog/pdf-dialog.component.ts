@@ -97,8 +97,8 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
         label: 'Apartado seguidores',
         completed: false,
         elems: [
-          { id: 'anexoSeguidores', label: 'Apartado seguidores', completed: true },
-          { id: 'anexoSegsNoAnoms', label: 'Apartado seguidores sin anomalías', completed: true },
+          { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: true },
+          { id: 'anexoSegsNoAnoms', label: 'Seguidores sin anomalías', completed: true },
         ],
       };
     }
