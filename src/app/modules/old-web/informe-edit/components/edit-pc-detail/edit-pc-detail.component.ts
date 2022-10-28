@@ -54,6 +54,7 @@ export class EditPcDetailComponent implements OnInit {
         '1: una célula caliente'
       )
     );
+
     this.hotkeysService.add(
       new Hotkey(
         'shift+1',
@@ -68,6 +69,7 @@ export class EditPcDetailComponent implements OnInit {
         'shift+1: Sin anomalias'
       )
     );
+
     this.hotkeysService.add(
       new Hotkey(
         'ctrl+1',
@@ -82,6 +84,7 @@ export class EditPcDetailComponent implements OnInit {
         'ctrl+1: cross-connection'
       )
     );
+
     this.hotkeysService.add(
       new Hotkey(
         '2',
@@ -96,20 +99,7 @@ export class EditPcDetailComponent implements OnInit {
         '2: varias células caliente (por defecto)'
       )
     );
-    this.hotkeysService.add(
-      new Hotkey(
-        'shift+2',
-        (): boolean => {
-          if (this.checkSelectedPc()) {
-            this.selectedPc.tipo = 15;
-            this.updatePcInDb(this.selectedPc);
-          }
-          return false; // Prevent bubbling
-        },
-        undefined,
-        'shift+2: Módulo con sombras'
-      )
-    );
+
     this.hotkeysService.add(
       new Hotkey(
         '3',
@@ -124,6 +114,7 @@ export class EditPcDetailComponent implements OnInit {
         '3: varias células caliente (por defecto)'
       )
     );
+
     this.hotkeysService.add(
       new Hotkey(
         'ctrl+3',
@@ -138,6 +129,7 @@ export class EditPcDetailComponent implements OnInit {
         'ctrl+3: 2x substring en circuito abierto'
       )
     );
+
     this.hotkeysService.add(
       new Hotkey(
         'shift+3',
@@ -152,6 +144,7 @@ export class EditPcDetailComponent implements OnInit {
         'shift+3: Substring en cortocircuito'
       )
     );
+
     this.hotkeysService.add(
       new Hotkey(
         '4',
@@ -166,6 +159,7 @@ export class EditPcDetailComponent implements OnInit {
         '4: String en circuito abierto'
       )
     );
+
     this.hotkeysService.add(
       new Hotkey(
         '5',
@@ -178,6 +172,21 @@ export class EditPcDetailComponent implements OnInit {
         },
         undefined,
         '5: Módulo en circuito abierto'
+      )
+    );
+
+    this.hotkeysService.add(
+      new Hotkey(
+        '7',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 7;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        '7: Módulo en cortocircuito'
       )
     );
 
@@ -198,6 +207,51 @@ export class EditPcDetailComponent implements OnInit {
 
     this.hotkeysService.add(
       new Hotkey(
+        'ctrl+8',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 20;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'ctrl+8: PID regular'
+      )
+    );
+
+    this.hotkeysService.add(
+      new Hotkey(
+        'shift+8',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 21;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'shift+8: PID iregular'
+      )
+    );
+
+    this.hotkeysService.add(
+      new Hotkey(
+        'd',
+        (event: KeyboardEvent): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 11;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'D: Suciedad'
+      )
+    );
+
+    this.hotkeysService.add(
+      new Hotkey(
         'q',
         (event: KeyboardEvent): boolean => {
           if (this.checkSelectedPc()) {
@@ -209,12 +263,29 @@ export class EditPcDetailComponent implements OnInit {
         'q: eliminar anomalia'
       )
     );
+
+    this.hotkeysService.add(
+      new Hotkey(
+        's',
+        (): boolean => {
+          if (this.checkSelectedPc()) {
+            this.selectedPc.tipo = 15;
+            this.updatePcInDb(this.selectedPc);
+          }
+          return false; // Prevent bubbling
+        },
+        undefined,
+        'S: Módulo con sombras'
+      )
+    );
   }
+
   checkSelectedPc() {
     return (
       this.selectedPc !== undefined && this.selectedPc.archivo === this.informeService.selectedArchivoVuelo.archivo
     );
   }
+
   ngOnInit(): void {
     this.informeService.selectedElementoPlanta$.subscribe((elementoPlanta) => {
       if (elementoPlanta !== null) {
@@ -239,6 +310,7 @@ export class EditPcDetailComponent implements OnInit {
       }
     }
   }
+
   onClickDeletePc(pc: Pc) {
     // Avisamos de que estamos eliminando
     this.informeService.avisadorNuevoElementoSource.next(pc);
