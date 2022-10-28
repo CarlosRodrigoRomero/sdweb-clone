@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+import { Subscription } from 'rxjs';
+
 import { PdfService } from '@data/services/pdf.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { Subscription } from 'rxjs';
 
 export interface DialogData {
   id: string;
@@ -65,6 +66,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   selectEmail = false;
   emailUser = this.reportControlService.user.email;
   emailSelected: string;
+  plantaFija = true;
 
   private subscriptions = new Subscription();
 
@@ -75,6 +77,8 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.plantaFija = this.reportControlService.plantaFija;
+
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
         const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);

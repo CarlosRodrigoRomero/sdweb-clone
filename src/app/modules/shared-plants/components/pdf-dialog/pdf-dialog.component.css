@@ -48,6 +48,11 @@ li {
   flex-direction: column;
 }
 
+.little-explain {
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .btns {
   display: flex;
   gap: 1rem;

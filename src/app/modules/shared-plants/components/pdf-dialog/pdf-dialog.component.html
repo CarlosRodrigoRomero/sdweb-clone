@@ -128,15 +128,35 @@
           </mat-form-field>
           <div class="btns">
             <button mat-stroked-button matStepperPrevious>Volver atrás</button>
-            <button mat-stroked-button class="btn-generate" [disabled]="form.invalid" mat-dialog-close type="submit">
+            <button mat-stroked-button class="btn-generate" [disabled]="form.invalid" matStepperNext type="submit">
               Solicitar PDF
             </button>
           </div>
         </form>
         <div class="btns" *ngIf="!selectEmail">
           <button mat-stroked-button matStepperPrevious>Volver atrás</button>
-          <button mat-stroked-button class="btn-generate" mat-dialog-close (click)="generate()">Solicitar PDF</button>
+          <button mat-stroked-button class="btn-generate" matStepperNext (click)="generate()">Solicitar PDF</button>
         </div>
+      </div>
+    </mat-step>
+    <mat-step>
+      <div class="step-content">
+        <span class="titulo-principal">PDF solicitado</span>
+        <div *ngIf="plantaFija" class="text-explain">
+          <span>En breve recibiras un correo con un enlace para descargar tu PDF.</span>
+          <span *ngIf="anexoAnomalias !== undefined">
+            Como has seleccionado el apartado que incluye imágenes de las anomalías, ten en cuenta que el tiempo podría
+            dilatarse si el número de anomalias es elevado.</span
+          >
+        </div>
+        <div *ngIf="!plantaFija" class="text-explain">
+          <span>En breve recibiras un correo con un enlace para descargar tu PDF.</span>
+          <span *ngIf="anexoSeguidores !== undefined">
+            Como has seleccionado el apartado que incluye imágenes de los seguidores, ten en cuenta que el tiempo podría
+            dilatarse si el número de seguidores es elevado.</span
+          >
+        </div>
+        <button mat-stroked-button mat-dialog-close>Cerrar</button>
       </div>
     </mat-step>
   </mat-horizontal-stepper>
