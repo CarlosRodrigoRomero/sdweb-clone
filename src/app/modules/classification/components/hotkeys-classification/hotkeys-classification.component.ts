@@ -45,6 +45,7 @@ export class HotkeysClassificationComponent implements OnInit {
           '1: una célula caliente'
         )
       );
+
       this.hotkeysService.add(
         new Hotkey(
           'shift+1',
@@ -64,6 +65,7 @@ export class HotkeysClassificationComponent implements OnInit {
           'shift+1: Sin anomalias'
         )
       );
+
       this.hotkeysService.add(
         new Hotkey(
           'ctrl+1',
@@ -83,6 +85,7 @@ export class HotkeysClassificationComponent implements OnInit {
           'ctrl+1: cross-connection'
         )
       );
+
       this.hotkeysService.add(
         new Hotkey(
           '2',
@@ -102,44 +105,7 @@ export class HotkeysClassificationComponent implements OnInit {
           '2: varias células caliente (por defecto)'
         )
       );
-      this.hotkeysService.add(
-        new Hotkey(
-          'shift+2',
-          (): boolean => {
-            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 15;
 
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 15);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
-            }
-            return false; // Prevent bubbling
-          },
-          undefined,
-          'shift+2: Módulo con sombras'
-        )
-      );
-      this.hotkeysService.add(
-        new Hotkey(
-          'ctrl+2',
-          (): boolean => {
-            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 11;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 11);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
-            }
-            return false; // Prevent bubbling
-          },
-          undefined,
-          'ctrl+2: Suciedad'
-        )
-      );
       this.hotkeysService.add(
         new Hotkey(
           '3',
@@ -216,6 +182,7 @@ export class HotkeysClassificationComponent implements OnInit {
           '4: String en circuito abierto'
         )
       );
+
       this.hotkeysService.add(
         new Hotkey(
           '5',
@@ -233,6 +200,26 @@ export class HotkeysClassificationComponent implements OnInit {
           },
           undefined,
           '5: Módulo en circuito abierto'
+        )
+      );
+
+      this.hotkeysService.add(
+        new Hotkey(
+          '7',
+          (event: KeyboardEvent): boolean => {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
+              this.classificationService.anomaliaSelected.tipo = 7;
+
+              // actualizamos el tipo en la DB
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 5);
+
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
+            }
+            return false; // Prevent bubbling
+          },
+          undefined,
+          '7: Módulo en cortocircuito'
         )
       );
 
@@ -298,6 +285,26 @@ export class HotkeysClassificationComponent implements OnInit {
 
       this.hotkeysService.add(
         new Hotkey(
+          'd',
+          (): boolean => {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
+              this.classificationService.anomaliaSelected.tipo = 11;
+
+              // actualizamos el tipo en la DB
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 11);
+
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
+            }
+            return false; // Prevent bubbling
+          },
+          undefined,
+          'D: Suciedad'
+        )
+      );
+
+      this.hotkeysService.add(
+        new Hotkey(
           'q',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
@@ -316,6 +323,26 @@ export class HotkeysClassificationComponent implements OnInit {
           },
           undefined,
           'q: eliminar anomalia'
+        )
+      );
+
+      this.hotkeysService.add(
+        new Hotkey(
+          's',
+          (): boolean => {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
+              this.classificationService.anomaliaSelected.tipo = 15;
+
+              // actualizamos el tipo en la DB
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 15);
+
+              // reseteamos lo seleccionado
+              this.classificationService.resetElemsSelected();
+            }
+            return false; // Prevent bubbling
+          },
+          undefined,
+          'S: Módulo con sombras'
         )
       );
     }
