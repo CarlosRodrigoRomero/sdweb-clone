@@ -1,0 +1,69 @@
+:host ::ng-deep .mat-horizontal-stepper-header-container {
+  display: none;
+}
+
+:host ::ng-deep .mat-horizontal-content-container {
+  padding: 0 24px;
+  width: min-content;
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dialog-content {
+  max-height: unset;
+  overflow: unset;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.titulo-principal {
+  font-size: 20px;
+  font-weight: 500;
+  width: max-content;
+}
+
+.titulo {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.checkbox-titulo {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+li {
+  list-style-type: none;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.text-explain {
+  display: flex;
+  flex-direction: column;
+}
+
+.little-explain {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.btn-generate {
+  color: #d32f2f;
+  font-size: 16px;
+}
+
+.email-input {
+  width: 300px;
+}
