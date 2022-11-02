@@ -197,7 +197,7 @@ export class ImagesLoadService {
               this.loadedChangingImages++;
             } else {
               const canvas = document.createElement('canvas');
-              this.imgSuciedadBase64 = canvas.toDataURL('png');
+              this.imgPortadaBase64 = canvas.toDataURL('png');
               // indicamos que la imagen se ha cargado
               this.loadedChangingImages++;
             }
@@ -254,7 +254,7 @@ export class ImagesLoadService {
           this.loadedChangingImages++;
         } else {
           const canvas = document.createElement('canvas');
-          this.imgSuciedadBase64 = canvas.toDataURL('png');
+          this.imgSolardroneBase64 = canvas.toDataURL('png');
           // indicamos que la imagen se ha cargado
           this.loadedChangingImages++;
         }
@@ -293,7 +293,7 @@ export class ImagesLoadService {
               this.loadedFixedImages++;
             } else {
               const canvas = document.createElement('canvas');
-              this.imgSuciedadBase64 = canvas.toDataURL('png');
+              this.imgLogoBase64 = canvas.toDataURL('png');
               // indicamos que la imagen se ha cargado
               this.loadedChangingImages++;
             }
@@ -330,7 +330,7 @@ export class ImagesLoadService {
           this.loadedFixedImages++;
         } else {
           const canvas = document.createElement('canvas');
-          this.imgSuciedadBase64 = canvas.toDataURL('png');
+          this.imgCurvaMaeBase64 = canvas.toDataURL('png');
           // indicamos que la imagen se ha cargado
           this.loadedChangingImages++;
         }
@@ -357,7 +357,7 @@ export class ImagesLoadService {
           this.loadedFixedImages++;
         } else {
           const canvas = document.createElement('canvas');
-          this.imgSuciedadBase64 = canvas.toDataURL('png');
+          this.imgFormulaMaeBase64 = canvas.toDataURL('png');
           // indicamos que la imagen se ha cargado
           this.loadedChangingImages++;
         }

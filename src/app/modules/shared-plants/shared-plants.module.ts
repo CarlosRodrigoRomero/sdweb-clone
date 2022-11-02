@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from '@shared/shared.module';
 
 import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
-import { DownloadPdfComponent } from './components/download-pdf/download-pdf.component';
 import { ProgressBarPdfComponent } from './components/download-progress-bar/download-progress-bar.component';
 import { DownloadReportComponent } from './components/download-report/download-report.component';
 import { DialogFilteredReportComponent } from './components/dialog-filtered-report/dialog-filtered-report.component';
@@ -18,12 +17,14 @@ import { ViewToggleComponent } from './components/view-toggle/view-toggle.compon
 import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { CommentsComponent } from './components/comments/comments.component';
 import { CommentComponent } from './components/comment/comment.component';
+import { PdfComponent } from './components/pdf/pdf.component';
+import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component';
+import { PdfEmailSelectComponent } from './components/pdf-email-select/pdf-email-select.component';
 import { SimplifiedViewComponent } from './components/simplified-view/simplified-view.component';
 
 @NgModule({
   declarations: [
     GlobalCoordAreasComponent,
-    DownloadPdfComponent,
     ProgressBarPdfComponent,
     DownloadReportComponent,
     DialogFilteredReportComponent,
@@ -37,6 +38,9 @@ import { SimplifiedViewComponent } from './components/simplified-view/simplified
     LeyendaComponent,
     CommentsComponent,
     CommentComponent,
+    PdfComponent,
+    PdfDialogComponent,
+    PdfEmailSelectComponent,
     SimplifiedViewComponent,
   ],
   imports: [CommonModule, SharedModule],

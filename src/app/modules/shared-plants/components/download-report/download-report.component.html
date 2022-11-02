@@ -12,7 +12,7 @@
     <h4 class="title" (click)="$event.stopPropagation()">Descargas</h4>
     <app-select-language *ngIf="!plantaDemo"></app-select-language>
 
-    <app-download-pdf *ngIf="!plantaDemo"></app-download-pdf>
+    <app-pdf *ngIf="!plantaDemo"></app-pdf>
 
     <!-- PDF DEMO -->
     <a *ngIf="plantaDemo" mat-menu-item href="{{ pdfDemo }}" download="" [disabled]="!excelExist">
@@ -37,7 +37,7 @@
       [disabled]="!imagesZipExist"
     >
       <mat-icon>crop_original</mat-icon>
-      <span>Imágenes</span>
+      <span class="label">Imágenes</span>
     </a>
   </div></mat-menu
 >

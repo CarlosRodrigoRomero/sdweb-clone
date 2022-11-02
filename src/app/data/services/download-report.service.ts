@@ -28,7 +28,7 @@ export class DownloadReportService {
   endingDownload$ = new BehaviorSubject<boolean>(this._endingDownload);
   private _progressBarValue = 0;
   progressBarValue$ = new BehaviorSubject<number>(this._progressBarValue);
-  private _progressBarMode = 'determinate';
+  private _progressBarMode = 'indeterminate';
   progressBarMode$ = new BehaviorSubject<string>(this._progressBarMode);
   private _filteredPDF: boolean = undefined;
   filteredPDF$ = new BehaviorSubject<boolean>(this._filteredPDF);
