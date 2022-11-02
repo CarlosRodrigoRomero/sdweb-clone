@@ -430,4 +430,20 @@ export const warnings: Warning[] = [
       },
     ],
   },
+  {
+    type: 'segsRepeatName',
+    message: 'Hay seguidores con el mismo nombre',
+    adminActions: [
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+    reportActions: [
+      {
+        name: 'irLocs',
+        label: 'Ir a Localizaciones',
+      },
+    ],
+  },
 ];

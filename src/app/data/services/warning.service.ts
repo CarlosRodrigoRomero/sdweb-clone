@@ -169,6 +169,7 @@ export class WarningService {
     const imgPortadaChecked = this.checkImagePortada(informe.id, warns);
     const imgSuciedadChecked = this.checkImageSuciedad(informe.id, warns);
     const tempMaxAnomsChecked = this.checkTempMaxAnomsError(anomalias, warns, informe.id);
+
     let thermalLayerChecked = false;
     if (planta.tipo === 'seguidores') {
       thermalLayerChecked = true;
@@ -699,7 +700,7 @@ export class WarningService {
     return true;
   }
 
-  checkVisualLayer(informe: InformeInterface, warns: Warning[]): boolean {
+  private checkVisualLayer(informe: InformeInterface, warns: Warning[]): boolean {
     const url = this.geoserverService.getGeoserverUrl(informe, 'visual', true);
 
     this.http
@@ -731,7 +732,7 @@ export class WarningService {
     return true;
   }
 
-  checkThermalLayer(informe: InformeInterface, warns: Warning[]): boolean {
+  private checkThermalLayer(informe: InformeInterface, warns: Warning[]): boolean {
     const url = this.geoserverService.getGeoserverUrl(informe, 'thermal', true);
 
     this.http
@@ -764,7 +765,7 @@ export class WarningService {
     return true;
   }
 
-  checkImagePortada(informeId: string, warns: Warning[]): boolean {
+  private checkImagePortada(informeId: string, warns: Warning[]): boolean {
     this.storage
       .ref(`informes/${informeId}/portada.jpg`)
       .getDownloadURL()
@@ -786,7 +787,7 @@ export class WarningService {
     return true;
   }
 
-  checkImageSuciedad(informeId: string, warns: Warning[]): boolean {
+  private checkImageSuciedad(informeId: string, warns: Warning[]): boolean {
     this.storage
       .ref(`informes/${informeId}/suciedad.jpg`)
       .getDownloadURL()
@@ -808,7 +809,7 @@ export class WarningService {
     return true;
   }
 
-  checkTempMaxAnomsError(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
+  private checkTempMaxAnomsError(anomalias: Anomalia[], warns: Warning[], informeId: string): boolean {
     if (anomalias.length > 0) {
       const highestTemp = anomalias.sort((a, b) => b.temperaturaMax - a.temperaturaMax)[0].temperaturaMax;
 
