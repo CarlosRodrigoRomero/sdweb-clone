@@ -121,7 +121,7 @@ export class PdfComponent implements OnInit, OnDestroy {
     const blob = new Blob([jsonString], { type: 'application/json' });
     const ref = this.storage.ref('').child('informes/' + this.reportControlService.selectedInformeId + '/data.json');
     ref.put(blob).then(() => {
-      console.log('Archivo subido');
+      // console.log('Archivo subido');
 
       this.downloadPdf();
     });

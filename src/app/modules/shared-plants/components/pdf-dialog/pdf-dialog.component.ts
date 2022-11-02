@@ -83,11 +83,15 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
         const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
 
-        // para plantas de seguidores con servidor antiguo no permitimos el plano de la planta
+        // para plantas de seguidores con servidor antiguo no permitimos las imagenes de tiles
         if (!informe.hasOwnProperty('servidorCapas') || informe.servidorCapas === 'old') {
           this.noOrtofotos = true;
           this.anexoAnomalias = undefined;
         } else if (this.reportControlService.plantaFija) {
+          // para Barbastro Sep22 no permitimos los mapas porque fallan
+          if (informe.id === 'q915Koqc7kzUQ0GvwwWs') {
+            this.noOrtofotos = true;
+          }
           this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Apartado anomalías', completed: true };
         }
       })
