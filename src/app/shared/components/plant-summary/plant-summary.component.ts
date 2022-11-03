@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { NavigationStart, Router, Event } from '@angular/router';
 
 import { switchMap } from 'rxjs/operators';
@@ -38,7 +38,8 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
     private router: Router,
     private informeService: InformeService,
     private reportControlService: ReportControlService,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -84,6 +85,9 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
                 0
               );
             }
+
+            // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
+            this.cdr.detectChanges();
           })
       );
     }

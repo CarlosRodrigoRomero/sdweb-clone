@@ -67,6 +67,8 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   emailUser = this.reportControlService.user.email;
   emailSelected: string;
   plantaFija = true;
+  numAnoms = 0;
+  numSegs = 0;
 
   private subscriptions = new Subscription();
 
@@ -81,6 +83,11 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+        this.numAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId).length;
+        this.numSegs = this.reportControlService.allFilterableElements.filter(
+          (elem) => elem.informeId === informeId
+        ).length;
+
         const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
 
         // para plantas de seguidores con servidor antiguo no permitimos las imagenes de tiles
@@ -92,7 +99,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
           if (informe.id === 'q915Koqc7kzUQ0GvwwWs') {
             this.noOrtofotos = true;
           }
-          this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Apartado anomalías', completed: true };
+          this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Imágenes anomalías', completed: true };
         }
       })
     );
@@ -102,7 +109,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
     } else {
       this.elemAnexoSeguidores = {
         id: 'seguidores',
-        label: 'Apartado seguidores',
+        label: 'Imágenes seguidores',
         completed: false,
         elems: [
           { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: true },
