@@ -103,6 +103,45 @@
         <button mat-stroked-button matStepperNext>Siguiente</button>
       </div>
     </mat-step>
+    <!-- ADVERTENCIA MUCHAS ANOMALÍAS -->
+    <mat-step *ngIf="plantaFija && anexoAnomalias !== undefined && anexoAnomalias.completed && numAnoms > 300">
+      <div class="step-content">
+        <div class="text-explain">
+          <span
+            >Has seleccionado el apartado <b>Imágenes de anomalías</b>. Se generará un PDF con una página por anomalía,
+            por lo que tendrá más de <b>{{ numAnoms }}</b> páginas.</span
+          >
+          <span>¿Quieres continuar? </span>
+        </div>
+        <div class="btns">
+          <button mat-stroked-button matStepperPrevious>Volver atrás</button>
+          <button mat-stroked-button matStepperNext>Continuar</button>
+        </div>
+      </div>
+    </mat-step>
+    <!-- ADVERTENCIA MUCHOS SEGUIDORES -->
+    <mat-step
+      *ngIf="
+        !plantaFija &&
+        elemAnexoSeguidores !== undefined &&
+        (elemAnexoSeguidores.elems[0].completed || elemAnexoSeguidores.elems[1].completed) &&
+        numSegs > 300
+      "
+    >
+      <div class="step-content">
+        <div class="text-explain">
+          <span
+            >Has seleccionado algún apartado de <b>Imágenes seguidores</b>. Se generará un PDF con una o más páginas por
+            seguidor, por lo que tendrá más de <b>{{ numSegs }}</b> páginas.</span
+          >
+          <span>¿Quieres continuar? </span>
+        </div>
+        <div class="btns">
+          <button mat-stroked-button matStepperPrevious>Volver atrás</button>
+          <button mat-stroked-button matStepperNext>Continuar</button>
+        </div>
+      </div>
+    </mat-step>
     <mat-step>
       <div class="step-content">
         <span class="titulo-principal">Selecciona destino</span>
