@@ -17,6 +17,7 @@ import { ConfianzaFilterComponent } from './components/confianza-filter/confianz
 import { AspectRatioFilterComponent } from './components/aspect-ratio-filter/aspect-ratio-filter.component';
 import { AreaModuloBrutoFilterComponent } from './components/area-modulo-bruto-filter/area-modulo-bruto-filter.component';
 import { AreaFilterContainerComponent } from './containers/area-filter-container/area-filter-container.component';
+import { FiltersPanelContainerComponent } from './containers/filters-panel-container/filters-panel-container.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { AreaFilterContainerComponent } from './containers/area-filter-container
     AspectRatioFilterComponent,
     AreaModuloBrutoFilterComponent,
     AreaFilterContainerComponent,
+    FiltersPanelContainerComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
