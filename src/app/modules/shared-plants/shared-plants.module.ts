@@ -21,6 +21,7 @@ import { PdfComponent } from './components/pdf/pdf.component';
 import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component';
 import { PdfEmailSelectComponent } from './components/pdf-email-select/pdf-email-select.component';
 import { SimplifiedViewComponent } from './components/simplified-view/simplified-view.component';
+import { LeyendaContainerComponent } from './containers/leyenda-container/leyenda-container.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { SimplifiedViewComponent } from './components/simplified-view/simplified
     PdfDialogComponent,
     PdfEmailSelectComponent,
     SimplifiedViewComponent,
+    LeyendaContainerComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -54,9 +56,9 @@ import { SimplifiedViewComponent } from './components/simplified-view/simplified
     SliderTemporalComponent,
     ViewControlComponent,
     ViewToggleComponent,
-    LeyendaComponent,
     CommentsComponent,
     SimplifiedViewComponent,
+    LeyendaContainerComponent,
   ],
 })
 export class SharedPlantsModule {}
