@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
 import { switchMap, take } from 'rxjs/operators';
@@ -64,7 +64,8 @@ export class ChartMaeGlobalComponent implements OnInit {
     private informeService: InformeService,
     private portfolioControlService: PortfolioControlService,
     private authService: AuthService,
-    private decimalPipe: DecimalPipe
+    private decimalPipe: DecimalPipe,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -202,6 +203,9 @@ export class ChartMaeGlobalComponent implements OnInit {
           },
         };
         this.loadChart = true;
+
+        // detectamos cambios porque estamos utilizando la estrategia OnPush
+        this.cdr.detectChanges();
       });
   }
 }

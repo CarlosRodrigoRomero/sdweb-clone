@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { Notification } from '@layout/navbar/navbar.component';
+import { Notification } from '@layout/containers/navbar-container/navbar-container.component';
 
 @Component({
-  selector: 'app-navbar-view',
-  templateUrl: './navbar-view.component.html',
-  styleUrls: ['./navbar-view.component.css'],
+  selector: 'app-navbar',
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavbarViewComponent {
+export class NavbarComponent {
   @Input() loadContent: boolean;
   @Input() tipoComentarios: boolean;
   @Input() isAdmin: boolean;

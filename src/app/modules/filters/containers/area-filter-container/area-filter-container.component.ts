@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -41,20 +41,26 @@ export class AreaFilterContainerComponent implements OnInit {
   constructor(
     private filterService: FilterService,
     private olMapService: OlMapService,
-    private filterControlService: FilterControlService
+    private filterControlService: FilterControlService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
     this.subscriptions.add(this.filterControlService.activeDrawArea$.subscribe((value) => (this.activeDraw = value)));
     this.subscriptions.add(
-      this.filterControlService.activeDeleteArea$.subscribe((value) => (this.activeDelete = value))
+      this.filterControlService.activeDeleteArea$.subscribe((value) => {
+        this.activeDelete = value;
+
+        // detectamos cambios porque estamos utilizando la estrategia OnPush
+        this.cdr.detectChanges();
+      })
     );
     this.subscriptions.add(this.olMapService.draw$.subscribe((draw) => (this.draw = draw)));
   }
 
   clickButtonDraw() {
-    this.activeDraw = !this.activeDraw;
+    this.filterControlService.activeDrawArea = !this.filterControlService.activeDrawArea;
 
     // si hay un area dibujada la eliminamos...
     if (this.activeDelete) {
@@ -116,7 +122,7 @@ export class AreaFilterContainerComponent implements OnInit {
       this.map.removeInteraction(this.draw);
 
       // activamos el boton borrar area
-      this.activeDelete = true;
+      this.filterControlService.activeDeleteArea = true;
     });
   }
 
@@ -172,13 +178,13 @@ export class AreaFilterContainerComponent implements OnInit {
   }
 
   addAreaFilter(coords: Coordinate[][]) {
-    this.activeDraw = true;
+    this.filterControlService.activeDrawArea = true;
     this.areaFilter = new AreaFilter('area', coords);
     this.filterService.addFilter(this.areaFilter);
   }
 
   deleteAreaFilter() {
-    this.activeDraw = false;
+    this.filterControlService.activeDrawArea = false;
 
     // eliminamos el filtro
     this.filterService.deleteFilter(this.areaFilter);
@@ -187,6 +193,6 @@ export class AreaFilterContainerComponent implements OnInit {
     this.olMapService.deleteAllDrawLayers();
 
     // cambiamos el boton a dibujar area
-    this.activeDelete = false;
+    this.filterControlService.activeDeleteArea = false;
   }
 }

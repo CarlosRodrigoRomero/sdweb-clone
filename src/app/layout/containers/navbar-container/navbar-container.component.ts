@@ -20,11 +20,11 @@ export interface Notification {
 }
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'],
+  selector: 'app-navbar-container',
+  templateUrl: './navbar-container.component.html',
+  styleUrls: ['./navbar-container.component.css'],
 })
-export class NavbarComponent implements OnInit, OnDestroy {
+export class NavbarContainerComponent implements OnInit, OnDestroy {
   isShared = false;
   userLogged: boolean;
   private user: UserInterface;
