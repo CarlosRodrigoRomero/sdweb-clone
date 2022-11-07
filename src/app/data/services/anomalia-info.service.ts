@@ -74,19 +74,19 @@ export class AnomaliaInfoService {
   }
 
   getFechaHoraLabel(anomalia: Anomalia, informe: InformeInterface): string {
-    let correctHoraSrt = 8;
+    let correccHoraSrt = 8;
     if (
-      informe.hasOwnProperty('correctHoraSrt') &&
+      informe.hasOwnProperty('correccHoraSrt') &&
       informe.correccHoraSrt !== undefined &&
       informe.correccHoraSrt !== null
     ) {
-      correctHoraSrt = informe.correccHoraSrt;
+      correccHoraSrt = informe.correccHoraSrt;
     }
-    const correctHoraSrtUnix = correctHoraSrt * 3600;
+    const correccHoraSrtUnix = correccHoraSrt * 3600;
 
-    const date = new Date(anomalia.datetime + correctHoraSrtUnix * 1000);
+    const date = new Date((anomalia.datetime + correccHoraSrtUnix) * 1000);
 
-    return date.toLocaleString();
+    return date.toLocaleString('es-ES', { hour12: false });
   }
 
   getModuloLabel(anomalia: Anomalia): string {

@@ -283,10 +283,15 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     if (!this.reportControlService.plantaFija) {
       row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
     }
+
     row.temperaturaMax = Number(this.decimalPipe.transform(anomalia.temperaturaMax, '1.2-2'));
+
     row.gradienteNormalizado = Number(this.decimalPipe.transform(anomalia.gradienteNormalizado, '1.2-2'));
+
     row.tipo = this.anomaliaInfoService.getTipoLabel(anomalia);
+
     row.clase = anomalia.clase;
+
     row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia, this.anomaliaService.criterioCriticidad);
 
     if (this.reportControlService.plantaFija) {
@@ -314,16 +319,22 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     if (this.informeSelected.correccHoraSrt !== undefined) {
       datetime += this.informeSelected.correccHoraSrt * 3600;
     }
-    row.datetime = this.datePipe.transform(datetime * 1000, 'dd/MM/yyyy HH:mm:ss');
+    row.datetime = this.anomaliaInfoService.getFechaHoraLabel(anomalia, this.informeSelected);
+
     row.lugar = this.planta.nombre;
+
     if (anomalia.hasOwnProperty('irradiancia') && anomalia.irradiancia !== null) {
       row.irradiancia = anomalia.irradiancia;
     } else {
       row.irradiancia = this.anomaliaService.getIrradiancia(datetime);
     }
+
     row.nubosidad = this.informeSelected.nubosidad;
+
     row.temperaturaAire = this.informeSelected.temperatura;
+
     row.emisividad = this.informeSelected.emisividad;
+
     row.temperaturaReflejada = this.informeSelected.tempReflejada;
 
     if (this.informeSelected.hasOwnProperty('vientoVelocidad')) {
@@ -336,6 +347,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     if (this.informeSelected.hasOwnProperty('camara')) {
       row.camaraModelo = this.informeSelected.camara;
     }
+
     if (this.informeSelected.hasOwnProperty('camaraSN')) {
       row.camaraSN = this.informeSelected.camaraSN;
     }
