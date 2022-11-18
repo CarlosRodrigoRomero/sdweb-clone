@@ -24,6 +24,7 @@ export class PdfService {
     this._generatePdf = false;
     this._emailSelected = '';
     this._generateSimplePdf = false;
+    this._filteredPdf = false;
   }
 
   get apartadosInforme(): string[] {
