@@ -166,6 +166,16 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
 
     if (this.reportControlService.plantaFija) {
       this.elemOrtofotos.elems.push({ id: 'planoTermico', label: 'Ortofoto térmica', completed: true });
+    } else {
+      this.elemAnexoSeguidores = {
+        id: 'seguidores',
+        label: 'Imágenes seguidores',
+        completed: false,
+        elems: [
+          { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: true },
+          { id: 'anexoSegsNoAnoms', label: 'Seguidores sin anomalías', completed: true },
+        ],
+      };
     }
 
     this.buildForm();
