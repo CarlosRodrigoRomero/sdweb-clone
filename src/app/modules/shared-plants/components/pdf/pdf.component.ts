@@ -11,6 +11,7 @@ import { PdfService } from '@data/services/pdf.service';
 import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ThermalService } from '@data/services/thermal.service';
+import { FilterService } from '@data/services/filter.service';
 
 import { Seguidor } from '@core/models/seguidor';
 
@@ -25,6 +26,7 @@ export class PdfComponent implements OnInit, OnDestroy {
   private apartadosInforme: string[] = [];
   private emailSelected: string;
   oldPdf = false;
+  private filteredPdf = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -37,12 +39,14 @@ export class PdfComponent implements OnInit, OnDestroy {
     private pdfService: PdfService,
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
-    private thermalService: ThermalService
+    private thermalService: ThermalService,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(this.pdfService.apartadosInforme$.subscribe((apt) => (this.apartadosInforme = apt)));
     this.subscriptions.add(this.pdfService.emailSelected$.subscribe((email) => (this.emailSelected = email)));
+    this.subscriptions.add(this.pdfService.filteredPdf$.subscribe((filtered) => (this.filteredPdf = filtered)));
 
     this.subscriptions.add(
       this.pdfService.generatePdf$.subscribe((gen) => {
@@ -98,18 +102,37 @@ export class PdfComponent implements OnInit, OnDestroy {
     json['sliderMax'] = this.thermalService.sliderMax[indexInforme];
 
     json['email'] = this.emailSelected;
+    json['totalAnoms'] = this.reportControlService.allAnomalias.length;
 
     if (this.reportControlService.plantaFija) {
-      const anomalias = Object.assign(
-        {},
-        this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informe.id)
-      );
+      let anomalias;
+      if (this.filteredPdf) {
+        anomalias = Object.assign(
+          {},
+          this.filterService.filteredElements.filter((anom) => anom.informeId === informe.id)
+        );
+      } else {
+        anomalias = Object.assign(
+          {},
+          this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informe.id)
+        );
+      }
+
       json['anomalias'] = anomalias;
     } else {
-      const seguidores = Object.assign(
-        {},
-        (this.reportControlService.allFilterableElements as Seguidor[]).filter((seg) => seg.informeId === informe.id)
-      );
+      let seguidores;
+      if (this.filteredPdf) {
+        seguidores = Object.assign(
+          {},
+          (this.filterService.filteredElements as Seguidor[]).filter((seg) => seg.informeId === informe.id)
+        );
+      } else {
+        seguidores = Object.assign(
+          {},
+          (this.reportControlService.allFilterableElements as Seguidor[]).filter((seg) => seg.informeId === informe.id)
+        );
+      }
+
       json['seguidores'] = seguidores;
     }
 
