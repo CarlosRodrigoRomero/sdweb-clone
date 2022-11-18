@@ -4,6 +4,15 @@
       <div class="step-content">
         <span class="titulo-principal">Configura el PDF como prefieras</span>
 
+        <!-- FILTRADAS O TODAS -->
+        <div>
+          <span class="titulo">Anomalías a incluir</span>
+          <mat-radio-group class="radio-btns" [value]="'all'" (change)="setFilteredPdf($event)">
+            <mat-radio-button value="all">Todas</mat-radio-button>
+            <mat-radio-button value="filtered">Solo filtradas</mat-radio-button>
+          </mat-radio-group>
+        </div>
+
         <!-- INTRODUCCION -->
         <div>
           <mat-checkbox
@@ -103,6 +112,7 @@
         <button mat-stroked-button matStepperNext>Siguiente</button>
       </div>
     </mat-step>
+
     <!-- ADVERTENCIA MUCHAS ANOMALÍAS -->
     <mat-step *ngIf="plantaFija && anexoAnomalias !== undefined && anexoAnomalias.completed && numAnoms > 300">
       <div class="step-content">
@@ -122,10 +132,7 @@
     <!-- ADVERTENCIA MUCHOS SEGUIDORES -->
     <mat-step
       *ngIf="
-        !plantaFija &&
-        elemAnexoSeguidores !== undefined &&
-        (elemAnexoSeguidores.elems[0].completed || elemAnexoSeguidores.elems[1].completed) &&
-        numSegs > 300
+        !plantaFija && elemAnexoSeguidores !== undefined && elemAnexoSeguidores.elems[0].completed && numSegs > 300
       "
     >
       <div class="step-content">

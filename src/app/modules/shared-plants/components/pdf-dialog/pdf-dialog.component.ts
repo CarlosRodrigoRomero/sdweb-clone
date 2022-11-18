@@ -1,10 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatRadioChange } from '@angular/material/radio';
 
 import { Subscription } from 'rxjs';
 
 import { PdfService } from '@data/services/pdf.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { FilterService } from '@data/services/filter.service';
 
 export interface DialogData {
   id: string;
@@ -50,7 +52,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
     completed: false,
     elems: [
       { id: 'resultadosClase', label: 'Resultados por clase (CoA)', completed: true },
-      { id: 'resultadosCategoria', label: 'Resultados por tipo de anomalía', completed: true },
+      { id: 'resultadosTipo', label: 'Resultados por tipo de anomalía', completed: true },
       { id: 'resultadosPosicion', label: 'Resultados por posición', completed: true },
     ],
   };
@@ -69,13 +71,16 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   plantaFija = true;
   numAnoms = 0;
   numSegs = 0;
+  private selectedInformeId: string;
+  filteredPdf = false;
 
   private subscriptions = new Subscription();
 
   constructor(
     private pdfService: PdfService,
     private reportControlService: ReportControlService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -83,10 +88,17 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-        this.numAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId).length;
-        this.numSegs = this.reportControlService.allFilterableElements.filter(
-          (elem) => elem.informeId === informeId
-        ).length;
+        this.selectedInformeId = informeId;
+
+        if (this.pdfService.filteredPdf) {
+          this.numAnoms = this.filterService.filteredElements.filter((anom) => anom.informeId === informeId).length;
+          this.numSegs = this.filterService.filteredElements.filter((elem) => elem.informeId === informeId).length;
+        } else {
+          this.numAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId).length;
+          this.numSegs = this.reportControlService.allFilterableElements.filter(
+            (elem) => elem.informeId === informeId
+          ).length;
+        }
 
         const informe = this.reportControlService.informes.find((inf) => inf.id === informeId);
 
@@ -104,18 +116,51 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
       })
     );
 
+    this.subscriptions.add(
+      this.pdfService.filteredPdf$.subscribe((filteredPdf) => {
+        if (this.selectedInformeId !== undefined) {
+          if (filteredPdf) {
+            this.numAnoms = this.filterService.filteredElements.filter(
+              (anom) => anom.informeId === this.selectedInformeId
+            ).length;
+            this.numSegs = this.filterService.filteredElements.filter(
+              (elem) => elem.informeId === this.selectedInformeId
+            ).length;
+
+            if (!this.reportControlService.plantaFija) {
+              this.elemAnexoSeguidores = {
+                id: 'seguidores',
+                label: 'Imágenes seguidores',
+                completed: false,
+                elems: [{ id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: true }],
+              };
+            }
+          } else {
+            this.numAnoms = this.reportControlService.allAnomalias.filter(
+              (anom) => anom.informeId === this.selectedInformeId
+            ).length;
+            this.numSegs = this.reportControlService.allFilterableElements.filter(
+              (elem) => elem.informeId === this.selectedInformeId
+            ).length;
+
+            if (!this.reportControlService.plantaFija) {
+              this.elemAnexoSeguidores = {
+                id: 'seguidores',
+                label: 'Imágenes seguidores',
+                completed: false,
+                elems: [
+                  { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: true },
+                  { id: 'anexoSegsNoAnoms', label: 'Seguidores sin anomalías', completed: true },
+                ],
+              };
+            }
+          }
+        }
+      })
+    );
+
     if (this.reportControlService.plantaFija) {
       this.elemOrtofotos.elems.push({ id: 'planoTermico', label: 'Ortofoto térmica', completed: true });
-    } else {
-      this.elemAnexoSeguidores = {
-        id: 'seguidores',
-        label: 'Imágenes seguidores',
-        completed: false,
-        elems: [
-          { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: true },
-          { id: 'anexoSegsNoAnoms', label: 'Seguidores sin anomalías', completed: true },
-        ],
-      };
     }
 
     this.buildForm();
@@ -167,6 +212,14 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
     }
 
     this.pdfService.emailSelected = this.emailSelected;
+  }
+
+  setFilteredPdf(event: MatRadioChange) {
+    if (event.value === 'filtered') {
+      this.pdfService.filteredPdf = true;
+    } else {
+      this.pdfService.filteredPdf = false;
+    }
   }
 
   updateAllComplete(id: string) {
