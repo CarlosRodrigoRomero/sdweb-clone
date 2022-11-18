@@ -235,20 +235,20 @@ export class EditPcDetailComponent implements OnInit {
       )
     );
 
-    this.hotkeysService.add(
-      new Hotkey(
-        'd',
-        (event: KeyboardEvent): boolean => {
-          if (this.checkSelectedPc()) {
-            this.selectedPc.tipo = 11;
-            this.updatePcInDb(this.selectedPc);
-          }
-          return false; // Prevent bubbling
-        },
-        undefined,
-        'D: Suciedad'
-      )
-    );
+    // this.hotkeysService.add(
+    //   new Hotkey(
+    //     'd',
+    //     (event: KeyboardEvent): boolean => {
+    //       if (this.checkSelectedPc()) {
+    //         this.selectedPc.tipo = 11;
+    //         this.updatePcInDb(this.selectedPc);
+    //       }
+    //       return false; // Prevent bubbling
+    //     },
+    //     undefined,
+    //     'D: Suciedad'
+    //   )
+    // );
 
     this.hotkeysService.add(
       new Hotkey(
@@ -264,20 +264,20 @@ export class EditPcDetailComponent implements OnInit {
       )
     );
 
-    this.hotkeysService.add(
-      new Hotkey(
-        's',
-        (): boolean => {
-          if (this.checkSelectedPc()) {
-            this.selectedPc.tipo = 15;
-            this.updatePcInDb(this.selectedPc);
-          }
-          return false; // Prevent bubbling
-        },
-        undefined,
-        'S: Módulo con sombras'
-      )
-    );
+    // this.hotkeysService.add(
+    //   new Hotkey(
+    //     's',
+    //     (): boolean => {
+    //       if (this.checkSelectedPc()) {
+    //         this.selectedPc.tipo = 15;
+    //         this.updatePcInDb(this.selectedPc);
+    //       }
+    //       return false; // Prevent bubbling
+    //     },
+    //     undefined,
+    //     'S: Módulo con sombras'
+    //   )
+    // );
   }
 
   checkSelectedPc() {
