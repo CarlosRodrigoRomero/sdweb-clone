@@ -67,3 +67,8 @@ li {
 .email-input {
   width: 300px;
 }
+
+.radio-btns {
+  display: flex;
+  gap: 1rem;
+}
