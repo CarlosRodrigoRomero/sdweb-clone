@@ -104,6 +104,12 @@ export class PdfComponent implements OnInit, OnDestroy {
     json['email'] = this.emailSelected;
     json['totalAnoms'] = this.reportControlService.allAnomalias.length;
 
+    if (this.filteredPdf) {
+      json['filtered'] = true;
+    } else {
+      json['filtered'] = false;
+    }
+
     if (this.reportControlService.plantaFija) {
       let anomalias;
       if (this.filteredPdf) {
