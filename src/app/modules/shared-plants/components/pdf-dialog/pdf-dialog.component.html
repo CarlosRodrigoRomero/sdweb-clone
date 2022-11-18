@@ -5,7 +5,7 @@
         <span class="titulo-principal">Configura el PDF como prefieras</span>
 
         <!-- FILTRADAS O TODAS -->
-        <div>
+        <div *ngIf="numElems > 0">
           <span class="titulo">Anomalías a incluir</span>
           <mat-radio-group class="radio-btns" [value]="'all'" (change)="setFilteredPdf($event)">
             <mat-radio-button value="all">Todas</mat-radio-button>

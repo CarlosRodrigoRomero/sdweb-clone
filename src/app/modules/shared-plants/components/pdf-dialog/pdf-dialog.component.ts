@@ -71,6 +71,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   plantaFija = true;
   numAnoms = 0;
   numSegs = 0;
+  numElems = 0;
   private selectedInformeId: string;
   filteredPdf = false;
 
@@ -157,6 +158,10 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
           }
         }
       })
+    );
+
+    this.subscriptions.add(
+      this.filterService.filteredElements$.subscribe((filteredElements) => (this.numElems = filteredElements.length))
     );
 
     if (this.reportControlService.plantaFija) {
