@@ -81,33 +81,48 @@
           <span class="checkbox-titulo">{{ anexoLista.label }}</span>
         </mat-checkbox>
 
-        <!-- ANEXO ANOMALIAS -->
-        <mat-checkbox
-          *ngIf="anexoAnomalias"
-          [checked]="anexoAnomalias.completed"
-          (change)="anexoAnomalias.completed = !anexoAnomalias.completed"
-        >
-          <span class="checkbox-titulo">{{ anexoAnomalias.label }}</span>
-        </mat-checkbox>
-
-        <!-- ANEXO SEGUIDORES -->
-        <div *ngIf="elemAnexoSeguidores">
-          <mat-checkbox
-            [checked]="allElemsSeguidoresCompleted"
-            [indeterminate]="someComplete(elemAnexoSeguidores.id)"
-            (change)="setAll($event.checked, elemAnexoSeguidores.id)"
+        <!-- AVANZADO -->
+        <mat-accordion>
+          <mat-expansion-panel
+            class="mat-elevation-z0"
+            (opened)="panelOpenState = true"
+            (closed)="panelOpenState = false"
           >
-            <span class="titulo">{{ elemAnexoSeguidores.label }}</span>
-          </mat-checkbox>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <span class="titulo-2">Avanzado</span>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
 
-          <li *ngFor="let elem of elemAnexoSeguidores.elems">
-            <mat-checkbox [(ngModel)]="elem.completed" (ngModelChange)="updateAllComplete(elemAnexoSeguidores.id)">
-              <span style="font-size: 15px">
-                {{ elem.label }}
-              </span>
+            <!-- ANEXO ANOMALIAS -->
+            <mat-checkbox
+              *ngIf="anexoAnomalias"
+              [checked]="anexoAnomalias.completed"
+              (change)="anexoAnomalias.completed = !anexoAnomalias.completed"
+            >
+              <span class="checkbox-titulo">{{ anexoAnomalias.label }}</span>
             </mat-checkbox>
-          </li>
-        </div>
+
+            <!-- ANEXO SEGUIDORES -->
+            <div *ngIf="elemAnexoSeguidores">
+              <mat-checkbox
+                [checked]="allElemsSeguidoresCompleted"
+                [indeterminate]="someComplete(elemAnexoSeguidores.id)"
+                (change)="setAll($event.checked, elemAnexoSeguidores.id)"
+              >
+                <span class="titulo">{{ elemAnexoSeguidores.label }}</span>
+              </mat-checkbox>
+
+              <li *ngFor="let elem of elemAnexoSeguidores.elems">
+                <mat-checkbox [(ngModel)]="elem.completed" (ngModelChange)="updateAllComplete(elemAnexoSeguidores.id)">
+                  <span style="font-size: 15px">
+                    {{ elem.label }}
+                  </span>
+                </mat-checkbox>
+              </li>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
 
         <button mat-stroked-button matStepperNext>Siguiente</button>
       </div>
