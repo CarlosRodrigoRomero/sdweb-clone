@@ -7,6 +7,10 @@
   width: min-content;
 }
 
+:host ::ng-deep .mat-expansion-panel-header {
+  padding: 4px;
+}
+
 .step-content {
   display: flex;
   flex-direction: column;
@@ -29,6 +33,11 @@
 
 .titulo {
   font-size: 18px;
+  font-weight: 500;
+}
+
+.titulo-2 {
+  font-size: 16px;
   font-weight: 500;
 }
 

@@ -62,7 +62,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   noAptAnoms = false;
   anexoAnomalias: any = undefined;
   elemAnexoSeguidores: DialogData = undefined;
-  allElemsSeguidoresCompleted = true;
+  allElemsSeguidoresCompleted = false;
 
   form: FormGroup;
   selectEmail = false;
@@ -74,6 +74,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   numElems = 0;
   private selectedInformeId: string;
   filteredPdf = false;
+  panelOpenState = false;
 
   private subscriptions = new Subscription();
 
@@ -112,7 +113,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
           if (informe.id === 'q915Koqc7kzUQ0GvwwWs') {
             this.noOrtofotos = true;
           }
-          this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Imágenes anomalías', completed: true };
+          this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Imágenes anomalías', completed: false };
         }
       })
     );
@@ -133,7 +134,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
                 id: 'seguidores',
                 label: 'Imágenes seguidores',
                 completed: false,
-                elems: [{ id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: true }],
+                elems: [{ id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: false }],
               };
             }
           } else {
@@ -150,8 +151,8 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
                 label: 'Imágenes seguidores',
                 completed: false,
                 elems: [
-                  { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: true },
-                  { id: 'anexoSegsNoAnoms', label: 'Seguidores sin anomalías', completed: true },
+                  { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: false },
+                  { id: 'anexoSegsNoAnoms', label: 'Seguidores sin anomalías', completed: false },
                 ],
               };
             }
@@ -172,8 +173,8 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
         label: 'Imágenes seguidores',
         completed: false,
         elems: [
-          { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: true },
-          { id: 'anexoSegsNoAnoms', label: 'Seguidores sin anomalías', completed: true },
+          { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: false },
+          { id: 'anexoSegsNoAnoms', label: 'Seguidores sin anomalías', completed: false },
         ],
       };
     }
