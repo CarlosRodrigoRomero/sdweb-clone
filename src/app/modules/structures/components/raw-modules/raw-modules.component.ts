@@ -113,7 +113,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
 
   private addRawModules() {
     this.rawModsSubscriptions.add(
-      this.structuresService.allRawModules$
+      this.structuresService.loadedRawModules$
         .pipe(
           switchMap((rawMods) => from(this.filterService.initService(rawMods))),
           switchMap(() => this.structuresService.getFiltersParams()),
