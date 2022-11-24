@@ -95,6 +95,8 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
       .getModulosBrutos()
       .pipe(take(1))
       .subscribe((modulos) => {
+        this.structuresService.allRawModules = modulos;
+
         let selectedModules: RawModule[] = [];
 
         if (zones) {
@@ -118,7 +120,7 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
           selectedModules = modulos;
         }
 
-        this.structuresService.allRawModules = selectedModules;
+        this.structuresService.loadedRawModules = selectedModules;
 
         if (selectedModules.length > 0) {
           // calculamos las medias y desviaciones

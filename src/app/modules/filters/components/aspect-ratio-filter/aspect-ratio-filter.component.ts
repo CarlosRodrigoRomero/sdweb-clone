@@ -48,7 +48,7 @@ export class AspectRatioFilterComponent implements OnInit, OnDestroy {
               }
             }
 
-            return this.structuresService.allRawModules$;
+            return this.structuresService.loadedRawModules$;
           })
         )
         .subscribe((rawMods) => {
