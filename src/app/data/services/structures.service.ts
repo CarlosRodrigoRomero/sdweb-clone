@@ -45,7 +45,8 @@ export class StructuresService {
   private _loadRawModules = false;
   loadRawModules$ = new BehaviorSubject<boolean>(this._loadRawModules);
   private _allRawModules: RawModule[] = [];
-  allRawModules$ = new BehaviorSubject<RawModule[]>(this._allRawModules);
+  private _loadedRawModules: RawModule[] = [];
+  loadedRawModules$ = new BehaviorSubject<RawModule[]>(this._loadedRawModules);
   private _createRawModMode = false;
   createRawModMode$ = new BehaviorSubject<boolean>(this._createRawModMode);
   private _deleteRawModMode = false;
@@ -131,15 +132,15 @@ export class StructuresService {
   }
 
   setInitialAveragesAndStandardDeviations() {
-    const areas = this.allRawModules.map((module) => module.area);
+    const areas = this.loadedRawModules.map((module) => module.area);
     this.areaAverage = MathOperations.average(areas);
     this.areaStdDev = MathOperations.standardDeviation(areas);
 
-    const aspectRatios = this.allRawModules.map((module) => module.aspectRatio);
+    const aspectRatios = this.loadedRawModules.map((module) => module.aspectRatio);
     this.aspectRatioAverage = MathOperations.average(aspectRatios);
     this.aspectRatioStdDev = MathOperations.standardDeviation(aspectRatios);
 
-    const confianzas = this.allRawModules.map((module) => module.confianza);
+    const confianzas = this.loadedRawModules.map((module) => module.confianza);
     this.confianzaAverage = MathOperations.average(confianzas);
     this.confianzaStdDev = MathOperations.standardDeviation(confianzas);
 
@@ -525,6 +526,7 @@ export class StructuresService {
 
     this.loadRawModules = false;
     this.allRawModules = [];
+    this.loadedRawModules = [];
     this.createRawModMode = false;
     this.deleteRawModMode = false;
     this.deletedRawModIds = [];
@@ -624,7 +626,15 @@ export class StructuresService {
 
   set allRawModules(value: RawModule[]) {
     this._allRawModules = value;
-    this.allRawModules$.next(value);
+  }
+
+  get loadedRawModules() {
+    return this._loadedRawModules;
+  }
+
+  set loadedRawModules(value: RawModule[]) {
+    this._loadedRawModules = value;
+    this.loadedRawModules$.next(value);
   }
 
   get loadRawModules() {
