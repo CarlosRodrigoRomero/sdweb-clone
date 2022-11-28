@@ -5,7 +5,7 @@ import { listenImage } from 'ol/Image.js';
 
 import { PALETTE } from '@data/constants/palette';
 
-class ImageTileMod extends Tile {
+class ImageTileCubiertasMod extends Tile {
   /**
    * @param {import("./tilecoord.js").TileCoord} tileCoord Tile coordinate.
    * @param {import("./TileState.js").default} state State.
@@ -207,6 +207,10 @@ class ImageTileMod extends Tile {
     for (let i = 0; i < inputData.data.length; i += 4) {
       let pixel = [inputData.data[i + 0], inputData.data[i + 1], inputData.data[i + 2], inputData.data[i + 3]];
 
+      if (pixel.toString() == '0,0,0,255' || pixel.toString() == '255,255,255,255') {
+        pixel[3] = 0;
+      }
+
       if (pixel[3] == 0) {
         continue;
       }
@@ -288,4 +292,4 @@ function getBlankImage() {
   return ctx.canvas;
 }
 
-export default ImageTileMod;
+export default ImageTileCubiertasMod;
