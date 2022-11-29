@@ -7,8 +7,6 @@ import { AngularFirestore } from '@angular/fire/firestore';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 
-
-
 @Injectable({
   providedIn: 'root',
 })
@@ -69,7 +67,11 @@ export class ThermalService {
             return data;
           })
         ),
-        map((thermalLayers) => thermalLayers.filter((thermalLayer) => informesId.includes(thermalLayer.informeId)))
+        map((tLs) =>
+          tLs
+            .filter((tL) => informesId.includes(tL.informeId))
+            .sort((a, b) => informesId.indexOf(a.informeId) - informesId.indexOf(b.informeId))
+        )
       );
     return query$;
   }
@@ -93,8 +95,6 @@ export class ThermalService {
 
     return this.thermalLayers$;
   }
-
-  
 
   resetService() {
     this.thermalLayers = [];
