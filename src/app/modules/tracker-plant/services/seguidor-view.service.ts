@@ -88,7 +88,7 @@ export class SeguidorViewService {
     this.seguidoresControlService.visualImageExist = true;
     this.imagesLoaded = false;
     // volvemos el valor al de la vista del mapa
-    this.seguidorViewSelected = this.viewReportService.reportViewSelected;
+    this.seguidorViewSelected = 'tipo';
     // limpiamos la feature seleccionada
     this.seguidoresControlService.clearSelectFeature();
     // seleccionamos el mismo que el mapa al cerrar
