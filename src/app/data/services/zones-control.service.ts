@@ -21,6 +21,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { FilterableElement } from '@core/models/filterableInterface';
+import { ZoneInterface } from '@core/models/zone';
 
 import { COLOR } from '@data/constants/color';
 
@@ -118,29 +119,52 @@ export class ZonesControlService {
     return [maeLayer, ccLayer, gradLayer];
   }
 
-  mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
+  createZonas(locAreas: LocationAreaInterface[]): ZoneInterface[] {
+    const zones: ZoneInterface[] = [];
+    this.reportControlService.informesIdList.forEach((informeId) => {
+      const elemsInforme = this.reportControlService.allFilterableElements.filter(
+        (elem) => elem.informeId === informeId
+      );
+
+      locAreas.forEach((locArea) => {
+        const elemsZone = this.getElemsZona(locArea, elemsInforme);
+
+        const zone: ZoneInterface = {
+          id: this.getGlobalsLabel(locArea.globalCoords),
+          informeId,
+          elems: elemsZone,
+          globalCoords: locArea.globalCoords,
+          path: locArea.path,
+        };
+
+        zones.push(zone);
+      });
+    });
+
+    return zones;
+  }
+
+  mostrarZonas(zones: ZoneInterface[], layers: VectorLayer[]) {
     this.subscriptions.add(
       this.filterService.filteredElements$.subscribe((elems) => {
-        this.addZonas(zonas, layers, elems);
+        this.addZonas(zones, layers, elems);
       })
     );
   }
 
-  private addZonas(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
+  private addZonas(zonas: ZoneInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
       const view = l.getProperties().view;
       const informeId = l.getProperties().informeId;
-      const elemsInforme = this.reportControlService.allFilterableElements.filter(
-        (elem) => elem.informeId === informeId
-      );
       const source = l.getSource();
       source.clear();
-      zonas.forEach((zona) => {
-        const allElemsZona = this.getElemsZona(zona, elemsInforme);
-        const elemsFilteredZona = allElemsZona.filter((elem) => elems.includes(elem));
+      const zonasInforme = zonas.filter((z) => z.informeId === informeId);
+      zonasInforme.forEach((zona) => {
+        const elemsZona = zona.elems;
+        const elemsFilteredZona = elemsZona.filter((elem) => elems.includes(elem));
 
-        const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
+        const property = this.getPropertyView(view, informeId, zona, zonasInforme, elemsZona);
 
         const coords = this.pathToLonLat(zona.path);
 

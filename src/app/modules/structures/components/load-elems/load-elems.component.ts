@@ -51,7 +51,7 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
           this.largestZones = this.zonesService.zonesBySize[0];
 
           // las ordenamos por su global mayor
-          this.largestZones = this.largestZones.sort((a, b) => a.globalCoords[0] - b.globalCoords[0]);
+          this.largestZones = this.largestZones.sort((a, b) => a.globalCoords[0].localeCompare(b.globalCoords[0]));
 
           this.largestZones.forEach((zone) => {
             this.zones.push({

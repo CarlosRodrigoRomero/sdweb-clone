@@ -38,7 +38,9 @@ export class ZonesComponent implements OnInit, OnDestroy {
     // iniciamos el servicio que controla las zonas y las cargamos
     this.zonesControlService.initService().then((value) => {
       if (value) {
-        this.zonesControlService.mostrarZonas(this.zones[this.zones.length - 1], this.zonesLayers);
+        const newZones = this.zonesControlService.createZonas(this.zones[this.zones.length - 1]);
+
+        this.zonesControlService.mostrarZonas(newZones, this.zonesLayers);
       }
     });
 
