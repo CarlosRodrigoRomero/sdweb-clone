@@ -82,17 +82,6 @@ export class ZonesControlService {
   }
 
   createZonasLayers(informeId: string): VectorLayer[] {
-    const tipoLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleTipo(false),
-      visible: false,
-    });
-    tipoLayer.setProperties({
-      informeId,
-      view: 'tipo',
-      type: 'zonas',
-    });
-
     const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleMae(false),
@@ -126,7 +115,7 @@ export class ZonesControlService {
       type: 'zonas',
     });
 
-    return [tipoLayer, maeLayer, ccLayer, gradLayer];
+    return [maeLayer, ccLayer, gradLayer];
   }
 
   mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
@@ -539,22 +528,6 @@ export class ZonesControlService {
     } else {
       return COLOR.colores_severity_rgb[2].replace(',1)', ',' + opacity + ')');
     }
-  }
-
-  // ESTILOS TIPO ANOMALÍA
-  private getStyleTipo(focused: boolean) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : 'black',
-            width: focused ? 2 : 1,
-          }),
-          fill: null,
-          text: this.getLabelStyle(feature),
-        });
-      }
-    };
   }
 
   getLabelStyle(feature: Feature) {
