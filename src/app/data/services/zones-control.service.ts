@@ -134,13 +134,12 @@ export class ZonesControlService {
       const elemsInforme = this.reportControlService.allFilterableElements.filter(
         (elem) => elem.informeId === informeId
       );
-      const elemsFilteredInforme = elems.filter((elem) => elem.informeId === informeId);
       const source = l.getSource();
       source.clear();
       zonas.forEach((zona) => {
-        const elemsFilteredZona = this.getElemsZona(zona, elemsFilteredInforme);
-
         const allElemsZona = this.getElemsZona(zona, elemsInforme);
+        const elemsFilteredZona = allElemsZona.filter((elem) => elems.includes(elem));
+
         const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
 
         const coords = this.pathToLonLat(zona.path);
