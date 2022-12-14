@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { MapViewContainerComponent } from './containers/map-view-container/map-view-container.component';
+import { MapViewComponent } from './components/map-view/map-view.component';
 
 const routes: Routes = [
   {
     path: ':id',
-    component: MapViewContainerComponent,
+    component: MapViewComponent,
   },
 ];
 
