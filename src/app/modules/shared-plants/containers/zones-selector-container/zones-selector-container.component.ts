@@ -23,25 +23,25 @@ export interface Task {
 }
 
 @Component({
-  selector: 'app-global-coord-areas',
-  templateUrl: './global-coord-areas.component.html',
-  styleUrls: ['./global-coord-areas.component.css'],
+  selector: 'app-zones-selector-container',
+  templateUrl: './zones-selector-container.component.html',
+  styleUrls: ['./zones-selector-container.component.css'],
 })
-export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
-  public planta: PlantaInterface;
+export class ZonesSelectorContainerComponent implements OnInit, OnDestroy {
+  planta: PlantaInterface;
   private zones: LocationAreaInterface[][] = [];
-  public globalCoordAreasVectorSources: VectorSource[] = [];
-  public globalCoordAreasVectorLayers: VectorLayer[] = [];
+  globalCoordAreasVectorSources: VectorSource[] = [];
+  globalCoordAreasVectorLayers: VectorLayer[] = [];
   private nombreGlobalCoords: string[] = [];
-  public map: Map;
-  public numAreas: number;
+  map: Map;
+  numAreas: number;
 
   task: Task = {
     name: 'Ver zonas de la planta',
     completed: false,
     subtasks: [],
   };
-  public allComplete = false;
+  allComplete = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -173,23 +173,12 @@ export class GlobalCoordAreasComponent implements OnInit, OnDestroy {
     this.allComplete = this.task.subtasks != null && this.task.subtasks.every((t) => t.completed);
   }
 
-  someComplete(): boolean {
-    if (this.task.subtasks == null) {
-      return false;
-    }
-    return this.task.subtasks.filter((t) => t.completed).length > 0 && !this.allComplete;
-  }
-
   setAll(completed: boolean) {
     this.allComplete = completed;
     if (this.task.subtasks == null) {
       return;
     }
     this.task.subtasks.forEach((t) => (t.completed = completed));
-  }
-
-  stopPropagation(event) {
-    event.stopPropagation();
   }
 
   ngOnDestroy(): void {

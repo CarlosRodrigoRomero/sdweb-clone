@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { SharedModule } from '@shared/shared.module';
 
-import { GlobalCoordAreasComponent } from './components/global-coord-areas/global-coord-areas.component';
+import { ZonesSelectorComponent } from './components/zones-selector/zones-selector.component';
 import { ProgressBarPdfComponent } from './components/download-progress-bar/download-progress-bar.component';
 import { DownloadReportComponent } from './components/download-report/download-report.component';
 import { DialogFilteredReportComponent } from './components/dialog-filtered-report/dialog-filtered-report.component';
@@ -22,10 +22,11 @@ import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component
 import { PdfEmailSelectComponent } from './components/pdf-email-select/pdf-email-select.component';
 import { SimplifiedViewComponent } from './components/simplified-view/simplified-view.component';
 import { LeyendaContainerComponent } from './containers/leyenda-container/leyenda-container.component';
+import { ZonesSelectorContainerComponent } from './containers/zones-selector-container/zones-selector-container.component';
 
 @NgModule({
   declarations: [
-    GlobalCoordAreasComponent,
+    ZonesSelectorComponent,
     ProgressBarPdfComponent,
     DownloadReportComponent,
     DialogFilteredReportComponent,
@@ -44,10 +45,11 @@ import { LeyendaContainerComponent } from './containers/leyenda-container/leyend
     PdfEmailSelectComponent,
     SimplifiedViewComponent,
     LeyendaContainerComponent,
+    ZonesSelectorContainerComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
-    GlobalCoordAreasComponent,
+    ZonesSelectorContainerComponent,
     DownloadReportComponent,
     ProgressBarPdfComponent,
     ShareReportComponent,

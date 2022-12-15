@@ -5,7 +5,7 @@
         class="checkbox"
         [checked]="allComplete"
         [indeterminate]="someComplete()"
-        (change)="setVisibilityAllLayers($event.checked)"
+        (change)="setVisibilityAllLayers.emit($event.checked)"
       >
         {{ task.name }}
       </mat-checkbox>
@@ -21,7 +21,7 @@
               <mat-checkbox
                 class="checkbox"
                 [(ngModel)]="subtask.completed"
-                (ngModelChange)="setVisibilityLayer(i)"
+                (ngModelChange)="setVisibilityLayer.emit(i)"
               >
                 {{ subtask.name }}
               </mat-checkbox>
