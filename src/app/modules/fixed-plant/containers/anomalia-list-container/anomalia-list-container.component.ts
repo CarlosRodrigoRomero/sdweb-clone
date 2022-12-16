@@ -20,11 +20,11 @@ import { GLOBAL } from '@data/constants/global';
 import { Colors } from '@core/classes/colors';
 
 @Component({
-  selector: 'app-anomalias-list',
-  templateUrl: './anomalias-list.component.html',
-  styleUrls: ['./anomalias-list.component.css'],
+  selector: 'app-anomalia-list-container',
+  templateUrl: './anomalia-list-container.component.html',
+  styleUrls: ['./anomalia-list-container.component.css'],
 })
-export class AnomaliasListComponent implements OnInit, OnDestroy {
+export class AnomaliasListContainer implements OnInit, OnDestroy {
   viewSeleccionada: string;
   dataSource: MatTableDataSource<any>;
   allData: any[];

@@ -16,12 +16,12 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Anomalia } from '@core/models/anomalia';
 
 @Component({
-  selector: 'app-list',
-  templateUrl: './list.component.html',
-  styleUrls: ['./list.component.css'],
+  selector: 'app-anomalia-list',
+  templateUrl: './anomalia-list.component.html',
+  styleUrls: ['./anomalia-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListComponent implements OnChanges {
+export class AnomaliaListComponent implements OnChanges {
   @Input() viewSeleccionada: string;
   @Input() dataSource: MatTableDataSource<any>;
   @Input() anomaliaHovered: Anomalia;
