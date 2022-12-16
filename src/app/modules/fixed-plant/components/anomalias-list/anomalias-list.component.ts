@@ -52,61 +52,41 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
       this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSeleccionada = view))
     );
 
-    this.subscriptions.add(
-      this.reportControlService.selectedInformeId$
-        .pipe(
-          switchMap((informeId) => {
-            this.selectedInformeId = informeId;
+    this.loadData().then(() => {
+      this.subscriptions.add(
+        this.reportControlService.selectedInformeId$
+          .pipe(
+            switchMap((informeId) => {
+              this.selectedInformeId = informeId;
 
-            return this.filterService.filteredElements$;
-          })
-        )
-        .subscribe((elems) => {
-          const filteredElements = [];
+              if (this.selectedInformeId !== undefined) {
+                const dataInforme = this.allData.filter((data) => data.informeId === this.selectedInformeId);
 
-          if (this.allData !== undefined) {
-            if (this.dataSource.data.length !== this.allData.length) {
-              this.dataSource.data = this.allData.filter((dataElem) =>
-                elems.map((elem) => elem.id).includes(dataElem.id)
-              );
+                this.dataSource = new MatTableDataSource(dataInforme);
+
+                this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;
+              }
+
+              return this.filterService.filteredElements$;
+            })
+          )
+          .subscribe((elems) => {
+            if (this.allData !== undefined && this.dataSource !== undefined && elems !== undefined) {
+              console.log('allData', this.allData.length);
+              console.log('dataSource', this.dataSource.data.length);
+              console.log('elems', elems.length);
             }
-          } else {
-            elems
-              .filter((elem) => (elem as Anomalia).informeId === this.selectedInformeId)
-              .forEach((elem) => {
-                const anomalia = elem as Anomalia;
 
-                let numComentarios = null;
-                if (anomalia.hasOwnProperty('comentarios')) {
-                  numComentarios = anomalia.comentarios.length;
-                }
-
-                filteredElements.push({
-                  id: anomalia.id,
-                  tipoLabel: GLOBAL.labels_tipos[anomalia.tipo],
-                  tipo: anomalia.tipo,
-                  perdidas: anomalia.perdidas,
-                  temp: anomalia.temperaturaMax,
-                  temperaturaMax: anomalia.temperaturaMax,
-                  gradiente: anomalia.gradienteNormalizado,
-                  gradienteNormalizado: anomalia.gradienteNormalizado,
-                  clase: anomalia.clase,
-                  anomalia,
-                  hovered: false,
-                  selected: false,
-                  zoom: false,
-                  numAnom: anomalia.numAnom,
-                  colors: this.getAnomViewColors(anomalia),
-                  numComentarios,
-                });
-              });
-
-            this.dataSource = new MatTableDataSource(filteredElements);
-            this.allData = this.dataSource.data;
-          }
-          this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;
-        })
-    );
+            if (this.allData !== undefined) {
+              if (elems.length !== this.allData.length) {
+                this.dataSource.data = this.allData
+                  .filter((dataElem) => dataElem.informe === this.selectedInformeId)
+                  .filter((dataElem) => elems.map((elem) => elem.id).includes(dataElem.id));
+              }
+            }
+          })
+      );
+    });
 
     this.subscriptions.add(
       this.anomaliasControlService.anomaliaHover$.subscribe((anomHov) => (this.anomaliaHovered = anomHov))
@@ -114,6 +94,43 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.anomaliasControlService.anomaliaSelect$.subscribe((anomSel) => (this.anomaliaSelected = anomSel))
     );
+  }
+
+  private loadData(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const data: any[] = [];
+
+      this.reportControlService.allAnomalias.forEach((anom) => {
+        let numComentarios = null;
+        if (anom.hasOwnProperty('comentarios')) {
+          numComentarios = anom.comentarios.length;
+        }
+
+        data.push({
+          id: anom.id,
+          informeId: anom.informeId,
+          tipoLabel: GLOBAL.labels_tipos[anom.tipo],
+          tipo: anom.tipo,
+          perdidas: anom.perdidas,
+          temp: anom.temperaturaMax,
+          temperaturaMax: anom.temperaturaMax,
+          gradiente: anom.gradienteNormalizado,
+          gradienteNormalizado: anom.gradienteNormalizado,
+          clase: anom.clase,
+          anomalia: anom,
+          hovered: false,
+          selected: false,
+          zoom: false,
+          numAnom: anom.numAnom,
+          colors: this.getAnomViewColors(anom),
+          numComentarios,
+        });
+      });
+
+      this.allData = data;
+
+      resolve();
+    });
   }
 
   private getAnomViewColors(anomalia: Anomalia): any {

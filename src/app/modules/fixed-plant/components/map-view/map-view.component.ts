@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ComponentFactoryResolver } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -9,6 +9,10 @@ import { ZonesService } from '@data/services/zones.service';
 import { ResetServices } from '@data/services/reset-services.service';
 import { ViewReportService } from '@data/services/view-report.service';
 import { MatSidenav } from '@angular/material/sidenav';
+
+import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
+
+import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
 
 @Component({
   selector: 'app-map-view',
@@ -32,6 +36,12 @@ export class MapViewComponent implements OnInit, OnDestroy {
   numInformes = 1;
   viewSelected: string;
 
+  @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
+  @ViewChild('sidenavRight') sidenavRight: MatSidenav;
+  @ViewChild('sidenavStats') sidenavStats: MatSidenav;
+
+  @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -40,7 +50,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
     private resetServicesService: ResetServices,
-    private viewReportService: ViewReportService
+    private viewReportService: ViewReportService,
+    private componentFactoryResolver: ComponentFactoryResolver
   ) {}
 
   ngOnInit(): void {
@@ -90,6 +101,13 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
   setSidenavStats(sidenavStats: MatSidenav) {
     this.statsService.setSidenav(sidenavStats);
+  }
+
+  loadStats() {
+    const component = this.componentFactoryResolver.resolveComponentFactory(PlantaStatsComponent);
+
+    this.dynamicStats.viewContainerRef.clear();
+    this.dynamicStats.viewContainerRef.createComponent(component);
   }
 
   ngOnDestroy(): void {
