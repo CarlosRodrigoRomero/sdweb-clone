@@ -71,12 +71,6 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
             })
           )
           .subscribe((elems) => {
-            if (this.allData !== undefined && this.dataSource !== undefined && elems !== undefined) {
-              console.log('allData', this.allData.length);
-              console.log('dataSource', this.dataSource.data.length);
-              console.log('elems', elems.length);
-            }
-
             if (this.allData !== undefined) {
               if (elems.length !== this.allData.length) {
                 this.dataSource.data = this.allData

@@ -1,10 +1,11 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 
@@ -20,7 +21,7 @@ import { Anomalia } from '@core/models/anomalia';
   styleUrls: ['./list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListComponent implements AfterViewInit {
+export class ListComponent implements OnChanges {
   @Input() viewSeleccionada: string;
   @Input() dataSource: MatTableDataSource<any>;
   @Input() anomaliaHovered: Anomalia;
@@ -32,9 +33,11 @@ export class ListComponent implements AfterViewInit {
 
   displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente', 'comentarios'];
 
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.dataSource && changes.dataSource.currentValue) {
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+    }
   }
 
   applyFilter(event: Event) {

@@ -68,8 +68,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(this.reportControlService.completeView$.subscribe((value) => (this.completeView = value)));
 
-    this.subscriptions.add(this.reportControlService.mapLoaded$.subscribe((value) => (this.mapLoaded = value)));
-
     this.subscriptions.add(this.zonesService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
 
     this.subscriptions.add(
@@ -88,6 +86,16 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.viewSelected = viewSel))
+    );
+
+    this.subscriptions.add(
+      this.reportControlService.mapLoaded$.subscribe((value) => {
+        this.mapLoaded = value;
+
+        if (this.mapLoaded) {
+          this.statsService.setSidenav(this.sidenavStats);
+        }
+      })
     );
   }
 
