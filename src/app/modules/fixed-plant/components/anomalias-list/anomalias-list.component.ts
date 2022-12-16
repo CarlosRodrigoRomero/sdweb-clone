@@ -27,6 +27,7 @@ import { Colors } from '@core/classes/colors';
 export class AnomaliasListComponent implements OnInit, OnDestroy {
   viewSeleccionada: string;
   dataSource: MatTableDataSource<any>;
+  allData: any[];
   selectedRow: string;
   prevSelectedRow: any;
   anomaliaHovered;
@@ -63,38 +64,46 @@ export class AnomaliasListComponent implements OnInit, OnDestroy {
         .subscribe((elems) => {
           const filteredElements = [];
 
-          elems
-            .filter((elem) => (elem as Anomalia).informeId === this.selectedInformeId)
-            .forEach((elem) => {
-              const anomalia = elem as Anomalia;
+          if (this.allData !== undefined) {
+            if (this.dataSource.data.length !== this.allData.length) {
+              this.dataSource.data = this.allData.filter((dataElem) =>
+                elems.map((elem) => elem.id).includes(dataElem.id)
+              );
+            }
+          } else {
+            elems
+              .filter((elem) => (elem as Anomalia).informeId === this.selectedInformeId)
+              .forEach((elem) => {
+                const anomalia = elem as Anomalia;
 
-              let numComentarios = null;
-              if (anomalia.hasOwnProperty('comentarios')) {
-                numComentarios = anomalia.comentarios.length;
-              }
+                let numComentarios = null;
+                if (anomalia.hasOwnProperty('comentarios')) {
+                  numComentarios = anomalia.comentarios.length;
+                }
 
-              filteredElements.push({
-                id: anomalia.id,
-                tipoLabel: GLOBAL.labels_tipos[anomalia.tipo],
-                tipo: anomalia.tipo,
-                perdidas: anomalia.perdidas,
-                temp: anomalia.temperaturaMax,
-                temperaturaMax: anomalia.temperaturaMax,
-                gradiente: anomalia.gradienteNormalizado,
-                gradienteNormalizado: anomalia.gradienteNormalizado,
-                clase: anomalia.clase,
-                anomalia,
-                hovered: false,
-                selected: false,
-                zoom: false,
-                numAnom: anomalia.numAnom,
-                colors: this.getAnomViewColors(anomalia),
-                numComentarios,
+                filteredElements.push({
+                  id: anomalia.id,
+                  tipoLabel: GLOBAL.labels_tipos[anomalia.tipo],
+                  tipo: anomalia.tipo,
+                  perdidas: anomalia.perdidas,
+                  temp: anomalia.temperaturaMax,
+                  temperaturaMax: anomalia.temperaturaMax,
+                  gradiente: anomalia.gradienteNormalizado,
+                  gradienteNormalizado: anomalia.gradienteNormalizado,
+                  clase: anomalia.clase,
+                  anomalia,
+                  hovered: false,
+                  selected: false,
+                  zoom: false,
+                  numAnom: anomalia.numAnom,
+                  colors: this.getAnomViewColors(anomalia),
+                  numComentarios,
+                });
               });
-            });
 
-          this.dataSource = new MatTableDataSource(filteredElements);
-
+            this.dataSource = new MatTableDataSource(filteredElements);
+            this.allData = this.dataSource.data;
+          }
           this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;
         })
     );
