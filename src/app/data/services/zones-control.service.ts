@@ -162,7 +162,12 @@ export class ZonesControlService {
       const zonasInforme = zonas.filter((z) => z.informeId === informeId);
       zonasInforme.forEach((zona) => {
         const elemsZona = zona.elems;
-        const elemsFilteredZona = elemsZona.filter((elem) => elems.includes(elem));
+        let elemsFilteredZona = elemsZona.filter((elem) => elems.includes(elem));
+
+        // filtramos solo las cels calientes para la vista de cels calientes
+        if (l.getProperties().view === 'cc') {
+          elemsFilteredZona = elemsFilteredZona.filter((elem) => elem.tipo == 8 || elem.tipo == 9);
+        }
 
         const property = this.getPropertyView(view, informeId, zona, zonasInforme, elemsZona);
 
