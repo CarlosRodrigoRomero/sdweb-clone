@@ -39,7 +39,7 @@ import { FiltersPanelContainerComponent } from './containers/filters-panel-conta
   ],
   imports: [CommonModule, SharedModule],
   exports: [
-    FiltersPanelComponent,
+    FiltersPanelContainerComponent,
     ConfianzaFilterComponent,
     AspectRatioFilterComponent,
     AreaModuloBrutoFilterComponent,
