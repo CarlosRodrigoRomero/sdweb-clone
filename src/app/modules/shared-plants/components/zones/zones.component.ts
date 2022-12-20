@@ -38,7 +38,14 @@ export class ZonesComponent implements OnInit, OnDestroy {
     // iniciamos el servicio que controla las zonas y las cargamos
     this.zonesControlService.initService().then((value) => {
       if (value) {
-        this.zonesControlService.mostrarZonas(this.zones[this.zones.length - 1], this.zonesLayers);
+        let sizeZonesClusters = this.zones.length - 1;
+        // si tiene un tamaño de agrupación por zonas seleccionado lo aplicamos
+        if (this.reportControlService.planta.hasOwnProperty('sizeZonesClusters')) {
+          sizeZonesClusters = this.reportControlService.planta.sizeZonesClusters;
+        }
+        const newZones = this.zonesControlService.createZonas(this.zones[sizeZonesClusters]);
+
+        this.zonesControlService.mostrarZonas(newZones, this.zonesLayers);
       }
     });
 

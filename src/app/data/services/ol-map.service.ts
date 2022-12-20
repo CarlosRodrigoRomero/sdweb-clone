@@ -26,10 +26,11 @@ import { InformeInterface } from '@core/models/informe';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { GeoserverService } from './geoserver.service';
 
-import { GLOBAL } from '@data/constants/global';
+import { GEO } from '@data/constants/geo';
 
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
+import ImageTileCubiertasMod from '@shared/modules/ol-maps/ImageTileCubiertasMod.js';
 
 @Injectable({
   providedIn: 'root',
@@ -188,23 +189,28 @@ export class OlMapService {
     if (informe.hasOwnProperty('servidorCapas')) {
       switch (informe.servidorCapas) {
         case 'geoserver': {
-          url = GLOBAL.urlGeoserver + thermalLayer.gisName + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
+          url = GEO.urlGeoserver + thermalLayer.gisName + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
           break;
         }
         case 'old': {
-          url = GLOBAL.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
+          url = GEO.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
           break;
         }
       }
     } else {
-      url = GLOBAL.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
+      url = GEO.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
+    }
+
+    let tileClass = ImageTileMod;
+    if (GEO.plantasTipoCubiertas.includes(informe.plantaId)) {
+      tileClass = ImageTileCubiertasMod;
     }
 
     const tl = new TileLayer({
       source: new XYZ_mod({
         url,
         crossOrigin: 'anonymous',
-        tileClass: ImageTileMod,
+        tileClass,
         tileLoadFunction: (imageTile, src) => {
           imageTile.rangeTempMax = thermalLayer.rangeTempMax;
           imageTile.rangeTempMin = thermalLayer.rangeTempMin;

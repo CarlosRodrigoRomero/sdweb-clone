@@ -89,12 +89,7 @@ export class AnomaliasControlService {
       );
 
       this.subscriptions.add(
-        this.viewReportService.reportViewSelected$.subscribe((viewSel) => {
-          this.toggleViewSelected = viewSel;
-
-          // filtramos las ccs para la vista CelsCalientes
-          this.filterService.filterCCs(this.toggleViewSelected);
-        })
+        this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel))
       );
 
       initService(true);
@@ -180,7 +175,12 @@ export class AnomaliasControlService {
     // Para cada vector layer (que corresponde a un informe)
     this.anomaliaLayers.forEach((l) => {
       // filtra las anomalías correspondientes al informe
-      const anomaliasInforme = anomalias.filter((item) => item.informeId === l.getProperties().informeId);
+      let anomaliasInforme = anomalias.filter((anom) => anom.informeId === l.getProperties().informeId);
+
+      // filtramos solo las cels calientes para la vista de cels calientes
+      if (l.getProperties().view === 'cc') {
+        anomaliasInforme = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+      }
 
       const source = l.getSource();
       source.clear();

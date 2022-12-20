@@ -1,8 +1,6 @@
-import { Component, OnDestroy, OnInit, ViewChild, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ComponentFactoryResolver } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-
-import { MatSidenav } from '@angular/material/sidenav';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { StatsService } from '@data/services/stats.service';
@@ -10,6 +8,7 @@ import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ResetServices } from '@data/services/reset-services.service';
 import { ViewReportService } from '@data/services/view-report.service';
+import { MatSidenav } from '@angular/material/sidenav';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
 
@@ -21,14 +20,14 @@ import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-sta
   styleUrls: ['./map-view.component.css'],
 })
 export class MapViewComponent implements OnInit, OnDestroy {
-  public plantaFija = true;
-  public rightOpened = false;
-  public statsOpened: boolean;
-  public anomaliasLoaded = false;
-  public notSharedReport = true;
+  plantaFija = true;
+  // rightOpened = false;
+  // statsOpened: boolean;
+  anomaliasLoaded = false;
+  sharedReport = false;
   completeView = false;
-  public showFilters = true;
-  public mapLoaded = false;
+  showFilters = true;
+  mapLoaded = false;
   noAnomsReport = false;
   thereAreZones = true;
   thereAreLargestZones = false;
@@ -37,13 +36,13 @@ export class MapViewComponent implements OnInit, OnDestroy {
   numInformes = 1;
   viewSelected: string;
 
-  private subscriptions: Subscription = new Subscription();
-
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
 
   @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private reportControlService: ReportControlService,
@@ -51,8 +50,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
     private resetServicesService: ResetServices,
-    private componentFactoryResolver: ComponentFactoryResolver,
-    private viewReportService: ViewReportService
+    private viewReportService: ViewReportService,
+    private componentFactoryResolver: ComponentFactoryResolver
   ) {}
 
   ngOnInit(): void {
@@ -65,21 +64,9 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))
     );
-    this.subscriptions.add(
-      this.reportControlService.sharedReport$.subscribe((value) => (this.notSharedReport = !value))
-    );
+    this.subscriptions.add(this.reportControlService.sharedReport$.subscribe((value) => (this.sharedReport = value)));
 
     this.subscriptions.add(this.reportControlService.completeView$.subscribe((value) => (this.completeView = value)));
-
-    this.subscriptions.add(
-      this.reportControlService.mapLoaded$.subscribe((value) => {
-        this.mapLoaded = value;
-
-        if (this.mapLoaded) {
-          this.statsService.setSidenav(this.sidenavStats);
-        }
-      })
-    );
 
     this.subscriptions.add(this.zonesService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
 
@@ -100,6 +87,16 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.viewSelected = viewSel))
     );
+
+    this.subscriptions.add(
+      this.reportControlService.mapLoaded$.subscribe((value) => {
+        this.mapLoaded = value;
+
+        if (this.mapLoaded) {
+          this.statsService.setSidenav(this.sidenavStats);
+        }
+      })
+    );
   }
 
   showControls() {
@@ -108,6 +105,10 @@ export class MapViewComponent implements OnInit, OnDestroy {
     } else {
       document.getElementById('map-control').style.display = 'none';
     }
+  }
+
+  setSidenavStats(sidenavStats: MatSidenav) {
+    this.statsService.setSidenav(sidenavStats);
   }
 
   loadStats() {

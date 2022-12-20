@@ -6,7 +6,7 @@ import { AuthGuard } from '@core/guards/auth.guard';
 import { SelectivePreloadingStrategyService } from '@data/services/selective-preloading-strategy.service';
 
 import { AvisoLegalComponent } from '@shared/components/aviso-legal/aviso-legal.component';
-import { SkeletonComponent } from '@layout/skeleton/skeleton.component';
+import { SkeletonComponent } from '@layout/components/skeleton/skeleton.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'clients', pathMatch: 'full' },

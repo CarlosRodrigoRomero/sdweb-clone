@@ -84,7 +84,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         .subscribe((warnings) => {
           this.warnings = warnings;
 
-          // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
+          // detectamos cambios porque estamos utilizando la estrategia OnPush
           this.cdr.detectChanges();
         })
     );
@@ -134,7 +134,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
               this.locAreas
             );
 
-            // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
+            // detectamos cambios porque estamos utilizando la estrategia OnPush
             this.cdr.detectChanges();
           }
         });
@@ -183,7 +183,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
               seguidoresInforme
             );
 
-            // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
+            // detectamos cambios porque estamos utilizando la estrategia OnPush
             this.cdr.detectChanges();
           }
         });
