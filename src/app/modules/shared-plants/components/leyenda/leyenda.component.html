@@ -3,7 +3,7 @@
     <div
       *ngIf="
         !plantaFija ||
-        (plantaFija && viewSelected != 'tipo' && simplifiedView && currentZoom < zonesControlService.zoomChangeView)
+        (plantaFija && viewSelected != 'tipo' && simplifiedView && currentZoom < zoomChangeView)
       "
       class="lines"
     >
@@ -29,7 +29,7 @@
     <div
       *ngIf="
         (plantaFija && viewSelected != 'tipo' && !simplifiedView) ||
-        (plantaFija && viewSelected != 'tipo' && simplifiedView && currentZoom >= zonesControlService.zoomChangeView)
+        (plantaFija && viewSelected != 'tipo' && simplifiedView && currentZoom >= zoomChangeView)
       "
       class="lines"
     >

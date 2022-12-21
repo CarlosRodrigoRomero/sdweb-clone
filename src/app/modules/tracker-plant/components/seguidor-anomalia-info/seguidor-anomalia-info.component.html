@@ -30,19 +30,19 @@
         <div class="line-sub-content" *ngIf="anomaliaInfo.temperaturaMax !== undefined">
           <span>T. Máx:</span>
           <span
-            ><b>{{ anomaliaInfo.temperaturaMax | number: '1.0-1' }}ºC</b></span
+            ><b>{{ anomaliaInfo.temperaturaMax | number : '1.0-1' }}ºC</b></span
           >
         </div>
         <div class="line-sub-content" *ngIf="anomaliaInfo.temperaturaRef !== undefined" style="color: blue">
           <span>T. Ref: </span>
           <span
-            ><b>{{ anomaliaInfo.temperaturaRef | number: '1.0-1' }}ºC</b></span
+            ><b>{{ anomaliaInfo.temperaturaRef | number : '1.0-1' }}ºC</b></span
           >
         </div>
         <div class="line-sub-content" *ngIf="anomaliaInfo.gradienteNormalizado !== undefined" style="color: red">
           <span>&Delta;T (norm):</span>
           <span
-            ><b>+{{ anomaliaInfo.gradienteNormalizado | number: '1.0-1' }}ºC</b></span
+            ><b>+{{ anomaliaInfo.gradienteNormalizado | number : '1.0-1' }}ºC</b></span
           >
         </div>
       </div>
@@ -67,11 +67,12 @@
         <span class="subtitle-label">Localización: </span>
       </div>
       <div class="line-content">
-        <div class="line-sub-content">
+        <span>{{ anomaliaInfo.localizacion }}</span>
+        <div *ngIf="isAdmin" class="line-sub-content">
           <span>Fila:</span>
-          <span
+          <!-- <span
             ><b>{{ anomaliaInfo.fila }}</b></span
-          >
+          > -->
           <input
             *ngIf="isAdmin"
             class="imput"
@@ -81,11 +82,11 @@
             (change)="updateAnomalia($event.target.value, 'local_y')"
           />
         </div>
-        <div class="line-sub-content">
+        <div *ngIf="isAdmin" class="line-sub-content">
           <span>Columna:</span>
-          <span
+          <!-- <span
             ><b>{{ anomaliaInfo.columna }}</b></span
-          >
+          > -->
           <input
             *ngIf="isAdmin"
             class="imput"
@@ -102,7 +103,7 @@
         <mat-icon>today</mat-icon>
         <span class="subtitle-label">Fecha de captura: </span>
       </div>
-      <span class="line-content">{{ anomaliaInfo.fecha * 1000 | date: 'dd/MM/yyyy HH:mm' }}</span>
+      <span class="line-content">{{ anomaliaInfo.fecha * 1000 | date : 'dd/MM/yyyy HH:mm' }}</span>
     </div>
     <div
       *ngIf="
@@ -121,7 +122,7 @@
       <div class="meteo-two-lines">
         <div class="meteo-line">
           <span *ngIf="anomaliaInfo.irradiancia !== undefined" class="meteo-content"
-            >Irradiancia: <b>{{ anomaliaInfo.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></b></span
+            >Irradiancia: <b>{{ anomaliaInfo.irradiancia | number : '1.0-0' }} W/m<sup>2</sup></b></span
           >
           <!-- <span *ngIf="anomaliaInfo.vientoDireccion !== undefined" class="meteo-content"
             >Direc. viento: <b>{{ anomaliaInfo.vientoDireccion }}º</b></span

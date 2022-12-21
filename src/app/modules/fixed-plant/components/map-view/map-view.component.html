@@ -6,7 +6,7 @@
   (backdropClick)="sidenavStats.toggle()"
 >
   <!-- SIDENAV STATS -->
-  <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end">
+  <mat-sidenav #sidenavStats class="stats-sidenav" position="end">
     <!-- cargamos el modulo Stats -->
     <ng-template appDynamicStats></ng-template>
   </mat-sidenav>
@@ -27,15 +27,15 @@
         <div class="titulo">
           <h4>Filtros</h4>
         </div>
-        <app-filters-panel></app-filters-panel>
+        <app-filters-panel-container></app-filters-panel-container>
       </mat-sidenav>
 
       <!-- SIDENAV LISTA ANOMALIAS -->
-      <mat-sidenav #sidenavRight [(opened)]="rightOpened" class="right-sidenav" position="end" disableClose>
+      <mat-sidenav #sidenavRight class="right-sidenav" position="end" disableClose>
         <div class="titulo">
           <h4>Listado de anomalías</h4>
         </div>
-        <app-anomalias-list></app-anomalias-list>
+        <app-anomalia-list-container></app-anomalia-list-container>
       </mat-sidenav>
 
       <mat-sidenav-content>
@@ -51,15 +51,15 @@
             <app-simplified-view *ngIf="viewSelected !== 'tipo' && thereAreZones"></app-simplified-view>
 
             <!-- LEYENDA -->
-            <app-leyenda class="leyenda-tipo" *ngIf="viewSelected === 'tipo'"></app-leyenda>
-            <app-leyenda class="leyenda-no-tipo" *ngIf="viewSelected !== 'tipo'"></app-leyenda>
+            <app-leyenda-container class="leyenda-tipo" *ngIf="viewSelected === 'tipo'"></app-leyenda-container>
+            <app-leyenda-container class="leyenda-no-tipo" *ngIf="viewSelected !== 'tipo'"></app-leyenda-container>
 
             <div class="btns-export">
               <!-- BOTON COMPARTIR -->
-              <app-share-report *ngIf="notSharedReport || completeView"></app-share-report>
+              <app-share-report *ngIf="!sharedReport || completeView"></app-share-report>
 
               <!-- BOTON DESCARGAS -->
-              <app-download-report *ngIf="notSharedReport || completeView"></app-download-report>
+              <app-download-report *ngIf="!sharedReport || completeView"></app-download-report>
             </div>
 
             <button mat-raised-button class="btn-open-controls" (click)="showControls()">
@@ -78,7 +78,7 @@
               <!-- CONTROLES VISUALES -->
               <div class="visual-control">
                 <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider>
-                <app-global-coord-areas *ngIf="thereAreLargestZones"></app-global-coord-areas>
+                <app-zones-selector-container *ngIf="thereAreLargestZones"></app-zones-selector-container>
                 <app-slider-opacity></app-slider-opacity>
               </div>
             </div>
@@ -101,7 +101,7 @@
 
           <!-- BOTON SIDENAV STATS -->
           <button
-            *ngIf="notSharedReport || completeView"
+            *ngIf="!sharedReport || completeView"
             mat-raised-button
             class="btn-right-stats stats"
             (click)="loadStats(); sidenavStats.toggle()"

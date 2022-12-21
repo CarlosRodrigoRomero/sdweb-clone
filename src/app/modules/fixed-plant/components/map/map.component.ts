@@ -6,7 +6,7 @@ import { combineLatest, Subscription } from 'rxjs';
 import Map from 'ol/Map';
 import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
-import { TileDebug } from 'ol/source';
+import { OSM, TileDebug } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { defaults as defaultControls } from 'ol/control.js';
 import XYZ from 'ol/source/XYZ';
@@ -140,6 +140,11 @@ export class MapComponent implements OnInit, OnDestroy {
     });
     const satelliteLayer = new TileLayer({
       source: satellite,
+      preload: Infinity,
+    });
+
+    const osmLayer = new TileLayer({
+      source: new OSM(),
     });
 
     let aerial;
@@ -152,6 +157,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
       const aerialLayer = new TileLayer({
         source: aerial,
+        preload: Infinity,
       });
 
       aerialLayer.setExtent(this.extent1);
@@ -160,6 +166,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     const layers = [
+      // osmLayer,
       satelliteLayer,
       ...this.aerialLayers,
       ...this.thermalLayers,

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { InformeInterface } from '@core/models/informe';
 
-import { GLOBAL } from '@data/constants/global';
+import { GEO } from '@data/constants/geo';
 import { TileCoord } from 'ol/tilecoord';
 
 @Injectable({
@@ -21,23 +21,23 @@ export class GeoserverService {
       switch (informe.servidorCapas) {
         case 'geoserver': {
           url =
-            GLOBAL.urlGeoserver + informe.id + '_' + type + '@WebMercatorQuad@png/' + tileCoords + '.png?flipY=true';
+            GEO.urlGeoserver + informe.id + '_' + type + '@WebMercatorQuad@png/' + tileCoords + '.png?flipY=true';
           break;
         }
         case 'old': {
           if (checkType) {
-            url = GLOBAL.urlServidorAntiguo + informe.id + '_' + type + '/' + tileCoords + '.png';
+            url = GEO.urlServidorAntiguo + informe.id + '_' + type + '/' + tileCoords + '.png';
           } else {
-            url = GLOBAL.urlServidorAntiguo + informe.id + '_' + type + '/' + tileCoords + '.png';
+            url = GEO.urlServidorAntiguo + informe.id + '_' + type + '/' + tileCoords + '.png';
           }
           break;
         }
       }
     } else {
       if (checkType) {
-        url = GLOBAL.urlServidorAntiguo + informe.id + '_' + type + '/' + tileCoords + '.png';
+        url = GEO.urlServidorAntiguo + informe.id + '_' + type + '/' + tileCoords + '.png';
       } else {
-        url = GLOBAL.urlServidorAntiguo + informe.id + '_' + type + '/' + tileCoords + '.png';
+        url = GEO.urlServidorAntiguo + informe.id + '_' + type + '/' + tileCoords + '.png';
       }
     }
 

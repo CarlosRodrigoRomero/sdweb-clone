@@ -21,6 +21,7 @@ import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
 import { FilterableElement } from '@core/models/filterableInterface';
+import { ZoneInterface } from '@core/models/zone';
 
 import { COLOR } from '@data/constants/color';
 
@@ -82,17 +83,6 @@ export class ZonesControlService {
   }
 
   createZonasLayers(informeId: string): VectorLayer[] {
-    const tipoLayer = new VectorLayer({
-      source: new VectorSource({ wrapX: false }),
-      style: this.getStyleTipo(false),
-      visible: false,
-    });
-    tipoLayer.setProperties({
-      informeId,
-      view: 'tipo',
-      type: 'zonas',
-    });
-
     const maeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleMae(false),
@@ -126,33 +116,62 @@ export class ZonesControlService {
       type: 'zonas',
     });
 
-    return [tipoLayer, maeLayer, ccLayer, gradLayer];
+    return [maeLayer, ccLayer, gradLayer];
   }
 
-  mostrarZonas(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
+  createZonas(locAreas: LocationAreaInterface[]): ZoneInterface[] {
+    const zones: ZoneInterface[] = [];
+    this.reportControlService.informesIdList.forEach((informeId) => {
+      const elemsInforme = this.reportControlService.allFilterableElements.filter(
+        (elem) => elem.informeId === informeId
+      );
+
+      locAreas.forEach((locArea) => {
+        const elemsZone = this.getElemsZona(locArea, elemsInforme);
+
+        const zone: ZoneInterface = {
+          id: this.getGlobalsLabel(locArea.globalCoords),
+          informeId,
+          elems: elemsZone,
+          globalCoords: locArea.globalCoords,
+          path: locArea.path,
+        };
+
+        zones.push(zone);
+      });
+    });
+
+    return zones;
+  }
+
+  mostrarZonas(zones: ZoneInterface[], layers: VectorLayer[]) {
     this.subscriptions.add(
       this.filterService.filteredElements$.subscribe((elems) => {
-        this.addZonas(zonas, layers, elems);
+        this.addZonas(zones, layers, elems);
       })
     );
   }
 
-  private addZonas(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
+  private addZonas(zonas: ZoneInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
       const view = l.getProperties().view;
       const informeId = l.getProperties().informeId;
-      const elemsInforme = this.reportControlService.allFilterableElements.filter(
-        (elem) => elem.informeId === informeId
-      );
-      const elemsFilteredInforme = elems.filter((elem) => elem.informeId === informeId);
       const source = l.getSource();
       source.clear();
-      zonas.forEach((zona) => {
-        const elemsFilteredZona = this.getElemsZona(zona, elemsFilteredInforme);
+      const zonasInforme = zonas.filter((z) => z.informeId === informeId);
+      zonasInforme.forEach((zona) => {
+        const elemsZona = zona.elems;
+        let elemsFilteredZona = elemsZona.filter((elem) => elems.includes(elem));
 
-        const allElemsZona = this.getElemsZona(zona, elemsInforme);
-        const property = this.getPropertyView(view, informeId, zona, zonas, allElemsZona);
+        // filtramos solo las cels calientes para la vista de cels calientes
+        if (l.getProperties().view === 'cc') {
+          if (this.reportControlService.plantaFija) {
+            elemsFilteredZona = elemsFilteredZona.filter((elem) => elem.tipo == 8 || elem.tipo == 9);
+          }
+        }
+
+        const property = this.getPropertyView(view, informeId, zona, zonasInforme, elemsZona);
 
         const coords = this.pathToLonLat(zona.path);
 
@@ -539,22 +558,6 @@ export class ZonesControlService {
     } else {
       return COLOR.colores_severity_rgb[2].replace(',1)', ',' + opacity + ')');
     }
-  }
-
-  // ESTILOS TIPO ANOMALÍA
-  private getStyleTipo(focused: boolean) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : 'black',
-            width: focused ? 2 : 1,
-          }),
-          fill: null,
-          text: this.getLabelStyle(feature),
-        });
-      }
-    };
   }
 
   getLabelStyle(feature: Feature) {

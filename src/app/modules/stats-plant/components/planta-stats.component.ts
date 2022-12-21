@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -27,15 +27,35 @@ export class PlantaStatsComponent implements OnInit, OnDestroy {
     private statsService: StatsService,
     private portfolioControlService: PortfolioControlService,
     public reportControlService: ReportControlService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.portfolioControlService.initService().then((res) => (this.portfolioLoaded = res));
+    this.portfolioControlService.initService().then((res) => {
+      this.portfolioLoaded = res;
 
-    this.subscriptions.add(this.zonesService.thereAreZones$.subscribe((value) => (this.thereAreZones = value)));
+      // detectamos cambios porque estamos utilizando la estrategia OnPush
+      this.cdr.detectChanges();
+    });
 
-    this.subscriptions.add(this.reportControlService.sharedReport$.subscribe((shared) => (this.sharedReport = shared)));
+    this.subscriptions.add(
+      this.zonesService.thereAreZones$.subscribe((value) => {
+        this.thereAreZones = value;
+
+        // detectamos cambios porque estamos utilizando la estrategia OnPush
+        this.cdr.detectChanges();
+      })
+    );
+
+    this.subscriptions.add(
+      this.reportControlService.sharedReport$.subscribe((shared) => {
+        this.sharedReport = shared;
+
+        // detectamos cambios porque estamos utilizando la estrategia OnPush
+        this.cdr.detectChanges();
+      })
+    );
 
     this.subscriptions.add(this.statsService.loadCCyGradChart$.subscribe((load) => (this.loadCCyGradChart = load)));
 

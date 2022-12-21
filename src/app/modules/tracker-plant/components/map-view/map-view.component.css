@@ -73,7 +73,7 @@ app-view-toggle {
   left: 9px;
 }
 
-app-leyenda {
+app-leyenda-container {
   position: absolute;
   left: 9px;
   top: 58px;

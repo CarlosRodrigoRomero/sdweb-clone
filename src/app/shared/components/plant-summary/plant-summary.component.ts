@@ -86,7 +86,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
               );
             }
 
-            // detectamos cambios porque estamos dentro de un componento con estrategia OnPush
+            // detectamos cambios porque estamos utilizando la estrategia OnPush
             this.cdr.detectChanges();
           })
       );
