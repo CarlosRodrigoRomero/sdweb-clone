@@ -27,6 +27,7 @@ export class FilterService {
   private _allFiltrableElements: FilterableElement[] = [];
   public allFiltrableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFiltrableElements);
   public plantaSeguidores = false;
+  private _cleaningFilters = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -100,7 +101,7 @@ export class FilterService {
     if (this.filters.length === 0) {
       // desaplicamos filtros si los hubiese
       if (this.plantaSeguidores) {
-        this.unaplySegsFilters();
+        this.unapplySegsFilters();
       } else {
         this.unapplyFilters();
       }
@@ -226,16 +227,20 @@ export class FilterService {
   }
 
   private unapplyFilters() {
+    this.cleaningFilters = true;
+
     this.filteredElements = this.allFiltrableElements;
+
+    setTimeout(() => (this.cleaningFilters = false), 100);
   }
 
-  private unaplySegsFilters() {
+  private unapplySegsFilters() {
     this.allFiltrableElements.forEach((seg) => {
       const seguidor = seg as Seguidor;
       seguidor.anomaliasCliente = seguidor.anomalias.filter((anom) => anom.tipo != 0 && anom.criticidad !== null);
     });
 
-    this.filteredElements = this.allFiltrableElements;
+    this.unapplyFilters();
   }
 
   getAllFilters(): Observable<FilterInterface[]> {
@@ -316,5 +321,13 @@ export class FilterService {
   set filteredElements(value: FilterableElement[]) {
     this._filteredElements = value;
     this.filteredElements$.next(value);
+  }
+
+  get cleaningFilters() {
+    return this._cleaningFilters;
+  }
+
+  set cleaningFilters(value: boolean) {
+    this._cleaningFilters = value;
   }
 }

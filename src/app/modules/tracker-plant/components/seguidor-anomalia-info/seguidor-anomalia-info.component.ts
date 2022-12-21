@@ -77,6 +77,10 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
               temperaturaAire: (this.anomaliaSelected as PcInterface).temperaturaAire,
               nubosidad: (this.anomaliaSelected as PcInterface).nubosidad,
               numComentarios,
+              localizacion: this.anomaliaInfoService.getPosicionModuloLabel(
+                this.anomaliaSelected,
+                this.reportControlService.planta
+              ),
             };
           }
         })

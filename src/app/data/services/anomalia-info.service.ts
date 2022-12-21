@@ -90,12 +90,7 @@ export class AnomaliaInfoService {
   }
 
   getModuloLabel(anomalia: Anomalia): string {
-    if (
-      !anomalia.hasOwnProperty('modulo') ||
-      anomalia.modulo === null ||
-      anomalia.modulo === undefined ||
-      anomalia.modulo === ''
-    ) {
+    if (!anomalia.hasOwnProperty('modulo') || anomalia.modulo === null || anomalia.modulo === undefined) {
       return this.translation.t('Desconocido');
     } else {
       const modulo = anomalia.modulo;
@@ -184,6 +179,21 @@ export class AnomaliaInfoService {
         }
       }
     });
+
+    const numModulo = this.getNumeroModulo(anomalia, planta);
+    if (numModulo !== null) {
+      label += `${this.translation.t('Nº módulo')}: ${numModulo.toString()}`;
+    } else {
+      const altura = this.getAlturaAnom(anomalia, planta);
+      const columna = this.getColumnaAnom(anomalia, planta);
+      label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`;
+    }
+
+    return label;
+  }
+
+  getPosicionModuloLabel(anomalia: Anomalia, planta: PlantaInterface) {
+    let label = '';
 
     const numModulo = this.getNumeroModulo(anomalia, planta);
     if (numModulo !== null) {

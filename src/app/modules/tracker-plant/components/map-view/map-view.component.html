@@ -29,7 +29,7 @@
             <div class="titulo">
               <h4>Filtros</h4>
             </div>
-            <app-filters-panel></app-filters-panel>
+            <app-filters-panel-container></app-filters-panel-container>
           </mat-sidenav>
 
           <!-- SIDENAV LISTA SEGUIDORES -->
@@ -44,7 +44,7 @@
             <div class="titulo">
               <h4>Listado de seguidores</h4>
             </div>
-            <app-seguidores-list></app-seguidores-list>
+            <app-seguidor-list-container></app-seguidor-list-container>
           </mat-sidenav>
 
           <mat-sidenav-content>
@@ -57,7 +57,7 @@
                 <app-view-toggle></app-view-toggle>
 
                 <!-- LEYENDA -->
-                <app-leyenda></app-leyenda>
+                <app-leyenda-container></app-leyenda-container>
 
                 <div class="btns-export">
                   <!-- BOTON COMPARTIR -->
@@ -78,7 +78,7 @@
 
                   <!-- CONTROLES VISUALES -->
                   <div class="visual-control">
-                    <app-global-coord-areas *ngIf="thereAreLargestZones"></app-global-coord-areas>
+                    <app-zones-selector-container *ngIf="thereAreLargestZones"></app-zones-selector-container>
                   </div>
                 </div>
               </div>

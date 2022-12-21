@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -66,7 +66,8 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -273,6 +274,9 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
         },
       };
       this.chartLoaded = true;
+
+      // detectamos cambios porque estamos utilizando la estrategia OnPush
+      this.cdr.detectChanges();
     }
   }
 

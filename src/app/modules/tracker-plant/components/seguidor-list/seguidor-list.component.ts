@@ -1,10 +1,11 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 
@@ -15,12 +16,12 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Seguidor } from '@core/models/seguidor';
 
 @Component({
-  selector: 'app-list',
-  templateUrl: './list.component.html',
-  styleUrls: ['./list.component.css'],
+  selector: 'app-seguidor-list',
+  templateUrl: './seguidor-list.component.html',
+  styleUrls: ['./seguidor-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListComponent implements AfterViewInit {
+export class SeguidorListComponent implements OnChanges {
   @Input() viewSeleccionada: string;
   @Input() dataSource: MatTableDataSource<any>;
   @Input() displayedColumns: string[];
@@ -31,9 +32,11 @@ export class ListComponent implements AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.dataSource && changes.dataSource.currentValue) {
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+    }
   }
 
   applyFilter(event: Event) {

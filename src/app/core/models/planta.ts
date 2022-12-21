@@ -42,4 +42,5 @@ export interface PlantaInterface {
   autoLocReady?: boolean;
   numeroGlobalCoords?: number;
   ortofoto?: OrtofotoInterface;
+  sizeZonesClusters?: number;
 }

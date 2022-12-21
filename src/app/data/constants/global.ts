@@ -6,11 +6,9 @@ export let GLOBAL = {
   // 3: Estructuras
   // 4: Localizaciones
   // 5: Clasificación
-  urlServidorAntiguo: 'https://solardrontech.es/tileserver.php?/index.json?/',
   url: 'http://localhost:3977/api',
   urlStorageInformes:
     'https://console.firebase.google.com/project/sdweb-d33ce/storage/sdweb-d33ce.appspot.com/files/~2Finformes',
-  urlGeoserver: 'https://geoserver.solardrone.app:8083/geoserver/gwc/service/tms/1.0.0/sd:',
   num_tipos: 16,
   carpetaJpgGray: 'gray\\',
   temperaturaLimiteFabricantes: 90,
