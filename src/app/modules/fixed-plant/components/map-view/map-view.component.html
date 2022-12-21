@@ -35,7 +35,10 @@
         <div class="titulo">
           <h4>Listado de anomalías</h4>
         </div>
-        <app-anomalia-list-container></app-anomalia-list-container>
+
+        <ng-template appDynamicAnomaliaList></ng-template>
+
+        <!-- <app-anomalia-list-container></app-anomalia-list-container> -->
       </mat-sidenav>
 
       <mat-sidenav-content>
@@ -90,7 +93,7 @@
           <button
             mat-raised-button
             class="btn-right"
-            (click)="sidenavRight.toggle()"
+            (click)="loadAnomList(); sidenavRight.toggle()"
             matTooltip="Lista anomalías"
             matTooltipClass="tooltip-style"
           >

@@ -20,6 +20,8 @@ import { MapViewComponent } from './components/map-view/map-view.component';
 import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 
+import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list.directive';
+
 @NgModule({
   declarations: [
     MapViewComponent,
@@ -28,7 +30,9 @@ import { SliderOpacityComponent } from './components/slider-opacity/slider-opaci
     AnomaliaListComponent,
     MapComponent,
     SliderOpacityComponent,
+    DynamicAnomaliaListDirective,
   ],
+  entryComponents: [DynamicAnomaliaListDirective],
   imports: [
     PlantaFijaRoutingModule,
     NgApexchartsModule,
