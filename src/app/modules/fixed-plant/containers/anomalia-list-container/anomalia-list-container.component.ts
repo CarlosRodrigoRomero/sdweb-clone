@@ -72,10 +72,11 @@ export class AnomaliasListContainer implements OnInit, OnDestroy {
           )
           .subscribe((elems) => {
             if (this.allData !== undefined) {
-              if (elems.length !== this.allData.length) {
-                this.dataSource.data = this.allData
-                  .filter((dataElem) => dataElem.informe === this.selectedInformeId)
-                  .filter((dataElem) => elems.map((elem) => elem.id).includes(dataElem.id));
+              if (elems.length !== this.allData.length || this.filterService.cleaningFilters) {
+                const dataInforme = this.allData.filter((data) => data.informeId === this.selectedInformeId);
+                this.dataSource.data = dataInforme.filter((dataElem) =>
+                  elems.map((elem) => elem.id).includes(dataElem.id)
+                );
               }
             }
           })

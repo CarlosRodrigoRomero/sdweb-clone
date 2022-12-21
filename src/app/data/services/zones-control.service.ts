@@ -166,7 +166,9 @@ export class ZonesControlService {
 
         // filtramos solo las cels calientes para la vista de cels calientes
         if (l.getProperties().view === 'cc') {
-          elemsFilteredZona = elemsFilteredZona.filter((elem) => elem.tipo == 8 || elem.tipo == 9);
+          if (this.reportControlService.plantaFija) {
+            elemsFilteredZona = elemsFilteredZona.filter((elem) => elem.tipo == 8 || elem.tipo == 9);
+          }
         }
 
         const property = this.getPropertyView(view, informeId, zona, zonasInforme, elemsZona);

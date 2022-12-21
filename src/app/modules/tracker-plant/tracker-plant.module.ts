@@ -7,8 +7,10 @@ import { FiltersModule } from '@modules/filters/filters.module';
 import { StatsPlantModule } from '@modules/stats-plant/stats-plant.module';
 import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module';
 
+import { SeguidoresListContainer } from './containers/seguidor-list-container/seguidor-list-container.component';
+
 import { MapViewComponent } from './components/map-view/map-view.component';
-import { SeguidoresListComponent } from './components/seguidores-list/seguidores-list.component';
+import { SeguidorListComponent } from './components/seguidor-list/seguidor-list.component';
 import { MapSeguidoresComponent } from './components/map-seguidores/map-seguidores.component';
 import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
 import { SeguidorViewComponent } from './components/seguidor-view/seguidor-view.component';
@@ -23,12 +25,11 @@ import { SeguidorImageDownloadComponent } from './components/seguidor-image-down
 import { SeguidorViewNavbarComponent } from './components/seguidor-view-navbar/seguidor-view-navbar.component';
 import { SeguidorViewLeyendaComponent } from './components/seguidor-view-leyenda/seguidor-view-leyenda.component';
 import { SeguidorImageOriginComponent } from './components/seguidor-image-origin/seguidor-image-origin.component';
-import { ListComponent } from './components/list/list.component';
 
 @NgModule({
   declarations: [
     MapViewComponent,
-    SeguidoresListComponent,
+    SeguidoresListContainer,
     MapSeguidoresComponent,
     SeguidorInfoComponent,
     SeguidorViewComponent,
@@ -43,7 +44,7 @@ import { ListComponent } from './components/list/list.component';
     SeguidorViewNavbarComponent,
     SeguidorViewLeyendaComponent,
     SeguidorImageOriginComponent,
-    ListComponent,
+    SeguidorListComponent,
   ],
   imports: [
     CommonModule,

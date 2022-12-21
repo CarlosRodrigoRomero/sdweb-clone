@@ -24,17 +24,18 @@ interface SeguidorData {
 }
 
 @Component({
-  selector: 'app-seguidores-list',
-  templateUrl: './seguidores-list.component.html',
-  styleUrls: ['./seguidores-list.component.css'],
+  selector: 'app-seguidor-list-container',
+  templateUrl: './seguidor-list-container.component.html',
+  styleUrls: ['./seguidor-list-container.component.css'],
 })
-export class SeguidoresListComponent implements OnInit, OnDestroy {
+export class SeguidoresListContainer implements OnInit, OnDestroy {
   viewSeleccionada: string;
   displayedColumns: string[] = [];
   dataSource: MatTableDataSource<SeguidorData>;
   seguidorHovered: Seguidor = undefined;
   seguidorSelected: Seguidor = undefined;
   private selectedInformeId: string;
+  allData: any[];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -65,51 +66,36 @@ export class SeguidoresListComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subscriptions.add(
-      this.reportControlService.selectedInformeId$
-        .pipe(
-          switchMap((informeId) => {
-            this.selectedInformeId = informeId;
+    this.loadData().then(() => {
+      this.subscriptions.add(
+        this.reportControlService.selectedInformeId$
+          .pipe(
+            switchMap((informeId) => {
+              this.selectedInformeId = informeId;
 
-            return this.filterService.filteredElements$;
-          })
-        )
-        .subscribe((elems) => {
-          const filteredElements = [];
+              if (this.selectedInformeId !== undefined) {
+                const dataInforme = this.allData.filter((data) => data.informeId === this.selectedInformeId);
 
-          elems
-            .filter((elem) => (elem as Seguidor).informeId === this.selectedInformeId)
-            .forEach((elem) => {
-              const seguidor = elem as Seguidor;
+                this.dataSource = new MatTableDataSource(dataInforme);
 
-              let numComentarios = null;
-              if (seguidor.anomaliasCliente.length > 0) {
-                const anomWithComs = seguidor.anomaliasCliente.filter(
-                  (anom) => anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0
-                );
-                if (anomWithComs.length > 0) {
-                  numComentarios = anomWithComs.reduce((acc, anom) => acc + anom.comentarios.length, 0);
-                }
+                // this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;
               }
 
-              filteredElements.push({
-                nombre: seguidor.nombre,
-                numAnomalias: seguidor.anomaliasCliente.length,
-                modulo: seguidor.moduloLabel,
-                mae: seguidor.mae,
-                celsCalientes: seguidor.celsCalientes,
-                gradiente: seguidor.gradienteNormalizado,
-                colors: this.getColorsViewSeguidor(seguidor),
-                seguidor,
-                numComentarios,
-                hovered: false,
-                selected: false,
-              });
-            });
-
-          this.dataSource = new MatTableDataSource(filteredElements);
-        })
-    );
+              return this.filterService.filteredElements$;
+            })
+          )
+          .subscribe((elems) => {
+            if (this.allData !== undefined) {
+              if (elems.length !== this.allData.length || this.filterService.cleaningFilters) {
+                const dataInforme = this.allData.filter((data) => data.informeId === this.selectedInformeId);
+                this.dataSource.data = dataInforme.filter((dataElem) =>
+                  elems.map((elem) => elem.id).includes(dataElem.id)
+                );
+              }
+            }
+          })
+      );
+    });
 
     this.subscriptions.add(
       this.seguidoresControlService.seguidorHovered$.subscribe((segHov) => (this.seguidorHovered = segHov))
@@ -117,6 +103,46 @@ export class SeguidoresListComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.seguidoresControlService.seguidorSelected$.subscribe((segSel) => (this.seguidorSelected = segSel))
     );
+  }
+
+  private loadData(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const data: any[] = [];
+
+      this.reportControlService.allFilterableElements.forEach((elem) => {
+        const seguidor = elem as Seguidor;
+
+        let numComentarios = null;
+        if (seguidor.anomaliasCliente.length > 0) {
+          const anomWithComs = seguidor.anomaliasCliente.filter(
+            (anom) => anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0
+          );
+          if (anomWithComs.length > 0) {
+            numComentarios = anomWithComs.reduce((acc, anom) => acc + anom.comentarios.length, 0);
+          }
+        }
+
+        data.push({
+          id: seguidor.id,
+          nombre: seguidor.nombre,
+          informeId: seguidor.informeId,
+          numAnomalias: seguidor.anomaliasCliente.length,
+          modulo: seguidor.moduloLabel,
+          mae: seguidor.mae,
+          celsCalientes: seguidor.celsCalientes,
+          gradiente: seguidor.gradienteNormalizado,
+          colors: this.getColorsViewSeguidor(seguidor),
+          seguidor,
+          numComentarios,
+          hovered: false,
+          selected: false,
+        });
+      });
+
+      this.allData = data;
+
+      resolve();
+    });
   }
 
   private getColorsViewSeguidor(seguidor: Seguidor): any {
