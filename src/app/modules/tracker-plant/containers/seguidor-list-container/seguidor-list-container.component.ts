@@ -36,6 +36,7 @@ export class SeguidoresListContainer implements OnInit, OnDestroy {
   seguidorSelected: Seguidor = undefined;
   private selectedInformeId: string;
   allData: any[];
+  private dataInforme: any[];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -74,9 +75,9 @@ export class SeguidoresListContainer implements OnInit, OnDestroy {
               this.selectedInformeId = informeId;
 
               if (this.selectedInformeId !== undefined) {
-                const dataInforme = this.allData.filter((data) => data.informeId === this.selectedInformeId);
+                this.dataInforme = this.allData.filter((data) => data.informeId === this.selectedInformeId);
 
-                this.dataSource = new MatTableDataSource(dataInforme);
+                this.dataSource = new MatTableDataSource(this.dataInforme);
 
                 // this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;
               }
@@ -86,9 +87,10 @@ export class SeguidoresListContainer implements OnInit, OnDestroy {
           )
           .subscribe((elems) => {
             if (this.allData !== undefined) {
-              if (elems.length !== this.allData.length || this.filterService.cleaningFilters) {
-                const dataInforme = this.allData.filter((data) => data.informeId === this.selectedInformeId);
-                this.dataSource.data = dataInforme.filter((dataElem) =>
+              if (this.filterService.cleaningFilters) {
+                this.dataSource.data = this.dataInforme;
+              } else if (elems.length !== this.allData.length) {
+                this.dataSource.data = this.dataInforme.filter((dataElem) =>
                   elems.map((elem) => elem.id).includes(dataElem.id)
                 );
               }
