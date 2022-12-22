@@ -13,6 +13,7 @@ import { fromLonLat } from 'ol/proj';
 import { Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 import { circular } from 'ol/geom/Polygon';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { SeguidoresControlCommentsService } from '@data/services/seguidores-control-comments.service';
 import { OlMapService } from '@data/services/ol-map.service';
@@ -35,7 +36,7 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
   private planta: PlantaInterface;
   private informe: InformeInterface;
   private aerialLayer: TileLayer;
-  private seguidoresLayer: VectorLayer;
+  private seguidoresLayer: VectorImageLayer;
   private prevFeatureSelected: Feature;
 
   private subscriptions: Subscription = new Subscription();
@@ -74,8 +75,7 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
 
         if (seg !== undefined) {
           if (this.seguidoresLayer !== undefined) {
-            const seguidorFeature = this.seguidoresLayer
-              .getSource()
+            const seguidorFeature = (this.seguidoresLayer.getSource() as VectorSource)
               .getFeatures()
               .find((feature) => feature.getProperties().properties.seguidorId === seg.id);
 

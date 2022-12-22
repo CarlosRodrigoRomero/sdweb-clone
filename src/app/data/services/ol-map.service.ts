@@ -19,6 +19,7 @@ import { Draw } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
 import XYZ from 'ol/source/XYZ';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { ThermalService } from '@data/services/thermal.service';
 
@@ -45,16 +46,17 @@ export class OlMapService {
   private drawLayers: VectorLayer[] = [];
   private thermalLayers: TileLayer[] = [];
   private thermalLayers$ = new BehaviorSubject<TileLayer[]>(this.thermalLayers);
-  private anomaliaLayers: VectorLayer[] = [];
-  private anomaliaLayers$ = new BehaviorSubject<VectorLayer[]>(this.anomaliaLayers);
-  private seguidorLayers: VectorLayer[] = [];
-  private seguidorLayers$ = new BehaviorSubject<VectorLayer[]>(this.seguidorLayers);
-  private _zonasLayers: VectorLayer[] = [];
-  zonasLayers$ = new BehaviorSubject<VectorLayer[]>(this._zonasLayers);
+  private anomaliaLayers: VectorImageLayer[] = [];
+  private anomaliaLayers$ = new BehaviorSubject<VectorImageLayer[]>(this.anomaliaLayers);
+  private seguidorLayers: VectorImageLayer[] = [];
+  private seguidorLayers$ = new BehaviorSubject<VectorImageLayer[]>(this.seguidorLayers);
+  private _zonasLayers: VectorImageLayer[] = [];
+  zonasLayers$ = new BehaviorSubject<VectorImageLayer[]>(this._zonasLayers);
   private incrementoLayers: VectorLayer[] = [];
   private incrementoLayers$ = new BehaviorSubject<VectorLayer[]>(this.incrementoLayers);
   private _aerialLayers: TileLayer[] = [];
   aerialLayers$ = new BehaviorSubject<TileLayer[]>(this._aerialLayers);
+  mapMoving = false;
 
   constructor(
     private http: HttpClient,
@@ -82,6 +84,10 @@ export class OlMapService {
     return this.map$.asObservable();
   }
 
+  addMoveStartEvent() {
+    this.map.on('movestart', () => (this.mapMoving = true));
+  }
+
   createVectorLayer(source: VectorSource): VectorLayer {
     const layer = new VectorLayer({ source });
     this.drawLayers.push(layer);
@@ -98,7 +104,7 @@ export class OlMapService {
     return this.thermalLayers$.asObservable();
   }
 
-  addAnomaliaLayer(layer: VectorLayer) {
+  addAnomaliaLayer(layer: VectorImageLayer) {
     this.anomaliaLayers.push(layer);
     this.anomaliaLayers$.next(this.anomaliaLayers);
   }
@@ -111,12 +117,12 @@ export class OlMapService {
     this.drawLayers.forEach((layer) => (this._map as Map).removeLayer(layer));
   }
 
-  addSeguidorLayer(layer: VectorLayer) {
+  addSeguidorLayer(layer: VectorImageLayer) {
     this.seguidorLayers.push(layer);
     this.seguidorLayers$.next(this.seguidorLayers);
   }
 
-  addZoneLayer(layer: VectorLayer) {
+  addZoneLayer(layer: VectorImageLayer) {
     this._zonasLayers.push(layer);
     this.zonasLayers$.next(this._zonasLayers);
   }
@@ -326,6 +332,19 @@ export class OlMapService {
     this.map.getView().setZoom(zoom);
   }
 
+  refreshLayersView(informeId: string, view: string) {
+    if (this.map !== undefined) {
+      this.map
+        .getLayers()
+        .getArray()
+        .forEach((layer) => {
+          if (layer.getProperties().informeId === informeId && layer.getProperties().view === view) {
+            (layer as VectorImageLayer).getSource().changed();
+          }
+        });
+    }
+  }
+
   resetService() {
     this.map = undefined;
     this.draw = undefined;
@@ -368,11 +387,11 @@ export class OlMapService {
     this.currentZoom$.next(value);
   }
 
-  get zonasLayers(): VectorLayer[] {
+  get zonasLayers(): VectorImageLayer[] {
     return this._zonasLayers;
   }
 
-  set zonasLayers(value: VectorLayer[]) {
+  set zonasLayers(value: VectorImageLayer[]) {
     this._zonasLayers = value;
     this.zonasLayers$.next(value);
   }

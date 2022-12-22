@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Feature } from 'ol';
 import Polygon from 'ol/geom/Polygon';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { OlMapService } from './ol-map.service';
 import { ViewCommentsService } from './view-comments.service';
@@ -21,7 +21,7 @@ import { Colors } from '@core/classes/colors';
 export class AnomaliasControlCommentsService {
   private currentZoom: number;
   public listaAnomalias: Anomalia[];
-  private anomaliaLayer: VectorLayer;
+  private anomaliaLayer: VectorImageLayer;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -43,8 +43,8 @@ export class AnomaliasControlCommentsService {
     });
   }
 
-  createCommentsAnomaliaLayers(): VectorLayer {
-    const layer = new VectorLayer({
+  createCommentsAnomaliaLayers(): VectorImageLayer {
+    const layer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleAnoms(false),
       visible: false,
@@ -68,7 +68,7 @@ export class AnomaliasControlCommentsService {
   }
 
   private dibujarAnomalias(anomalias: Anomalia[]) {
-    const source = this.anomaliaLayer.getSource();
+    const source = this.anomaliaLayer.getSource() as VectorSource;
     source.clear();
     anomalias.forEach((anom) => {
       const feature = new Feature({

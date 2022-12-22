@@ -11,6 +11,7 @@ import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Map } from 'ol';
 import { Select } from 'ol/interaction';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { OlMapService } from './ol-map.service';
 import { FilterService } from './filter.service';
@@ -82,8 +83,8 @@ export class ZonesControlService {
     });
   }
 
-  createZonasLayers(informeId: string): VectorLayer[] {
-    const maeLayer = new VectorLayer({
+  createZonasLayers(informeId: string): VectorImageLayer[] {
+    const maeLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleMae(false),
       visible: false,
@@ -94,7 +95,7 @@ export class ZonesControlService {
       type: 'zonas',
     });
 
-    const ccLayer = new VectorLayer({
+    const ccLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleCelsCalientes(false),
       visible: false,
@@ -105,7 +106,7 @@ export class ZonesControlService {
       type: 'zonas',
     });
 
-    const gradLayer = new VectorLayer({
+    const gradLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleGradienteNormMax(false),
       visible: false,
@@ -144,7 +145,7 @@ export class ZonesControlService {
     return zones;
   }
 
-  mostrarZonas(zones: ZoneInterface[], layers: VectorLayer[]) {
+  mostrarZonas(zones: ZoneInterface[], layers: VectorImageLayer[]) {
     this.subscriptions.add(
       this.filterService.filteredElements$.subscribe((elems) => {
         this.addZonas(zones, layers, elems);
@@ -152,12 +153,12 @@ export class ZonesControlService {
     );
   }
 
-  private addZonas(zonas: ZoneInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
+  private addZonas(zonas: ZoneInterface[], layers: VectorImageLayer[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
       const view = l.getProperties().view;
       const informeId = l.getProperties().informeId;
-      const source = l.getSource();
+      const source = l.getSource() as VectorSource;
       source.clear();
       const zonasInforme = zonas.filter((z) => z.informeId === informeId);
       zonasInforme.forEach((zona) => {

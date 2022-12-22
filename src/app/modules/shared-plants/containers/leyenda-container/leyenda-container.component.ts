@@ -63,7 +63,7 @@ export class LeyendaContainerComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view)));
 
     this.subscriptions.add(
-      this.viewReportService.simplifiedView$.subscribe((simplifiedView) => (this.simplifiedView = simplifiedView))
+      this.viewReportService.groupByZonesView$.subscribe((simplifiedView) => (this.simplifiedView = simplifiedView))
     );
 
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {

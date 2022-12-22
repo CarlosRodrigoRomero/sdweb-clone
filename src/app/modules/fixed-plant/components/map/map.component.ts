@@ -7,9 +7,10 @@ import Map from 'ol/Map';
 import { fromLonLat, transformExtent } from 'ol/proj.js';
 import View from 'ol/View';
 import { OSM, TileDebug } from 'ol/source';
-import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
+import TileLayer from 'ol/layer/Tile';
 import { defaults as defaultControls } from 'ol/control.js';
 import XYZ from 'ol/source/XYZ';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { PlantaService } from '@data/services/planta.service';
 import { MapControlService } from '../../services/map-control.service';
@@ -45,7 +46,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public thermalSource;
   private thermalLayersDB: ThermalLayerInterface[];
   private thermalLayers: TileLayer[];
-  private anomaliaLayers: VectorLayer[];
+  private anomaliaLayers: VectorImageLayer[];
   public leftOpened: boolean;
   public rightOpened: boolean;
   public statsOpened: boolean;
@@ -201,6 +202,9 @@ export class MapComponent implements OnInit, OnDestroy {
         this.map = map;
 
         if (this.map !== undefined) {
+          // añadimos el evento de inicio de movimiento al mapa
+          this.olMapService.addMoveStartEvent();
+
           this.map.once('postrender', () => (this.reportControlService.mapLoaded = true));
         }
       })
