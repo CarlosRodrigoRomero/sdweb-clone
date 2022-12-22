@@ -43,7 +43,7 @@ export class ZonesService {
             this.thereAreZones = true;
 
             this.zonesBySize = this.getCompleteGlobals(this.zones);
-            if (this.zonesBySize.length > 1) {
+            if (this.zonesBySize.length > 0) {
               this.thereAreLargestZones = true;
             }
 
