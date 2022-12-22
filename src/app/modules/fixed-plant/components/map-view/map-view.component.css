@@ -93,28 +93,14 @@ app-download-progress-bar {
   transform: translate(-50%, 0%);
 }
 
-app-view-toggle {
+.views-area {
   position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  left: 9px;
   top: 9px;
-  left: 9px;
-}
-
-app-group-by-zones-view {
-  position: absolute;
-  left: 9px;
-  top: 58px;
-}
-
-.leyenda-tipo {
-  position: absolute;
-  left: 9px;
-  top: 58px;
-}
-
-.leyenda-no-tipo {
-  position: absolute;
-  left: 9px;
-  top: 103px;
+  width: 100px;
 }
 
 .left-sidenav {
