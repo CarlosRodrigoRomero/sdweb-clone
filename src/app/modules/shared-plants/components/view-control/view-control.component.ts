@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import TileLayer from 'ol/layer/Tile';
-import VectorLayer from 'ol/layer/Vector';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -20,9 +20,9 @@ import { ZonesService } from '@data/services/zones.service';
 export class ViewControlComponent implements OnInit, OnDestroy {
   private aerialLayers: TileLayer[];
   private thermalLayers: TileLayer[];
-  private anomaliaLayers: VectorLayer[];
-  private seguidorLayers: VectorLayer[];
-  private zonesLayers: VectorLayer[];
+  private anomaliaLayers: VectorImageLayer[];
+  private seguidorLayers: VectorImageLayer[];
+  private zonesLayers: VectorImageLayer[];
   public selectedInformeId: string;
   private reportViewSelected: string;
   private currentZoom: number;
@@ -86,7 +86,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
 
     // checkbox ver u ocultar zonas
     this.subscriptions.add(
-      this.viewReportService.simplifiedView$.subscribe((view) => {
+      this.viewReportService.groupByZonesView$.subscribe((view) => {
         this.viewZones = view;
 
         this.setLayersVisibility(this.selectedInformeId);

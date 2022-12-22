@@ -20,7 +20,7 @@ import { CommentComponent } from './components/comment/comment.component';
 import { PdfComponent } from './components/pdf/pdf.component';
 import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component';
 import { PdfEmailSelectComponent } from './components/pdf-email-select/pdf-email-select.component';
-import { SimplifiedViewComponent } from './components/simplified-view/simplified-view.component';
+import { GroupByZonesViewComponent } from './components/group-by-zones-view/group-by-zones-view.component';
 import { LeyendaContainerComponent } from './containers/leyenda-container/leyenda-container.component';
 import { ZonesSelectorContainerComponent } from './containers/zones-selector-container/zones-selector-container.component';
 
@@ -43,7 +43,7 @@ import { ZonesSelectorContainerComponent } from './containers/zones-selector-con
     PdfComponent,
     PdfDialogComponent,
     PdfEmailSelectComponent,
-    SimplifiedViewComponent,
+    GroupByZonesViewComponent,
     LeyendaContainerComponent,
     ZonesSelectorContainerComponent,
   ],
@@ -59,7 +59,7 @@ import { ZonesSelectorContainerComponent } from './containers/zones-selector-con
     ViewControlComponent,
     ViewToggleComponent,
     CommentsComponent,
-    SimplifiedViewComponent,
+    GroupByZonesViewComponent,
     LeyendaContainerComponent,
   ],
 })

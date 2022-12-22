@@ -5,7 +5,9 @@ import { Subscription } from 'rxjs';
 import { Map } from 'ol';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import { OlMapService } from '@data/services/ol-map.service';
+import VectorImageLayer from 'ol/layer/VectorImage';
+
+        import { OlMapService } from '@data/services/ol-map.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesCommentControlService } from '@data/services/zones-comment-control.service';
@@ -21,7 +23,7 @@ import { InformeInterface } from '@core/models/informe';
 export class ZonesCommentsComponent implements OnInit, OnDestroy {
   private smallZones: LocationAreaInterface[] = [];
   private bigZones: LocationAreaInterface[][] = [];
-  private zonesLayers: VectorLayer[];
+  private zonesLayers: VectorImageLayer[];
   private map: Map;
   public selectedInformeId: string;
   private informe: InformeInterface;

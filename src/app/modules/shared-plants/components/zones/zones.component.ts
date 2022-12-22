@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import VectorLayer from 'ol/layer/Vector';
 import { Map } from 'ol';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesService } from '@data/services/zones.service';
@@ -19,7 +19,7 @@ import { LocationAreaInterface } from '@core/models/location';
 })
 export class ZonesComponent implements OnInit, OnDestroy {
   private zones: LocationAreaInterface[][] = [];
-  private zonesLayers: VectorLayer[];
+  private zonesLayers: VectorImageLayer[];
   private map: Map;
   public selectedInformeId: string;
 

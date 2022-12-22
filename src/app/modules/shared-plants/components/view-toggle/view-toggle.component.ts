@@ -28,7 +28,7 @@ export class ViewToggleComponent implements OnInit, OnDestroy {
     this.viewReportService.reportViewSelected = view;
 
     if (view === 'tipo') {
-      this.viewReportService.simplifiedView = false;
+      this.viewReportService.groupByZonesView = false;
     }
   }
 

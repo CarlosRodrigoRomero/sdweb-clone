@@ -15,6 +15,7 @@ import { fromLonLat } from 'ol/proj';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Select } from 'ol/interaction';
 import VectorSource from 'ol/source/Vector';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -41,7 +42,7 @@ export class SeguidoresControlService {
   private listaAllSeguidores: Seguidor[];
   public prevSeguidorSelected: Seguidor;
   private sharedReportNoFilters = false;
-  private seguidorLayers: VectorLayer[];
+  private seguidorLayers: VectorImageLayer[];
   private prevFeatureHover: Feature;
   private toggleViewSelected: string;
   private _seguidorViewOpened = false;
@@ -91,7 +92,7 @@ export class SeguidoresControlService {
             this.addCursorOnHover();
             this.addOnHoverAction();
             this.addSelectInteraction();
-            this.addZoomEvent();
+            this.addMoveEndEvent();
           }
         })
       );
@@ -108,7 +109,7 @@ export class SeguidoresControlService {
           this.toggleViewSelected = viewSel;
 
           // refrescamos la capa para que la vista se muestre correctamente
-          this.refreshLayersView();
+          this.olMapService.refreshLayersView(this.selectedInformeId, this.toggleViewSelected);
         })
       );
 
@@ -118,10 +119,10 @@ export class SeguidoresControlService {
     });
   }
 
-  createSeguidorLayers(informeId: string): VectorLayer[] {
-    const seguidoresLayers: VectorLayer[] = [];
+  createSeguidorLayers(informeId: string): VectorImageLayer[] {
+    const seguidoresLayers: VectorImageLayer[] = [];
 
-    const maeLayer = new VectorLayer({
+    const maeLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleSeguidoresMae(false),
       visible: true,
@@ -133,7 +134,7 @@ export class SeguidoresControlService {
     });
     seguidoresLayers.push(maeLayer);
 
-    const celsCalientesLayer = new VectorLayer({
+    const celsCalientesLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleSeguidoresCelsCalientes(false),
       visible: true,
@@ -145,7 +146,7 @@ export class SeguidoresControlService {
     });
     seguidoresLayers.push(celsCalientesLayer);
 
-    const gradNormMaxLayer = new VectorLayer({
+    const gradNormMaxLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleSeguidoresGradienteNormMax(false),
       visible: true,
@@ -187,7 +188,7 @@ export class SeguidoresControlService {
       // filtra los seguidores correspondientes al informe
       const seguidoresInforme = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
 
-      const source = l.getSource();
+      const source = l.getSource() as VectorSource;
       source.clear();
       seguidoresInforme.forEach((seguidor) => {
         // crea poligono seguidor
@@ -215,18 +216,20 @@ export class SeguidoresControlService {
 
   private addCursorOnHover() {
     this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        let feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined);
-        feature = feature.filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
-        if (feature.length > 0) {
-          this.map.getViewport().style.cursor = 'pointer';
+      if (!this.olMapService.mapMoving) {
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          let feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined);
+          feature = feature.filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
+          if (feature.length > 0) {
+            this.map.getViewport().style.cursor = 'pointer';
+          } else {
+            this.map.getViewport().style.cursor = 'inherit';
+          }
         } else {
           this.map.getViewport().style.cursor = 'inherit';
         }
-      } else {
-        this.map.getViewport().style.cursor = 'inherit';
       }
     });
   }
@@ -245,40 +248,42 @@ export class SeguidoresControlService {
     };
 
     this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined)
-          .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-          .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)[0] as Feature;
+      if (!this.olMapService.mapMoving) {
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          const feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined)
+            .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
+            .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)[0] as Feature;
 
-        if (feature !== undefined) {
-          // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
-          if (this.prevFeatureHover !== undefined) {
-            this.prevFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+          if (feature !== undefined) {
+            // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
+            if (this.prevFeatureHover !== undefined) {
+              this.prevFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+            }
+            currentFeatureHover = feature;
+
+            const seguidorId = feature.getProperties().properties.seguidorId;
+            const seguidor = this.listaSeguidores.filter((seg) => seg.id === seguidorId)[0];
+
+            const coords = seguidor.featureCoords[0];
+
+            this.setPopupPosition(coords);
+
+            feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
+
+            if (this.selectedInformeId === seguidor.informeId) {
+              this.seguidorHovered = seguidor;
+            }
+            this.prevFeatureHover = feature;
           }
-          currentFeatureHover = feature;
+        } else {
+          this.seguidorHovered = undefined;
 
-          const seguidorId = feature.getProperties().properties.seguidorId;
-          const seguidor = this.listaSeguidores.filter((seg) => seg.id === seguidorId)[0];
-
-          const coords = seguidor.featureCoords[0];
-
-          this.setPopupPosition(coords);
-
-          feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
-
-          if (this.selectedInformeId === seguidor.informeId) {
-            this.seguidorHovered = seguidor;
+          if (currentFeatureHover !== undefined) {
+            currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+            currentFeatureHover = undefined;
           }
-          this.prevFeatureHover = feature;
-        }
-      } else {
-        this.seguidorHovered = undefined;
-
-        if (currentFeatureHover !== undefined) {
-          currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
-          currentFeatureHover = undefined;
         }
       }
     });
@@ -319,28 +324,15 @@ export class SeguidoresControlService {
     });
   }
 
-  private addZoomEvent() {
+  private addMoveEndEvent() {
     this.map.on('moveend', (event) => {
+      // marcamos el movimiento del mapa como terminado
+      this.olMapService.mapMoving = false;
+
+      // añadimos las acciones por cambio de zoom
       this.olMapService.currentZoom = this.map.getView().getZoom();
-
-      this.refreshLayersView();
+      this.olMapService.refreshLayersView(this.selectedInformeId, this.toggleViewSelected);
     });
-  }
-
-  private refreshLayersView() {
-    if (this.map !== undefined) {
-      this.map
-        .getLayers()
-        .getArray()
-        .forEach((layer) => {
-          if (
-            layer.getProperties().informeId === this.selectedInformeId &&
-            layer.getProperties().view === this.toggleViewSelected
-          ) {
-            (layer as VectorLayer).getSource().changed();
-          }
-        });
-    }
   }
 
   clearSelectFeature() {
@@ -658,7 +650,7 @@ export class SeguidoresControlService {
     const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
 
     const features: Feature[] = [];
-    layersView.forEach((layer) => features.push(...layer.getSource().getFeatures()));
+    layersView.forEach((layer) => features.push(...(layer.getSource() as VectorSource).getFeatures()));
 
     const feature = features.find((f) => f.getProperties().properties.seguidorId === seguidorId);
 

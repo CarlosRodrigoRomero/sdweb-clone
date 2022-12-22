@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Feature } from 'ol';
 import Polygon from 'ol/geom/Polygon';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { OlMapService } from './ol-map.service';
 import { ViewCommentsService } from './view-comments.service';
@@ -20,7 +20,7 @@ import { Seguidor } from '@core/models/seguidor';
 })
 export class SeguidoresControlCommentsService {
   private currentZoom: number;
-  private seguidoresLayer: VectorLayer;
+  private seguidoresLayer: VectorImageLayer;
   private listaSeguidores: Seguidor[];
 
   private subscriptions: Subscription = new Subscription();
@@ -43,8 +43,8 @@ export class SeguidoresControlCommentsService {
     });
   }
 
-  createCommentsSeguidoresLayers(): VectorLayer {
-    const layer = new VectorLayer({
+  createCommentsSeguidoresLayers(): VectorImageLayer {
+    const layer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleSegs(false),
       visible: false,
@@ -68,7 +68,7 @@ export class SeguidoresControlCommentsService {
   }
 
   private dibujarSeguidores(seguidores: Seguidor[]) {
-    const source = this.seguidoresLayer.getSource();
+    const source = this.seguidoresLayer.getSource() as VectorSource;
     source.clear();
     seguidores.forEach((seg) => {
       // solo añadimos los que tienen anomalías
