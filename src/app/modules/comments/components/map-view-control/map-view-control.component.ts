@@ -1,16 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
-import VectorLayer from 'ol/layer/Vector';
 import TileLayer from 'ol/layer/Tile';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ViewCommentsService } from '@data/services/view-comments.service';
 import { ZonesService } from '@data/services/zones.service';
-import VectorImageLayer from 'ol/layer/VectorImage';
 
 @Component({
   selector: 'app-map-view-control',
@@ -19,8 +18,8 @@ import VectorImageLayer from 'ol/layer/VectorImage';
 })
 export class MapViewControlComponent implements OnInit, OnDestroy {
   private anomaliaLayer: VectorImageLayer;
-  private seguidorLayers: VectorLayer[];
-  private zonesLayers: VectorLayer[];
+  private seguidorLayers: VectorImageLayer[];
+  private zonesLayers: VectorImageLayer[];
   private thermalLayer: TileLayer;
   private currentZoom: number;
 

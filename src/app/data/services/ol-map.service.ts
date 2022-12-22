@@ -19,6 +19,7 @@ import { Draw } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
 import { fromLonLat } from 'ol/proj';
 import XYZ from 'ol/source/XYZ';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { ThermalService } from '@data/services/thermal.service';
 
@@ -31,7 +32,6 @@ import { GEO } from '@data/constants/geo';
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 import ImageTileCubiertasMod from '@shared/modules/ol-maps/ImageTileCubiertasMod.js';
-import VectorImageLayer from 'ol/layer/VectorImage';
 
 @Injectable({
   providedIn: 'root',
@@ -48,10 +48,10 @@ export class OlMapService {
   private thermalLayers$ = new BehaviorSubject<TileLayer[]>(this.thermalLayers);
   private anomaliaLayers: VectorImageLayer[] = [];
   private anomaliaLayers$ = new BehaviorSubject<VectorImageLayer[]>(this.anomaliaLayers);
-  private seguidorLayers: VectorLayer[] = [];
-  private seguidorLayers$ = new BehaviorSubject<VectorLayer[]>(this.seguidorLayers);
-  private _zonasLayers: VectorLayer[] = [];
-  zonasLayers$ = new BehaviorSubject<VectorLayer[]>(this._zonasLayers);
+  private seguidorLayers: VectorImageLayer[] = [];
+  private seguidorLayers$ = new BehaviorSubject<VectorImageLayer[]>(this.seguidorLayers);
+  private _zonasLayers: VectorImageLayer[] = [];
+  zonasLayers$ = new BehaviorSubject<VectorImageLayer[]>(this._zonasLayers);
   private incrementoLayers: VectorLayer[] = [];
   private incrementoLayers$ = new BehaviorSubject<VectorLayer[]>(this.incrementoLayers);
   private _aerialLayers: TileLayer[] = [];
@@ -121,12 +121,12 @@ export class OlMapService {
     this.drawLayers.forEach((layer) => (this._map as Map).removeLayer(layer));
   }
 
-  addSeguidorLayer(layer: VectorLayer) {
+  addSeguidorLayer(layer: VectorImageLayer) {
     this.seguidorLayers.push(layer);
     this.seguidorLayers$.next(this.seguidorLayers);
   }
 
-  addZoneLayer(layer: VectorLayer) {
+  addZoneLayer(layer: VectorImageLayer) {
     this._zonasLayers.push(layer);
     this.zonasLayers$.next(this._zonasLayers);
   }
@@ -378,11 +378,11 @@ export class OlMapService {
     this.currentZoom$.next(value);
   }
 
-  get zonasLayers(): VectorLayer[] {
+  get zonasLayers(): VectorImageLayer[] {
     return this._zonasLayers;
   }
 
-  set zonasLayers(value: VectorLayer[]) {
+  set zonasLayers(value: VectorImageLayer[]) {
     this._zonasLayers = value;
     this.zonasLayers$.next(value);
   }

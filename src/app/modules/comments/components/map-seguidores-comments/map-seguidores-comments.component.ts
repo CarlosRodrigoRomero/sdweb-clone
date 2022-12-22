@@ -24,6 +24,7 @@ import { InformeInterface } from '@core/models/informe';
 import { FilterService } from '@data/services/filter.service';
 import { Seguidor } from '@core/models/seguidor';
 import Point from 'ol/geom/Point';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 @Component({
   selector: 'app-map-seguidores-comments',
@@ -35,7 +36,7 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
   private planta: PlantaInterface;
   private informe: InformeInterface;
   private aerialLayer: TileLayer;
-  private seguidoresLayer: VectorLayer;
+  private seguidoresLayer: VectorImageLayer;
   private prevFeatureSelected: Feature;
 
   private subscriptions: Subscription = new Subscription();
@@ -74,8 +75,7 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
 
         if (seg !== undefined) {
           if (this.seguidoresLayer !== undefined) {
-            const seguidorFeature = this.seguidoresLayer
-              .getSource()
+            const seguidorFeature = (this.seguidoresLayer.getSource() as VectorSource)
               .getFeatures()
               .find((feature) => feature.getProperties().properties.seguidorId === seg.id);
 

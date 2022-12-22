@@ -8,6 +8,7 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Select } from 'ol/interaction';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { OlMapService } from './ol-map.service';
 import { FilterService } from './filter.service';
@@ -60,8 +61,8 @@ export class ZonesCommentControlService {
     });
   }
 
-  createSmallZonesLayer(informeId: string): VectorLayer {
-    const layer = new VectorLayer({
+  createSmallZonesLayer(informeId: string): VectorImageLayer {
+    const layer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getSmallZonesStyle(),
       visible: true,
@@ -74,7 +75,7 @@ export class ZonesCommentControlService {
     return layer;
   }
 
-  mostrarSmallZones(zonas: LocationAreaInterface[], layers: VectorLayer[]) {
+  mostrarSmallZones(zonas: LocationAreaInterface[], layers: VectorImageLayer[]) {
     if (this.reportControlService.plantaFija) {
       this.subscriptions.add(
         this.comentariosControlService.anomalias$.subscribe((anoms) => this.addSmallZones(zonas, layers, anoms))
@@ -86,10 +87,10 @@ export class ZonesCommentControlService {
     }
   }
 
-  private addSmallZones(zonas: LocationAreaInterface[], layers: VectorLayer[], elems: FilterableElement[]) {
+  private addSmallZones(zonas: LocationAreaInterface[], layers: VectorImageLayer[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
-      const source = l.getSource();
+      const source = l.getSource() as VectorSource;
       source.clear();
       zonas.forEach((zona) => {
         const elemsZona = this.zonesControlService.getElemsZona(zona, elems);

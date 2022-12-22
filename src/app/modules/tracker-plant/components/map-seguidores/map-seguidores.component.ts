@@ -10,6 +10,7 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { Overlay } from 'ol';
 import { defaults as defaultControls } from 'ol/control.js';
 import XYZ from 'ol/source/XYZ';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { MapSeguidoresService } from '../../services/map-seguidores.service';
 import { IncrementosService } from '../../services/incrementos.service';
@@ -42,7 +43,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public sliderYear: number;
   public aerialLayers: TileLayer[];
   public thermalSource;
-  private seguidorLayers: VectorLayer[];
+  private seguidorLayers: VectorImageLayer[];
   private incrementoLayers: VectorLayer[];
   public leftOpened: boolean;
   public rightOpened: boolean;

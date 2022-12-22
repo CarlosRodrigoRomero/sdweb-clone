@@ -4,7 +4,6 @@ import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import TileLayer from 'ol/layer/Tile';
-import VectorLayer from 'ol/layer/Vector';
 import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { OlMapService } from '@data/services/ol-map.service';
@@ -22,8 +21,8 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private aerialLayers: TileLayer[];
   private thermalLayers: TileLayer[];
   private anomaliaLayers: VectorImageLayer[];
-  private seguidorLayers: VectorLayer[];
-  private zonesLayers: VectorLayer[];
+  private seguidorLayers: VectorImageLayer[];
+  private zonesLayers: VectorImageLayer[];
   public selectedInformeId: string;
   private reportViewSelected: string;
   private currentZoom: number;
