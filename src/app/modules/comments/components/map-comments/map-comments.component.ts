@@ -16,6 +16,7 @@ import { circular } from 'ol/geom/Polygon';
 import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
@@ -37,7 +38,7 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
   private planta: PlantaInterface;
   private informe: InformeInterface;
   private thermalLayer: TileLayer;
-  private anomaliaLayer: VectorLayer;
+  private anomaliaLayer: VectorImageLayer;
   private aerialLayer: TileLayer;
   private prevFeatureSelected: Feature;
   thermalVisible = false;
@@ -107,8 +108,7 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
 
         if (anom !== undefined) {
           if (this.anomaliaLayer !== undefined) {
-            const anomaliaFeature = this.anomaliaLayer
-              .getSource()
+            const anomaliaFeature = (this.anomaliaLayer.getSource() as VectorSource)
               .getFeatures()
               .find((feature) => feature.getProperties().properties.anomaliaId === anom.id);
 

@@ -5,6 +5,7 @@ import { take } from 'rxjs/operators';
 
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -20,7 +21,7 @@ import { ZonesService } from '@data/services/zones.service';
 export class ViewControlComponent implements OnInit, OnDestroy {
   private aerialLayers: TileLayer[];
   private thermalLayers: TileLayer[];
-  private anomaliaLayers: VectorLayer[];
+  private anomaliaLayers: VectorImageLayer[];
   private seguidorLayers: VectorLayer[];
   private zonesLayers: VectorLayer[];
   public selectedInformeId: string;

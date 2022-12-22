@@ -14,6 +14,7 @@ import GeometryType from 'ol/geom/GeometryType';
 import { createBox } from 'ol/interaction/Draw';
 import { Coordinate } from 'ol/coordinate';
 import VectorSource from 'ol/source/Vector';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { OlMapService } from '@data/services/ol-map.service';
 import { FilterService } from '@data/services/filter.service';
@@ -40,7 +41,7 @@ export class AnomaliasControlService {
   private prevFeatureHover: any;
   public prevAnomaliaSelect: Anomalia;
   public listaAnomalias: Anomalia[];
-  private anomaliaLayers: VectorLayer[];
+  private anomaliaLayers: VectorImageLayer[];
   private sharedReportNoFilters = false;
   private toggleViewSelected: string;
   private _coordsPointer: Coordinate = undefined;
@@ -96,10 +97,10 @@ export class AnomaliasControlService {
     });
   }
 
-  createAnomaliaLayers(informeId: string): VectorLayer[] {
-    const anomaliasLayers: VectorLayer[] = [];
+  createAnomaliaLayers(informeId: string): VectorImageLayer[] {
+    const anomaliasLayers: VectorImageLayer[] = [];
 
-    const perdidasLayer = new VectorLayer({
+    const perdidasLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStylePerdidas(false),
       visible: false,
@@ -111,7 +112,7 @@ export class AnomaliasControlService {
     });
     anomaliasLayers.push(perdidasLayer);
 
-    const celsCalientesLayer = new VectorLayer({
+    const celsCalientesLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleCelsCalientes(false),
       visible: false,
@@ -123,7 +124,7 @@ export class AnomaliasControlService {
     });
     anomaliasLayers.push(celsCalientesLayer);
 
-    const gradNormMaxLayer = new VectorLayer({
+    const gradNormMaxLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleGradienteNormMax(false),
       visible: false,
@@ -135,7 +136,7 @@ export class AnomaliasControlService {
     });
     anomaliasLayers.push(gradNormMaxLayer);
 
-    const tiposLayer = new VectorLayer({
+    const tiposLayer = new VectorImageLayer({
       // declutter: true,
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleTipos(false),

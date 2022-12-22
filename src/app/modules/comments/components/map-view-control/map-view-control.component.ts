@@ -10,6 +10,7 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ViewCommentsService } from '@data/services/view-comments.service';
 import { ZonesService } from '@data/services/zones.service';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 @Component({
   selector: 'app-map-view-control',
@@ -17,7 +18,7 @@ import { ZonesService } from '@data/services/zones.service';
   styleUrls: ['./map-view-control.component.css'],
 })
 export class MapViewControlComponent implements OnInit, OnDestroy {
-  private anomaliaLayer: VectorLayer;
+  private anomaliaLayer: VectorImageLayer;
   private seguidorLayers: VectorLayer[];
   private zonesLayers: VectorLayer[];
   private thermalLayer: TileLayer;

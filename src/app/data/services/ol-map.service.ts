@@ -31,6 +31,7 @@ import { GEO } from '@data/constants/geo';
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 import ImageTileCubiertasMod from '@shared/modules/ol-maps/ImageTileCubiertasMod.js';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 @Injectable({
   providedIn: 'root',
@@ -45,8 +46,8 @@ export class OlMapService {
   private drawLayers: VectorLayer[] = [];
   private thermalLayers: TileLayer[] = [];
   private thermalLayers$ = new BehaviorSubject<TileLayer[]>(this.thermalLayers);
-  private anomaliaLayers: VectorLayer[] = [];
-  private anomaliaLayers$ = new BehaviorSubject<VectorLayer[]>(this.anomaliaLayers);
+  private anomaliaLayers: VectorImageLayer[] = [];
+  private anomaliaLayers$ = new BehaviorSubject<VectorImageLayer[]>(this.anomaliaLayers);
   private seguidorLayers: VectorLayer[] = [];
   private seguidorLayers$ = new BehaviorSubject<VectorLayer[]>(this.seguidorLayers);
   private _zonasLayers: VectorLayer[] = [];
@@ -107,7 +108,7 @@ export class OlMapService {
     return this.thermalLayers$.asObservable();
   }
 
-  addAnomaliaLayer(layer: VectorLayer) {
+  addAnomaliaLayer(layer: VectorImageLayer) {
     this.anomaliaLayers.push(layer);
     this.anomaliaLayers$.next(this.anomaliaLayers);
   }
