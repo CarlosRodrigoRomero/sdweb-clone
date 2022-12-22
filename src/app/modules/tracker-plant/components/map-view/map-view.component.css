@@ -67,22 +67,14 @@ app-barra-resumen-planta {
   z-index: 999;
 }
 
-app-view-toggle {
+.views-area {
   position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  left: 9px;
   top: 9px;
-  left: 9px;
-}
-
-app-group-by-zones-view {
-  position: absolute;
-  left: 9px;
-  top: 58px;
-}
-
-app-leyenda-container {
-  position: absolute;
-  left: 9px;
-  top: 103px;
+  width: 100px;
 }
 
 .btns-export {
