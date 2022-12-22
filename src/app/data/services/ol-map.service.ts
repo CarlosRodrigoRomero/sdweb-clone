@@ -88,10 +88,6 @@ export class OlMapService {
     this.map.on('movestart', () => (this.mapMoving = true));
   }
 
-  addMoveEndEvent() {
-    this.map.on('moveend', () => (this.mapMoving = false));
-  }
-
   createVectorLayer(source: VectorSource): VectorLayer {
     const layer = new VectorLayer({ source });
     this.drawLayers.push(layer);
@@ -334,6 +330,19 @@ export class OlMapService {
 
   setViewZoom(zoom: number) {
     this.map.getView().setZoom(zoom);
+  }
+
+  refreshLayersView(informeId: string, view: string) {
+    if (this.map !== undefined) {
+      this.map
+        .getLayers()
+        .getArray()
+        .forEach((layer) => {
+          if (layer.getProperties().informeId === informeId && layer.getProperties().view === view) {
+            (layer as VectorImageLayer).getSource().changed();
+          }
+        });
+    }
   }
 
   resetService() {

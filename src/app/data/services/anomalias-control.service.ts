@@ -75,7 +75,7 @@ export class AnomaliasControlService {
             this.addPointerOnHover();
             this.addOnHoverAction();
             this.addClickOutFeatures();
-            this.addZoomEvent();
+            this.addMoveEndEvent();
           }
         })
       );
@@ -90,7 +90,12 @@ export class AnomaliasControlService {
       );
 
       this.subscriptions.add(
-        this.viewReportService.reportViewSelected$.subscribe((viewSel) => (this.toggleViewSelected = viewSel))
+        this.viewReportService.reportViewSelected$.subscribe((viewSel) => {
+          this.toggleViewSelected = viewSel;
+
+          // refrescamos la capa para que la vista se muestre correctamente
+          this.olMapService.refreshLayersView(this.selectedInformeId, this.toggleViewSelected);
+        })
       );
 
       initService(true);
@@ -364,20 +369,14 @@ export class AnomaliasControlService {
     });
   }
 
-  private addZoomEvent() {
+  private addMoveEndEvent() {
     this.map.on('moveend', (event) => {
+      // marcamos el movimiento del mapa como terminado
+      this.olMapService.mapMoving = false;
+
+      // añadimos las acciones por cambio de zoom
       this.olMapService.currentZoom = this.map.getView().getZoom();
-      this.map
-        .getLayers()
-        .getArray()
-        .forEach((layer) => {
-          if (
-            layer.getProperties().informeId === this.selectedInformeId &&
-            layer.getProperties().view === this.toggleViewSelected
-          ) {
-            (layer as VectorLayer).getSource().changed();
-          }
-        });
+      this.olMapService.refreshLayersView(this.selectedInformeId, this.toggleViewSelected);
     });
   }
 

@@ -92,7 +92,7 @@ export class SeguidoresControlService {
             this.addCursorOnHover();
             this.addOnHoverAction();
             this.addSelectInteraction();
-            this.addZoomEvent();
+            this.addMoveEndEvent();
           }
         })
       );
@@ -109,7 +109,7 @@ export class SeguidoresControlService {
           this.toggleViewSelected = viewSel;
 
           // refrescamos la capa para que la vista se muestre correctamente
-          this.refreshLayersView();
+          this.olMapService.refreshLayersView(this.selectedInformeId, this.toggleViewSelected);
         })
       );
 
@@ -324,28 +324,15 @@ export class SeguidoresControlService {
     });
   }
 
-  private addZoomEvent() {
+  private addMoveEndEvent() {
     this.map.on('moveend', (event) => {
+      // marcamos el movimiento del mapa como terminado
+      this.olMapService.mapMoving = false;
+
+      // añadimos las acciones por cambio de zoom
       this.olMapService.currentZoom = this.map.getView().getZoom();
-
-      this.refreshLayersView();
+      this.olMapService.refreshLayersView(this.selectedInformeId, this.toggleViewSelected);
     });
-  }
-
-  private refreshLayersView() {
-    if (this.map !== undefined) {
-      this.map
-        .getLayers()
-        .getArray()
-        .forEach((layer) => {
-          if (
-            layer.getProperties().informeId === this.selectedInformeId &&
-            layer.getProperties().view === this.toggleViewSelected
-          ) {
-            (layer as VectorLayer).getSource().changed();
-          }
-        });
-    }
   }
 
   clearSelectFeature() {

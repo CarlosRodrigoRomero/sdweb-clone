@@ -13,6 +13,7 @@ import { fromLonLat } from 'ol/proj';
 import { Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 import { circular } from 'ol/geom/Polygon';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { SeguidoresControlCommentsService } from '@data/services/seguidores-control-comments.service';
 import { OlMapService } from '@data/services/ol-map.service';
@@ -24,7 +25,6 @@ import { InformeInterface } from '@core/models/informe';
 import { FilterService } from '@data/services/filter.service';
 import { Seguidor } from '@core/models/seguidor';
 import Point from 'ol/geom/Point';
-import VectorImageLayer from 'ol/layer/VectorImage';
 
 @Component({
   selector: 'app-map-seguidores-comments',
