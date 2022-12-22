@@ -215,18 +215,20 @@ export class SeguidoresControlService {
 
   private addCursorOnHover() {
     this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        let feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined);
-        feature = feature.filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
-        if (feature.length > 0) {
-          this.map.getViewport().style.cursor = 'pointer';
+      if (!this.olMapService.mapMoving) {
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          let feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined);
+          feature = feature.filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
+          if (feature.length > 0) {
+            this.map.getViewport().style.cursor = 'pointer';
+          } else {
+            this.map.getViewport().style.cursor = 'inherit';
+          }
         } else {
           this.map.getViewport().style.cursor = 'inherit';
         }
-      } else {
-        this.map.getViewport().style.cursor = 'inherit';
       }
     });
   }
@@ -245,40 +247,42 @@ export class SeguidoresControlService {
     };
 
     this.map.on('pointermove', (event) => {
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined)
-          .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-          .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)[0] as Feature;
+      if (!this.olMapService.mapMoving) {
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          const feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined)
+            .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
+            .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)[0] as Feature;
 
-        if (feature !== undefined) {
-          // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
-          if (this.prevFeatureHover !== undefined) {
-            this.prevFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+          if (feature !== undefined) {
+            // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
+            if (this.prevFeatureHover !== undefined) {
+              this.prevFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+            }
+            currentFeatureHover = feature;
+
+            const seguidorId = feature.getProperties().properties.seguidorId;
+            const seguidor = this.listaSeguidores.filter((seg) => seg.id === seguidorId)[0];
+
+            const coords = seguidor.featureCoords[0];
+
+            this.setPopupPosition(coords);
+
+            feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
+
+            if (this.selectedInformeId === seguidor.informeId) {
+              this.seguidorHovered = seguidor;
+            }
+            this.prevFeatureHover = feature;
           }
-          currentFeatureHover = feature;
+        } else {
+          this.seguidorHovered = undefined;
 
-          const seguidorId = feature.getProperties().properties.seguidorId;
-          const seguidor = this.listaSeguidores.filter((seg) => seg.id === seguidorId)[0];
-
-          const coords = seguidor.featureCoords[0];
-
-          this.setPopupPosition(coords);
-
-          feature.setStyle(estilosViewFocused[this.toggleViewSelected]);
-
-          if (this.selectedInformeId === seguidor.informeId) {
-            this.seguidorHovered = seguidor;
+          if (currentFeatureHover !== undefined) {
+            currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
+            currentFeatureHover = undefined;
           }
-          this.prevFeatureHover = feature;
-        }
-      } else {
-        this.seguidorHovered = undefined;
-
-        if (currentFeatureHover !== undefined) {
-          currentFeatureHover.setStyle(estilosViewUnfocused[this.toggleViewSelected]);
-          currentFeatureHover = undefined;
         }
       }
     });

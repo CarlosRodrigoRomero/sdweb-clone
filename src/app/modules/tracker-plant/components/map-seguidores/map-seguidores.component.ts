@@ -134,6 +134,10 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
         this.map = map;
 
         if (this.map !== undefined) {
+          // añadimos los eventos de movimiento al mapa
+          this.olMapService.addMoveStartEvent();
+          this.olMapService.addMoveEndEvent();
+
           this.map.once('postrender', () => (this.reportControlService.mapLoaded = true));
         }
       })

@@ -55,6 +55,7 @@ export class OlMapService {
   private incrementoLayers$ = new BehaviorSubject<VectorLayer[]>(this.incrementoLayers);
   private _aerialLayers: TileLayer[] = [];
   aerialLayers$ = new BehaviorSubject<TileLayer[]>(this._aerialLayers);
+  mapMoving = false;
 
   constructor(
     private http: HttpClient,
@@ -80,6 +81,14 @@ export class OlMapService {
 
   getMap(): Observable<any> {
     return this.map$.asObservable();
+  }
+
+  addMoveStartEvent() {
+    this.map.on('movestart', () => (this.mapMoving = true));
+  }
+
+  addMoveEndEvent() {
+    this.map.on('moveend', () => (this.mapMoving = false));
   }
 
   createVectorLayer(source: VectorSource): VectorLayer {

@@ -136,6 +136,7 @@ export class AnomaliasControlService {
     anomaliasLayers.push(gradNormMaxLayer);
 
     const tiposLayer = new VectorLayer({
+      // declutter: true,
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleTipos(false),
       visible: false,
@@ -182,7 +183,7 @@ export class AnomaliasControlService {
         anomaliasInforme = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
       }
 
-      const source = l.getSource();
+      const source = l.getSource() as VectorSource;
       source.clear();
       anomaliasInforme.forEach((anom) => {
         const feature = new Feature({
@@ -224,53 +225,63 @@ export class AnomaliasControlService {
 
   private addPointerOnHover() {
     this.map.on('pointermove', (event) => {
-      this.coordsPointer = event.coordinate;
+      if (!this.olMapService.mapMoving) {
+        this.coordsPointer = event.coordinate;
 
-      if (this.map.hasFeatureAtPixel(event.pixel)) {
-        let feature = this.map
-          .getFeaturesAtPixel(event.pixel)
-          .filter((item) => item.getProperties().properties !== undefined);
-        feature = feature.filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
+        if (this.map.hasFeatureAtPixel(event.pixel)) {
+          let feature = this.map
+            .getFeaturesAtPixel(event.pixel)
+            .filter((item) => item.getProperties().properties !== undefined);
+          feature = feature.filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
 
-        if (feature.length > 0) {
-          // cambia el puntero por el de seleccionar
-          this.map.getViewport().style.cursor = 'pointer';
+          if (feature.length > 0) {
+            // cambia el puntero por el de seleccionar
+            this.map.getViewport().style.cursor = 'pointer';
+          } else {
+            // vuelve a poner el puntero normal
+            this.map.getViewport().style.cursor = 'inherit';
+          }
         } else {
           // vuelve a poner el puntero normal
           this.map.getViewport().style.cursor = 'inherit';
         }
-      } else {
-        // vuelve a poner el puntero normal
-        this.map.getViewport().style.cursor = 'inherit';
       }
     });
   }
 
   private addOnHoverAction() {
     this.map.on('pointermove', (event) => {
-      if (this.anomaliaSelect === undefined) {
-        if (this.map.hasFeatureAtPixel(event.pixel)) {
-          const feature = this.map
-            .getFeaturesAtPixel(event.pixel)
-            .filter((item) => item.getProperties().properties !== undefined)
-            .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-            .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)
-            .filter((item) => item.getProperties().properties.type === 'anomalia')[0] as Feature;
+      if (!this.olMapService.mapMoving) {
+        if (this.anomaliaSelect === undefined) {
+          if (this.map.hasFeatureAtPixel(event.pixel)) {
+            const feature = this.map
+              .getFeaturesAtPixel(event.pixel)
+              .filter((item) => item.getProperties().properties !== undefined)
+              .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
+              .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)
+              .filter((item) => item.getProperties().properties.type === 'anomalia')[0] as Feature;
 
-          if (feature !== undefined) {
-            // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
-            if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-              this.prevFeatureHover.setStyle(this.getStyleAnomalias(false));
+            if (feature !== undefined) {
+              // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
+              if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
+                this.prevFeatureHover.setStyle(this.getStyleAnomalias(false));
+              }
+
+              const anomaliaId = feature.getProperties().properties.anomaliaId;
+              const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
+
+              feature.setStyle(this.getStyleAnomalias(true));
+
+              this.anomaliaHover = anomalia;
+
+              this.prevFeatureHover = feature;
+            } else {
+              if (this.anomaliaHover !== undefined) {
+                this.setExternalStyle(this.anomaliaHover.id, false);
+
+                this.anomaliaHover = undefined;
+              }
             }
-
-            const anomaliaId = feature.getProperties().properties.anomaliaId;
-            const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
-
-            feature.setStyle(this.getStyleAnomalias(true));
-
-            this.anomaliaHover = anomalia;
-
-            this.prevFeatureHover = feature;
           } else {
             if (this.anomaliaHover !== undefined) {
               this.setExternalStyle(this.anomaliaHover.id, false);
@@ -279,14 +290,8 @@ export class AnomaliasControlService {
             }
           }
         } else {
-          if (this.anomaliaHover !== undefined) {
-            this.setExternalStyle(this.anomaliaHover.id, false);
-
-            this.anomaliaHover = undefined;
-          }
+          this.anomaliaHover = undefined;
         }
-      } else {
-        this.anomaliaHover = undefined;
       }
     });
   }
@@ -391,7 +396,7 @@ export class AnomaliasControlService {
 
   public permitirCrearAnomalias(plantaId: string) {
     const draw = new Draw({
-      source: this.anomaliaLayers[0].getSource(),
+      source: this.anomaliaLayers[0].getSource() as VectorSource,
       type: GeometryType.CIRCLE,
       geometryFunction: createBox(),
     });
@@ -536,7 +541,7 @@ export class AnomaliasControlService {
     const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
 
     const features: Feature[] = [];
-    layersView.forEach((layer) => features.push(...layer.getSource().getFeatures()));
+    layersView.forEach((layer) => features.push(...(layer.getSource() as VectorSource).getFeatures()));
 
     const feature = features.find((f) => f.getProperties().properties.anomaliaId === anomaliaId);
 
