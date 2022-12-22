@@ -73,10 +73,16 @@ app-view-toggle {
   left: 9px;
 }
 
-app-leyenda-container {
+app-group-by-zones-view {
   position: absolute;
   left: 9px;
   top: 58px;
+}
+
+app-leyenda-container {
+  position: absolute;
+  left: 9px;
+  top: 103px;
 }
 
 .btns-export {

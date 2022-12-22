@@ -12,15 +12,15 @@ export class ViewReportService {
   private _sliderTemporal = 100;
   sliderTemporal$ = new BehaviorSubject<number>(this._sliderTemporal);
 
-  private _simplifiedView = false;
-  simplifiedView$ = new BehaviorSubject<boolean>(this._simplifiedView);
+  private _groupByZonesView = false;
+  groupByZonesView$ = new BehaviorSubject<boolean>(this._groupByZonesView);
 
   constructor() {}
 
   resetService() {
     this.reportViewSelected = 'tipo';
     this.sliderTemporal = 100;
-    this.simplifiedView = false;
+    this.groupByZonesView = false;
   }
 
   get reportViewSelected() {
@@ -40,11 +40,11 @@ export class ViewReportService {
     this.sliderTemporal$.next(value);
   }
 
-  get simplifiedView() {
-    return this._simplifiedView;
+  get groupByZonesView() {
+    return this._groupByZonesView;
   }
-  set simplifiedView(value: boolean) {
-    this._simplifiedView = value;
-    this.simplifiedView$.next(value);
+  set groupByZonesView(value: boolean) {
+    this._groupByZonesView = value;
+    this.groupByZonesView$.next(value);
   }
 }

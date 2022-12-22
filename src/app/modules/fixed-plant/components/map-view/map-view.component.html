@@ -48,7 +48,7 @@
             <app-view-toggle></app-view-toggle>
 
             <!-- MOSTRAR / OCULTAR VISTA ZONAS -->
-            <app-simplified-view *ngIf="viewSelected !== 'tipo' && thereAreZones"></app-simplified-view>
+            <app-group-by-zones-view *ngIf="viewSelected !== 'tipo' && thereAreZones"></app-group-by-zones-view>
 
             <!-- LEYENDA -->
             <app-leyenda-container class="leyenda-tipo" *ngIf="viewSelected === 'tipo'"></app-leyenda-container>
