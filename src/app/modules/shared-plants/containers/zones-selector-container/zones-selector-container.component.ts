@@ -52,12 +52,7 @@ export class ZonesSelectorContainerComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // a las plantas de seguidores les quitamos las zonas más pequeñas porque ya se muestran por defecto
-    if (this.reportControlService.plantaFija) {
-      this.numAreas = this.zonesService.zonesBySize.length;
-    } else {
-      this.numAreas = this.zonesService.zonesBySize.length - 1;
-    }
+    this.numAreas = this.zonesService.zonesBySize.length;
 
     this.planta = this.reportControlService.planta;
 
@@ -81,10 +76,6 @@ export class ZonesSelectorContainerComponent implements OnInit, OnDestroy {
     });
 
     this.zones = this.zonesService.zonesBySize;
-    // quitamos las más pequeñas porque ya se muestran por defecto
-    if (!this.reportControlService.plantaFija) {
-      this.zones = this.zonesService.zonesBySize.filter((_, index, allZones) => index < allZones.length - 1);
-    }
 
     this.subscriptions.add(
       this.olMapService.getMap().subscribe((map) => {
