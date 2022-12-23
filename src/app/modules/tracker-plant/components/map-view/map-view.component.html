@@ -44,7 +44,10 @@
             <div class="titulo">
               <h4>Listado de seguidores</h4>
             </div>
-            <app-seguidor-list-container></app-seguidor-list-container>
+
+            <ng-template appDynamicSeguidorList></ng-template>
+
+            <!-- <app-seguidor-list-container></app-seguidor-list-container> -->
           </mat-sidenav>
 
           <mat-sidenav-content>
@@ -95,7 +98,7 @@
               <button
                 mat-raised-button
                 class="btn-right"
-                (click)="sidenavRight.toggle()"
+                (click)="loadSegList(); sidenavRight.toggle()"
                 matTooltip="Lista seguidores"
                 matTooltipClass="tooltip-style"
               >

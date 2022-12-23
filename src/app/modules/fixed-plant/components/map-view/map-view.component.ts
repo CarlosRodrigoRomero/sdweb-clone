@@ -14,7 +14,7 @@ import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-s
 import { DynamicAnomaliaListDirective } from '@modules/fixed-plant/directives/dynamic-anomalia-list.directive';
 
 import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
-import { AnomaliasListContainer } from '@modules/fixed-plant/containers/anomalia-list-container/anomalia-list-container.component';
+import { AnomaliaListContainer } from '@modules/fixed-plant/containers/anomalia-list-container/anomalia-list-container.component';
 
 @Component({
   selector: 'app-map-view',
@@ -115,7 +115,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   }
 
   loadAnomList() {
-    const component = this.componentFactoryResolver.resolveComponentFactory(AnomaliasListContainer);
+    const component = this.componentFactoryResolver.resolveComponentFactory(AnomaliaListContainer);
 
     this.dynamicAnomList.viewContainerRef.clear();
     this.dynamicAnomList.viewContainerRef.createComponent(component);

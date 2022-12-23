@@ -28,7 +28,7 @@ interface SeguidorData {
   templateUrl: './seguidor-list-container.component.html',
   styleUrls: ['./seguidor-list-container.component.css'],
 })
-export class SeguidoresListContainer implements OnInit, OnDestroy {
+export class SeguidorListContainer implements OnInit, OnDestroy {
   viewSeleccionada: string;
   displayedColumns: string[] = [];
   dataSource: MatTableDataSource<SeguidorData>;
