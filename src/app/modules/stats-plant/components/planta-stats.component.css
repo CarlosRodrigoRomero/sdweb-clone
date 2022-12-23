@@ -8,6 +8,14 @@ mat-tab {
   background-color: grey;
 }
 
+:host ::ng-deep .mat-tab-header {
+  top: 0;
+  z-index: 98;
+  position: sticky;
+  position: -webkit-sticky; /* macOS/iOS Safari */
+  background: white;
+}
+
 .mat-tab-stats {
   background-color: '#8080802b' !important;
 }
