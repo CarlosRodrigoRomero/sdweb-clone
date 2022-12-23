@@ -7,7 +7,7 @@ import { FiltersModule } from '@modules/filters/filters.module';
 import { StatsPlantModule } from '@modules/stats-plant/stats-plant.module';
 import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module';
 
-import { SeguidoresListContainer } from './containers/seguidor-list-container/seguidor-list-container.component';
+import { SeguidorListContainer } from './containers/seguidor-list-container/seguidor-list-container.component';
 
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { SeguidorListComponent } from './components/seguidor-list/seguidor-list.component';
@@ -26,10 +26,12 @@ import { SeguidorViewNavbarComponent } from './components/seguidor-view-navbar/s
 import { SeguidorViewLeyendaComponent } from './components/seguidor-view-leyenda/seguidor-view-leyenda.component';
 import { SeguidorImageOriginComponent } from './components/seguidor-image-origin/seguidor-image-origin.component';
 
+import { DynamicSeguidorListDirective } from './directives/dynamic-seguidor-list.directive';
+
 @NgModule({
   declarations: [
     MapViewComponent,
-    SeguidoresListContainer,
+    SeguidorListContainer,
     MapSeguidoresComponent,
     SeguidorInfoComponent,
     SeguidorViewComponent,
@@ -45,6 +47,7 @@ import { SeguidorImageOriginComponent } from './components/seguidor-image-origin
     SeguidorViewLeyendaComponent,
     SeguidorImageOriginComponent,
     SeguidorListComponent,
+    DynamicSeguidorListDirective,
   ],
   imports: [
     CommonModule,
