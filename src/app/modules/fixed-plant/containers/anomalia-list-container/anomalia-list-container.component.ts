@@ -24,7 +24,7 @@ import { Colors } from '@core/classes/colors';
   templateUrl: './anomalia-list-container.component.html',
   styleUrls: ['./anomalia-list-container.component.css'],
 })
-export class AnomaliasListContainer implements OnInit, OnDestroy {
+export class AnomaliaListContainer implements OnInit, OnDestroy {
   viewSeleccionada: string;
   dataSource: MatTableDataSource<any>;
   allData: any[];

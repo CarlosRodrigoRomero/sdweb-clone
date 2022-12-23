@@ -11,8 +11,10 @@ import { ViewReportService } from '@data/services/view-report.service';
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
+import { DynamicAnomaliaListDirective } from '@modules/fixed-plant/directives/dynamic-anomalia-list.directive';
 
 import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
+import { AnomaliaListContainer } from '@modules/fixed-plant/containers/anomalia-list-container/anomalia-list-container.component';
 
 @Component({
   selector: 'app-map-view',
@@ -41,6 +43,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
 
   @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
+  @ViewChild(DynamicAnomaliaListDirective) dynamicAnomList: DynamicAnomaliaListDirective;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -109,6 +112,13 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
   setSidenavStats(sidenavStats: MatSidenav) {
     this.statsService.setSidenav(sidenavStats);
+  }
+
+  loadAnomList() {
+    const component = this.componentFactoryResolver.resolveComponentFactory(AnomaliaListContainer);
+
+    this.dynamicAnomList.viewContainerRef.clear();
+    this.dynamicAnomList.viewContainerRef.createComponent(component);
   }
 
   loadStats() {
