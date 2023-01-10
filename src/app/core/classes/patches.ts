@@ -67,4 +67,43 @@ export class Patches {
 
     return informesCliente;
   }
+
+  static thermalTempsPatchs(informeId: string, tempMin: number, tempMax: number): number[] {
+    // PARCHE PARA SIRUELA MAYO 2022
+    if (informeId === 'M3PTkSUQfjPEd898haeR') {
+      tempMin = tempMin + 15;
+      tempMax = tempMax + 15;
+    }
+    // PARCHE VILLAROBLEDO 1 NOVIEMBRE 2021
+    if (informeId === 'm61ebnPfzPqqS5xWm7sy') {
+      tempMax = 100;
+    }
+    // PARCHE VERAZCRUZ MAYO 2022
+    if (informeId === 'PC8PsQ34puUxRhSaj2KA') {
+      tempMin = 30;
+      tempMax = 75;
+    }
+    // PARCHE BARBASTRO MAYO 2022
+    if (informeId === 'lR4PzmBML80tIFSKwSbT') {
+      tempMin = 30;
+      tempMax = 75;
+    }
+    // PARCHE HOYA VICENTES OCTUBRE 2021
+    if (informeId === 'bopuGnf8J50NYeQtyVS1') {
+      tempMin = 35;
+      tempMax = 70;
+    }
+    // PARCHE LAS CABEZAS NOVIEMBRE 2021
+    if (informeId === '1Ki3mmSzeh93S5PRGzQo') {
+      tempMin = 30;
+      tempMax = 50;
+    }
+    // PARCHE AEROPUERTO DE MURCIA DIC 2022
+    if (informeId === '0Y5xLCfdDKjLkUJaaVIy') {
+      tempMin = 20;
+      tempMax = 60;
+    }
+
+    return [tempMin, tempMax];
+  }
 }
