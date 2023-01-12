@@ -100,7 +100,7 @@ export class Patches {
     }
     // PARCHE AEROPUERTO DE MURCIA DIC 2022
     if (informeId === '0Y5xLCfdDKjLkUJaaVIy') {
-      tempMin = 20;
+      tempMin = 30;
       tempMax = 60;
     }
 
