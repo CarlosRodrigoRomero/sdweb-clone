@@ -1,7 +1,11 @@
+import { AuthService } from '@data/services/auth.service';
+
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
 
 export class Patches {
+  constructor(public authService: AuthService) {}
+
   static checkId(id: string): boolean {
     const informesIds: string[] = [
       'cAX7f55nKEQBzx7RcROI', // Casas de Don Pedro 2022
