@@ -125,8 +125,13 @@ export class ReportControlService {
               take(1),
               // obtenemos los informes de la planta
               switchMap((informes) => {
-                // parche plantas que compró Plenium a RIOS
-                this.informes = Patches.plantsTwoClients(this.user.uid, informes);
+                this.informes = informes;
+
+                // si el user no es admin aplicamos el parche
+                if (!this.authService.userIsAdmin(this.user)) {
+                  // parche plantas que compró Plenium a RIOS
+                  this.informes = Patches.plantsTwoClients(this.user.uid, informes);
+                }
 
                 if (this.router.url.includes('fixed')) {
                   this.plantaFija = true;
