@@ -184,7 +184,6 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
 
   private getInitialTempsLayer(informeId: string): number[] {
     const tempRefMedia = this.getTempRefMedia(informeId);
-    console.log(tempRefMedia);
     const thermalLayerDB = this.thermalLayersDB.find((layer) => layer.informeId === informeId);
 
     let tempMin = tempRefMedia - THERMAL.rangeMin;

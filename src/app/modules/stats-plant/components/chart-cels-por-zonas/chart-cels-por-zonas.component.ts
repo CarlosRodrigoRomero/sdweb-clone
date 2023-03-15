@@ -114,16 +114,32 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
     let series;
     // excluimos DEMO
     if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
-      series = [
-        {
-          name: 'CC por Zonas 2019',
-          data: [32, 45, 58],
-        },
-        {
-          name: 'CC por Zonas 2020',
-          data: [40, 38, 50],
-        },
-      ];
+      if (this.dateLabels.length > 1) {
+        series = [
+          {
+            name: 'CC por Zonas 2019',
+            data: [32, 45, 58],
+          },
+          {
+            name: 'CC por Zonas 2020',
+            data: [40, 38, 50],
+          },
+        ];
+      } else if (this.dateLabels[0] === 'Jul 2019') {
+        series = [
+          {
+            name: 'CC por Zonas 2019',
+            data: [32, 45, 58],
+          },
+        ];
+      } else {
+        series = [
+          {
+            name: 'CC por Zonas 2020',
+            data: [40, 38, 50],
+          },
+        ];
+      }
     } else {
       series = this.dateLabels.map((dateLabel, index) => {
         return { name: dateLabel, data: this.chartData[index] };

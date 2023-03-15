@@ -151,16 +151,33 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
     let series;
     // excluimos DEMO
     if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
-      series = [
-        {
-          name: 'MAE por Zonas 2019',
-          data: [1, 3, 3],
-        },
-        {
-          name: 'MAE por Zonas 2020',
-          data: [2, 1, 1],
-        },
-      ];
+      if (this.dateLabels.length > 1) {
+        series = [
+          {
+            name: 'MAE por Zonas 2019',
+            data: [1, 3, 3],
+          },
+          {
+            name: 'MAE por Zonas 2020',
+            data: [2, 1, 1],
+          },
+        ];
+      } else if (this.dateLabels[0] === 'Jul 2019') {
+        series = [
+          {
+            name: 'MAE por Zonas 2019',
+            data: [1, 3, 3],
+          },
+        ];
+      } else {
+        series = [
+          {
+            name: 'MAE por Zonas 2020',
+            data: [2, 1, 1],
+          },
+        ];
+      }
+    
     } else {
       series = this.dateLabels.map((dateLabel, index) => {
         return { name: dateLabel, data: this.chartData[index] };
