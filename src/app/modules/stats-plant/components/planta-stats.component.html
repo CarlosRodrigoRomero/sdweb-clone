@@ -8,11 +8,11 @@
     <div class="mae-grid">
       <div class="mae-content-izq">
         <!-- MAE GLOBAL -->
-        <app-chart-mae-global *ngIf="!sharedReport && portfolioLoaded"></app-chart-mae-global>
+        <app-chart-mae-global *ngIf="!sharedReport && portfolioLoaded || completeView"></app-chart-mae-global>
 
         <!-- MAE POR ZONAS -->
         <app-chart-mae-zonas
-          *ngIf="thereAreZones && reportControlService.nombreGlobalCoords.length > 0"
+          *ngIf="thereAreZones && reportControlService.nombreGlobalCoords.length > 0 || completeView"
         ></app-chart-mae-zonas>
       </div>
       <div>
