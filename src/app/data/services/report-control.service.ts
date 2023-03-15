@@ -254,128 +254,60 @@ export class ReportControlService {
                 this.completeView = true;
               }
 
-              if (!this.router.url.includes('filterable')) {
-                // iniciamos anomalia service antes de obtener las anomalias
-                this.anomaliaService.initService(this.plantaId).then(() =>
-                  this.plantaService
-                    .getPlanta(this.plantaId)
-                    .pipe(
-                      take(1),
-                      switchMap((planta) => {
-                        this.planta = planta;
+              // iniciamos anomalia service antes de obtener las anomalias
+              this.anomaliaService.initService(this.plantaId).then(() =>
+                this.plantaService
+                  .getPlanta(this.plantaId)
+                  .pipe(
+                    take(1),
+                    switchMap((planta) => {
+                      this.planta = planta;
 
-                        // iniciamos el servicio de zonas
-                        return from(this.zonesService.initService(this.planta));
-                      }),
-                      take(1),
-                      switchMap(() => this.informeService.getInforme(this.selectedInformeId)),
-                      take(1),
-                      switchMap((informe) => {
-                        this.informes = [informe];
+                      // iniciamos el servicio de zonas
+                      return from(this.zonesService.initService(this.planta));
+                    }),
+                    take(1),
+                    switchMap(() => this.informeService.getInforme(this.selectedInformeId)),
+                    take(1),
+                    switchMap((informe) => {
+                      this.informes = [informe];
 
-                        if (this.router.url.includes('fixed')) {
-                          this.plantaFija = true;
+                      if (this.router.url.includes('fixed')) {
+                        this.plantaFija = true;
 
-                          return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
-                        } else {
-                          this.plantaFija = false;
-
-                          return this.seguidorService.getSeguidoresPlanta$(this.planta, this.informes);
-                        }
-                      }),
-                      take(1)
-                    )
-                    .subscribe((elems) => {
-                      if (this.plantaFija) {
-                        this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
-
-                        this.allAnomalias = this.allFilterableElements as Anomalia[];
+                        return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
                       } else {
-                        this.allFilterableElements = elems;
+                        this.plantaFija = false;
 
-                        (this.allFilterableElements as Seguidor[]).forEach((seg) => {
-                          if (seg.anomaliasCliente.length > 0) {
-                            this.allAnomalias.push(...seg.anomaliasCliente);
-                          }
-                        });
+                        return this.seguidorService.getSeguidoresPlanta$(this.planta, this.informes);
                       }
+                    }),
+                    take(1)
+                  )
+                  .subscribe((elems) => {
+                    if (this.plantaFija) {
+                      this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
 
-                      // iniciamos filter service
-                      this.filterService
-                        .initService(this.allFilterableElements, true, this.sharedId)
-                        .then((filtersInit) => {
-                          // enviamos respuesta de servicio iniciado
-                          initService(filtersInit);
-                        });
-                    })
-                );
-              } else {
-                //////////////////// FILTERABLE SHARED REPORT /////////////////////////
-                // iniciamos anomalia service antes de obtener las anomalias
-                this.anomaliaService.initService(this.plantaId).then(() =>
-                  this.plantaService
-                    .getPlanta(this.plantaId)
-                    .pipe(
-                      take(1),
-                      switchMap((planta) => {
-                        this.planta = planta;
+                      this.allAnomalias = this.allFilterableElements as Anomalia[];
+                    } else {
+                      this.allFilterableElements = elems;
 
-                        // iniciamos el servicio de zonas
-                        return from(this.zonesService.initService(this.planta));
-                      }),
-                      take(1),
-                      switchMap(() => this.informeService.getInformesDisponiblesDePlanta(this.plantaId)),
-                      take(1),
-                      // obtenemos los informes de la planta
-                      switchMap((informes) => {
-                        // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
-                        this.informes = this.informeService.getOnlyNewInfomesFijas(informes);
-
-                        // evitamos cargar los informes dobles al navegar atras y volver
-                        if (this.informesIdList.length === 0) {
-                          // ordenamos los informes de menos a mas reciente y los añadimos a la lista
-                          this.informes.forEach((informe) => this.informesIdList.push(informe.id));
+                      (this.allFilterableElements as Seguidor[]).forEach((seg) => {
+                        if (seg.anomaliasCliente.length > 0) {
+                          this.allAnomalias.push(...seg.anomaliasCliente);
                         }
+                      });
+                    }
 
-                        if (this.router.url.includes('fixed')) {
-                          this.plantaFija = true;
-
-                          // obtenemos todas las anomalías
-                          return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
-                        } else {
-                          this.plantaFija = false;
-
-                          // obtenemos todos los seguidores
-                          return this.seguidorService.getSeguidoresPlanta$(this.planta, this.informes);
-                        }
-                      }),
-                      take(1)
-                    )
-                    .subscribe((elems) => {
-                      if (this.plantaFija) {
-                        this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
-
-                        this.allAnomalias = this.allFilterableElements as Anomalia[];
-                      } else {
-                        this.allFilterableElements = elems;
-
-                        (this.allFilterableElements as Seguidor[]).forEach((seg) => {
-                          if (seg.anomaliasCliente.length > 0) {
-                            this.allAnomalias.push(...seg.anomaliasCliente);
-                          }
-                        });
-                      }
-
-                      // iniciamos filter service
-                      this.filterService
-                        .initService(this.allFilterableElements, true, this.sharedId)
-                        .then((filtersInit) => {
-                          // enviamos respuesta de servicio iniciado
-                          initService(filtersInit);
-                        });
-                    })
-                );
-              }
+                    // iniciamos filter service
+                    this.filterService
+                      .initService(this.allFilterableElements, true, this.sharedId)
+                      .then((filtersInit) => {
+                        // enviamos respuesta de servicio iniciado
+                        initService(filtersInit);
+                      });
+                  })
+              );
             } else {
               console.log('No existe el documento');
             }
