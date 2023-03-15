@@ -133,6 +133,7 @@ export class ChartPctCelsComponent implements OnInit {
         });
 
         // si solo hay un informe no mostramos el gráfico
+        console.log(this.informes);
         if (this.informes.length > 1) {
           this._initChartData(data1, data2);
         } else {

@@ -39,51 +39,107 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
 
   @ViewChild('chart') chart: ChartComponent;
 
+  private series2019: ApexAxisChartSeries = [
+    {
+      name: '1',
+      data: [{ x: 'Jul 2019', y: 35 }],
+    },
+    {
+      name: '2',
+      data: [{ x: 'Jul 2019', y: 20 }],
+    },
+    {
+      name: '3',
+      data: [{ x: 'Jul 2019', y: 20 }],
+    },
+    {
+      name: '4',
+      data: [{ x: 'Jul 2019', y: 15 }],
+    },
+    {
+      name: '5',
+      data: [{ x: 'Jul 2019', y: 18 }],
+    },
+    {
+      name: '6',
+      data: [{ x: 'Jul 2019', y: 36 }],
+    },
+  ];
+
+  private series2020: ApexAxisChartSeries = [
+    {
+      name: '1',
+      data: [{ x: 'Jun 2020', y: 25 }],
+    },
+    {
+      name: '2',
+      data: [{ x: 'Jun 2020', y: 17 }],
+    },
+    {
+      name: '3',
+      data: [{ x: 'Jun 2020', y: 15 }],
+    },
+    {
+      name: '4',
+      data: [{ x: 'Jun 2020', y: 25 }],
+    },
+    {
+      name: '5',
+      data: [{ x: 'Jun 2020', y: 20 }],
+    },
+    {
+      name: '6',
+      data: [{ x: 'Jun 2020', y: 18 }],
+    },
+  ];
+
+  private series20192020: ApexAxisChartSeries = [
+    {
+      name: '1',
+      data: [
+        { x: 'Jul 2019', y: 35 },
+        { x: 'Jun 2020', y: 25 },
+      ],
+    },
+    {
+      name: '2',
+      data: [
+        { x: 'Jul 2019', y: 20 },
+        { x: 'Jun 2020', y: 17 },
+      ],
+    },
+    {
+      name: '3',
+      data: [
+        { x: 'Jul 2019', y: 20 },
+        { x: 'Jun 2020', y: 15 },
+      ],
+    },
+    {
+      name: '4',
+      data: [
+        { x: 'Jul 2019', y: 15 },
+        { x: 'Jun 2020', y: 25 },
+      ],
+    },
+    {
+      name: '5',
+      data: [
+        { x: 'Jul 2019', y: 18 },
+        { x: 'Jun 2020', y: 20 },
+      ],
+    },
+    {
+      name: '6',
+      data: [
+        { x: 'Jul 2019', y: 36 },
+        { x: 'Jun 2020', y: 18 },
+      ],
+    },
+  ];
+
   public chartOptions: Partial<ChartOptions> = {
-    series: [
-      {
-        name: '1',
-        data: [
-          { x: 'Jul 2019', y: 35 },
-          { x: 'Jun 2020', y: 25 },
-        ],
-      },
-      {
-        name: '2',
-        data: [
-          { x: 'Jul 2019', y: 20 },
-          { x: 'Jun 2020', y: 17 },
-        ],
-      },
-      {
-        name: '3',
-        data: [
-          { x: 'Jul 2019', y: 20 },
-          { x: 'Jun 2020', y: 15 },
-        ],
-      },
-      {
-        name: '4',
-        data: [
-          { x: 'Jul 2019', y: 15 },
-          { x: 'Jun 2020', y: 25 },
-        ],
-      },
-      {
-        name: '5',
-        data: [
-          { x: 'Jul 2019', y: 18 },
-          { x: 'Jun 2020', y: 20 },
-        ],
-      },
-      {
-        name: '6',
-        data: [
-          { x: 'Jul 2019', y: 36 },
-          { x: 'Jun 2020', y: 18 },
-        ],
-      },
-    ],
+    series: this.series20192020,
     chart: {
       height: 170,
       type: 'heatmap',
@@ -130,6 +186,14 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.informeService.getDateLabelsInformes(this.informesIdList).subscribe((dateLabels) => {
+        if (dateLabels.length < 2) {
+          if (dateLabels[0] === 'Jul 2019') {
+            this.chartOptions.series = this.series2019;
+          } else {
+            this.chartOptions.series = this.series2020;
+          }
+        }
+
         const alturaMax = this.planta.filas;
 
         if (this.allCC.length > 0) {

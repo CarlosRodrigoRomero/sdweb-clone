@@ -247,6 +247,7 @@ export class ReportControlService {
               const params = doc.data() as ParamsFilterShare;
               this.plantaId = params.plantaId;
               this.selectedInformeId = params.informeId;
+              this.informesIdList = [this.selectedInformeId];
 
               // comprobamos si ese enlace shared debe mostrar la vista completa
               if (this.plantaId === this.demoService.plantaId) {
