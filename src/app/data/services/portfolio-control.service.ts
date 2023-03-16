@@ -93,7 +93,7 @@ export class PortfolioControlService {
             ]);
           })
         )
-        .pipe(take(3))
+        .pipe(take(1))
         .subscribe(([plantas, plantasEmpresa, informes]) => {
           const informesExtra = this.informeService.getInformesWithEmpresaId(informes, this.user.uid);
 
