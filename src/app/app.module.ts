@@ -25,9 +25,16 @@ import { NavbarContainerComponent } from '@layout/containers/navbar-container/na
 import { NavbarComponent } from '@layout/components/navbar/navbar.component';
 
 import { WINDOW_PROVIDERS } from './window.providers';
+import { NavComponent } from './layout/components/nav/nav.component';
+import { LayoutModule } from '@angular/cdk/layout';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
 
 @NgModule({
-  declarations: [AppComponent, SkeletonComponent, NavbarContainerComponent, NavbarComponent],
+  declarations: [AppComponent, SkeletonComponent, NavbarContainerComponent, NavbarComponent, NavComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -41,6 +48,12 @@ import { WINDOW_PROVIDERS } from './window.providers';
     CommonModule,
     HotkeyModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    LayoutModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
   ],
   providers: [{ provide: SETTINGS, useValue: {} }, AuthService, WINDOW_PROVIDERS],
   bootstrap: [AppComponent],

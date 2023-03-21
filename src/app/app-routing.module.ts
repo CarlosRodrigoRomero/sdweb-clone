@@ -7,6 +7,7 @@ import { SelectivePreloadingStrategyService } from '@data/services/selective-pre
 
 import { AvisoLegalComponent } from '@shared/components/aviso-legal/aviso-legal.component';
 import { SkeletonComponent } from '@layout/components/skeleton/skeleton.component';
+import { NavComponent } from '@layout/components/nav/nav.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'clients', pathMatch: 'full' },
@@ -23,7 +24,8 @@ export const routes: Routes = [
   },
   {
     path: 'clients',
-    component: SkeletonComponent,
+    component: NavComponent,
+    // component: SkeletonComponent,
     loadChildren: () => import('@modules/clients/clients.module').then((m) => m.ClientsModule),
     canActivate: [AuthGuard],
     data: { preload: true },
