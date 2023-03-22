@@ -36,30 +36,9 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
-    <mat-toolbar color="primary" class="navbar">
-      <button
-        type="button"
-        aria-label="Toggle sidenav"
-        mat-icon-button
-        (click)="drawer.toggle()"
-        *ngIf="isHandset$ | async"
-      >
-        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-      </button>
-      <span>Solardrone</span>
-      <button class="right-menu" mat-icon-button [matMenuTriggerFor]="rightMenu">
-        <mat-icon>more_horiz</mat-icon>
-      </button>
-      <mat-menu #rightMenu="matMenu">
-        <button mat-menu-item routerLink="/admin">Admin</button>
-        <button mat-menu-item routerLink="/clientes">Web antigua</button>
-        <!-- <button mat-menu-item (click)="signOut.emit()" routerLink="../auth">
-          <strong> Cerrar sesión </strong>
-        </button> -->
-      </mat-menu>
-    </mat-toolbar>
-
     <!-- CONTENT -->
+    <app-navbar-container></app-navbar-container>
+
     <router-outlet></router-outlet>
   </mat-sidenav-content>
 </mat-sidenav-container>

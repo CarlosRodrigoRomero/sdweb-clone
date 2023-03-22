@@ -1,7 +1,7 @@
-<mat-toolbar [class.mat-elevation-z2]="true" class="nb">
-  <a class="navbar-brand" (click)="navigateHome.emit()">
+<mat-toolbar [class.mat-elevation-z0]="true" class="navbar">
+  <!-- <a class="navbar-brand" (click)="navigateHome.emit()">
     <img src="../../../assets/images/logo_sd.png" height="50" class="d-inline-block align-top" alt="" />
-  </a>
+  </a> -->
 
   <div id="plant-summary" *ngIf="loadContent && !tipoComentarios">
     <app-plant-summary></app-plant-summary>
@@ -35,7 +35,7 @@
 
     <!-- botón menu derecha -->
     <button *ngIf="!isShared" mat-icon-button [matMenuTriggerFor]="endMenu">
-      <mat-icon>keyboard_arrow_down</mat-icon>
+      <mat-icon>more_horiz</mat-icon>
     </button>
     <mat-menu #endMenu="matMenu">
       <button *ngIf="isAdmin" mat-menu-item routerLink="/admin">Admin</button>
