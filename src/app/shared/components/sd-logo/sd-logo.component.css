@@ -1,0 +1,14 @@
+.sd-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.sd-icon {
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
+  color: red;
+}

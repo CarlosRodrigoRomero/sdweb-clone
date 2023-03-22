@@ -16,18 +16,9 @@
   z-index: 1;
 }
 
-.sd-logo {
+.logo {
   display: flex;
-  align-items: center;
   justify-content: center;
-  height: 100%;
-  width: 100%;
-}
-
-.sd-icon {
-  height: 40px;
-  width: 40px;
-  cursor: pointer;
 }
 
 .list-items {

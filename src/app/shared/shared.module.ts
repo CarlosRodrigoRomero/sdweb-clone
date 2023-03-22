@@ -27,6 +27,7 @@ import { WarningsComponent } from './components/warnings/warnings.component';
 import { ReportRecalcComponent } from './components/report-recalc/report-recalc.component';
 import { SimplePlantSummaryComponent } from './components/simple-plant-summary/simple-plant-summary.component';
 import { SwitchThemeComponent } from './components/switch-theme/switch-theme.component';
+import { SdLogoComponent } from './components/sd-logo/sd-logo.component';
 
 const components = [
   SpinnerComponent,
@@ -40,6 +41,7 @@ const components = [
   ReportRecalcComponent,
   SimplePlantSummaryComponent,
   SwitchThemeComponent,
+  SdLogoComponent,
 ];
 const modules = [
   CommonModule,

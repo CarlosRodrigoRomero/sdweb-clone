@@ -7,10 +7,8 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="(isHandset$ | async) === false"
   >
-    <mat-toolbar>
-      <div class="sd-logo">
-        <mat-icon class="sd-icon" svgIcon="sd"></mat-icon>
-      </div>
+    <mat-toolbar class="logo">
+      <app-sd-logo></app-sd-logo>
     </mat-toolbar>
     <mat-nav-list class="list-items">
       <div class="top-items">
