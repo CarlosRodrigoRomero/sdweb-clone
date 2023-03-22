@@ -8,7 +8,7 @@ import { ThemeService } from '@data/services/theme.service';
   styleUrls: ['./switch-theme.component.css'],
 })
 export class SwitchThemeComponent {
-  public darkMode = false;
+  darkMode = false;
 
   constructor(private themeService: ThemeService) {
     this.themeService.themeSelected$.subscribe((theme) => {
@@ -18,7 +18,7 @@ export class SwitchThemeComponent {
     });
   }
 
-  public onSetTheme(theme: string) {
+  onSetTheme(theme: string) {
     this.darkMode = !this.darkMode;
     this.themeService.themeSelected = theme;
   }
