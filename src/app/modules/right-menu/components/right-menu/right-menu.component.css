@@ -1,0 +1,16 @@
+::ng-deep .mat-menu-panel {
+  max-width: none !important;
+}
+
+.right-menu {
+  margin: 1rem;
+}
+
+@media (max-width: 600px) {
+  .content {
+    display: flex;
+    flex-direction: column;
+    width: calc(100vw - 32px);
+    height: calc(100vh - 78px);
+  }
+}
