@@ -1,20 +1,39 @@
+.navbar-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.left-content {
+  display: flex;
+  align-items: center;
+}
+
+.right-content {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .left-content {
+    display: none;
+  }
+
+  app-warnings-menu {
+    display: none;
+  }
+
+  app-report-recalc {
+    display: none;
+  }
+
+  .btn-notif {
+    display: none;
+  }
+}
+
 .example-spacer {
   flex: 1 1 auto;
-}
-
-.navbar {
-  position: relative;
-  z-index: 999;
-  overflow-x: hidden;
-  padding: 0 2rem;
-}
-
-.navbar-brand {
-  cursor: pointer;
-}
-
-.navbar-brand-logo {
-  display: none;
 }
 
 #plant-summary {
@@ -30,10 +49,6 @@
     display: block;
     padding-right: 1.2rem;
   }
-}
-
-.right {
-  display: flex;
 }
 
 .btn-notif {

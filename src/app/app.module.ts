@@ -16,6 +16,7 @@ import { SharedModule } from '@shared/shared.module';
 import { CoreModule } from '@core/core.module';
 
 import { AuthService } from '@data/services/auth.service';
+import { RightMenuModule } from '@modules/right-menu/right-menu.module';
 
 import { environment } from '../environments/environment';
 
@@ -54,6 +55,7 @@ import { MatListModule } from '@angular/material/list';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
+    RightMenuModule,
   ],
   providers: [{ provide: SETTINGS, useValue: {} }, AuthService, WINDOW_PROVIDERS],
   bootstrap: [AppComponent],

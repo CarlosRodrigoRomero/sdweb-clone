@@ -1,19 +1,17 @@
-<mat-toolbar [class.mat-elevation-z0]="true" class="navbar">
-  <!-- <a class="navbar-brand" (click)="navigateHome.emit()">
-    <img src="../../../assets/images/logo_sd.png" height="50" class="d-inline-block align-top" alt="" />
-  </a> -->
+<div class="navbar-content">
+  <div class="left-content">
+    <div id="plant-summary" *ngIf="loadContent && !tipoComentarios">
+      <app-plant-summary></app-plant-summary>
+    </div>
 
-  <div id="plant-summary" *ngIf="loadContent && !tipoComentarios">
-    <app-plant-summary></app-plant-summary>
-  </div>
-
-  <div *ngIf="tipoComentarios">
-    <app-simple-plant-summary></app-simple-plant-summary>
+    <div *ngIf="tipoComentarios">
+      <app-simple-plant-summary></app-simple-plant-summary>
+    </div>
   </div>
 
   <span class="example-spacer"></span>
 
-  <div class="right">
+  <div class="right-content">
     <!-- MENU ALERTAS INFORME TERMINADO ANTES DE ENTREGAR -->
     <app-warnings-menu *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-warnings-menu>
 
@@ -33,16 +31,7 @@
       </button>
     </mat-menu>
 
-    <!-- botón menu derecha -->
-    <button *ngIf="!isShared" mat-icon-button [matMenuTriggerFor]="endMenu">
-      <mat-icon>more_horiz</mat-icon>
-    </button>
-    <mat-menu #endMenu="matMenu">
-      <button *ngIf="isAdmin" mat-menu-item routerLink="/admin">Admin</button>
-      <button *ngIf="isAdmin" mat-menu-item routerLink="/clientes">Web antigua</button>
-      <button mat-menu-item (click)="signOut.emit()" routerLink="../auth">
-        <strong> Cerrar sesión </strong>
-      </button>
-    </mat-menu>
+    <!-- MENU DERECHA -->
+    <app-right-menu-container></app-right-menu-container>
   </div>
-</mat-toolbar>
+</div>
