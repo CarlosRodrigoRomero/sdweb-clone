@@ -107,6 +107,11 @@ export class Patches {
       tempMin = 30;
       tempMax = 60;
     }
+    // PARCHE AEROPUERTO DE MURCIA MARZO 2023
+    if (informeId === '6gA1koLMOyJqCWUyq5IH') {
+      tempMin = 30;
+      tempMax = 60;
+    }
 
     return [tempMin, tempMax];
   }
