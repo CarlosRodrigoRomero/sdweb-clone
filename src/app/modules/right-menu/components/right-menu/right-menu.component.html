@@ -1,7 +1,7 @@
-<button *ngIf="!isShared" mat-icon-button [matMenuTriggerFor]="endMenu">
-  <mat-icon>more_horiz</mat-icon>
+<button *ngIf="!isShared" mat-icon-button [matMenuTriggerFor]="endMenu" (menuOpened)="menuOpen = true">
+  <mat-icon>{{ menuOpen ? 'close' : 'more_horiz' }}</mat-icon>
 </button>
-<mat-menu #endMenu="matMenu">
+<mat-menu #endMenu="matMenu" (closed)="menuOpen = false">
   <button *ngIf="isAdmin" mat-menu-item routerLink="/admin">Admin</button>
   <button *ngIf="isAdmin" mat-menu-item routerLink="/clientes">Web antigua</button>
   <button mat-menu-item (click)="signOut.emit()" routerLink="../auth">

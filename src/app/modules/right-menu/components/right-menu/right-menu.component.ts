@@ -6,6 +6,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
   styleUrls: ['./right-menu.component.css'],
 })
 export class RightMenuComponent implements OnInit {
+  menuOpen = false;
   @Input() isShared: boolean;
   @Input() isAdmin: boolean;
   @Output() signOut = new EventEmitter();
