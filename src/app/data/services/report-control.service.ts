@@ -134,7 +134,7 @@ export class ReportControlService {
                   this.informes = Patches.plantsTwoClients(this.user.uid, informes);
                 }
 
-                if (this.router.url.includes('fixed')) {
+                if (this.planta.tipo !== 'seguidores') {
                   this.plantaFija = true;
 
                   // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
