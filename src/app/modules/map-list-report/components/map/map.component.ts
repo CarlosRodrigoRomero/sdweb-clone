@@ -17,6 +17,7 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { ThermalService } from '@data/services/thermal.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -36,7 +37,8 @@ export class MapComponent implements OnInit, OnDestroy {
   private aerialLayers: TileLayer[];
   private anomaliaLayers: VectorImageLayer[];
   noAnomsReport = false;
-  public map: Map;
+  private map: Map;
+  selectedInformeId: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -45,7 +47,8 @@ export class MapComponent implements OnInit, OnDestroy {
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
     private anomaliasControlService: AnomaliasControlService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private thermalService: ThermalService
   ) {}
 
   ngOnInit(): void {
@@ -104,6 +107,10 @@ export class MapComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
 
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
+
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((id) => (this.selectedInformeId = id))
+    );
   }
 
   initMap() {

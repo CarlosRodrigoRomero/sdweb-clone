@@ -1,10 +1,8 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { LabelType, Options } from '@angular-slider/ngx-slider';
-
 import { take } from 'rxjs/operators';
-import { combineLatest, Subscription } from 'rxjs';
+import { combineLatest } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
 
@@ -13,44 +11,21 @@ import { ThermalService } from '@data/services/thermal.service';
 import { ReportControlService } from '@data/services/report-control.service';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
-import { MathOperations } from '@core/classes/math-operations';
-import { THERMAL } from '@data/constants/thermal';
 import { InformeInterface } from '@core/models/informe';
+import { THERMAL } from '@data/constants/thermal';
 import { Patches } from '@core/classes/patches';
+import { MathOperations } from '@core/classes/math-operations';
 
 @Component({
-  selector: 'app-thermal-slider',
-  templateUrl: './thermal-slider.component.html',
-  styleUrls: ['./thermal-slider.component.scss'],
+  selector: 'app-thermal-layers',
+  templateUrl: './thermal-layers.component.html',
+  styleUrls: ['./thermal-layers.component.css'],
 })
-export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
+export class ThermalLayersComponent implements OnInit {
   private thermalLayers: TileLayer[] = [];
   private thermalLayersDB: ThermalLayerInterface[] = [];
   private indexSelected: number;
-  private thermalLayersLoaded = false;
   private informes: InformeInterface[] = [];
-
-  @Input() informeId: string;
-
-  private subscriptions: Subscription = new Subscription();
-
-  /* Valores de inicio */
-  lowTemp = 25;
-  highTemp = 75;
-  optionsTemp: Options = {
-    floor: 25,
-    ceil: 100,
-    translate: (value: number, label: LabelType): string => {
-      switch (label) {
-        case LabelType.Low:
-          return '<b>' + value + '</b> ºC';
-        case LabelType.High:
-          return '<b>' + value + '</b> ºC';
-        default:
-          return value + 'ºC';
-      }
-    },
-  };
 
   constructor(
     private thermalService: ThermalService,
@@ -63,50 +38,6 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     this.informes = this.reportControlService.informes;
 
     this.loadThermalLayers();
-
-    this.subscriptions.add(
-      this.thermalService.sliderMin$.subscribe((value) => {
-        const minValue = value[this.indexSelected];
-        if (minValue) {
-          this.lowTemp = minValue;
-          if (this.thermalLayers.length > 0) {
-            this.thermalLayers[this.indexSelected].getSource().changed();
-          }
-        }
-      })
-    );
-
-    this.subscriptions.add(
-      this.thermalService.sliderMax$.subscribe((value) => {
-        const maxValue = value[this.indexSelected];
-        if (maxValue) {
-          this.highTemp = maxValue;
-          if (this.thermalLayers.length > 0) {
-            this.thermalLayers[this.indexSelected].getSource().changed();
-          }
-        }
-      })
-    );
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.informeId && this.thermalLayersLoaded) {
-      const index = this.informes.findIndex((informe) => informe.id === this.informeId);
-
-      if (index !== -1) {
-        this.indexSelected = index;
-
-        const selectedThermalLayer = this.thermalLayersDB[this.indexSelected];
-
-        this.optionsTemp = {
-          floor: selectedThermalLayer.rangeTempMin,
-          ceil: selectedThermalLayer.rangeTempMax,
-          translate: this.optionsTemp.translate,
-        };
-
-        this.setInitialValues(this.informeId);
-      }
-    }
   }
 
   private loadThermalLayers() {
@@ -133,13 +64,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
           // establecemos el indice seleccinado
           this.indexSelected = this.thermalLayersDB.length - 1;
 
-          const selectedThermalLayer = this.thermalLayersDB[this.indexSelected];
-
-          this.optionsTemp = {
-            floor: selectedThermalLayer.rangeTempMin,
-            ceil: selectedThermalLayer.rangeTempMax,
-            translate: this.optionsTemp.translate,
-          };
+          this.thermalService.indexSelected = this.indexSelected;
 
           // le damos el tamaño de la capa termica seleccionada
           this.thermalService.sliderMin = new Array(this.thermalLayersDB.length).fill(null);
@@ -149,7 +74,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
           this.thermalLayersDB.forEach((layerDB, index) => {
             this.setInitialValues(layerDB.informeId);
             if (index === this.thermalLayersDB.length - 1) {
-              this.thermalLayersLoaded = true;
+              // this.thermalLayersLoaded = true;
             }
           });
         }
@@ -173,10 +98,10 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
       [tempMin, tempMax] = this.getInitialTempsLayer(informeId);
     }
 
-    if (informeId === this.informeId) {
-      this.lowTemp = tempMin;
-      this.highTemp = tempMax;
-    }
+    // if (informeId === this.informeId) {
+    //   this.lowTemp = tempMin;
+    //   this.highTemp = tempMax;
+    // }
 
     this.setSliderMinValue(tempMin, indexInforme);
     this.setSliderMaxValue(tempMax, indexInforme);
@@ -211,11 +136,6 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     return tempRefMedia;
   }
 
-  onChangeTemperatureSlider(lowValue: number, highValue: number) {
-    this.setSliderMinValue(lowValue);
-    this.setSliderMaxValue(highValue);
-  }
-
   private setSliderMinValue(lowValue: number, indexInforme?: number) {
     let indexInf = this.indexSelected;
     if (indexInforme !== undefined) {
@@ -243,9 +163,5 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
         return value;
       }
     });
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
   }
 }

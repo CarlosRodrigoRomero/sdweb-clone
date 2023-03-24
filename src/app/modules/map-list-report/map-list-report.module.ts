@@ -12,6 +12,7 @@ import { ListComponent } from './components/list/list.component';
 import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { ZonesComponent } from './components/zones/zones.component';
 import { ViewControlComponent } from './components/view-control/view-control.component';
+import { ThermalLayersComponent } from './components/thermal-layers/thermal-layers.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { ViewControlComponent } from './components/view-control/view-control.com
     ZonesComponent,
     ViewControlComponent,
     LeyendaContainerComponent,
+    ThermalLayersComponent,
   ],
   imports: [CommonModule, MapListReportRoutingModule, SharedModule],
 })

@@ -11,14 +11,17 @@ import { ThermalLayerInterface } from '@core/models/thermalLayer';
   providedIn: 'root',
 })
 export class ThermalService {
-  private _thermalLayers: ThermalLayerInterface[] = [];
-  thermalLayers$ = new BehaviorSubject<ThermalLayerInterface[]>(this._thermalLayers);
+  private _thermalLayersDB: ThermalLayerInterface[] = [];
+  thermalLayersDB$ = new BehaviorSubject<ThermalLayerInterface[]>(this._thermalLayersDB);
 
   private _sliderMin: number[] = [];
   sliderMin$ = new BehaviorSubject<number[]>(this._sliderMin);
 
   private _sliderMax: number[] = [];
   sliderMax$ = new BehaviorSubject<number[]>(this._sliderMax);
+
+  private _indexSelected: number = undefined;
+  indexSelected$ = new BehaviorSubject<number>(this._indexSelected);
 
   private subscriptions: Subscription = new Subscription();
 
@@ -90,14 +93,14 @@ export class ThermalService {
             });
           })
         )
-        .subscribe((tL) => (this.thermalLayers = tL))
+        .subscribe((tL) => (this.thermalLayersDB = tL))
     );
 
-    return this.thermalLayers$;
+    return this.thermalLayersDB$;
   }
 
   resetService() {
-    this.thermalLayers = [];
+    this.thermalLayersDB = [];
     this.sliderMin = [];
     this.sliderMax = [];
 
@@ -105,13 +108,13 @@ export class ThermalService {
     this.subscriptions = new Subscription();
   }
 
-  get thermalLayers() {
-    return this._thermalLayers;
+  get thermalLayersDB() {
+    return this._thermalLayersDB;
   }
 
-  set thermalLayers(value: ThermalLayerInterface[]) {
-    this._thermalLayers = value;
-    this.thermalLayers$.next(value);
+  set thermalLayersDB(value: ThermalLayerInterface[]) {
+    this._thermalLayersDB = value;
+    this.thermalLayersDB$.next(value);
   }
 
   get sliderMin() {
@@ -130,5 +133,14 @@ export class ThermalService {
   set sliderMax(value: number[]) {
     this._sliderMax = value;
     this.sliderMax$.next(value);
+  }
+
+  get indexSelected() {
+    return this._indexSelected;
+  }
+
+  set indexSelected(value: number) {
+    this._indexSelected = value;
+    this.indexSelected$.next(value);
   }
 }
