@@ -87,7 +87,7 @@ export class ReportControlService {
   initService(): Promise<boolean> {
     if (!this.router.url.includes('shared')) {
       // obtenemos plantaId de la url
-      this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+      this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 2];
 
       return new Promise((initService) => {
         // iniciamos anomalia service antes de obtener las anomalias
