@@ -74,7 +74,7 @@ export class ThermalLayersComponent implements OnInit {
           this.thermalLayersDB.forEach((layerDB, index) => {
             this.setInitialValues(layerDB.informeId);
             if (index === this.thermalLayersDB.length - 1) {
-              // this.thermalLayersLoaded = true;
+              this.thermalService.thermalLayersLoaded = true;
             }
           });
         }

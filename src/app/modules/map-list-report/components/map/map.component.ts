@@ -39,6 +39,7 @@ export class MapComponent implements OnInit, OnDestroy {
   noAnomsReport = false;
   private map: Map;
   selectedInformeId: string;
+  thermalLayersLoaded = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -110,6 +111,10 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((id) => (this.selectedInformeId = id))
+    );
+
+    this.subscriptions.add(
+      this.thermalService.thermalLayersLoaded$.subscribe((value) => (this.thermalLayersLoaded = value))
     );
   }
 

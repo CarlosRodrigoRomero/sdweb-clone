@@ -5,5 +5,5 @@
 
   <app-thermal-layers></app-thermal-layers>
 
-  <!-- <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider> -->
+  <app-thermal-layer-slider *ngIf="thermalLayersLoaded" [informeId]="selectedInformeId"></app-thermal-layer-slider>
 </mat-card>

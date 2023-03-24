@@ -13,6 +13,7 @@ import { LeyendaComponent } from './components/leyenda/leyenda.component';
 import { ZonesComponent } from './components/zones/zones.component';
 import { ViewControlComponent } from './components/view-control/view-control.component';
 import { ThermalLayersComponent } from './components/thermal-layers/thermal-layers.component';
+import { ThermalLayerSliderComponent } from './components/thermal-layer-slider/thermal-layer-slider.component';
 
 @NgModule({
   declarations: [
@@ -22,8 +23,9 @@ import { ThermalLayersComponent } from './components/thermal-layers/thermal-laye
     LeyendaComponent,
     ZonesComponent,
     ViewControlComponent,
-    LeyendaContainerComponent,
     ThermalLayersComponent,
+    ThermalLayerSliderComponent,
+    LeyendaContainerComponent,
   ],
   imports: [CommonModule, MapListReportRoutingModule, SharedModule],
 })

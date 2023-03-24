@@ -23,6 +23,9 @@ export class ThermalService {
   private _indexSelected: number = undefined;
   indexSelected$ = new BehaviorSubject<number>(this._indexSelected);
 
+  private _thermalLayersLoaded: boolean = false;
+  thermalLayersLoaded$ = new BehaviorSubject<boolean>(this._thermalLayersLoaded);
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(private afs: AngularFirestore) {}
@@ -142,5 +145,14 @@ export class ThermalService {
   set indexSelected(value: number) {
     this._indexSelected = value;
     this.indexSelected$.next(value);
+  }
+
+  get thermalLayersLoaded() {
+    return this._thermalLayersLoaded;
+  }
+
+  set thermalLayersLoaded(value: boolean) {
+    this._thermalLayersLoaded = value;
+    this.thermalLayersLoaded$.next(value);
   }
 }
