@@ -6,7 +6,7 @@ import { SharedModule } from '@shared/shared.module';
 
 import { LeyendaContainerComponent } from './containers/leyenda-container/leyenda-container.component';
 
-import { MapListContentComponent } from './components/map-list-content/map-list-content.component';
+import { MapListContentComponent } from './components/map-list-content.component';
 import { MapComponent } from './components/map/map.component';
 import { ListComponent } from './components/list/list.component';
 import { LeyendaComponent } from './components/leyenda/leyenda.component';

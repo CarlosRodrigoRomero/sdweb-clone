@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { AuthGuard } from '@core/guards/auth.guard';
 
-import { MapListContentComponent } from './components/map-list-content/map-list-content.component';
+import { MapListContentComponent } from './components/map-list-content.component';
 
 const routes: Routes = [
   {

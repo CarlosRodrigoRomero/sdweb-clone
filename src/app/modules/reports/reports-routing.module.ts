@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AuthGuard } from '@core/guards/auth.guard';
 
-import { ReportsContentComponent } from './components/reports-content/reports-content.component';
+import { ReportsContentComponent } from './components/reports-content.component';
 
 const routes: Routes = [
   {

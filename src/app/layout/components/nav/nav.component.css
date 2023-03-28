@@ -61,6 +61,10 @@ app-navbar-container {
   width: 100%;
 }
 
+.bottom-bar {
+  display: none;
+}
+
 @media (max-width: 600px) {
   .navbar {
     padding: 0 1rem;
@@ -68,5 +72,15 @@ app-navbar-container {
 
   app-navbar-container {
     width: fit-content;
+  }
+
+  .bottom-bar {
+    position: fixed;
+    display: flex;
+    background-color: grey;
+    height: 80px;
+    bottom: 0;
+    width: 100%;
+    z-index: 999;
   }
 }

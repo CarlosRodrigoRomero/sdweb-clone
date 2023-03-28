@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ReportsRoutingModule } from './reports-routing.module';
-import { ReportsContentComponent } from './components/reports-content/reports-content.component';
+import { ReportsContentComponent } from './components/reports-content.component';
 
 
 @NgModule({
