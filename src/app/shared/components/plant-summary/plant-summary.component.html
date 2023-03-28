@@ -2,7 +2,7 @@
   <div class="grupo1">
     <!-- <mat-icon color="primary">home</mat-icon> -->
     <span class="titulo">{{ nombrePlanta }}</span>
-    <span class="subtitulo">({{ potenciaPlanta | number: '1.0-2' }} MW / {{ tipoPlanta }})</span>
+    <span class="subtitulo">({{ potenciaPlanta | number : '1.0-2' }} MW / {{ tipoPlanta }})</span>
     <span class="fecha">{{ fechaSelectedInforme }}</span>
   </div>
   <div class="grupo2" [matMenuTriggerFor]="menu" matTooltip="Datos del vuelo" matTooltipClass="tooltip-style">
@@ -10,34 +10,35 @@
     <mat-icon>expand_more</mat-icon>
     <mat-menu #menu="matMenu" class="menu">
       <div class="menu-grupo2">
-        <div class="elemento">
+        <div mat-menu-item class="elemento">
           <h5>Datos del vuelo</h5>
         </div>
-        <div class="elemento">
+        <div mat-menu-item class="elemento">
           <mat-icon color="secondary">today</mat-icon>
-          <h5 class="subtitulo">{{ informe.fecha * 1000 | date: 'dd/MM/yyyy' }}</h5>
+          <h5 class="subtitulo">{{ informe.fecha * 1000 | date : 'dd/MM/yyyy' }}</h5>
         </div>
-        <div *ngIf="informe.irradiancia !== undefined" class="elemento">
+        <div mat-menu-item *ngIf="informe.irradiancia !== undefined" class="elemento">
           <mat-icon color="secondary">wb_sunny</mat-icon>
-          <h5 class="subtitulo">{{ informe.irradiancia | number: '1.0-0' }} W/m<sup>2</sup></h5>
+          <h5 class="subtitulo">{{ informe.irradiancia | number : '1.0-0' }} W/m<sup>2</sup></h5>
         </div>
-        <div class="elemento">
+        <div mat-menu-item class="elemento">
           <mat-icon color="secondary">cloud_queue</mat-icon>
-          <h5 class="subtitulo">{{ informe.nubosidad | number: '1.0-0' }}/8 octavas</h5>
+          <h5 class="subtitulo">{{ informe.nubosidad | number : '1.0-0' }}/8 octavas</h5>
         </div>
-        <div class="elemento">
+        <div mat-menu-item class="elemento">
           <mat-icon color="secondary">window</mat-icon>
-          <h5 class="subtitulo">{{ informe.gsd | number: '1.0-0' }} &plusmn; 0.5 cm/pixel</h5>
+          <h5 class="subtitulo">{{ informe.gsd | number : '1.0-0' }} &plusmn; 0.5 cm/pixel</h5>
         </div>
-        <div *ngIf="informe.vientoDireccion !== undefined" class="elemento">
+        <div mat-menu-item *ngIf="informe.vientoDireccion !== undefined" class="elemento">
           <mat-icon color="secondary">east</mat-icon>
           <h5 class="subtitulo">{{ informe.vientoDireccion }}º</h5>
         </div>
-        <div *ngIf="vientoVelocidad !== undefined" class="elemento">
+        <div mat-menu-item *ngIf="vientoVelocidad !== undefined" class="elemento">
           <mat-icon color="secondary">air</mat-icon>
           <h5 class="subtitulo">{{ vientoVelocidad }} (Beaufort)</h5>
         </div>
         <div
+          mat-menu-item
           *ngIf="
             informe.vientoVelocidad === undefined &&
             informe.vientoDireccion === undefined &&
@@ -60,7 +61,7 @@
         >help</mat-icon
       >
       <span class="titulo">MAE</span>
-      <span class="valor-mae">{{ informe.mae * 100 | number: '1.0-2' }}%</span>
+      <span class="valor-mae">{{ informe.mae * 100 | number : '1.0-2' }}%</span>
       <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->
     </div>
     <div class="elemento">
@@ -71,7 +72,7 @@
         >help</mat-icon
       >
       <span class="titulo">CC</span>
-      <span class="valor-cc">{{ informe.cc * 100 | number: '1.0-2' }}%</span>
+      <span class="valor-cc">{{ informe.cc * 100 | number : '1.0-2' }}%</span>
       <!-- <mat-icon *ngIf="informe.cc < 3" class="success">arrow_circle_down</mat-icon> -->
     </div>
     <div class="elemento">
@@ -79,7 +80,7 @@
         >help</mat-icon
       >
       <span class="titulo"># anomalías</span>
-      <span class="valor-cc">{{ numAnomsFiltered }} / {{numAnoms}}</span>
+      <span class="valor-cc">{{ numAnomsFiltered }} / {{ numAnoms }}</span>
     </div>
   </div>
 </div>

@@ -13,8 +13,7 @@ mat-spinner {
 .left-bar {
   display: flex;
   flex-direction: column;
-  background: white;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 64px);
   overflow: auto;
   width: 350px;
 }

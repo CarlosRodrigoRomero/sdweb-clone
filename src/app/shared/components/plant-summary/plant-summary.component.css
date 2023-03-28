@@ -130,3 +130,10 @@
     margin-right: 0px;
   }
 }
+
+.mat-menu-item {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  cursor: unset
+}

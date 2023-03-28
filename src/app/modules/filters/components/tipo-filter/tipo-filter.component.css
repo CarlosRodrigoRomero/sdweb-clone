@@ -13,7 +13,7 @@ h5 {
 
 .filter-default {
   font-weight: 200;
-  color: grey;
+  /* color: grey; */
 }
 
 .filter-selected {
@@ -45,4 +45,10 @@ li {
   line-height: 2.9;
   margin-top: -6px;
   text-align: end;
+}
+
+.mat-menu-item {
+  height: 30px;
+  display: flex;
+  align-items: center;
 }

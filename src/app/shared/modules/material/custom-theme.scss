@@ -72,12 +72,8 @@ $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dar
 
 .light-theme {
   @include angular-material-theme($app-light-theme);
-  // background: #fff;
-  color: #222;
 }
 
 .dark-theme {
   @include angular-material-theme($app-dark-theme);
-  // background: #0f172a;
-  // color: #f3f4f6;
 }

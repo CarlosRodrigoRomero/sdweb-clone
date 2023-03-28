@@ -6,7 +6,7 @@ import { AuthGuard } from '@core/guards/auth.guard';
 import { SelectivePreloadingStrategyService } from '@data/services/selective-preloading-strategy.service';
 
 import { AvisoLegalComponent } from '@shared/components/aviso-legal/aviso-legal.component';
-import { SkeletonComponent } from '@layout/components/skeleton/skeleton.component';
+
 import { NavComponent } from '@layout/components/nav/nav.component';
 
 export const routes: Routes = [
@@ -25,7 +25,6 @@ export const routes: Routes = [
   {
     path: 'clients',
     component: NavComponent,
-    // component: SkeletonComponent,
     loadChildren: () => import('@modules/clients/clients.module').then((m) => m.ClientsModule),
     canActivate: [AuthGuard],
     data: { preload: true },

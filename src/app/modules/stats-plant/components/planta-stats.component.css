@@ -13,7 +13,6 @@ mat-tab {
   z-index: 98;
   position: sticky;
   position: -webkit-sticky; /* macOS/iOS Safari */
-  background: white;
 }
 
 .mat-tab-stats {

@@ -6,6 +6,12 @@
   margin: 1rem;
 }
 
+.mat-menu-item {
+  height: 42px;
+  display: flex;
+  align-items: center;
+}
+
 @media (max-width: 600px) {
   .content {
     display: flex;

@@ -27,6 +27,7 @@
   justify-content: space-between;
   height: calc(100vh - 64px);
   padding: 2rem 0;
+  overflow: hidden;
 }
 
 .top-items {
@@ -63,6 +64,10 @@ app-navbar-container {
 
 .bottom-bar {
   display: none;
+}
+
+.content {
+  overflow: hidden;
 }
 
 @media (max-width: 600px) {
