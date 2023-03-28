@@ -34,9 +34,10 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { ReportContentComponent } from './modules/fixed-plant/components/report-content/report-content.component';
+import { SimpleBackgroundComponent } from './layout/components/simple-background/simple-background.component';
 
 @NgModule({
-  declarations: [AppComponent, SkeletonComponent, NavbarContainerComponent, NavbarComponent, NavComponent, ReportContentComponent],
+  declarations: [AppComponent, SkeletonComponent, NavbarContainerComponent, NavbarComponent, NavComponent, ReportContentComponent, SimpleBackgroundComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

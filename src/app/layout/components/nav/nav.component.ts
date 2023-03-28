@@ -17,6 +17,7 @@ export class NavComponent implements OnInit {
   );
 
   id: string;
+  showNavbar = true;
 
   constructor(private breakpointObserver: BreakpointObserver, private router: Router) {}
 

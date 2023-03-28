@@ -7,7 +7,7 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="(isHandset$ | async) === false"
   >
-    <mat-toolbar class="logo">
+    <mat-toolbar *ngIf="showNavbar" class="logo">
       <app-sd-logo></app-sd-logo>
     </mat-toolbar>
     <mat-nav-list class="list-items">
@@ -22,6 +22,12 @@
           <div class="item-content">
             <mat-icon>map</mat-icon>
             <span>Mapa</span>
+          </div>
+        </a>
+        <a mat-list-item (click)="navigateTo('map')">
+          <div class="item-content">
+            <mat-icon>list</mat-icon>
+            <span>Listado</span>
           </div>
         </a>
         <a mat-list-item>

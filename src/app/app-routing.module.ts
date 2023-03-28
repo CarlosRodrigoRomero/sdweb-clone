@@ -8,12 +8,14 @@ import { SelectivePreloadingStrategyService } from '@data/services/selective-pre
 import { AvisoLegalComponent } from '@shared/components/aviso-legal/aviso-legal.component';
 
 import { NavComponent } from '@layout/components/nav/nav.component';
+import { SimpleBackgroundComponent } from '@layout/components/simple-background/simple-background.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'clients', pathMatch: 'full' },
   { path: 'aviso-legal', component: AvisoLegalComponent },
   {
     path: 'auth',
+    component: SimpleBackgroundComponent,
     loadChildren: () => import('@modules/auth/auth.module').then((m) => m.AuthenticationModule),
     data: { preload: true },
   },

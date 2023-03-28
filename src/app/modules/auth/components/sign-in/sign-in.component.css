@@ -3,12 +3,6 @@
   align-items: center;
 }
 
-.logo {
-  margin-top: 15px;
-  margin-bottom: 15px;
-  width: 100%;
-}
-
 @media (max-width: 250px) {
   .logo {
     display: none;

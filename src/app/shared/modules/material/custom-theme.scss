@@ -40,15 +40,15 @@ $custom-dark-theme-foreground: (
   slider-off-active: rgba(white, 0.3),
 );
 
-$app-light-primary: mat-palette($mat-red, 700);
-$app-light-accent: mat-palette($mat-red, 900);
-$app-light-warn: mat-palette($mat-red);
+$app-light-primary: mat-palette($mat-deep-orange, 700);
+$app-light-accent: mat-palette($mat-deep-orange, 900);
+$app-light-warn: mat-palette($mat-deep-orange);
 
 $app-light-background: mat-palette($mat-grey, 50);
 
-$app-dark-primary: mat-palette($mat-red, 700);
-$app-dark-accent: mat-palette($mat-red, 900);
-$app-dark-warn: mat-palette($mat-red);
+$app-dark-primary: mat-palette($mat-deep-orange, 700);
+$app-dark-accent: mat-palette($mat-deep-orange, 900);
+$app-dark-warn: mat-palette($mat-deep-orange);
 
 $app-dark-background: mat-palette($mat-blue, 900);
 
