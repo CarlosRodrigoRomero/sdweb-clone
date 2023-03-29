@@ -6,6 +6,7 @@
   <mat-card-content>
     <div class="mae-global">
       <apx-chart
+        id="chart"
         *ngIf="loadChart"
         [series]="chartOptionsMAE.series"
         [chart]="chartOptionsMAE.chart"
@@ -19,6 +20,7 @@
         [grid]="chartOptionsMAE.grid"
         [yaxis]="chartOptionsMAE.yaxis"
         [title]="chartOptionsMAE.title"
+        [tooltip]="chartOptionsMAE.tooltip"
       ></apx-chart>
     </div>
   </mat-card-content>

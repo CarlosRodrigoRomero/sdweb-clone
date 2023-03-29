@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
 import { switchMap, take } from 'rxjs/operators';
@@ -24,6 +24,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
 import { AuthService } from '@data/services/auth.service';
+import { ThemeService } from '@data/services/theme.service';
 
 import { COLOR } from '@data/constants/color';
 
@@ -51,13 +52,17 @@ export type ChartOptions = {
   providers: [DecimalPipe],
 })
 export class ChartMaeGlobalComponent implements OnInit {
-  @ViewChild('chartMAE') chartMAE: ChartComponent;
-  public chartOptionsMAE: Partial<ChartOptions>;
+  @ViewChildren('chart') chart: ChartComponent;
+  chartOptionsMAE: Partial<ChartOptions>;
   loadChart = false;
   private maeData: number[] = [];
   private maeColors: string[] = [];
   private maeMedio: number;
   private maeSigma: number;
+  private foreColor = '#000';
+  private typeChart: ChartType = 'line';
+  private theme = 'light';
+  private dateLabels: string[] = [];
 
   constructor(
     private reportControlService: ReportControlService,
@@ -65,7 +70,8 @@ export class ChartMaeGlobalComponent implements OnInit {
     private portfolioControlService: PortfolioControlService,
     private authService: AuthService,
     private decimalPipe: DecimalPipe,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -96,13 +102,21 @@ export class ChartMaeGlobalComponent implements OnInit {
 
           return this.informeService.getDateLabelsInformes(informes.map((inf) => inf.id));
         }),
+        take(1),
+        switchMap((dateLabels) => {
+          this.dateLabels = dateLabels;
+
+          return this.themeService.themeSelected$;
+        }),
         take(1)
       )
-      .subscribe((dateLabels) => {
+      .subscribe((theme) => {
+        // aplicamos el tema seleccionado
+        this.changeTheme(theme);
+
         // si solo hay un informe cambiamos a grafico tipo barra
-        let typeChart: ChartType = 'line';
         if (this.maeData.length === 1) {
-          typeChart = 'bar';
+          this.typeChart = 'bar';
         }
 
         this.chartOptionsMAE = {
@@ -113,8 +127,9 @@ export class ChartMaeGlobalComponent implements OnInit {
             },
           ],
           chart: {
+            foreColor: this.foreColor,
             width: '100%',
-            type: typeChart,
+            type: this.typeChart,
             height: 250,
             dropShadow: {
               enabled: true,
@@ -148,18 +163,11 @@ export class ChartMaeGlobalComponent implements OnInit {
               fontSize: '16px',
             },
           },
-          grid: {
-            borderColor: '#e7e7e7',
-            row: {
-              colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-              opacity: 0.5,
-            },
-          },
           markers: {
             size: 1,
           },
           xaxis: {
-            categories: dateLabels,
+            categories: this.dateLabels,
           },
           yaxis: {
             title: {
@@ -201,11 +209,42 @@ export class ChartMaeGlobalComponent implements OnInit {
               },
             ],
           },
+          tooltip: {
+            theme: this.theme,
+          },
         };
         this.loadChart = true;
 
         // detectamos cambios porque estamos utilizando la estrategia OnPush
         this.cdr.detectChanges();
       });
+
+    this.themeService.themeSelected$.subscribe((theme) => {
+      if (this.chartOptionsMAE) {
+        // aplicamos el tema seleccionado
+        this.changeTheme(theme);
+
+        this.chartOptionsMAE = {
+          ...this.chartOptionsMAE,
+          chart: {
+            type: this.typeChart,
+            foreColor: this.foreColor,
+          },
+          tooltip: {
+            theme: this.theme,
+          },
+        };
+      }
+    });
+  }
+
+  private changeTheme(theme: string): void {
+    if (theme === 'dark-theme') {
+      this.foreColor = '#fff';
+      this.theme = 'dark';
+    } else {
+      this.foreColor = '#000';
+      this.theme = 'light';
+    }
   }
 }
