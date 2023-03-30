@@ -26,6 +26,11 @@ table {
   width: 100%;
 }
 
+/* ocultamos la barra vertical overscrool */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 .tabla-container {
   position: relative;
   height: calc(100vh - 280px);
@@ -38,11 +43,11 @@ table {
 }
 
 .mat-row.selected {
-  background-color: rgb(187, 187, 187);
+  background-color: grey;
 }
 
 .mat-row.hovered {
-  background-color: lightgrey;
+  background-color: grey;
 }
 
 .row-content {

@@ -1,9 +1,17 @@
-.loading {
+.loading-light {
   position: absolute;
   width: 100vw;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 64px);
   z-index: 99;
-  background: white;
+  background: #f3f4f6;
+}
+
+.loading-dark {
+  position: absolute;
+  width: 100vw;
+  height: calc(100vh - 64px);
+  z-index: 99;
+  background: #263238;
 }
 
 app-spinner {
@@ -11,4 +19,14 @@ app-spinner {
   justify-self: center;
   margin-top: 50vh;
   transform: translate(0, -100%);
+}
+
+@media (max-width: 600px) {
+  .loading-light {
+    height: calc(100vh - 56px);
+  }
+
+  .loading-dark {
+    height: calc(100vh - 56px);
+  }
 }

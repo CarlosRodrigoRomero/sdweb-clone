@@ -129,6 +129,11 @@ app-download-progress-bar {
   z-index: 999;
 }
 
+/* ocultamos la barra vertical overscrool */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 .stats-sidenav {
   position: absolute;
   display: flex;
