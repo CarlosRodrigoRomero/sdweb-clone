@@ -128,6 +128,9 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
             width: '100%',
             type: this.typeChart,
             height: 250,
+            toolbar: {
+              show: false,
+            },
             dropShadow: {
               enabled: true,
               color: '#000',

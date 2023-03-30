@@ -300,6 +300,9 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
           width: '100%',
           height: this.chartHeight,
           foreColor: this.themeService.textColor,
+          toolbar: {
+            show: false,
+          },
         },
 
         yaxis: {
@@ -329,6 +332,9 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
           width: '100%',
           height: this.chartHeight,
           foreColor: this.themeService.textColor,
+          toolbar: {
+            show: false,
+          },
         },
         colors: [COLOR.gris],
         yaxis: {

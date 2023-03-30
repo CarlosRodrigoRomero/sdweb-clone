@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { GLOBAL } from '@data/constants/global';
+import { Subscription } from 'rxjs';
+
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
+import { ThemeService } from '@data/services/theme.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+
+import { GLOBAL } from '@data/constants/global';
 
 interface PlantaChart {
   planta: PlantaInterface;
@@ -32,11 +35,16 @@ export class BarChartComponent implements OnInit {
   private informesRecientes: InformeInterface[] = [];
   private plantasChart: PlantaChart[] = [];
   private chartPosition = 0;
+  theme: string;
+  textColor: string;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private portfolioControlService: PortfolioControlService,
     private router: Router,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -66,6 +74,13 @@ export class BarChartComponent implements OnInit {
       this.barChartLabels.push(plant.planta.nombre);
       this.coloresChart.push(this.portfolioControlService.getColorMae(plant.mae));
     });
+
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        this.theme = theme.split('-')[0];
+        this.textColor = this.themeService.textColor;
+      })
+    );
   }
 
   onClick(index: number) {

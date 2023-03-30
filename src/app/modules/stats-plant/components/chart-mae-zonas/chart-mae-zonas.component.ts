@@ -233,19 +233,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
           width: '100%',
           height: 250,
           toolbar: {
-            show: true,
-            offsetX: 0,
-            offsetY: 0,
-            tools: {
-              download: true,
-              selection: false,
-              zoom: false,
-              zoomin: false,
-              zoomout: false,
-              pan: false,
-              reset: false,
-              customIcons: [],
-            },
+            show: false,
           },
         },
         legend: {

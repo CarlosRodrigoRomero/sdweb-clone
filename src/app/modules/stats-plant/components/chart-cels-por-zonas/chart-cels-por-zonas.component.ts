@@ -200,19 +200,7 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
           width: '100%',
           foreColor: this.themeService.textColor,
           toolbar: {
-            show: true,
-            offsetX: 0,
-            offsetY: 0,
-            tools: {
-              download: true,
-              selection: false,
-              zoom: false,
-              zoomin: false,
-              zoomout: false,
-              pan: false,
-              reset: false,
-              customIcons: [],
-            },
+            show: false,
           },
         },
         legend: {

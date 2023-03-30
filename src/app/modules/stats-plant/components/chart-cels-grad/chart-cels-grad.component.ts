@@ -164,6 +164,9 @@ export class ChartCelsGradComponent implements OnInit, OnDestroy {
       chart: {
         type: 'bar',
         height: 250,
+        toolbar: {
+          show: false,
+        },
         foreColor: this.themeService.textColor,
       },
       legend: {

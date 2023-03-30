@@ -166,6 +166,9 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
             chart: {
               height: 170,
               type: 'heatmap',
+              toolbar: {
+                show: false,
+              },
               foreColor: this.themeService.textColor,
             },
             dataLabels: {
