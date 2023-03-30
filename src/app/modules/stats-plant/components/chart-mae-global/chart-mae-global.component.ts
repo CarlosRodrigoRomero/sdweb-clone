@@ -1,7 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
 import { switchMap, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import {
   ChartComponent,
@@ -51,18 +52,18 @@ export type ChartOptions = {
   styleUrls: ['./chart-mae-global.component.css'],
   providers: [DecimalPipe],
 })
-export class ChartMaeGlobalComponent implements OnInit {
-  @ViewChildren('chart') chart: ChartComponent;
-  chartOptionsMAE: Partial<ChartOptions>;
+export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
+  @ViewChild('chart') chart: ChartComponent;
+  chartOptions: Partial<ChartOptions>;
   loadChart = false;
   private maeData: number[] = [];
   private maeColors: string[] = [];
   private maeMedio: number;
   private maeSigma: number;
-  private foreColor = '#000';
   private typeChart: ChartType = 'line';
-  private theme = 'light';
   private dateLabels: string[] = [];
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private reportControlService: ReportControlService,
@@ -112,14 +113,14 @@ export class ChartMaeGlobalComponent implements OnInit {
       )
       .subscribe((theme) => {
         // aplicamos el tema seleccionado
-        this.changeTheme(theme);
+        this.themeService.applyTheme(theme);
 
         // si solo hay un informe cambiamos a grafico tipo barra
         if (this.maeData.length === 1) {
           this.typeChart = 'bar';
         }
 
-        this.chartOptionsMAE = {
+        this.chartOptions = {
           series: [
             {
               name: 'MAE %',
@@ -127,7 +128,7 @@ export class ChartMaeGlobalComponent implements OnInit {
             },
           ],
           chart: {
-            foreColor: this.foreColor,
+            foreColor: this.themeService.textColor,
             width: '100%',
             type: this.typeChart,
             height: 250,
@@ -210,7 +211,7 @@ export class ChartMaeGlobalComponent implements OnInit {
             ],
           },
           tooltip: {
-            theme: this.theme,
+            theme: theme.split('-')[0],
           },
         };
         this.loadChart = true;
@@ -219,32 +220,28 @@ export class ChartMaeGlobalComponent implements OnInit {
         this.cdr.detectChanges();
       });
 
-    this.themeService.themeSelected$.subscribe((theme) => {
-      if (this.chartOptionsMAE) {
-        // aplicamos el tema seleccionado
-        this.changeTheme(theme);
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        if (this.chartOptions) {
+          // aplicamos el tema seleccionado
+          this.themeService.applyTheme(theme);
 
-        this.chartOptionsMAE = {
-          ...this.chartOptionsMAE,
-          chart: {
-            type: this.typeChart,
-            foreColor: this.foreColor,
-          },
-          tooltip: {
-            theme: this.theme,
-          },
-        };
-      }
-    });
+          this.chartOptions = {
+            ...this.chartOptions,
+            chart: {
+              type: this.typeChart,
+              foreColor: this.themeService.textColor,
+            },
+            tooltip: {
+              theme: theme.split('-')[0],
+            },
+          };
+        }
+      })
+    );
   }
 
-  private changeTheme(theme: string): void {
-    if (theme === 'dark-theme') {
-      this.foreColor = '#fff';
-      this.theme = 'dark';
-    } else {
-      this.foreColor = '#000';
-      this.theme = 'light';
-    }
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

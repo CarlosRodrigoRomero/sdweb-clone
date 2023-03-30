@@ -5,12 +5,15 @@ import { BehaviorSubject } from 'rxjs';
 
 import { LocalStorageService } from '@data/services/local-storage.service';
 
+import { COLOR } from '@data/constants/color';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
   private _themeSelected: string = undefined;
-  public themeSelected$ = new BehaviorSubject<string>(this._themeSelected);
+  themeSelected$ = new BehaviorSubject<string>(this._themeSelected);
+  textColor = COLOR.light_on_background;
 
   constructor(public overlayContainer: OverlayContainer, private localStorageService: LocalStorageService) {
     const themeLocal = this.localStorageService.get('theme');
@@ -18,6 +21,14 @@ export class ThemeService {
       this.themeSelected = themeLocal;
     } else {
       this.themeSelected = 'ligth-theme';
+    }
+  }
+
+  applyTheme(theme: string): void {
+    if (theme === 'dark-theme') {
+      this.textColor = COLOR.dark_on_background;
+    } else {
+      this.textColor = COLOR.light_on_background;
     }
   }
 
