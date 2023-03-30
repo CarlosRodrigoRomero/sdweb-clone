@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import {
   ApexAxisChartSeries,
@@ -22,6 +22,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
 import { InformeService } from '@data/services/informe.service';
 import { ZonesService } from '@data/services/zones.service';
+import { ThemeService } from '@data/services/theme.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { LocationAreaInterface } from '@core/models/location';
@@ -65,7 +66,8 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
     private informeService: InformeService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -79,20 +81,49 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
     this.allAnomalias = this.reportControlService.allAnomalias;
 
     this.subscriptions.add(
-      this.informeService.getDateLabelsInformes(this.informesIdList).subscribe((dateLabels) => {
-        this.dateLabels = dateLabels;
+      this.informeService
+        .getDateLabelsInformes(this.informesIdList)
+        .pipe(
+          take(1),
+          switchMap((dateLabels) => {
+            this.dateLabels = dateLabels;
 
-        this.chartData = [];
-        this.informesIdList.forEach((informeId) => {
-          const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
+            return this.themeService.themeSelected$;
+          }),
+          take(1)
+        )
+        .subscribe((theme) => {
+          this.chartData = [];
+          this.informesIdList.forEach((informeId) => {
+            const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
 
-          // tslint:disable-next-line: triple-equals
-          const celscalInforme = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+            // tslint:disable-next-line: triple-equals
+            const celscalInforme = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
 
-          this.chartData.push(this._calculateChartData(celscalInforme));
-        });
+            this.chartData.push(this._calculateChartData(celscalInforme));
+          });
 
-        this._initChart();
+          this._initChart(theme.split('-')[0]);
+        })
+    );
+
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        if (this.chartOptions) {
+          // aplicamos el tema seleccionado
+          this.themeService.applyTheme(theme);
+
+          this.chartOptions = {
+            ...this.chartOptions,
+            chart: {
+              ...this.chartOptions.chart,
+              foreColor: this.themeService.textColor,
+            },
+            tooltip: {
+              theme: theme.split('-')[0],
+            },
+          };
+        }
       })
     );
   }
@@ -110,7 +141,7 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  private _initChart(): void {
+  private _initChart(theme: string): void {
     let series;
     // excluimos DEMO
     if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
@@ -170,6 +201,7 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
           type: 'bar',
           height: 240,
           width: '100%',
+          foreColor: this.themeService.textColor,
           toolbar: {
             show: true,
             offsetX: 0,
@@ -246,6 +278,7 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
               },
             },
           },
+          theme,
         },
       };
       this.chartLoaded = true;
