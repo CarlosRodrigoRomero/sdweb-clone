@@ -19,13 +19,15 @@
             <span>Pérdidas</span>
           </div>
         </a>
-        <a mat-list-item (click)="navigateTo('map')">
+        <!-- <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('map')"> -->
+        <a *ngIf="!isPortfolio" mat-list-item>
           <div class="item-content">
             <mat-icon>map</mat-icon>
             <span>Mapa</span>
           </div>
         </a>
-        <a mat-list-item (click)="navigateTo('map')">
+        <!-- <a *ngIf="isPortfolio" mat-list-item (click)="navigateTo('map')"> -->
+        <a *ngIf="isPortfolio" mat-list-item>
           <div class="item-content">
             <mat-icon>list</mat-icon>
             <span>Listado</span>

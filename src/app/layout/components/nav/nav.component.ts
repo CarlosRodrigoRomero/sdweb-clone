@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 import { Observable } from 'rxjs';
@@ -18,8 +18,19 @@ export class NavComponent implements OnInit {
 
   id: string;
   showNavbar = true;
+  isPortfolio = false;
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router) {}
+  constructor(private breakpointObserver: BreakpointObserver, private router: Router) {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        if (this.router.url.split('/').includes('plants')) {
+          this.isPortfolio = true;
+        } else {
+          this.isPortfolio = false;
+        }
+      }
+    });
+  }
 
   ngOnInit() {}
 
