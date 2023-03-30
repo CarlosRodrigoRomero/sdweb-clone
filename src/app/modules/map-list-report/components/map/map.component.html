@@ -1,0 +1,9 @@
+<mat-card class="map-card">
+  <div id="map" class="map"></div>
+
+  <app-leyenda-container></app-leyenda-container>
+
+  <app-thermal-layers></app-thermal-layers>
+
+  <app-thermal-layer-slider *ngIf="thermalLayersLoaded" [informeId]="selectedInformeId"></app-thermal-layer-slider>
+</mat-card>

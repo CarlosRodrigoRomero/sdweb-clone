@@ -17,14 +17,18 @@ const routes: Routes = [
         canActivate: [AuthGuard],
       },
       {
+        path: 'reports',
+        loadChildren: () => import('@modules/reports/reports.module').then((m) => m.ReportsModule),
+        canActivate: [AuthGuard],
+      },
+      {
         path: 'fixed',
         loadChildren: () => import('../fixed-plant/fixed-plant.module').then((m) => m.FixedPlantModule),
         canActivate: [AuthGuard],
       },
       {
         path: 'tracker',
-        loadChildren: () =>
-          import('../tracker-plant/tracker-plant.module').then((m) => m.TrackerPlantModule),
+        loadChildren: () => import('../tracker-plant/tracker-plant.module').then((m) => m.TrackerPlantModule),
         canActivate: [AuthGuard],
       },
       { path: '', redirectTo: 'plants', pathMatch: 'full' },

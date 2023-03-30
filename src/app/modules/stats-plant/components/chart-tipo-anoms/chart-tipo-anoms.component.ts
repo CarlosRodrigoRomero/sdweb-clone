@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import {
   ChartComponent,
@@ -21,12 +22,14 @@ import {
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
-import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
+import { ThemeService } from '@data/services/theme.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
 import { COLOR } from '@data/constants/color';
 import { GLOBAL } from '@data/constants/global';
+
+import { Colors } from '@core/classes/colors';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -60,16 +63,16 @@ export interface DataPlot {
   templateUrl: './chart-tipo-anoms.component.html',
   styleUrls: ['./chart-tipo-anoms.component.css'],
 })
-export class ChartTipoAnomsComponent implements OnInit {
+export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
   @ViewChild('chartTipoAnoms') chartTipoAnoms: ChartComponent;
   public chartOptionsComun: Partial<ChartOptions>;
   public chartOptions1: Partial<ChartOptions>;
   public chartOptions2: Partial<ChartOptions>;
   public selectedAnomalias: Anomalia[];
 
-  public labelsCategoria: string[];
-  public coloresCategoria: string[];
-  public numsCategoria: number[];
+  public labelsCategoria: string[] = [];
+  public coloresCategoria: string[] = [];
+  public numsCategoria: number[] = [];
 
   public chartLoaded = false;
   public selectedInformeId: string;
@@ -80,10 +83,12 @@ export class ChartTipoAnomsComponent implements OnInit {
 
   private labelDatesReports: string;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private reportControlService: ReportControlService,
     private informeService: InformeService,
-    private anomaliaInfoService: AnomaliaInfoService
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -101,12 +106,52 @@ export class ChartTipoAnomsComponent implements OnInit {
 
     this.informeService
       .getDateLabelsInformes(this.informesIdList)
-      .pipe(take(1))
-      .subscribe((labels) => {
-        this.labelDatesReports = labels.join(' - ');
+      .pipe(
+        take(1),
+        switchMap((labels) => {
+          this.labelDatesReports = labels.join(' - ');
 
-        this.initChart();
-      });
+          return this.themeService.themeSelected$;
+        }),
+        take(1)
+      )
+      .subscribe((theme) => this.initChart(theme.split('-')[0]));
+
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        if (this.chartOptionsComun && this.chartOptions1 && this.chartOptions2) {
+          this.chartOptionsComun = {
+            ...this.chartOptionsComun,
+            tooltip: {
+              theme: theme.split('-')[0],
+            },
+            dataLabels: {
+              ...this.chartOptionsComun.dataLabels,
+              style: {
+                ...this.chartOptionsComun.dataLabels.style,
+                colors: [this.themeService.textColor],
+              },
+            },
+          };
+
+          this.chartOptions1 = {
+            ...this.chartOptions1,
+            chart: {
+              ...this.chartOptions1.chart,
+              foreColor: this.themeService.textColor,
+            },
+          };
+
+          this.chartOptions2 = {
+            ...this.chartOptions2,
+            chart: {
+              ...this.chartOptions2.chart,
+              foreColor: this.themeService.textColor,
+            },
+          };
+        }
+      })
+    );
   }
 
   private getAllCategorias(anomalias): void {
@@ -119,7 +164,8 @@ export class ChartTipoAnomsComponent implements OnInit {
     allNumCategorias.forEach((i) => {
       if (anomalias.filter((anom) => anom.tipo === i).length > 0) {
         labelsCategoria.push(GLOBAL.labels_tipos[i]);
-        coloresCategoria.push(this.anomaliaInfoService.getPerdidasColor(GLOBAL.pcPerdidas[i]));
+        // coloresCategoria.push(this.anomaliaInfoService.getPerdidasColor(GLOBAL.pcPerdidas[i]));
+        coloresCategoria.push(Colors.rgbaToHex(COLOR.colores_tipos[i]));
         numsCategoria.push(i);
       }
     });
@@ -176,13 +222,13 @@ export class ChartTipoAnomsComponent implements OnInit {
       .reduce((a, b) => a + b, 0);
   }
 
-  initChart() {
+  initChart(theme: string) {
     this.chartOptionsComun = {
       dataLabels: {
         enabled: true,
         style: {
           fontSize: '14px',
-          colors: ['#304758'],
+          colors: [this.themeService.textColor],
         },
         offsetX: 0,
         offsetY: -25,
@@ -193,9 +239,7 @@ export class ChartTipoAnomsComponent implements OnInit {
         colors: ['transparent'],
       },
       toolbar: {
-        tools: {
-          selection: false,
-        },
+        show: false,
       },
       legend: {
         show: false,
@@ -203,9 +247,7 @@ export class ChartTipoAnomsComponent implements OnInit {
       plotOptions: {
         bar: {
           barHeight: '100%',
-
           columnWidth: '45%',
-
           distributed: true,
           endingShape: 'rounded',
           dataLabels: {
@@ -235,10 +277,8 @@ export class ChartTipoAnomsComponent implements OnInit {
             },
           },
         },
+        theme,
       },
-      // grid: {
-      //   clipMarkers: false,
-      // },
     };
 
     // espera a que el dataPlot tenga datos
@@ -253,13 +293,16 @@ export class ChartTipoAnomsComponent implements OnInit {
           text: '# Anomalías     (' + this.labelDatesReports + ')',
           align: 'left',
         },
-
         chart: {
           id: 'fb',
           group: 'social',
           type: 'bar',
           width: '100%',
           height: this.chartHeight,
+          foreColor: this.themeService.textColor,
+          toolbar: {
+            show: false,
+          },
         },
 
         yaxis: {
@@ -288,6 +331,10 @@ export class ChartTipoAnomsComponent implements OnInit {
           type: 'bar',
           width: '100%',
           height: this.chartHeight,
+          foreColor: this.themeService.textColor,
+          toolbar: {
+            show: false,
+          },
         },
         colors: [COLOR.gris],
         yaxis: {
@@ -304,7 +351,12 @@ export class ChartTipoAnomsComponent implements OnInit {
           },
         },
       };
+
       this.chartLoaded = true;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

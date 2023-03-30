@@ -1,0 +1,45 @@
+.map-card {
+  width: 100%;
+  height: 100%;
+}
+
+.map {
+  height: calc(100vh - 128px);
+  width: 100%;
+}
+
+app-leyenda-container {
+  position: absolute;
+  top: 26px;
+  left: 26px;
+  z-index: 10;
+}
+
+app-thermal-layer-slider {
+  position: absolute;
+  bottom: 26px;
+  left: 26px;
+  z-index: 10;
+}
+
+@media (max-width: 600px) {
+  .map {
+    height: calc(100vh - 120px);
+  }
+}
+
+::ng-deep .ol-zoom {
+  left: unset;
+  right: 10px;
+  top: unset;
+  bottom: 10px;
+}
+
+/* ::ng-deep .ol-control {
+  background-color: rgba(0, 0, 0, 0.2);
+} */
+
+::ng-deep .ol-control button {
+  background-color: white;
+  color: black;
+}

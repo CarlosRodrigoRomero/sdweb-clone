@@ -21,6 +21,8 @@ import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
 
 import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list.directive';
+import { LostDashboardComponent } from './components/lost-dashboard/lost-dashboard.component';
+import { MapTestComponent } from './components/map-test/map-test.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +33,8 @@ import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list
     MapComponent,
     SliderOpacityComponent,
     DynamicAnomaliaListDirective,
+    LostDashboardComponent,
+    MapTestComponent,
   ],
   imports: [
     PlantaFijaRoutingModule,

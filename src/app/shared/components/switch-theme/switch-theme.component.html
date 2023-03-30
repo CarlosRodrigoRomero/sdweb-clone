@@ -1,0 +1,26 @@
+<div class="switch-theme">
+  <button
+    class="btn-switch"
+    *ngIf="!darkMode"
+    mat-stroked-button
+    (click)="onSetTheme('dark-theme')"
+    matTooltip="Modo oscuro"
+  >
+    <div class="btn-content">
+      <mat-icon>dark_mode</mat-icon>
+      <span class="label">Cambiar a modo oscuro</span>
+    </div>
+  </button>
+  <button
+    class="btn-switch"
+    *ngIf="darkMode"
+    mat-stroked-button
+    (click)="onSetTheme('light-theme')"
+    matTooltip="Modo claro"
+  >
+    <div class="btn-content">
+      <mat-icon>light_mode</mat-icon>
+      <span class="label">Cambiar a modo claro</span>
+    </div>
+  </button>
+</div>

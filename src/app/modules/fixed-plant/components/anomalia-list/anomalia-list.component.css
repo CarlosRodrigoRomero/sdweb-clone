@@ -26,6 +26,11 @@ table {
   width: 100%;
 }
 
+/* ocultamos la barra vertical overscrool */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 .tabla-container {
   position: relative;
   height: calc(100vh - 280px);

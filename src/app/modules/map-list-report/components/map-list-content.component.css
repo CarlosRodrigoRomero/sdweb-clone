@@ -1,0 +1,19 @@
+.map-list-content {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: calc(100vh - 200px);
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .map-list-content {
+    display: block;
+  }
+
+  app-list {
+    display: none;
+  }
+}

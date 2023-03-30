@@ -9,8 +9,12 @@
 </button>
 <mat-menu #menu="matMenu" class="menu">
   <div class="contenedor-menu">
-    <h4 class="title" (click)="$event.stopPropagation()">Descargas</h4>
-    <app-select-language *ngIf="!plantaDemo"></app-select-language>
+    <div mat-menu-item (click)="$event.stopPropagation()">
+      <span class="title">Descargas</span>
+    </div>
+    <div *ngIf="!plantaDemo" (click)="$event.stopPropagation()" mat-menu-item class="select-language">
+      <app-select-language></app-select-language>
+    </div>
 
     <app-pdf *ngIf="!plantaDemo"></app-pdf>
 

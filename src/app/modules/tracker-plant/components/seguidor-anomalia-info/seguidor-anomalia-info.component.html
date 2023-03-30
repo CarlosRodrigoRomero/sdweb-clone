@@ -1,8 +1,8 @@
 <div class="anomalia-info" *ngIf="anomaliaSelected">
-  <button *ngIf="!showComments" class="btn-comments" mat-icon-button (click)="showHideComments()">
+  <button *ngIf="!showComments" class="btn-comments" mat-stroked-button (click)="showHideComments()">
     <mat-icon matBadge="{{ anomaliaInfo.numComentarios }}" matBadgeColor="primary">message</mat-icon>
   </button>
-  <button *ngIf="showComments" class="btn-comments" mat-icon-button (click)="showHideComments()">
+  <button *ngIf="showComments" class="btn-comments" mat-stroked-button (click)="showHideComments()">
     <mat-icon>list</mat-icon>
   </button>
 

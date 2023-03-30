@@ -8,7 +8,7 @@
   <mat-menu class="menu-tipo" #menu="matMenu">
     <div class="grid">
       <div>
-        <li *ngFor="let tipo of tiposElem; index as i" (click)="stopPropagation($event)">
+        <li mat-menu-item *ngFor="let tipo of tiposElem; index as i" (click)="stopPropagation($event)">
           <mat-checkbox
             [checked]="tiposSelected[i]"
             [id]="'tipo_' + (i + 1)"

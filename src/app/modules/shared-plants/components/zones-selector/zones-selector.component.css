@@ -28,3 +28,9 @@ li {
   padding: 0px 6px;
   font-size: 12px;
 }
+
+.mat-menu-item {
+  height: 34px;
+  display: flex;
+  align-items: center;
+}

@@ -21,7 +21,7 @@ interface PlantsData {
   informesAntiguos: InformeInterface[];
   plantaId: string;
   tipo: string;
-  color: String;
+  color: string;
 }
 
 @Component({

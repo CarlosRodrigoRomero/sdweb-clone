@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 import {
   ApexAxisChartSeries,
@@ -21,6 +21,7 @@ import {
 import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
 import { InformeService } from '@data/services/informe.service';
+import { ThemeService } from '@data/services/theme.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
@@ -67,7 +68,8 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
     private informeService: InformeService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +77,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
       this.plantaService
         .getLocationsArea(this.reportControlService.plantaId)
         .pipe(
+          take(1),
           switchMap((locAreas) => {
             // obtenemos las zonas mayores
             this.zones = locAreas.filter(
@@ -92,19 +95,40 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
             this.allAnomalias = this.reportControlService.allAnomalias;
 
             return this.informeService.getDateLabelsInformes(this.informesIdList);
-          })
-        )
-        .subscribe((dateLabels) => {
-          this.dateLabels = dateLabels;
+          }),
+          switchMap((dateLabels) => {
+            this.dateLabels = dateLabels;
 
+            return this.themeService.themeSelected$;
+          }),
+          take(1)
+        )
+        .subscribe((theme) => {
           this.chartData = [];
           this.informesIdList.forEach((informeId) => {
             const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
 
             this.chartData.push(this._calculateChartData(anomaliasInforme));
           });
-          this._initChart();
+          this._initChart(theme.split('-')[0]);
         })
+    );
+
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        if (this.chartOptions) {
+          this.chartOptions = {
+            ...this.chartOptions,
+            chart: {
+              type: 'bar',
+              foreColor: this.themeService.textColor,
+            },
+            tooltip: {
+              theme: theme.split('-')[0],
+            },
+          };
+        }
+      })
     );
   }
 
@@ -147,7 +171,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
     );
   }
 
-  private _initChart(): void {
+  private _initChart(theme: string): void {
     let series;
     // excluimos DEMO
     if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
@@ -177,7 +201,6 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
           },
         ];
       }
-    
     } else {
       series = this.dateLabels.map((dateLabel, index) => {
         return { name: dateLabel, data: this.chartData[index] };
@@ -206,22 +229,11 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
         series,
         chart: {
           type: 'bar',
+          foreColor: this.themeService.textColor,
           width: '100%',
           height: 250,
           toolbar: {
-            show: true,
-            offsetX: 0,
-            offsetY: 0,
-            tools: {
-              download: true,
-              selection: false,
-              zoom: false,
-              zoomin: false,
-              zoomout: false,
-              pan: false,
-              reset: false,
-              customIcons: [],
-            },
+            show: false,
           },
         },
         legend: {
@@ -288,6 +300,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
               },
             },
           },
+          theme,
         },
       };
       this.chartLoaded = true;

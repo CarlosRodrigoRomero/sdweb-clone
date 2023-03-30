@@ -1,3 +1,6 @@
-<div class="loading">
+<div *ngIf="!isDarkTheme" class="loading-light">
+  <app-spinner></app-spinner>
+</div>
+<div *ngIf="isDarkTheme" class="loading-dark">
   <app-spinner></app-spinner>
 </div>

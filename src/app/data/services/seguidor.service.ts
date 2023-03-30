@@ -359,7 +359,7 @@ export class SeguidorService {
 
   getTipoAnomColor(anomalia: Anomalia) {
     const colorRGBA = COLOR.colores_tipos[anomalia.tipo];
-    const colorRGB = colorRGBA.replace('rgba', 'rgb').replace(', 1)', ')');
+    const colorRGB = colorRGBA.replace('rgba', 'rgb').replace(',1)', ')');
     const colorHex = Colors.rgbToHex(colorRGB);
     return colorHex;
   }

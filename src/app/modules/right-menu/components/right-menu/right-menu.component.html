@@ -1,0 +1,12 @@
+<button *ngIf="!isShared" mat-icon-button [matMenuTriggerFor]="rigthMenu" (menuOpened)="menuOpen = true">
+  <mat-icon>{{ menuOpen ? 'close' : 'more_horiz' }}</mat-icon>
+</button>
+<mat-menu #rigthMenu="matMenu" (closed)="menuOpen = false" class="right-menu">
+  <div class="content">
+    <button *ngIf="isAdmin" mat-menu-item routerLink="/admin">Admin</button>
+    <button *ngIf="isAdmin" mat-menu-item routerLink="/clientes">Web antigua</button>
+    <button mat-menu-item (click)="signOut.emit()" routerLink="../auth">
+      <strong> Cerrar sesión </strong>
+    </button>
+  </div>
+</mat-menu>
