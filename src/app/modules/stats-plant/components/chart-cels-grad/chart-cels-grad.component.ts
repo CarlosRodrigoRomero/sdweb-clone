@@ -129,9 +129,6 @@ export class ChartCelsGradComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          // aplicamos el tema seleccionado
-          this.themeService.applyTheme(theme);
-
           this.chartOptions = {
             ...this.chartOptions,
             chart: {

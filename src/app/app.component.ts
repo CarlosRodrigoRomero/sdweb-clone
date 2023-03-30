@@ -31,6 +31,9 @@ export class AppComponent implements OnInit {
     this.themeService.themeSelected$.subscribe((theme) => {
       this.overlayContainer.getContainerElement().classList.add(theme);
       this.componentCssClass = theme;
+
+      // aplicamos el tema seleccionado
+      this.themeService.applyTheme(theme);
     });
   }
 }

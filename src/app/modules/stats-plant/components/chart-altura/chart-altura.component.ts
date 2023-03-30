@@ -161,9 +161,6 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
       .pipe(
         take(1),
         switchMap((theme) => {
-          // aplicamos el tema seleccionado
-          this.themeService.applyTheme(theme);
-
           this.chartOptions = {
             series: this.series20192020,
             chart: {
@@ -265,9 +262,6 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          // aplicamos el tema seleccionado
-          this.themeService.applyTheme(theme);
-
           this.chartOptions = {
             ...this.chartOptions,
             chart: {

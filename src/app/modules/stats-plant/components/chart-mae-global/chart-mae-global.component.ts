@@ -42,7 +42,6 @@ export type ChartOptions = {
   legend: ApexLegend;
   title: ApexTitleSubtitle;
   annotations: ApexAnnotations;
-  toolbar: any;
   tooltip: ApexTooltip;
 };
 
@@ -112,9 +111,6 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
         take(1)
       )
       .subscribe((theme) => {
-        // aplicamos el tema seleccionado
-        this.themeService.applyTheme(theme);
-
         // si solo hay un informe cambiamos a grafico tipo barra
         if (this.maeData.length === 1) {
           this.typeChart = 'bar';
@@ -139,21 +135,6 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
               left: 7,
               blur: 10,
               opacity: 0.2,
-            },
-            toolbar: {
-              show: true,
-              offsetX: 0,
-              offsetY: 0,
-              tools: {
-                download: true,
-                selection: false,
-                zoom: false,
-                zoomin: false,
-                zoomout: false,
-                pan: false,
-                reset: false,
-                customIcons: [],
-              },
             },
           },
           colors: this.maeColors,
@@ -223,9 +204,6 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          // aplicamos el tema seleccionado
-          this.themeService.applyTheme(theme);
-
           this.chartOptions = {
             ...this.chartOptions,
             chart: {

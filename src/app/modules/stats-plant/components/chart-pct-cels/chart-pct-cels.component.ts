@@ -117,9 +117,6 @@ export class ChartPctCelsComponent implements OnInit {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.commonOptions && this.chart1options && this.chart2options) {
-          // aplicamos el tema seleccionado
-          this.themeService.applyTheme(theme);
-
           this.commonOptions = {
             ...this.commonOptions,
             tooltip: {

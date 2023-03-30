@@ -115,23 +115,22 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
         }),
         take(1)
       )
-      .subscribe((theme) => {
-        // aplicamos el tema seleccionado
-        this.themeService.applyTheme(theme);
-
-        this.initChart(theme.split('-')[0]);
-      });
+      .subscribe((theme) => this.initChart(theme.split('-')[0]));
 
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptionsComun && this.chartOptions1 && this.chartOptions2) {
-          // aplicamos el tema seleccionado
-          this.themeService.applyTheme(theme);
-
           this.chartOptionsComun = {
             ...this.chartOptionsComun,
             tooltip: {
               theme: theme.split('-')[0],
+            },
+            dataLabels: {
+              ...this.chartOptionsComun.dataLabels,
+              style: {
+                ...this.chartOptionsComun.dataLabels.style,
+                colors: [this.themeService.textColor],
+              },
             },
           };
 
@@ -229,7 +228,7 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
         enabled: true,
         style: {
           fontSize: '14px',
-          colors: ['#304758'],
+          colors: [this.themeService.textColor],
         },
         offsetX: 0,
         offsetY: -25,
@@ -240,9 +239,7 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
         colors: ['transparent'],
       },
       toolbar: {
-        tools: {
-          selection: false,
-        },
+        show: false,
       },
       legend: {
         show: false,
@@ -250,9 +247,7 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
       plotOptions: {
         bar: {
           barHeight: '100%',
-
           columnWidth: '45%',
-
           distributed: true,
           endingShape: 'rounded',
           dataLabels: {

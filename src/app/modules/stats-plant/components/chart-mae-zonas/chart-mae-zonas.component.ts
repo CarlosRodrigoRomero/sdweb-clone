@@ -104,25 +104,19 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
           take(1)
         )
         .subscribe((theme) => {
-          // aplicamos el tema seleccionado
-          this.themeService.applyTheme(theme);
-
           this.chartData = [];
           this.informesIdList.forEach((informeId) => {
             const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
 
             this.chartData.push(this._calculateChartData(anomaliasInforme));
           });
-          this._initChart();
+          this._initChart(theme.split('-')[0]);
         })
     );
 
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          // aplicamos el tema seleccionado
-          this.themeService.applyTheme(theme);
-
           this.chartOptions = {
             ...this.chartOptions,
             chart: {
@@ -177,7 +171,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
     );
   }
 
-  private _initChart(): void {
+  private _initChart(theme: string): void {
     let series;
     // excluimos DEMO
     if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
@@ -318,6 +312,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
               },
             },
           },
+          theme,
         },
       };
       this.chartLoaded = true;
