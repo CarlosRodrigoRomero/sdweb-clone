@@ -51,6 +51,8 @@ export class BarExpandableChartComponent implements OnInit {
   @Input() zoomed: boolean;
   @Input() units: string;
   @Input() titleY: string;
+  @Input() textColor: string;
+  @Input() theme: string;
 
   @Output() elemSelected = new EventEmitter();
   @Output() elemHovered = new EventEmitter();
@@ -140,6 +142,10 @@ export class BarExpandableChartComponent implements OnInit {
       chart: {
         type: 'bar',
         height: '100%',
+        foreColor: this.textColor,
+        toolbar: {
+          show: false,
+        },
         events: {
           click: (event, chartContext, config) => {
             const index = config.dataPointIndex;
@@ -192,6 +198,7 @@ export class BarExpandableChartComponent implements OnInit {
         y: {
           formatter: (value) => this.decimalPipe.transform(value, '1.0-2') + this.units,
         },
+        theme: this.theme,
       },
       colors: this.colors,
       annotations,

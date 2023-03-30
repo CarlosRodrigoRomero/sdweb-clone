@@ -1,7 +1,6 @@
 .bottom-bar {
   display: flex;
   flex-direction: column;
-  background: aliceblue;
   height: 240px;
 }
 

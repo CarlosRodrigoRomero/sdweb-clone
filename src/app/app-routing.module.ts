@@ -6,13 +6,16 @@ import { AuthGuard } from '@core/guards/auth.guard';
 import { SelectivePreloadingStrategyService } from '@data/services/selective-preloading-strategy.service';
 
 import { AvisoLegalComponent } from '@shared/components/aviso-legal/aviso-legal.component';
-import { SkeletonComponent } from '@layout/components/skeleton/skeleton.component';
+
+import { NavComponent } from '@layout/components/nav/nav.component';
+import { SimpleBackgroundComponent } from '@layout/components/simple-background/simple-background.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'clients', pathMatch: 'full' },
   { path: 'aviso-legal', component: AvisoLegalComponent },
   {
     path: 'auth',
+    component: SimpleBackgroundComponent,
     loadChildren: () => import('@modules/auth/auth.module').then((m) => m.AuthenticationModule),
     data: { preload: true },
   },
@@ -23,68 +26,68 @@ export const routes: Routes = [
   },
   {
     path: 'clients',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/clients/clients.module').then((m) => m.ClientsModule),
     canActivate: [AuthGuard],
     data: { preload: true },
   },
   {
     path: 'clientes',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/old-web/clientes/clientes.module').then((m) => m.ClientesModule),
     canActivate: [AuthGuard],
   },
   {
     path: 'fixed-shared',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/fixed-plant/fixed-plant.module').then((m) => m.FixedPlantModule),
   },
   {
     path: 'fixed-filterable-shared',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/fixed-plant/fixed-plant.module').then((m) => m.FixedPlantModule),
   },
   {
     path: 'tracker-shared',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/tracker-plant/tracker-plant.module').then((m) => m.TrackerPlantModule),
   },
   {
     path: 'tracker-filterable-shared',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/tracker-plant/tracker-plant.module').then((m) => m.TrackerPlantModule),
   },
   {
     path: 'comments-fixed-shared',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/comments/comments.module').then((m) => m.CommentsModule),
   },
   {
     path: 'comments-tracker-shared',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/comments/comments.module').then((m) => m.CommentsModule),
   },
   {
     path: 'clusters',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/clusters/clusters.module').then((m) => m.ClustersModule),
     canActivate: [AuthGuard],
   },
   {
     path: 'structures',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/structures/structures.module').then((m) => m.StructuresModule),
     canActivate: [AuthGuard],
   },
   {
     path: 'classification',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/classification/classification.module').then((m) => m.ClassificationModule),
     canActivate: [AuthGuard],
   },
   {
     path: 'autogeo',
-    component: SkeletonComponent,
+    component: NavComponent,
     loadChildren: () => import('@modules/autogeo/autogeo.module').then((m) => m.AutogeoModule),
     canActivate: [AuthGuard],
   },

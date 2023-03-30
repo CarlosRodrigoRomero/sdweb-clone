@@ -1,0 +1,34 @@
+.switch-theme {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-switch {
+  height: 48px;
+  width: 48px;
+  display: flex;
+  min-width: unset !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+}
+
+.label {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .label {
+    display: block;
+  }
+
+  .btn-switch {
+    width: fit-content;
+  }
+}

@@ -8,11 +8,13 @@ import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAx
 import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
+import { ThemeService } from '@data/services/theme.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
 
 import { COLOR } from '@data/constants/color';
+import { switchMap, take } from 'rxjs/operators';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -29,15 +31,13 @@ export type ChartOptions = {
   providers: [DecimalPipe],
 })
 export class ChartAlturaComponent implements OnInit, OnDestroy {
+  @ViewChild('chart') chart: ChartComponent;
   informesIdList: string[];
   allAnomalias: Anomalia[] = [];
   allCC: Anomalia[] = [];
   dataLoaded = false;
   private planta: PlantaInterface;
-
-  private subscriptions: Subscription = new Subscription();
-
-  @ViewChild('chart') chart: ChartComponent;
+  chartOptions: Partial<ChartOptions>;
 
   private series2019: ApexAxisChartSeries = [
     {
@@ -138,41 +138,14 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
     },
   ];
 
-  public chartOptions: Partial<ChartOptions> = {
-    series: this.series20192020,
-    chart: {
-      height: 170,
-      type: 'heatmap',
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    colors: [COLOR.gris],
-    yaxis: {
-      title: {
-        text: 'Fila',
-      },
-      labels: {
-        minWidth: 50,
-        formatter: (value) => {
-          return this.decimalPipe.transform(value, '1.0-0');
-        },
-      },
-    },
-    tooltip: {
-      y: {
-        formatter: (value) => {
-          return value.toString();
-        },
-      },
-    },
-  };
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private reportControlService: ReportControlService,
     private informeService: InformeService,
     private decimalPipe: DecimalPipe,
-    private anomaliaInfoService: AnomaliaInfoService
+    private anomaliaInfoService: AnomaliaInfoService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -184,8 +157,50 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
     this.informesIdList = this.reportControlService.informesIdList;
     this.planta = this.reportControlService.planta;
 
-    this.subscriptions.add(
-      this.informeService.getDateLabelsInformes(this.informesIdList).subscribe((dateLabels) => {
+    this.themeService.themeSelected$
+      .pipe(
+        take(1),
+        switchMap((theme) => {
+          this.chartOptions = {
+            series: this.series20192020,
+            chart: {
+              height: 170,
+              type: 'heatmap',
+              toolbar: {
+                show: false,
+              },
+              foreColor: this.themeService.textColor,
+            },
+            dataLabels: {
+              enabled: false,
+            },
+            colors: [COLOR.gris],
+            yaxis: {
+              title: {
+                text: 'Fila',
+              },
+              labels: {
+                minWidth: 50,
+                formatter: (value) => {
+                  return this.decimalPipe.transform(value, '1.0-0');
+                },
+              },
+            },
+            tooltip: {
+              y: {
+                formatter: (value) => {
+                  return value.toString();
+                },
+              },
+              theme: theme.split('-')[0],
+            },
+          };
+
+          return this.informeService.getDateLabelsInformes(this.informesIdList);
+        }),
+        take(1)
+      )
+      .subscribe((dateLabels) => {
         if (dateLabels.length < 2) {
           if (dateLabels[0] === 'Jul 2019') {
             this.chartOptions.series = this.series2019;
@@ -244,6 +259,22 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
           }
 
           this.dataLoaded = true;
+        }
+      });
+
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        if (this.chartOptions) {
+          this.chartOptions = {
+            ...this.chartOptions,
+            chart: {
+              ...this.chartOptions.chart,
+              foreColor: this.themeService.textColor,
+            },
+            tooltip: {
+              theme: theme.split('-')[0],
+            },
+          };
         }
       })
     );

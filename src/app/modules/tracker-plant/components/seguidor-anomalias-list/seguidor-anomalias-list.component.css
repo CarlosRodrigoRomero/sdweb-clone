@@ -19,16 +19,21 @@ table {
   padding-left: 0px;
 }
 
+/* ocultamos la barra vertical overscrool */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 .mat-row {
   cursor: pointer;
 }
 
 .mat-row.selected {
-  background-color: rgb(187, 187, 187);
+  background-color: grey;
 }
 
 .mat-row.hovered {
-  background-color: lightgray;
+  background-color: grey;
 }
 
 .row-content {

@@ -36,7 +36,6 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatBadgeModule } from '@angular/material/badge';
 
-import { SwitchThemeComponent } from './components/switch-theme/switch-theme.component';
 import { MatRangeSliderComponent } from './components/mat-range-slider/mat-range-slider.component';
 
 const modules = [
@@ -78,7 +77,7 @@ const modules = [
 ];
 
 @NgModule({
-  declarations: [SwitchThemeComponent, MatRangeSliderComponent],
+  declarations: [MatRangeSliderComponent],
   imports: modules,
   exports: modules,
 })

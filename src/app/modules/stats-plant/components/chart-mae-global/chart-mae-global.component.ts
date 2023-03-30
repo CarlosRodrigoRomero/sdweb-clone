@@ -1,7 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
 import { switchMap, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import {
   ChartComponent,
@@ -24,6 +25,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { InformeService } from '@data/services/informe.service';
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
 import { AuthService } from '@data/services/auth.service';
+import { ThemeService } from '@data/services/theme.service';
 
 import { COLOR } from '@data/constants/color';
 
@@ -40,7 +42,6 @@ export type ChartOptions = {
   legend: ApexLegend;
   title: ApexTitleSubtitle;
   annotations: ApexAnnotations;
-  toolbar: any;
   tooltip: ApexTooltip;
 };
 
@@ -50,14 +51,18 @@ export type ChartOptions = {
   styleUrls: ['./chart-mae-global.component.css'],
   providers: [DecimalPipe],
 })
-export class ChartMaeGlobalComponent implements OnInit {
-  @ViewChild('chartMAE') chartMAE: ChartComponent;
-  public chartOptionsMAE: Partial<ChartOptions>;
+export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
+  @ViewChild('chart') chart: ChartComponent;
+  chartOptions: Partial<ChartOptions>;
   loadChart = false;
   private maeData: number[] = [];
   private maeColors: string[] = [];
   private maeMedio: number;
   private maeSigma: number;
+  private typeChart: ChartType = 'line';
+  private dateLabels: string[] = [];
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private reportControlService: ReportControlService,
@@ -65,7 +70,8 @@ export class ChartMaeGlobalComponent implements OnInit {
     private portfolioControlService: PortfolioControlService,
     private authService: AuthService,
     private decimalPipe: DecimalPipe,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -96,16 +102,21 @@ export class ChartMaeGlobalComponent implements OnInit {
 
           return this.informeService.getDateLabelsInformes(informes.map((inf) => inf.id));
         }),
+        take(1),
+        switchMap((dateLabels) => {
+          this.dateLabels = dateLabels;
+
+          return this.themeService.themeSelected$;
+        }),
         take(1)
       )
-      .subscribe((dateLabels) => {
+      .subscribe((theme) => {
         // si solo hay un informe cambiamos a grafico tipo barra
-        let typeChart: ChartType = 'line';
         if (this.maeData.length === 1) {
-          typeChart = 'bar';
+          this.typeChart = 'bar';
         }
 
-        this.chartOptionsMAE = {
+        this.chartOptions = {
           series: [
             {
               name: 'MAE %',
@@ -113,9 +124,13 @@ export class ChartMaeGlobalComponent implements OnInit {
             },
           ],
           chart: {
+            foreColor: this.themeService.textColor,
             width: '100%',
-            type: typeChart,
+            type: this.typeChart,
             height: 250,
+            toolbar: {
+              show: false,
+            },
             dropShadow: {
               enabled: true,
               color: '#000',
@@ -123,21 +138,6 @@ export class ChartMaeGlobalComponent implements OnInit {
               left: 7,
               blur: 10,
               opacity: 0.2,
-            },
-            toolbar: {
-              show: true,
-              offsetX: 0,
-              offsetY: 0,
-              tools: {
-                download: true,
-                selection: false,
-                zoom: false,
-                zoomin: false,
-                zoomout: false,
-                pan: false,
-                reset: false,
-                customIcons: [],
-              },
             },
           },
           colors: this.maeColors,
@@ -148,18 +148,11 @@ export class ChartMaeGlobalComponent implements OnInit {
               fontSize: '16px',
             },
           },
-          grid: {
-            borderColor: '#e7e7e7',
-            row: {
-              colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-              opacity: 0.5,
-            },
-          },
           markers: {
             size: 1,
           },
           xaxis: {
-            categories: dateLabels,
+            categories: this.dateLabels,
           },
           yaxis: {
             title: {
@@ -201,11 +194,35 @@ export class ChartMaeGlobalComponent implements OnInit {
               },
             ],
           },
+          tooltip: {
+            theme: theme.split('-')[0],
+          },
         };
         this.loadChart = true;
 
         // detectamos cambios porque estamos utilizando la estrategia OnPush
         this.cdr.detectChanges();
       });
+
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        if (this.chartOptions) {
+          this.chartOptions = {
+            ...this.chartOptions,
+            chart: {
+              type: this.typeChart,
+              foreColor: this.themeService.textColor,
+            },
+            tooltip: {
+              theme: theme.split('-')[0],
+            },
+          };
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

@@ -1,0 +1,30 @@
+.sd-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.sd-icon {
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
+}
+
+.sd-complete-icon {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .sd-icon {
+    display: none;
+  }
+
+  .sd-complete-icon {
+    display: flex;
+    height: 80px;
+    width: 250px;
+    cursor: pointer;
+  }
+}

@@ -61,7 +61,7 @@ export class MapComponent implements OnInit, OnDestroy {
   constructor(
     public mapControlService: MapControlService,
     private plantaService: PlantaService,
-    public filterService: FilterService,
+    private filterService: FilterService,
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
     private anomaliasControlService: AnomaliasControlService,

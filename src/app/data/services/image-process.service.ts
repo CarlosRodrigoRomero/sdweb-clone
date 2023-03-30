@@ -33,7 +33,7 @@ export class ImageProcessService {
   }
 
   transformPixels(image: any, informeId: string) {
-    this.thermalLayer = this.thermalService.thermalLayers.find((tL) => tL.informeId === informeId);
+    this.thermalLayer = this.thermalService.thermalLayersDB.find((tL) => tL.informeId === informeId);
 
     // obtenemos el indice de la capa
     this.indexSelected = this.getIndexThermalLayer(informeId);

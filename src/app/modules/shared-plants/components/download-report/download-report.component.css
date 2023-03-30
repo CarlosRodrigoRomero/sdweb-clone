@@ -5,18 +5,28 @@
   min-width: unset !important;
 }
 
-.title {
-  margin-left: 1rem;
+.mat-menu-item.title {
+  cursor: unset;
+}
+
+.mat-menu-item.select-language {
+  cursor: unset;
 }
 
 .email {
   margin: 8px;
 }
+
 .menu {
   margin: 1.5rem;
 }
+
 .contenedor-menu {
   padding: 0.5rem 1rem;
+}
+
+.title {
+  font-size: 20px;
 }
 
 .warning {
@@ -39,4 +49,9 @@ a:hover {
 
 .label {
   font-weight: 500;
+}
+
+.select-language {
+  display: flex;
+  align-items: center;
 }

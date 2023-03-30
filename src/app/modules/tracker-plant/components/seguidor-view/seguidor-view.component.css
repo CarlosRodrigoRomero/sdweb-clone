@@ -6,6 +6,11 @@
   top: 70px;
 }
 
+/* ocultamos la barra vertical overscrool */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 .right-content {
   display: grid;
   row-gap: 1rem;

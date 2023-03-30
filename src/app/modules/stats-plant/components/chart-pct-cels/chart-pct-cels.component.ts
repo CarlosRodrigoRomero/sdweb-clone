@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { combineLatest } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
 import { ReportControlService } from '@data/services/report-control.service';
@@ -24,6 +24,7 @@ import {
 } from 'ng-apexcharts';
 
 import { StatsService } from '@data/services/stats.service';
+import { ThemeService } from '@data/services/theme.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { MathOperations } from '@core/classes/math-operations';
@@ -63,48 +64,15 @@ export class ChartPctCelsComponent implements OnInit {
 
   public chart1options: Partial<ChartOptions>;
   public chart2options: Partial<ChartOptions>;
-  public commonOptions: Partial<ChartOptions> = {
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      curve: 'straight',
-    },
-    markers: {
-      size: 6,
-      hover: {
-        size: 10,
-      },
-    },
-    tooltip: {
-      followCursor: false,
-      x: {
-        show: false,
-      },
-      marker: {
-        show: false,
-      },
-      y: {
-        title: {
-          formatter: (s) => {
-            return s;
-          },
-        },
-      },
-    },
-    grid: {
-      clipMarkers: false,
-    },
-    xaxis: {
-      type: 'category',
-      categories: ['Jul 2019', 'Jun 2020'],
-    },
-  };
+  public commonOptions: Partial<ChartOptions>;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private reportControlService: ReportControlService,
     private informeService: InformeService,
-    private statsService: StatsService
+    private statsService: StatsService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -114,10 +82,16 @@ export class ChartPctCelsComponent implements OnInit {
 
     this.informeService
       .getDateLabelsInformes(this.informesIdList)
-      .pipe(take(1))
-      .subscribe((dateLabels) => {
-        this.dateLabels = dateLabels;
+      .pipe(
+        take(1),
+        switchMap((dateLabels) => {
+          this.dateLabels = dateLabels;
 
+          return this.themeService.themeSelected$;
+        }),
+        take(1)
+      )
+      .subscribe((theme) => {
         const data1: number[] = [];
         const data2: number[] = [];
         this.informes.forEach((informe) => {
@@ -133,16 +107,83 @@ export class ChartPctCelsComponent implements OnInit {
         });
 
         // si solo hay un informe no mostramos el gráfico
-        console.log(this.informes);
         if (this.informes.length > 1) {
-          this._initChartData(data1, data2);
+          this._initChartData(data1, data2, theme.split('-')[0]);
         } else {
           this.statsService.loadCCyGradChart = false;
         }
       });
+
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        if (this.commonOptions && this.chart1options && this.chart2options) {
+          this.commonOptions = {
+            ...this.commonOptions,
+            tooltip: {
+              theme: theme.split('-')[0],
+            },
+          };
+
+          this.chart1options = {
+            ...this.chart1options,
+            chart: {
+              ...this.chart1options.chart,
+              foreColor: this.themeService.textColor,
+            },
+          };
+
+          this.chart2options = {
+            ...this.chart2options,
+            chart: {
+              ...this.chart2options.chart,
+              foreColor: this.themeService.textColor,
+            },
+          };
+        }
+      })
+    );
   }
 
-  private _initChartData(data1: number[], data2: number[]): void {
+  private _initChartData(data1: number[], data2: number[], theme: string): void {
+    this.commonOptions = {
+      dataLabels: {
+        enabled: false,
+      },
+      stroke: {
+        curve: 'straight',
+      },
+      markers: {
+        size: 6,
+        hover: {
+          size: 10,
+        },
+      },
+      tooltip: {
+        followCursor: false,
+        x: {
+          show: false,
+        },
+        marker: {
+          show: false,
+        },
+        y: {
+          title: {
+            formatter: (s) => {
+              return s;
+            },
+          },
+        },
+        theme,
+      },
+      grid: {
+        clipMarkers: false,
+      },
+      xaxis: {
+        type: 'category',
+        categories: ['Jul 2019', 'Jun 2020'],
+      },
+    };
+
     this.chart1options = {
       series: [
         {
@@ -156,20 +197,9 @@ export class ChartPctCelsComponent implements OnInit {
         width: '100%',
         height: this.chartHeight,
         group: 'groupCC',
+        foreColor: this.themeService.textColor,
         toolbar: {
-          show: true,
-          offsetX: 0,
-          offsetY: 0,
-          tools: {
-            download: true,
-            selection: false,
-            zoom: false,
-            zoomin: false,
-            zoomout: false,
-            pan: false,
-            reset: false,
-            customIcons: [],
-          },
+          show: false,
         },
       },
       colors: [COLOR.gris],
@@ -197,27 +227,6 @@ export class ChartPctCelsComponent implements OnInit {
       stroke: {
         curve: 'straight',
       },
-      // annotations: {
-      //   yaxis: [
-      //     {
-      //       y: 0.5, // DEMO - HAY QUE TRAER EL CC MEDIO DEL PORTFOLIO
-      //       borderColor: '#5b5b5c',
-      //       borderWidth: 2,
-      //       strokeDashArray: 10,
-
-      //       label: {
-      //         offsetX: -100,
-      //         borderColor: '#5b5b5c',
-      //         style: {
-      //           fontSize: '12px',
-      //           color: '#fff',
-      //           background: '#5b5b5c',
-      //         },
-      //         text: '% CC medio portfolio',
-      //       },
-      //     },
-      //   ],
-      // },
     };
 
     this.chart2options = {
@@ -233,20 +242,9 @@ export class ChartPctCelsComponent implements OnInit {
         width: '100%',
         height: this.chartHeight,
         group: 'groupCC',
+        foreColor: this.themeService.textColor,
         toolbar: {
-          show: true,
-          offsetX: 0,
-          offsetY: 0,
-          tools: {
-            download: true,
-            selection: false,
-            zoom: false,
-            zoomin: false,
-            zoomout: false,
-            pan: false,
-            reset: false,
-            customIcons: [],
-          },
+          show: false,
         },
       },
       colors: [COLOR.gris],
@@ -271,27 +269,6 @@ export class ChartPctCelsComponent implements OnInit {
           },
         },
       },
-      // annotations: {
-      //   yaxis: [
-      //     {
-      //       y: 12.1,
-      //       borderColor: '#5b5b5c',
-      //       borderWidth: 2,
-      //       strokeDashArray: 10,
-
-      //       label: {
-      //         offsetX: -100,
-      //         borderColor: '#5b5b5c',
-      //         style: {
-      //           fontSize: '12px',
-      //           color: '#fff',
-      //           background: '#5b5b5c',
-      //         },
-      //         text: 'ΔT (norm) medio portfolio (ºC)',
-      //       },
-      //     },
-      //   ],
-      // },
     };
 
     this.dataLoaded = true;

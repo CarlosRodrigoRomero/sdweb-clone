@@ -1,0 +1,12 @@
+<mat-card>
+  <mat-card-content>
+    <div class="temperature-slider">
+      <ngx-slider
+        (userChangeEnd)="onChangeTemperatureSlider(lowTemp, highTemp)"
+        [(value)]="lowTemp"
+        [(highValue)]="highTemp"
+        [options]="optionsTemp"
+      ></ngx-slider>
+    </div>
+  </mat-card-content>
+</mat-card>

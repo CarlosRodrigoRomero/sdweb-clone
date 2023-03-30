@@ -24,6 +24,33 @@ export class Colors {
       .join('')}`;
   }
 
+  static rgbaToHex(rgba: string) {
+    // Convertir la cadena RGBA en un arreglo de valores
+    const values = rgba.slice(5, -1).split(',');
+    const red = Number(values[0]);
+    const green = Number(values[1]);
+    const blue = Number(values[2]);
+    const alpha = parseFloat(values[3]);
+
+    // Asegurarse de que los valores estén dentro del rango correcto
+    const validRed = Math.max(0, Math.min(255, red));
+    const validGreen = Math.max(0, Math.min(255, green));
+    const validBlue = Math.max(0, Math.min(255, blue));
+    const validAlpha = Math.max(0, Math.min(1, alpha));
+
+    // Convertir los valores en hexadecimal
+    const hexRed = validRed.toString(16).padStart(2, '0');
+    const hexGreen = validGreen.toString(16).padStart(2, '0');
+    const hexBlue = validBlue.toString(16).padStart(2, '0');
+    const hexAlpha = Math.round(validAlpha * 255)
+      .toString(16)
+      .padStart(2, '0');
+
+    // Concatenar los valores
+    const hex = `#${hexRed}${hexGreen}${hexBlue}${hexAlpha}`;
+    return hex;
+  }
+
   static getColor(value: number, range: number[], opacity: number): string {
     if (value < range[0]) {
       return Colors.hexToRgb(COLOR.colores_severity[0], opacity);

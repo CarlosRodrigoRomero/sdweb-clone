@@ -1,5 +1,5 @@
 .map {
-  height: calc(100vh - 70px);
+  height: calc(100vh - 64px);
   width: 100%;
   // visibility: hidden;
 }
@@ -45,14 +45,10 @@
   bottom: 10px;
 }
 
-::ng-deep .ol-control {
-  background-color: rgba(0, 0, 0, 0.2);
-}
-
-::ng-deep .ol-control button {
-  background-color: white;
-  color: black;
-}
+// ::ng-deep .ol-control button {
+//   background-color: white;
+//   color: black;
+// }
 
 @media (max-width: 900px) {
   ::ng-deep .ol-zoom {

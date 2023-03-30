@@ -1,7 +1,15 @@
 .btn-comments {
   position: absolute;
-  right: 3rem;
+  display: flex;
+  align-items: center;
+  right: 1rem;
+  top: 530px;
   z-index: 10;
+  height: 48px;
+  width: 48px;
+  min-width: unset !important;
+  justify-content: center;
+  border-radius: 24px;
 }
 
 .anomalia-info {

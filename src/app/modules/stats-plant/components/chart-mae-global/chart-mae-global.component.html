@@ -6,19 +6,21 @@
   <mat-card-content>
     <div class="mae-global">
       <apx-chart
+        id="chart"
         *ngIf="loadChart"
-        [series]="chartOptionsMAE.series"
-        [chart]="chartOptionsMAE.chart"
-        [xaxis]="chartOptionsMAE.xaxis"
-        [stroke]="chartOptionsMAE.stroke"
-        [colors]="chartOptionsMAE.colors"
-        [dataLabels]="chartOptionsMAE.dataLabels"
-        [legend]="chartOptionsMAE.legend"
-        [annotations]="chartOptionsMAE.annotations"
-        [markers]="chartOptionsMAE.markers"
-        [grid]="chartOptionsMAE.grid"
-        [yaxis]="chartOptionsMAE.yaxis"
-        [title]="chartOptionsMAE.title"
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [xaxis]="chartOptions.xaxis"
+        [stroke]="chartOptions.stroke"
+        [colors]="chartOptions.colors"
+        [dataLabels]="chartOptions.dataLabels"
+        [legend]="chartOptions.legend"
+        [annotations]="chartOptions.annotations"
+        [markers]="chartOptions.markers"
+        [grid]="chartOptions.grid"
+        [yaxis]="chartOptions.yaxis"
+        [title]="chartOptions.title"
+        [tooltip]="chartOptions.tooltip"
       ></apx-chart>
     </div>
   </mat-card-content>
