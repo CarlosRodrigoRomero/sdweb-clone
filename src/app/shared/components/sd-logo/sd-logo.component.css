@@ -11,3 +11,20 @@
   width: 40px;
   cursor: pointer;
 }
+
+.sd-complete-icon {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .sd-icon {
+    display: none;
+  }
+
+  .sd-complete-icon {
+    display: flex;
+    height: 80px;
+    width: 250px;
+    cursor: pointer;
+  }
+}

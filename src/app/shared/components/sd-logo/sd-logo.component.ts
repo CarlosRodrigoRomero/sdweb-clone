@@ -66,5 +66,13 @@ export class SdLogoComponent implements OnInit {
       'sd_light',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/sd_light.svg')
     );
+    this.matIconRegistry.addSvgIcon(
+      'sd_complete_dark',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/sd_complete_dark.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'sd_complete_light',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/icons/sd_complete_light.svg')
+    );
   }
 }

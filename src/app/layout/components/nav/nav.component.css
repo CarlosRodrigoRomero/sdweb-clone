@@ -75,6 +75,10 @@ app-navbar-container {
     padding: 0 1rem;
   }
 
+  .sidenav {
+    width: fit-content;
+  }
+
   app-navbar-container {
     width: fit-content;
   }
@@ -87,5 +91,20 @@ app-navbar-container {
     bottom: 0;
     width: 100%;
     z-index: 999;
+  }
+
+  .item-content {
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: left;
+  }
+
+  .logo {
+    margin-top: 1rem;
+  }
+
+  .list-items {
+    height: calc(100vh - 80px);
+    padding: 2rem 1rem;
   }
 }
