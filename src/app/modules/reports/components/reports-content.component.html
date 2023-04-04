@@ -1,3 +1,4 @@
+<app-loading *ngIf="!anomaliasLoaded"></app-loading>
 <div *ngIf="anomaliasLoaded" class="reports-content">
   <router-outlet></router-outlet>
 </div>

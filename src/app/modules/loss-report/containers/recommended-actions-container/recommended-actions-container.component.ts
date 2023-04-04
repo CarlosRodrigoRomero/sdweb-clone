@@ -25,6 +25,7 @@ export class RecommendedActionsContainerComponent implements OnInit {
   ngOnInit(): void {
     this.subcriptions.add(
       this.filterService.filteredElements$.subscribe((elems) => {
+        console.log(elems.length);
         let anomalias: Anomalia[] = [];
         if (this.reportControlService.plantaFija) {
           anomalias = elems as Anomalia[];

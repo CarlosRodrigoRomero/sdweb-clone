@@ -69,6 +69,7 @@
 
 .stats-container {
   position: relative;
+  border-radius: 0 4px 4px 0;
 }
 
 .main-container {
@@ -107,6 +108,8 @@ app-download-progress-bar {
   display: flex;
   padding: 0.5rem;
   width: fit-content;
+  height: calc(100vh - 96px);
+  border-radius: 4px 0 0 4px;
 }
 
 @media (max-width: 420px) {

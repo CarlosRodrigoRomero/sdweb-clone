@@ -1,10 +1,5 @@
-<app-loading *ngIf="!mapLoaded"></app-loading>
-<mat-sidenav-container
-  *ngIf="anomaliasLoaded"
-  class="stats-container"
-  [hasBackdrop]="true"
-  (backdropClick)="sidenavStats.toggle()"
->
+<!-- <app-loading *ngIf="!mapLoaded"></app-loading> -->
+<mat-sidenav-container class="stats-container" [hasBackdrop]="true" (backdropClick)="sidenavStats.toggle()">
   <!-- SIDENAV STATS -->
   <mat-sidenav #sidenavStats class="stats-sidenav" position="end">
     <!-- cargamos el modulo Stats -->
@@ -21,7 +16,7 @@
         mode="side"
         [fixedInViewport]="true"
         class="left-sidenav"
-        [fixedTopGap]="64"
+        [fixedTopGap]="80"
         position="start"
       >
         <div class="titulo">
@@ -31,7 +26,13 @@
       </mat-sidenav>
 
       <!-- SIDENAV LISTA ANOMALIAS -->
-      <mat-sidenav #sidenavRight class="right-sidenav" position="end" disableClose>
+      <mat-sidenav
+        #sidenavRight
+        class="right-sidenav"
+        position="end"
+        disableClose
+        (openedChange)="(rightOpened = !rightOpened)"
+      >
         <div class="titulo">
           <h4>Listado de anomalías</h4>
         </div>
@@ -42,7 +43,7 @@
       </mat-sidenav>
 
       <mat-sidenav-content>
-        <div *ngIf="anomaliasLoaded" class="rel">
+        <div class="rel">
           <!-- MAPA -->
           <app-map></app-map>
 
@@ -90,7 +91,7 @@
           </div>
         </div>
 
-        <div *ngIf="anomaliasLoaded">
+        <div>
           <!-- BOTON SIDENAV LISTA ANOMALIAS -->
           <button
             mat-raised-button

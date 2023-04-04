@@ -5,7 +5,7 @@ import { MapViewComponent } from './components/map-view/map-view.component';
 
 const routes: Routes = [
   {
-    path: ':id',
+    path: '',
     component: MapViewComponent,
   },
 ];

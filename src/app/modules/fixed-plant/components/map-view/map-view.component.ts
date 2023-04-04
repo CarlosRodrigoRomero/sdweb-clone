@@ -23,7 +23,7 @@ import { AnomaliaListContainer } from '@modules/fixed-plant/containers/anomalia-
 })
 export class MapViewComponent implements OnInit, OnDestroy {
   plantaFija = true;
-  // rightOpened = false;
+  rightOpened = false;
   // statsOpened: boolean;
   anomaliasLoaded = false;
   sharedReport = false;
@@ -58,11 +58,13 @@ export class MapViewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.initService().then((res) => {
-      this.anomaliasLoaded = res;
+    // this.reportControlService.initService().then((res) => {
+    //   this.anomaliasLoaded = res;
 
-      this.numInformes = this.reportControlService.informes.length;
-    });
+    //   this.numInformes = this.reportControlService.informes.length;
+    // });
+
+    this.numInformes = this.reportControlService.informes.length;
 
     this.subscriptions.add(
       this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))
@@ -133,6 +135,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
 
     // reseteamos los servicios a sus valores por defecto
-    this.resetServicesService.resetServices();
+    // this.resetServicesService.resetServices();
   }
 }
