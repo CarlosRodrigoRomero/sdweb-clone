@@ -10,13 +10,26 @@
         </mat-expansion-panel-header>
         <div class="panel-content">
           <app-recommended-action
-            [title]="'Substring en circuito abierto'"
-            [cantidad]="1894"
-            [perdidas]="56"
-            [porcentajeBarra]="'30%'"
+            *ngFor="let action of fixableFilter(recomendedActions)"
+            [title]="action.title"
+            [cantidad]="action.quantity"
+            [perdidas]="action.loss"
+            [porcentajeBarra]="action.barPercentage"
           ></app-recommended-action>
-          <app-recommended-action></app-recommended-action>
-          <app-recommended-action></app-recommended-action>
+        </div>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title> Anomalías no reparables </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="panel-content">
+          <app-recommended-action
+            *ngFor="let action of notFixableFilter(recomendedActions)"
+            [title]="action.title"
+            [cantidad]="action.quantity"
+            [perdidas]="action.loss"
+            [porcentajeBarra]="action.barPercentage"
+          ></app-recommended-action>
         </div>
       </mat-expansion-panel>
     </mat-accordion>

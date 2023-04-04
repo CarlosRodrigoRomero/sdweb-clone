@@ -38,8 +38,9 @@
 }
 
 .row-subtitle {
-  font-size: small;
+  font-size: smaller;
   width: fit-content;
+  font-weight: 300;
 }
 
 .perdidas {
