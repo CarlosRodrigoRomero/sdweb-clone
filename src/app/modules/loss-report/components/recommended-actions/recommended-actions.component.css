@@ -1,0 +1,11 @@
+.content {
+  width: 100%;
+  height: fit-content;
+  background-color: green;
+}
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

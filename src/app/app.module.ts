@@ -37,7 +37,15 @@ import { ReportContentComponent } from './modules/fixed-plant/components/report-
 import { SimpleBackgroundComponent } from './layout/components/simple-background/simple-background.component';
 
 @NgModule({
-  declarations: [AppComponent, SkeletonComponent, NavbarContainerComponent, NavbarComponent, NavComponent, ReportContentComponent, SimpleBackgroundComponent],
+  declarations: [
+    AppComponent,
+    SkeletonComponent,
+    NavbarContainerComponent,
+    NavbarComponent,
+    NavComponent,
+    ReportContentComponent,
+    SimpleBackgroundComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,

@@ -56,6 +56,10 @@
   align-items: center;
   width: 100%;
   padding: 0 2rem;
+  position: sticky;
+  position: -webkit-sticky; /* For macOS/iOS Safari */
+  top: 0;
+  z-index: 999;
 }
 
 app-navbar-container {
@@ -64,10 +68,6 @@ app-navbar-container {
 
 .bottom-bar {
   display: none;
-}
-
-.content {
-  overflow: hidden;
 }
 
 @media (max-width: 600px) {

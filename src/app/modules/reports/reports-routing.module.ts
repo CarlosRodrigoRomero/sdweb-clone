@@ -19,6 +19,11 @@ const routes: Routes = [
           import('@modules/map-list-report/map-list-report.module').then((m) => m.MapListReportModule),
         canActivate: [AuthGuard],
       },
+      {
+        path: 'loss',
+        loadChildren: () => import('@modules/loss-report/loss-report.module').then((m) => m.LossReportModule),
+        canActivate: [AuthGuard],
+      },
     ],
   },
 ];
