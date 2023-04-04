@@ -1,0 +1,54 @@
+.content {
+  width: 100%;
+  height: fit-content;
+}
+
+.mat-checkbox {
+  width: 100% !important;
+}
+
+:host ::ng-deep .mat-checkbox-layout {
+  width: 100% !important;
+}
+
+:host ::ng-deep .mat-checkbox-layout .mat-checkbox-label {
+  width: 100% !important;
+}
+
+.check-content {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.content-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.row-title {
+  font-size: smaller;
+  width: fit-content;
+}
+
+.cantidad {
+  width: fit-content;
+  font-size: small;
+}
+
+.row-subtitle {
+  font-size: small;
+  width: fit-content;
+}
+
+.perdidas {
+  width: fit-content;
+  font-size: medium;
+}
+
+.bar-row {
+  background-color: yellow;
+  height: 10px;
+  border-radius: 2px;
+}
