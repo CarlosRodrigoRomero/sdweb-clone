@@ -1,0 +1,11 @@
+<div class="content">
+  <span class="title">Compartir informe</span>
+  <mat-checkbox class="editable-check" [(ngModel)]="versionTecnicos">Versión móvil para técnicos de campo</mat-checkbox>
+  <mat-checkbox class="editable-check" [(ngModel)]="onlyFiltered">Solo anomalías filtradas</mat-checkbox>
+  <button mat-raised-button mat-dialog-close class="btn-enviar" color="primary" (click)="copyLink()">
+    <div class="btn-enviar-content">
+      <mat-icon>link</mat-icon>
+      <span>Copiar enlace</span>
+    </div>
+  </button>
+</div>

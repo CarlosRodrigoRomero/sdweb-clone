@@ -17,7 +17,7 @@
             [porcentajeBarra]="action.barPercentage"
             (changeState)="action.active = $event; emitChangedActions()"
           ></app-recommended-action>
-          <button class="share-btn" mat-flat-button color="primary">
+          <button class="share-btn" mat-flat-button color="primary" (click)="openDialog()">
             <div class="share-btn-content">
               <mat-icon>share</mat-icon>
               <span>Compartir seleccionadas</span>
@@ -38,7 +38,7 @@
             [porcentajeBarra]="action.barPercentage"
             (changeState)="action.active = $event; emitChangedActions()"
           ></app-recommended-action>
-          <button class="share-btn" mat-flat-button color="primary">
+          <button class="share-btn" mat-flat-button color="primary" (click)="openDialog()">
             <div class="share-btn-content">
               <mat-icon>share</mat-icon>
               <span>Compartir seleccionadas</span>

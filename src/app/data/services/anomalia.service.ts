@@ -100,6 +100,7 @@ export class AnomaliaService {
         if (action.payload.exists) {
           const anomalia = action.payload.data() as Anomalia;
           anomalia.id = action.payload.id;
+          anomalia.tipo = Number(anomalia.tipo);
           return anomalia;
         } else {
           return null;
@@ -153,6 +154,7 @@ export class AnomaliaService {
           let anoms = actions.map((doc, index) => {
             let data = doc.payload.doc.data() as Anomalia;
             data.id = doc.payload.doc.id;
+            data.tipo = Number(data.tipo);
 
             // Parche para Casas de Don Pedro Jun22 y Alqueva Sep22
             if (Patches.checkId(informeId)) {

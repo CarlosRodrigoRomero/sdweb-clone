@@ -1,0 +1,21 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.btn-enviar {
+  border-radius: 8px;
+  width: fit-content;
+  align-self: center;
+}
+
+.btn-enviar-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.title {
+  font-size: 24px;
+}

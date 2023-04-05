@@ -61,6 +61,11 @@ export class ShareReportService {
     this.params$.next(this.params);
   }
 
+  getCreateDate(): number {
+    const date = new Date();
+    return date.getTime();
+  }
+
   setCreatedDate() {
     const date = new Date();
     this.params.fechaCreacion = date.getTime();
@@ -94,6 +99,14 @@ export class ShareReportService {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  createRecommendedActionsParams(tipos: number[]): ParamsFilterShare {
+    const params: ParamsFilterShare = {};
+
+    params.tipo = tipos;
+
+    return params;
   }
 
   setParams(filter: FilterInterface) {
@@ -201,13 +214,17 @@ export class ShareReportService {
     });
   }
 
-  saveParams() {
+  saveParams(params?: ParamsFilterShare) {
+    let paramsToSave = this.params;
+    if (params) {
+      paramsToSave = params;
+    }
     // guarda los params en la DB
     this.idDB = this.afs.createId();
     this.afs
       .collection('share')
       .doc(this.idDB)
-      .set(this.params)
+      .set(paramsToSave)
       .then(() => {
         console.log('Params guardados correctamente ' + this.idDB);
       })

@@ -23,6 +23,7 @@ import { PdfEmailSelectComponent } from './components/pdf-email-select/pdf-email
 import { GroupByZonesViewComponent } from './components/group-by-zones-view/group-by-zones-view.component';
 import { LeyendaContainerComponent } from './containers/leyenda-container/leyenda-container.component';
 import { ZonesSelectorContainerComponent } from './containers/zones-selector-container/zones-selector-container.component';
+import { ShareReportDialogComponent } from './components/share-report-dialog/share-report-dialog.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { ZonesSelectorContainerComponent } from './containers/zones-selector-con
     GroupByZonesViewComponent,
     LeyendaContainerComponent,
     ZonesSelectorContainerComponent,
+    ShareReportDialogComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [

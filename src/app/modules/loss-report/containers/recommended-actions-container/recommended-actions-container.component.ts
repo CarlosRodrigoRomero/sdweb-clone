@@ -17,6 +17,7 @@ import { Seguidor } from '@core/models/seguidor';
 })
 export class RecommendedActionsContainerComponent implements OnInit {
   recomendedActions: RecomendedAction[] = [];
+  tipos: number[];
 
   private subcriptions = new Subscription();
 
@@ -79,5 +80,22 @@ export class RecommendedActionsContainerComponent implements OnInit {
 
   changeActions(event: any) {
     this.recomendedActions = event;
+
+    // seteamos los tipos para compartir el informe
+    this.setTipos();
+  }
+
+  setTipos() {
+    if (this.tipos === undefined) {
+      this.tipos = new Array(this.recomendedActions.length).fill(null);
+    }
+
+    this.recomendedActions.forEach((action, index) => {
+      if (action.active) {
+        this.tipos[index] = action.type;
+      } else {
+        this.tipos[index] = null;
+      }
+    });
   }
 }
