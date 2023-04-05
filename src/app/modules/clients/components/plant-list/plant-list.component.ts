@@ -121,7 +121,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
       this.router.navigate(['clients/tracker/' + row.plantaId]);
     } else {
       if (row.ultimaInspeccion > GLOBAL.newReportsDate || row.plantaId === 'egF0cbpXnnBnjcrusoeR') {
-        this.router.navigate(['clients/reports/' + row.plantaId]);
+        this.router.navigate(['clients/fixed/' + row.plantaId]);
       } else {
         this.openSnackBar();
       }

@@ -128,6 +128,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
     // nos desuscribimos de los observables
     this.subscriptions.unsubscribe();
 
+    // reseteamos los servicios relacionados con los informes a sus valores por defecto
     this.resetServices.resetReportsServices();
   }
 }

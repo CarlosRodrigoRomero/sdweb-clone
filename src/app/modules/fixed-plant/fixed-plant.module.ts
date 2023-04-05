@@ -14,15 +14,16 @@ import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module'
 
 import { AnomaliaListContainer } from './containers/anomalia-list-container/anomalia-list-container.component';
 
+import { FixedPlantComponent } from './components/fixed-plant.component';
 import { AnomaliaListComponent } from './components/anomalia-list/anomalia-list.component';
 import { MapComponent } from './components/map/map.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
-
-import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list.directive';
 import { LostDashboardComponent } from './components/lost-dashboard/lost-dashboard.component';
 import { MapTestComponent } from './components/map-test/map-test.component';
+
+import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list.directive';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { MapTestComponent } from './components/map-test/map-test.component';
     DynamicAnomaliaListDirective,
     LostDashboardComponent,
     MapTestComponent,
+    FixedPlantComponent,
   ],
   imports: [
     PlantaFijaRoutingModule,

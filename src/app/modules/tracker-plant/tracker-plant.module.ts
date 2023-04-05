@@ -9,6 +9,7 @@ import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module'
 
 import { SeguidorListContainer } from './containers/seguidor-list-container/seguidor-list-container.component';
 
+import { TrackerPlantComponent } from './components/tracker-plant.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { SeguidorListComponent } from './components/seguidor-list/seguidor-list.component';
 import { MapSeguidoresComponent } from './components/map-seguidores/map-seguidores.component';
@@ -48,6 +49,7 @@ import { DynamicSeguidorListDirective } from './directives/dynamic-seguidor-list
     SeguidorImageOriginComponent,
     SeguidorListComponent,
     DynamicSeguidorListDirective,
+    TrackerPlantComponent,
   ],
   imports: [
     CommonModule,
