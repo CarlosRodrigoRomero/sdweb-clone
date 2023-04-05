@@ -6,21 +6,19 @@
     <mat-icon>keyboard_arrow_down</mat-icon>
   </button>
   <mat-menu class="menu-tipo" #menu="matMenu">
-    <div class="grid">
-      <div>
-        <li mat-menu-item *ngFor="let tipo of tiposElem; index as i" (click)="stopPropagation($event)">
-          <mat-checkbox
-            [checked]="tiposSelected[i]"
-            [id]="'tipo_' + (i + 1)"
-            [name]="tipo.label"
-            (change)="onChangeFiltroTipo($event)"
-          >
-            <span style="font-size: 15px">
-              {{ tipo.label }}
-            </span>
-          </mat-checkbox>
-        </li>
-      </div>
+    <div>
+      <li mat-menu-item *ngFor="let tipo of tiposElem; index as i" (click)="stopPropagation($event)">
+        <mat-checkbox
+          [checked]="tiposSelected[i]"
+          [id]="'tipo_' + (i + 1)"
+          [name]="tipo.label"
+          (change)="onChangeFiltroTipo($event)"
+        >
+          <span style="font-size: 15px">
+            {{ tipo.label }}
+          </span>
+        </mat-checkbox>
+      </li>
     </div>
   </mat-menu>
 </div>

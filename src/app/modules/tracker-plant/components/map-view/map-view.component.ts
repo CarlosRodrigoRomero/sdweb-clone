@@ -146,7 +146,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.seguidorViewService.sidenav = undefined;
 
     // reseteamos los servicios a sus valores por defecto
-    this.resetServices.resetServices();
+    this.resetServices.resetAllServices();
     this.mapSeguidoresService.resetService();
   }
 }

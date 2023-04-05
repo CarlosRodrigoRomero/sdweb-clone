@@ -16,7 +16,7 @@ const routes: Routes = [
         // loadChildren: () =>
         //   import('@modules/map-list-report/map-list-report.module').then((m) => m.MapListReportModule),
         loadChildren: () => import('@modules/fixed-plant/fixed-plant.module').then((m) => m.FixedPlantModule),
-        canActivate: [AuthGuard],
+        // canActivate: [AuthGuard],
       },
       {
         path: 'loss',

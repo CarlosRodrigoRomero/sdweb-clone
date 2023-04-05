@@ -9,3 +9,15 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+
+.share-btn {
+  border-radius: 8px;
+  width: fit-content;
+  align-self: center;
+}
+
+.share-btn-content {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}

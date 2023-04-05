@@ -40,12 +40,12 @@ export const routes: Routes = [
   {
     path: 'fixed-shared',
     component: NavComponent,
-    loadChildren: () => import('@modules/fixed-plant/fixed-plant.module').then((m) => m.FixedPlantModule),
+    loadChildren: () => import('@modules/reports/reports.module').then((m) => m.ReportsModule),
   },
   {
     path: 'fixed-filterable-shared',
     component: NavComponent,
-    loadChildren: () => import('@modules/fixed-plant/fixed-plant.module').then((m) => m.FixedPlantModule),
+    loadChildren: () => import('@modules/reports/reports.module').then((m) => m.ReportsModule),
   },
   {
     path: 'tracker-shared',

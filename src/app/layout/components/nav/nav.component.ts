@@ -17,8 +17,8 @@ export class NavComponent implements OnInit {
   );
 
   id: string;
-  showNavbar = true;
   isPortfolio = false;
+  isShared = false;
 
   constructor(private breakpointObserver: BreakpointObserver, private router: Router) {
     this.router.events.subscribe((event) => {
@@ -27,6 +27,12 @@ export class NavComponent implements OnInit {
           this.isPortfolio = true;
         } else {
           this.isPortfolio = false;
+        }
+
+        if (this.router.url.includes('shared')) {
+          this.isShared = true;
+        } else {
+          this.isShared = false;
         }
       }
     });

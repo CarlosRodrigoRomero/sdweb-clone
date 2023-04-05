@@ -99,6 +99,6 @@ export class StructuresComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
 
     // reseteamos los servicios a sus valores por defecto
-    this.resetServices.resetServices();
+    this.resetServices.resetAllServices();
   }
 }

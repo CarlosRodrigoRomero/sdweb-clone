@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ComponentFactoryResolver } from '@angular/core';
+import { MatSidenav } from '@angular/material/sidenav';
 
 import { Subscription } from 'rxjs';
 
@@ -6,9 +7,8 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { StatsService } from '@data/services/stats.service';
 import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
-import { ResetServices } from '@data/services/reset-services.service';
 import { ViewReportService } from '@data/services/view-report.service';
-import { MatSidenav } from '@angular/material/sidenav';
+import { ResetServices } from '@data/services/reset-services.service';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
 import { DynamicAnomaliaListDirective } from '@modules/fixed-plant/directives/dynamic-anomalia-list.directive';
@@ -52,18 +52,12 @@ export class MapViewComponent implements OnInit, OnDestroy {
     private statsService: StatsService,
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
-    private resetServicesService: ResetServices,
     private viewReportService: ViewReportService,
-    private componentFactoryResolver: ComponentFactoryResolver
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private resetServices: ResetServices
   ) {}
 
   ngOnInit(): void {
-    // this.reportControlService.initService().then((res) => {
-    //   this.anomaliasLoaded = res;
-
-    //   this.numInformes = this.reportControlService.informes.length;
-    // });
-
     this.numInformes = this.reportControlService.informes.length;
 
     this.subscriptions.add(
@@ -134,7 +128,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
     // nos desuscribimos de los observables
     this.subscriptions.unsubscribe();
 
-    // reseteamos los servicios a sus valores por defecto
-    // this.resetServicesService.resetServices();
+    this.resetServices.resetReportsServices();
   }
 }

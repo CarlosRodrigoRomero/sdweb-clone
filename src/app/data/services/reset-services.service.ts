@@ -68,7 +68,7 @@ export class ResetServices {
     private pdfService: PdfService
   ) {}
 
-  resetServices() {
+  resetAllServices() {
     this.reportControlService.resetService();
     this.olMapService.resetService();
     this.thermalService.resetService();
@@ -99,5 +99,9 @@ export class ResetServices {
     this.viewCommentsService.resetService();
     this.zonesCommentControlService.resetService();
     this.pdfService.resetService();
+  }
+
+  resetReportsServices() {
+    this.olMapService.resetService();
   }
 }

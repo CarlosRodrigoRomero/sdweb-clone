@@ -14,7 +14,6 @@ import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { PlantaService } from '@data/services/planta.service';
 import { MapControlService } from '../../services/map-control.service';
-import { FilterService } from '@data/services/filter.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
@@ -61,7 +60,6 @@ export class MapComponent implements OnInit, OnDestroy {
   constructor(
     public mapControlService: MapControlService,
     private plantaService: PlantaService,
-    private filterService: FilterService,
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
     private anomaliasControlService: AnomaliasControlService,
@@ -144,10 +142,6 @@ export class MapComponent implements OnInit, OnDestroy {
       preload: Infinity,
     });
 
-    const osmLayer = new TileLayer({
-      source: new OSM(),
-    });
-
     let aerial;
     // solo lo aplicamos a la planta DEMO
     if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
@@ -167,7 +161,6 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     const layers = [
-      // osmLayer,
       satelliteLayer,
       ...this.aerialLayers,
       ...this.thermalLayers,

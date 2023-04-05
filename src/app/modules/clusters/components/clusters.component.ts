@@ -32,6 +32,6 @@ export class ClustersComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
 
-    this.resetServices.resetServices();
+    this.resetServices.resetAllServices();
   }
 }

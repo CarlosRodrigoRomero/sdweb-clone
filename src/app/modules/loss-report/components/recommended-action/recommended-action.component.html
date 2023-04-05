@@ -1,5 +1,5 @@
 <div class="content">
-  <mat-checkbox class="example-margin">
+  <mat-checkbox (change)="changeState.emit($event.checked)">
     <div class="check-content">
       <div class="content-row">
         <span class="row-title">{{ title }}</span>

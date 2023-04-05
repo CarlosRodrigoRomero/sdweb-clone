@@ -1,17 +1,16 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-recommended-action',
   templateUrl: './recommended-action.component.html',
   styleUrls: ['./recommended-action.component.css'],
 })
-export class RecommendedActionComponent implements OnInit {
+export class RecommendedActionComponent {
   @Input() title: string;
   @Input() cantidad: number;
   @Input() perdidas: number;
   @Input() porcentajeBarra: string;
+  @Output() changeState = new EventEmitter<boolean>();
 
   constructor() {}
-
-  ngOnInit(): void {}
 }

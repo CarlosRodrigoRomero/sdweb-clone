@@ -231,7 +231,7 @@ export class ReportControlService {
         this.sharedReportWithFilters = false;
       }
       // obtenemos el ID de la URL
-      this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+      this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 2];
 
       // iniciamos el servicio share-report
       this.shareReportService.initService(this.sharedId);

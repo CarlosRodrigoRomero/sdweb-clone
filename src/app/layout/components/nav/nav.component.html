@@ -7,12 +7,12 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="(isHandset$ | async) === false"
   >
-    <mat-toolbar *ngIf="showNavbar" class="logo">
+    <mat-toolbar class="logo">
       <app-sd-logo></app-sd-logo>
     </mat-toolbar>
     <mat-nav-list class="list-items">
       <div class="top-items">
-        <a mat-list-item (click)="navigateTo('loss')">
+        <a *ngIf="!isShared" mat-list-item (click)="navigateTo('loss')">
           <!-- <a mat-list-item> -->
           <div class="item-content">
             <mat-icon>dashboard</mat-icon>

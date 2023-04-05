@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, Input, SimpleChanges } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, EventEmitter, Output } from '@angular/core';
 
 import { RecomendedAction } from '@core/models/recomendedAction';
 
@@ -10,14 +10,9 @@ import { RecomendedAction } from '@core/models/recomendedAction';
 })
 export class RecommendedActionsComponent {
   @Input() recomendedActions: RecomendedAction[];
+  @Output() changeRecommendedActions = new EventEmitter<RecomendedAction[]>();
 
   constructor() {}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes) {
-      console.log(changes);
-    }
-  }
 
   fixableFilter(actions: RecomendedAction[]): RecomendedAction[] {
     return actions.filter((action) => action.fixable);
@@ -25,5 +20,9 @@ export class RecommendedActionsComponent {
 
   notFixableFilter(actions: RecomendedAction[]): RecomendedAction[] {
     return actions.filter((action) => !action.fixable);
+  }
+
+  emitChangedActions() {
+    this.changeRecommendedActions.emit(this.recomendedActions);
   }
 }

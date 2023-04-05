@@ -26,6 +26,6 @@ export class MapListContentComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
 
     // reseteamos los servicios a sus valores por defecto
-    this.resetServicesService.resetServices();
+    this.resetServicesService.resetAllServices();
   }
 }

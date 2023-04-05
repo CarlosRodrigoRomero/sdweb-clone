@@ -15,7 +15,14 @@
             [cantidad]="action.quantity"
             [perdidas]="action.loss"
             [porcentajeBarra]="action.barPercentage"
+            (changeState)="action.active = $event; emitChangedActions()"
           ></app-recommended-action>
+          <button class="share-btn" mat-flat-button color="primary">
+            <div class="share-btn-content">
+              <mat-icon>share</mat-icon>
+              <span>Compartir seleccionadas</span>
+            </div>
+          </button>
         </div>
       </mat-expansion-panel>
       <mat-expansion-panel>
@@ -29,7 +36,14 @@
             [cantidad]="action.quantity"
             [perdidas]="action.loss"
             [porcentajeBarra]="action.barPercentage"
+            (changeState)="action.active = $event; emitChangedActions()"
           ></app-recommended-action>
+          <button class="share-btn" mat-flat-button color="primary">
+            <div class="share-btn-content">
+              <mat-icon>share</mat-icon>
+              <span>Compartir seleccionadas</span>
+            </div>
+          </button>
         </div>
       </mat-expansion-panel>
     </mat-accordion>
