@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { AngularFirestore } from '@angular/fire/firestore';
 
 import { AnomaliaService } from './anomalia.service';
+import { FilterControlService } from './filter-control.service';
 
 import { FilterInterface } from '@core/models/filter';
 import { GradientFilter } from '@core/models/gradientFilter';
@@ -28,7 +29,11 @@ export class ShareReportService {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private afs: AngularFirestore, private anomaliaService: AnomaliaService) {}
+  constructor(
+    private afs: AngularFirestore,
+    private anomaliaService: AnomaliaService,
+    private filterControlService: FilterControlService
+  ) {}
 
   initService(id: string) {
     this.subscriptions.add(
@@ -303,7 +308,6 @@ export class ShareReportService {
               this.params.criticidad.forEach((crit, index) => {
                 if (crit) {
                   const criticidadFilter = new CriticidadFilter(index.toString(), 'criticidad', index);
-
                   filters.push(criticidadFilter);
                 }
               });
@@ -317,12 +321,17 @@ export class ShareReportService {
           }
           if (Object.keys(this.params).includes('tipo')) {
             if (this.params.tipo !== null) {
+              let tiposSelected = this.filterControlService.tiposSelected;
               this.params.tipo.forEach((tipo, index, tipos) => {
                 if (tipo !== undefined && tipo !== null) {
-                  const tipoFilter = new TipoElemFilter('', 'tipo', tipo, tipos.length, index);
+                  const tipoFilter = new TipoElemFilter(`tipo_${tipo}`, 'tipo', tipo, tipos.length, index);
                   filters.push(tipoFilter);
+
+                  tiposSelected[tipo] = true;
                 }
               });
+
+              this.filterControlService.tiposSelected = tiposSelected;
             }
           }
           if (Object.keys(this.params).includes('zona')) {
