@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { FilterService } from '@data/services/filter.service';
@@ -9,19 +10,22 @@ import { FilterControlService } from '@data/services/filter-control.service';
 
 import { RecomendedAction } from '@core/models/recomendedAction';
 import { Anomalia } from '@core/models/anomalia';
-import { GLOBAL } from '@data/constants/global';
 import { Seguidor } from '@core/models/seguidor';
 import { FilterInterface } from '@core/models/filter';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
+import { InformeInterface } from '@core/models/informe';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-recommended-actions-container',
   templateUrl: './recommended-actions-container.component.html',
   styleUrls: ['./recommended-actions-container.component.css'],
 })
-export class RecommendedActionsContainerComponent implements OnInit {
+export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
   recomendedActions: RecomendedAction[] = [];
   tipos: number[];
+  private selectedReport: InformeInterface;
 
   private subcriptions = new Subscription();
 
@@ -34,18 +38,26 @@ export class RecommendedActionsContainerComponent implements OnInit {
 
   ngOnInit(): void {
     this.subcriptions.add(
-      this.filterService.filteredElements$.subscribe((elems) => {
-        let anomalias: Anomalia[] = [];
-        if (this.reportControlService.plantaFija) {
-          anomalias = elems as Anomalia[];
-        } else {
-          elems.forEach((elem) => {
-            anomalias = anomalias.concat((elem as Seguidor).anomaliasCliente);
-          });
-        }
+      this.reportControlService.selectedInformeId$
+        .pipe(
+          switchMap((id) => {
+            this.selectedReport = this.reportControlService.informes.find((informe) => informe.id === id);
 
-        this.recomendedActions = this.calculateRecomendedActions(anomalias).sort((a, b) => b.loss - a.loss);
-      })
+            return this.filterService.filteredElements$;
+          })
+        )
+        .subscribe((elems) => {
+          let anomalias: Anomalia[] = [];
+          if (this.reportControlService.plantaFija) {
+            anomalias = elems as Anomalia[];
+          } else {
+            elems.forEach((elem) => {
+              anomalias = anomalias.concat((elem as Seguidor).anomaliasCliente);
+            });
+          }
+
+          this.recomendedActions = this.calculateRecomendedActions(anomalias).sort((a, b) => b.loss - a.loss);
+        })
     );
   }
 
@@ -64,7 +76,7 @@ export class RecommendedActionsContainerComponent implements OnInit {
         types.push(index);
         titles.push(label);
         quantities.push(quantity);
-        losses.push(Number((quantity * GLOBAL.pcPerdidas[index]).toFixed(2)));
+        losses.push(Number(this.getTypeLosses(quantity, index).toFixed(2)));
       }
     });
 
@@ -85,6 +97,14 @@ export class RecommendedActionsContainerComponent implements OnInit {
     });
 
     return recomendedActions;
+  }
+
+  private getTypeLosses(quantity: number, index: number): number {
+    const totalLoss = quantity * GLOBAL.pcPerdidas[index];
+
+    const lossPercentage = totalLoss / this.selectedReport.numeroModulos;
+
+    return lossPercentage * this.reportControlService.planta.potencia;
   }
 
   changeActions(event: any) {
@@ -135,5 +155,9 @@ export class RecommendedActionsContainerComponent implements OnInit {
     const url = this.router.url.split('/');
     url[url.length - 1] = 'map';
     this.router.navigate(url);
+  }
+
+  ngOnDestroy() {
+    this.subcriptions.unsubscribe();
   }
 }
