@@ -174,11 +174,14 @@ export class ReportControlService {
                 } else {
                   this.allFilterableElements = elems;
 
-                  (this.allFilterableElements as Seguidor[]).forEach((seg) => {
+                  const seguidores = this.allFilterableElements as Seguidor[];
+                  seguidores.forEach((seg) => {
                     if (seg.anomaliasCliente.length > 0) {
                       this.allAnomalias.push(...seg.anomaliasCliente);
                     }
                   });
+
+                  this.setNumberOfModules(seguidores);
                 }
 
                 return this.comentariosService.getComentariosInformes(this.informes);
@@ -412,6 +415,14 @@ export class ReportControlService {
     const loss = this.getLossReport(fixedAnomalias, informe);
 
     return loss;
+  }
+
+  private setNumberOfModules(seguidores: Seguidor[]) {
+    this.informes.map((informe) => {
+      const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
+
+      informe.numeroModulos = seguidoresInforme.length * this.planta.filas * this.planta.columnas;
+    });
   }
 
   private checkCCInformes(elems: FilterableElement[]): void {
