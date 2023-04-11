@@ -358,15 +358,27 @@ export class ReportControlService {
   }
 
   setMaeInformeSeguidores(seguidores: Seguidor[], informe: InformeInterface) {
+    const mae = this.getMaeInformeSeguidores(seguidores, informe);
+
+    this.informeService.updateInformeField(informe.id, 'mae', mae);
+  }
+
+  getMaeInformeSeguidores(seguidores: Seguidor[], informe: InformeInterface): number {
     const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
     let mae = 0;
     seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
     mae = mae / seguidoresInforme.length;
 
-    this.informeService.updateInformeField(informe.id, 'mae', mae);
+    return mae;
   }
 
   setMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
+    const mae = this.getMaeInformeFija(anomalias, informe);
+
+    this.informeService.updateInformeField(informe.id, 'mae', mae);
+  }
+
+  getMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface): number {
     const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
     let mae = 0;
     if (anomaliasInforme.length > 0) {
@@ -377,7 +389,29 @@ export class ReportControlService {
       mae = perdidasTotales / informe.numeroModulos;
     }
 
-    this.informeService.updateInformeField(informe.id, 'mae', mae);
+    return mae;
+  }
+
+  getLossReport(anomalias: Anomalia[], informe: InformeInterface): number {
+    const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+    let loss = 0;
+    if (anomaliasInforme.length > 0) {
+      const perdidas = anomaliasInforme.map((anom) => anom.perdidas);
+      let totalLoss = 0;
+      perdidas.forEach((perd) => (totalLoss += perd));
+
+      loss = totalLoss / informe.numeroModulos;
+    }
+
+    return loss;
+  }
+
+  getFixedLossReport(anomalias: Anomalia[], informe: InformeInterface): number {
+    const fixedAnomalias = anomalias.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+
+    const loss = this.getLossReport(fixedAnomalias, informe);
+
+    return loss;
   }
 
   private checkCCInformes(elems: FilterableElement[]): void {

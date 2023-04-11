@@ -1,0 +1,24 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Pérdidas totales</mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="card-content">
+    <div class="data">
+      <span class="data-title">Totales</span>
+      <span class="data-value">{{ totalLoss | number : '1.0-2' }} MW</span>
+      <span class="data-secondary-value">{{ totalLossPercentage * 100 | number : '1.0-2' }}%</span>
+    </div>
+    <div class="row">
+      <div class="data">
+        <span class="data-title">Reparables</span>
+        <span class="data-value">{{ totalFixedLoss | number : '1.0-2' }} MW</span>
+        <span class="data-secondary-value">{{ totalFixedLossPercentage * 100 | number : '1.0-2' }}%</span>
+      </div>
+      <div class="data">
+        <span class="data-title">No reparables</span>
+        <span class="data-value">{{ totalNotFixedLoss | number : '1.0-2' }} MW</span>
+        <span class="data-secondary-value">{{ totalNotFixedLossPercentage * 100 | number : '1.0-2' }}%</span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
