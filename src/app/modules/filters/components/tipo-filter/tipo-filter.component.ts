@@ -20,6 +20,7 @@ import { COLOR } from '@data/constants/color';
 import { GLOBAL } from '@data/constants/global';
 
 export interface LabelTipo {
+  tipo: number;
   label?: string;
   count?: number;
   completed?: boolean;
@@ -90,7 +91,7 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
           // obtenermos los labels de todas las anomalias
           this._getAllCategorias(anomalias);
           this.labelsCategoria.forEach((label, i) => {
-            this.tiposElem.push({ label, color: this.coloresCategoria[i] });
+            this.tiposElem.push({ tipo: GLOBAL.labels_tipos.indexOf(label), label, color: this.coloresCategoria[i] });
 
             this.tiposSelected.push(false);
           });
@@ -129,11 +130,11 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
         'tipo',
         GLOBAL.labels_tipos.indexOf(event.source.name),
         this.tiposElem.length,
-        parseInt(event.source.id.replace('tipo_', '')) - 1
+        Number(event.source.id.replace('tipo_', ''))
       );
       this.filterService.addFilter(this.filtroTipo);
 
-      this.filterControlService.tiposSelected[parseInt(event.source.id.replace('tipo_', '')) - 1] = true;
+      this.filterControlService.tiposSelected[Number(event.source.id.replace('tipo_', ''))] = true;
 
       // añadimos el tipo seleccionado a la variable
       if (this.selectedLabels[0] !== this.defaultSelectLabel) {
@@ -153,7 +154,7 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
           })
       );
 
-      this.filterControlService.tiposSelected[parseInt(event.source.id.replace('tipo_', '')) - 1] = false;
+      this.filterControlService.tiposSelected[Number(event.source.id.replace('tipo_', ''))] = false;
 
       // eliminamos el 'tipo' de seleccionados
       this.selectedLabels = this.selectedLabels.filter((sel) => sel !== event.source.name);

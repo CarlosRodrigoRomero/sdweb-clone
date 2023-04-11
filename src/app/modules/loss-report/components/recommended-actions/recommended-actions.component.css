@@ -1,7 +1,7 @@
-.content {
-  width: 100%;
-  height: fit-content;
-  background-color: green;
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .panel-content {
@@ -10,13 +10,13 @@
   gap: 0.5rem;
 }
 
-.share-btn {
+.btn {
   border-radius: 8px;
   width: fit-content;
   align-self: center;
 }
 
-.share-btn-content {
+.btn-content {
   display: flex;
   gap: 0.5rem;
   align-items: center;

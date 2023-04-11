@@ -7,15 +7,16 @@
   </button>
   <mat-menu class="menu-tipo" #menu="matMenu">
     <div>
-      <li mat-menu-item *ngFor="let tipo of tiposElem; index as i" (click)="stopPropagation($event)">
+      <li mat-menu-item *ngFor="let tipoElem of tiposElem; index as i" (click)="stopPropagation($event)">
         <mat-checkbox
-          [checked]="tiposSelected[i]"
-          [id]="'tipo_' + (i + 1)"
-          [name]="tipo.label"
+          [checked]="tiposSelected[tipoElem.tipo]"
+          [id]="'tipo_' + tipoElem.tipo"
+          [name]="tipoElem.label"
+          [tipo]="tipoElem.tipo"
           (change)="onChangeFiltroTipo($event)"
         >
           <span style="font-size: 15px">
-            {{ tipo.label }}
+            {{ tipoElem.label }}
           </span>
         </mat-checkbox>
       </li>

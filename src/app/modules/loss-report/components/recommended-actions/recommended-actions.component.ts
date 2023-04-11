@@ -15,6 +15,7 @@ export class RecommendedActionsComponent {
   @Input() recomendedActions: RecomendedAction[];
   @Input() tipos: number[];
   @Output() changeRecommendedActions = new EventEmitter<RecomendedAction[]>();
+  @Output() navigateToMapFiltered = new EventEmitter();
 
   constructor(public dialog: MatDialog) {}
 
@@ -37,4 +38,6 @@ export class RecommendedActionsComponent {
       },
     });
   }
+
+  createFilters() {}
 }

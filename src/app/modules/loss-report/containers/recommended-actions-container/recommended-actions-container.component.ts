@@ -1,14 +1,18 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { FilterService } from '@data/services/filter.service';
+import { FilterControlService } from '@data/services/filter-control.service';
 
 import { RecomendedAction } from '@core/models/recomendedAction';
 import { Anomalia } from '@core/models/anomalia';
 import { GLOBAL } from '@data/constants/global';
 import { Seguidor } from '@core/models/seguidor';
+import { FilterInterface } from '@core/models/filter';
+import { TipoElemFilter } from '@core/models/tipoPcFilter';
 
 @Component({
   selector: 'app-recommended-actions-container',
@@ -21,7 +25,12 @@ export class RecommendedActionsContainerComponent implements OnInit {
 
   private subcriptions = new Subscription();
 
-  constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
+  constructor(
+    private filterService: FilterService,
+    private reportControlService: ReportControlService,
+    private router: Router,
+    private filterControlService: FilterControlService
+  ) {}
 
   ngOnInit(): void {
     this.subcriptions.add(
@@ -97,5 +106,34 @@ export class RecommendedActionsContainerComponent implements OnInit {
         this.tipos[index] = null;
       }
     });
+  }
+
+  navigateToMapFiltered() {
+    this.createTipoFilters();
+
+    this.navigateToMap();
+  }
+
+  private createTipoFilters() {
+    const filters: FilterInterface[] = [];
+    let tiposSelected = new Array(GLOBAL.labels_tipos.length).fill(false);
+    this.tipos.forEach((tipo, index, tipos) => {
+      if (tipo !== null) {
+        const filter = new TipoElemFilter(`tipo_${tipo}`, 'tipo', tipo, tipos.length, index);
+        filters.push(filter);
+
+        // marcamos para que se active el filtro en el mapa
+        tiposSelected[tipo] = true;
+      }
+    });
+    this.filterService.addFilters(filters);
+
+    this.filterControlService.tiposSelected = tiposSelected;
+  }
+
+  private navigateToMap() {
+    const url = this.router.url.split('/');
+    url[url.length - 1] = 'map';
+    this.router.navigate(url);
   }
 }
