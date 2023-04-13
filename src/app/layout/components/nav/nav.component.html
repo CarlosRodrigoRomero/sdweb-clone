@@ -12,13 +12,12 @@
     </mat-toolbar>
     <mat-nav-list class="list-items">
       <div class="top-items">
-        <a *ngIf="!isShared" mat-list-item (click)="navigateTo('loss')">
-          <!-- <a mat-list-item> -->
+        <!-- <a *ngIf="!isShared" mat-list-item (click)="navigateTo('loss')">
           <div class="item-content">
             <mat-icon>dashboard</mat-icon>
             <span>Pérdidas</span>
           </div>
-        </a>
+        </a> -->
         <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('map')">
           <!-- <a *ngIf="!isPortfolio" mat-list-item> -->
           <div class="item-content">
@@ -39,6 +38,12 @@
             <span>Gráficos</span>
           </div>
         </a> -->
+        <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('prediction')">
+          <div class="item-content">
+            <mat-icon>insights</mat-icon>
+            <span>Predicción</span>
+          </div>
+        </a>
       </div>
       <div class="bottom-items">
         <app-switch-theme></app-switch-theme>

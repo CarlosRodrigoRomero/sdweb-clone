@@ -23,6 +23,12 @@ const routes: Routes = [
         loadChildren: () => import('@modules/loss-report/loss-report.module').then((m) => m.LossReportModule),
         canActivate: [AuthGuard],
       },
+      {
+        path: 'prediction',
+        loadChildren: () =>
+          import('@modules/prediction-report/prediction-report.module').then((m) => m.PredictionReportModule),
+        canActivate: [AuthGuard],
+      },
     ],
   },
 ];
