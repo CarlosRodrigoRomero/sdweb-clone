@@ -75,3 +75,12 @@ h4 {
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+.sorted-column-header {
+  font-size: 14px;
+  color: aqua;
+}
+
+.sorted-column-row {
+  color: aqua;
+}

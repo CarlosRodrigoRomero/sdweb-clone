@@ -46,6 +46,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   public dataSource = new MatTableDataSource<PlantsData>();
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
+  sortedColumn = 'mae';
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -167,5 +168,9 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
   unhoverPlanta(row) {
     this.portfolioControlService.plantaHovered = undefined;
+  }
+
+  selectSortColumn(column: string) {
+    this.sortedColumn = column;
   }
 }
