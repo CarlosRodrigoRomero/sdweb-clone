@@ -217,6 +217,9 @@ export class ReportControlService {
               this.checkMaeInformes(this.allFilterableElements);
               this.checkCCInformes(this.allFilterableElements);
 
+              // calculamos la Potencia reparable de los informes si no tuviesen
+              this.checkFixedPowerLossInformes();
+
               // iniciamos filter service
               this.filterService.initService(this.allFilterableElements).then((filtersInit) => {
                 // enviamos respuesta de servicio iniciado
@@ -395,6 +398,20 @@ export class ReportControlService {
     return mae;
   }
 
+  private checkFixedPowerLossInformes(): void {
+    if (this.allAnomalias.length > 0) {
+      this.informes.forEach((informe) => {
+        if (this.checkIfNumberValueWrong(informe.fixedPowerLoss)) {
+          const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informe.id);
+
+          const fixedLossReport = this.getFixedLossReport(anomaliasInforme, informe);
+
+          this.setFixedLossReport(fixedLossReport, informe.id);
+        }
+      });
+    }
+  }
+
   getLossReport(anomalias: Anomalia[], informe: InformeInterface): number {
     const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
     let loss = 0;
@@ -415,6 +432,10 @@ export class ReportControlService {
     const loss = this.getLossReport(fixedAnomalias, informe);
 
     return loss;
+  }
+
+  setFixedLossReport(fixedLossReport: number, informeId: string) {
+    this.informeService.updateInformeField(informeId, 'fixedPowerLoss', fixedLossReport);
   }
 
   private setNumberOfModules(seguidores: Seguidor[]) {

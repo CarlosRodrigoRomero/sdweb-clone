@@ -45,6 +45,12 @@
             <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.powerLoss | number : '1.2-2' }}</td>
           </ng-container>
 
+          <!-- Potencia reparable -->
+          <ng-container matColumnDef="fixedPowerLoss">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia reparable (MW)</th>
+            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.fixedPowerLoss | number : '1.2-2' }}</td>
+          </ng-container>
+
           <!-- Tipo -->
           <ng-container matColumnDef="tipo">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>

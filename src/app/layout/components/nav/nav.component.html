@@ -12,12 +12,12 @@
     </mat-toolbar>
     <mat-nav-list class="list-items">
       <div class="top-items">
-        <!-- <a *ngIf="!isShared" mat-list-item (click)="navigateTo('loss')">
+        <a *ngIf="!isShared" mat-list-item (click)="navigateTo('loss')">
           <div class="item-content">
             <mat-icon>dashboard</mat-icon>
             <span>Pérdidas</span>
           </div>
-        </a> -->
+        </a>
         <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('map')">
           <!-- <a *ngIf="!isPortfolio" mat-list-item> -->
           <div class="item-content">
