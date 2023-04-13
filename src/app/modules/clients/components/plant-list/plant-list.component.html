@@ -29,14 +29,20 @@
 
           <!-- Potencia -->
           <ng-container matColumnDef="potencia">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia</th>
-            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.potencia | number: '1.2-2' }} MW</td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia (MW)</th>
+            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.potencia | number : '1.2-2' }}</td>
           </ng-container>
 
           <!-- MAE -->
           <ng-container matColumnDef="mae">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>MAE</th>
-            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.mae * 100 | number: '1.2-2' }}%</td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>MAE (%)</th>
+            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.mae * 100 | number : '1.2-2' }}</td>
+          </ng-container>
+
+          <!-- Pérdidad potencia -->
+          <ng-container matColumnDef="powerLoss">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Pérdidas de potencia (MW)</th>
+            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.powerLoss | number : '1.2-2' }}</td>
           </ng-container>
 
           <!-- Tipo -->
@@ -49,7 +55,7 @@
           <ng-container matColumnDef="ultimaInspeccion">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Última inspección</th>
             <td mat-cell (click)="onClick(row)" *matCellDef="let row">
-              {{ row.ultimaInspeccion * 1000 | date: 'dd/MM/yyyy' }}
+              {{ row.ultimaInspeccion * 1000 | date : 'dd/MM/yyyy' }}
             </td>
           </ng-container>
 
@@ -67,7 +73,7 @@
               </button>
               <mat-menu #menu="matMenu" class="menu">
                 <button mat-menu-item *ngFor="let item of row.informesAntiguos">
-                  <span (click)="navigateOldReport(item.id)">{{ item.fecha * 1000 | date: 'dd/MM/yyyy' }}</span>
+                  <span (click)="navigateOldReport(item.id)">{{ item.fecha * 1000 | date : 'dd/MM/yyyy' }}</span>
                 </button>
               </mat-menu>
             </td>

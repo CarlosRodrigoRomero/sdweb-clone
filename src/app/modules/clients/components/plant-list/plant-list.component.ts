@@ -17,6 +17,7 @@ interface PlantsData {
   nombre: string;
   potencia: number;
   mae: number;
+  powerLoss: number;
   ultimaInspeccion: number;
   informesAntiguos: InformeInterface[];
   plantaId: string;
@@ -35,6 +36,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     'nombre',
     'potencia',
     'mae',
+    'powerLoss',
     'tipo',
     'ultimaInspeccion',
     'inspeccionesAntiguas',
@@ -72,6 +74,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
         nombre: planta.nombre,
         potencia: planta.potencia,
         mae: informeReciente.mae,
+        powerLoss: planta.potencia * informeReciente.mae,
         ultimaInspeccion: informeReciente.fecha,
         informesAntiguos,
         plantaId: planta.id,
