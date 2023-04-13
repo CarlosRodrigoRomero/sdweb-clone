@@ -1,21 +1,25 @@
-import { Component, AfterViewInit } from '@angular/core';
-import { GLOBAL } from '@data/constants/global';
-declare let google;
+import { AfterViewInit, Component, OnInit } from '@angular/core';
+
+declare let google: any;
 
 @Component({
-  selector: 'app-chart-sankey',
-  templateUrl: './chart-sankey.component.html',
-  styleUrls: ['./chart-sankey.component.css'],
+  selector: 'app-chart-sankey-report',
+  templateUrl: './chart-sankey-report.component.html',
+  styleUrls: ['./chart-sankey-report.component.css'],
 })
-export class ChartSankeyComponent implements AfterViewInit {
+export class ChartSankeyReportComponent implements OnInit, AfterViewInit {
+  labels = ['2023', '2024'];
+
   constructor() {}
+
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     // this.drawChart();
     google.charts.load('current', { packages: ['sankey'] });
     google.charts.setOnLoadCallback(this.drawChart);
   }
-  
+
   drawChart() {
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'From');
@@ -83,7 +87,7 @@ export class ChartSankeyComponent implements AfterViewInit {
           nodePadding: 60,
           width: 10,
           colors: colors_nodes,
-          label: { fontSize: 14, color: '#000', bold: false, italic: false },
+          label: { fontSize: 14, color: '#fff', bold: false, italic: false },
         },
         link: {
           color: {
@@ -96,10 +100,12 @@ export class ChartSankeyComponent implements AfterViewInit {
           colorMode: 'gradient',
         },
       },
+      hAxis: { title: 'Años' },
+      vAxis: { title: 'Años' },
     };
 
     // Instantiates and draws our chart, passing in some options.
-    var chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
+    var chart = new google.visualization.Sankey(document.getElementById('sankey'));
     chart.draw(data, options);
   }
 }

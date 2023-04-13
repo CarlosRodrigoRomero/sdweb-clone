@@ -1,0 +1,11 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Predicción evolución anomalías</mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="card-content">
+    <div class="text-center" id="sankey"></div>
+    <div class="x-axis">
+      <span class="label" *ngFor="let label of labels">{{ label }}</span>
+    </div>
+  </mat-card-content>
+</mat-card>
