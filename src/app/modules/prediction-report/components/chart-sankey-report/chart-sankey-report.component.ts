@@ -15,7 +15,6 @@ export class ChartSankeyReportComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {}
 
   ngAfterViewInit(): void {
-    // this.drawChart();
     google.charts.load('current', { packages: ['sankey'] });
     google.charts.setOnLoadCallback(this.drawChart);
   }
