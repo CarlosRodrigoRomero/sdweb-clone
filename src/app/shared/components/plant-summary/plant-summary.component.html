@@ -2,7 +2,7 @@
   <div class="grupo1">
     <!-- <mat-icon color="primary">home</mat-icon> -->
     <span class="titulo">{{ nombrePlanta }}</span>
-    <span class="subtitulo">({{ potenciaPlanta | number : '1.0-2' }} MW / {{ tipoPlanta }})</span>
+    <span class="subtitulo">({{ potenciaPlanta | number : '1.0-2' }} MW)</span>
     <span class="fecha">{{ fechaSelectedInforme }}</span>
   </div>
   <div class="grupo2" [matMenuTriggerFor]="menu" matTooltip="Datos del vuelo" matTooltipClass="tooltip-style">
@@ -67,14 +67,29 @@
     <div class="elemento">
       <mat-icon
         class="help"
+        matTooltip="Módulos Apagados Equivalentes. Cada anomalía térmica detectada tiene una pérdida de energía asociada. El MAE cuantifica la suma de estas pérdidas acumuladas en la planta"
+        matTooltipClass="tooltip-style"
+        >help</mat-icon
+      >
+      <span class="titulo">Potencia reparable</span>
+      <span class="valor-mae"
+        >{{ informe.fixedPowerLoss * planta.potencia | number : '1.0-2' }} MW ({{
+          (informe.fixedPowerLoss / informe.mae) * 100 | number : '1.0-2'
+        }}%)</span
+      >
+      <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->
+    </div>
+    <!-- <div class="elemento">
+      <mat-icon
+        class="help"
         matTooltip="Porcentaje de módulos que tienen células calientes en la planta"
         matTooltipClass="tooltip-style"
         >help</mat-icon
       >
       <span class="titulo">CC</span>
       <span class="valor-cc">{{ informe.cc * 100 | number : '1.0-2' }}%</span>
-      <!-- <mat-icon *ngIf="informe.cc < 3" class="success">arrow_circle_down</mat-icon> -->
-    </div>
+      <mat-icon *ngIf="informe.cc < 3" class="success">arrow_circle_down</mat-icon>
+    </div> -->
     <div class="elemento">
       <mat-icon class="help" matTooltip="Nº total de anomalías del informe seleccionado" matTooltipClass="tooltip-style"
         >help</mat-icon

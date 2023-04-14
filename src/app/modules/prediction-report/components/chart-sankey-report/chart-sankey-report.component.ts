@@ -8,7 +8,7 @@ declare let google: any;
   styleUrls: ['./chart-sankey-report.component.css'],
 })
 export class ChartSankeyReportComponent implements OnInit, AfterViewInit {
-  labels = ['2023', '2024'];
+  labels = ['Actual', 'Próximo año'];
 
   constructor() {}
 
@@ -100,8 +100,6 @@ export class ChartSankeyReportComponent implements OnInit, AfterViewInit {
           colorMode: 'gradient',
         },
       },
-      hAxis: { title: 'Años' },
-      vAxis: { title: 'Años' },
     };
 
     // Instantiates and draws our chart, passing in some options.

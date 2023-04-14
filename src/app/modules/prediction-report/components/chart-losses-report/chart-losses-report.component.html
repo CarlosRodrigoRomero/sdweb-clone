@@ -1,0 +1,19 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Predicción evolución de pérdidas</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div id="chart">
+      <apx-chart
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [dataLabels]="chartOptions.dataLabels"
+        [plotOptions]="chartOptions.plotOptions"
+        [responsive]="chartOptions.responsive"
+        [xaxis]="chartOptions.xaxis"
+        [legend]="chartOptions.legend"
+        [fill]="chartOptions.fill"
+      ></apx-chart>
+    </div>
+  </mat-card-content>
+</mat-card>

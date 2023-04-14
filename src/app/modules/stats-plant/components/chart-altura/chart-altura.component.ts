@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
 import { Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 
 import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAxis, ApexTooltip } from 'ng-apexcharts';
 
@@ -14,7 +15,6 @@ import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
 
 import { COLOR } from '@data/constants/color';
-import { switchMap, take } from 'rxjs/operators';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
