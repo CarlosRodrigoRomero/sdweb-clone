@@ -8,34 +8,24 @@
         <mat-expansion-panel-header>
           <mat-panel-title> Anomalías reparables </mat-panel-title>
         </mat-expansion-panel-header>
-        <div class="panel-content">
-          <app-recommended-action
-            *ngFor="let action of fixableFilter(recomendedActions)"
-            [title]="action.title"
-            [cantidad]="action.quantity"
-            [perdidas]="action.loss"
-            [porcentajeBarra]="action.barPercentage"
-            (changeState)="action.active = $event; emitChangedActions()"
-          ></app-recommended-action>
-        </div>
+        <app-recommended-actions
+          [recomendedActions]="fixableFilter(recomendedActions)"
+          (changeRecommendedActions)="changeRecommendedActions.emit($event)"
+        ></app-recommended-actions>
       </mat-expansion-panel>
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title> Anomalías no reparables </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="panel-content">
-          <app-recommended-action
-            *ngFor="let action of notFixableFilter(recomendedActions)"
-            [title]="action.title"
-            [cantidad]="action.quantity"
-            [perdidas]="action.loss"
-            [porcentajeBarra]="action.barPercentage"
-            (changeState)="action.active = $event; emitChangedActions()"
-          ></app-recommended-action>
+          <app-recommended-actions
+            [recomendedActions]="notFixableFilter(recomendedActions)"
+            (changeRecommendedActions)="changeRecommendedActions.emit($event)"
+          ></app-recommended-actions>
         </div>
       </mat-expansion-panel>
     </mat-accordion>
-    <button class="btn" mat-flat-button color="primary" (click)="navigateToMapFiltered.emit()">
+    <button class="btn" mat-flat-button color="primary" (click)="navigateToMapFiltered()">
       <div class="btn-content">
         <mat-icon>map</mat-icon>
         <span>Ver seleccionadas en el mapa</span>

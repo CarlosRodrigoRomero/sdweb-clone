@@ -5,14 +5,19 @@ import { LossReportRoutingModule } from './loss-report-routing.module';
 import { SharedModule } from '@shared/shared.module';
 
 import { LossReportComponent } from './components/loss-report.component';
-import { RecommendedActionsComponent } from './components/recommended-actions/recommended-actions.component';
-import { RecommendedActionComponent } from './components/recommended-action/recommended-action.component';
+import { LossesRecommendedActionsComponent } from './components/losses-recommended-actions/losses-recommended-actions.component';
 import { RecommendedActionsContainerComponent } from './containers/recommended-actions-container/recommended-actions-container.component';
 import { TotalLossComponent } from './components/total-loss/total-loss.component';
 import { TotalLossContainerComponent } from './containers/total-loss-container/total-loss-container.component';
 
 @NgModule({
-  declarations: [LossReportComponent, RecommendedActionsComponent, RecommendedActionComponent, RecommendedActionsContainerComponent, TotalLossComponent, TotalLossContainerComponent],
+  declarations: [
+    LossReportComponent,
+    LossesRecommendedActionsComponent,
+    RecommendedActionsContainerComponent,
+    TotalLossComponent,
+    TotalLossContainerComponent,
+  ],
   imports: [CommonModule, LossReportRoutingModule, SharedModule],
 })
 export class LossReportModule {}

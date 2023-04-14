@@ -29,6 +29,8 @@ import { SimplePlantSummaryComponent } from './components/simple-plant-summary/s
 import { SwitchThemeComponent } from './components/switch-theme/switch-theme.component';
 import { SdLogoComponent } from './components/sd-logo/sd-logo.component';
 import { SdCompleteLogoComponent } from './components/sd-complete-logo/sd-complete-logo.component';
+import { RecommendedActionComponent } from './components/recommended-action/recommended-action.component';
+import { RecommendedActionsComponent } from './components/recommended-actions/recommended-actions.component';
 
 const components = [
   SpinnerComponent,
@@ -44,6 +46,8 @@ const components = [
   SwitchThemeComponent,
   SdLogoComponent,
   SdCompleteLogoComponent,
+  RecommendedActionComponent,
+  RecommendedActionsComponent,
 ];
 const modules = [
   CommonModule,
