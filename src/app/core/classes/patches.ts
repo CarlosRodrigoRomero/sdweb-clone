@@ -112,6 +112,11 @@ export class Patches {
       tempMin = 30;
       tempMax = 60;
     }
+    // LAS POSADAS ABRIL 2023
+    if (informeId === 'VFeI8XgOViD4N5aN4uac') {
+      tempMin = 15;
+      tempMax = 60;
+    }
 
     return [tempMin, tempMax];
   }
