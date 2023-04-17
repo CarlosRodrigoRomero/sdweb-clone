@@ -14,6 +14,7 @@ import {
   ApexLegend,
   ApexFill,
   ApexTooltip,
+  ApexStroke,
 } from 'ng-apexcharts';
 
 import { ThemeService } from '@data/services/theme.service';
@@ -27,15 +28,16 @@ export type ChartOptions = {
   xaxis: ApexXAxis;
   legend: ApexLegend;
   fill: ApexFill;
+  stroke: ApexStroke;
   tooltip: ApexTooltip;
 };
 
 @Component({
-  selector: 'app-chart-losses-report',
-  templateUrl: './chart-losses-report.component.html',
-  styleUrls: ['./chart-losses-report.component.css'],
+  selector: 'app-chart-mae-report',
+  templateUrl: './chart-mae-report.component.html',
+  styleUrls: ['./chart-mae-report.component.css'],
 })
-export class ChartLossesReportComponent implements OnInit, OnDestroy {
+export class ChartMaeReportComponent implements OnInit, OnDestroy {
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
 
@@ -49,11 +51,13 @@ export class ChartLossesReportComponent implements OnInit, OnDestroy {
         series: [
           {
             name: 'Reparables',
-            data: [44, 55],
+            type: 'column',
+            data: [0.2, 0.25],
           },
           {
             name: 'No reparables',
-            data: [13, 23],
+            type: 'column',
+            data: [0.1, 0.15],
           },
         ],
         chart: {
@@ -83,8 +87,22 @@ export class ChartLossesReportComponent implements OnInit, OnDestroy {
         plotOptions: {
           bar: {
             horizontal: false,
+            columnWidth: '20%',
+            // dataLabels: {
+            //   position: 'top', // top, center, bottom
+            // },
           },
         },
+        // dataLabels: {
+        //   enabled: true,
+        //   formatter: (val) => {
+        //     return val + '%';
+        //   },
+        //   offsetY: -20,
+        //   style: {
+        //     fontSize: '12px',
+        //   },
+        // },
         xaxis: {
           type: 'category',
           categories: ['Actual', 'Próximo año'],
@@ -94,6 +112,13 @@ export class ChartLossesReportComponent implements OnInit, OnDestroy {
         },
         fill: {
           opacity: 1,
+          // colors: ['#975252', '#000000'],
+        },
+        stroke: {
+          show: true,
+          dashArray: [0, 10],
+          width: 1,
+          colors: ['#F3CD90', '#FFFFFF'],
         },
         tooltip: {
           theme: theme.split('-')[0],

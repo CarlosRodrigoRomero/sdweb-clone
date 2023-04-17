@@ -11,6 +11,7 @@ export interface InformeInterface {
   mae?: number;
   cc?: number;
   fixedPowerLoss?: number;
+  predMae?: number;
   alturaVuelo?: number;
   nubosidad?: number;
   numeroModulos?: number;
