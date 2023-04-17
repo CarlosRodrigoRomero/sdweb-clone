@@ -26,10 +26,11 @@ export type ChartOptions = {
   plotOptions: ApexPlotOptions;
   responsive: ApexResponsive[];
   xaxis: ApexXAxis;
-  legend: ApexLegend;
   fill: ApexFill;
   stroke: ApexStroke;
   tooltip: ApexTooltip;
+  colors: string[];
+  legend: ApexLegend;
 };
 
 @Component({
@@ -46,82 +47,70 @@ export class ChartMaeReportComponent implements OnInit, OnDestroy {
   constructor(private themeService: ThemeService) {}
 
   ngOnInit(): void {
+    const greyColor = '#64748B';
+    const lightOrangeColor = '#FED7AA';
+
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => {
       this.chartOptions = {
         series: [
           {
-            name: 'Reparables',
-            type: 'column',
-            data: [0.2, 0.25],
-          },
-          {
-            name: 'No reparables',
-            type: 'column',
-            data: [0.1, 0.15],
+            name: 'Actual',
+            data: [300, 350],
           },
         ],
         chart: {
           type: 'bar',
-          height: 350,
-          stacked: true,
-          zoom: {
-            enabled: true,
-          },
+          height: 250,
           foreColor: this.themeService.textColor,
           toolbar: {
             show: false,
           },
         },
-        responsive: [
-          {
-            breakpoint: 480,
-            options: {
-              legend: {
-                position: 'bottom',
-                offsetX: -10,
-                offsetY: 0,
-              },
-            },
-          },
-        ],
         plotOptions: {
           bar: {
             horizontal: false,
-            columnWidth: '20%',
+            columnWidth: '25%',
+            borderRadius: 8,
+            distributed: true,
             // dataLabels: {
             //   position: 'top', // top, center, bottom
             // },
           },
         },
-        // dataLabels: {
-        //   enabled: true,
-        //   formatter: (val) => {
-        //     return val + '%';
-        //   },
-        //   offsetY: -20,
-        //   style: {
-        //     fontSize: '12px',
-        //   },
-        // },
+        dataLabels: {
+          enabled: false,
+          //   formatter: (val) => {
+          //     return val + '%';
+          //   },
+          //   offsetY: -20,
+          //   style: {
+          //     fontSize: '12px',
+          //   },
+        },
         xaxis: {
-          type: 'category',
           categories: ['Actual', 'Próximo año'],
+          labels: {
+            style: {
+              colors: [null, lightOrangeColor],
+            },
+          },
         },
-        legend: {
-          position: 'top',
-        },
-        fill: {
-          opacity: 1,
-          // colors: ['#975252', '#000000'],
-        },
-        stroke: {
-          show: true,
-          dashArray: [0, 10],
-          width: 1,
-          colors: ['#F3CD90', '#FFFFFF'],
-        },
+        colors: [greyColor, lightOrangeColor],
+        // fill: {
+        //   opacity: 1,
+        //   colors: [greyColor, lightOrangeColor],
+        // },
+        // stroke: {
+        //   show: true,
+        //   dashArray: 10,
+        //   width: 5,
+        //   colors: ['transparent', lightOrangeColor],
+        // },
         tooltip: {
           theme: theme.split('-')[0],
+        },
+        legend: {
+          show: false,
         },
       };
     });

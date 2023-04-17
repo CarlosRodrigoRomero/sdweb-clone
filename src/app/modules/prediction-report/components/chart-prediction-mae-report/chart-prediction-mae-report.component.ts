@@ -55,6 +55,8 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    const lightOrangeColor = '#FED7AA';
+
     const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
     // const maeData = [lastReport.mae, lastReport.predMae];
     const maeData = [0.2, 0.21];
@@ -77,6 +79,11 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
         },
         xaxis: {
           categories: ['Actual', 'Próximo año'],
+          labels: {
+            style: {
+              colors: [null, lightOrangeColor],
+            },
+          },
         },
         yaxis: {
           labels: {
