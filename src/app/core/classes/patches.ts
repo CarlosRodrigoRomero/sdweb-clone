@@ -117,6 +117,11 @@ export class Patches {
       tempMin = 15;
       tempMax = 60;
     }
+    // LA TABACA MARZO 2023
+    if (informeId === 'gxiQotbHAU7ZuNXcOW8t') {
+      tempMin = 20;
+      tempMax = 65;
+    }
 
     return [tempMin, tempMax];
   }
