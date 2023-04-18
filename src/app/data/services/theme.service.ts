@@ -14,6 +14,7 @@ export class ThemeService {
   private _themeSelected: string = undefined;
   themeSelected$ = new BehaviorSubject<string>(this._themeSelected);
   textColor = COLOR.light_on_background;
+  surfaceColor = COLOR.light_surface;
 
   constructor(public overlayContainer: OverlayContainer, private localStorageService: LocalStorageService) {
     const themeLocal = this.localStorageService.get('theme');
@@ -27,8 +28,10 @@ export class ThemeService {
   applyTheme(theme: string): void {
     if (theme === 'dark-theme') {
       this.textColor = COLOR.dark_on_background;
+      this.surfaceColor = COLOR.dark_surface;
     } else {
       this.textColor = COLOR.light_on_background;
+      this.surfaceColor = COLOR.light_surface;
     }
   }
 

@@ -17,6 +17,7 @@ import {
   ApexTooltip,
   ApexStroke,
   ApexYAxis,
+  ApexMarkers,
 } from 'ng-apexcharts';
 
 import { ThemeService } from '@data/services/theme.service';
@@ -107,7 +108,7 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
           type: 'gradient',
           gradient: {
             shade: 'dark',
-            gradientToColors: ['#64748B', '#FED7AA'],
+            gradientToColors: [COLOR.neutralGrey, COLOR.lightOrange],
             shadeIntensity: 1,
             type: 'horizontal',
             opacityFrom: 1,
@@ -117,6 +118,7 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
         },
         stroke: {
           dashArray: 10,
+          width: 3,
         },
         tooltip: {
           theme: theme.split('-')[0],
@@ -125,12 +127,14 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
           enabled: true,
           formatter: (value) => this.decimalPipe.transform(value, '1.0-2') + '%',
           style: {
-            fontSize: '16px',
+            fontSize: '12px',
+            colors: [this.themeService.surfaceColor],
           },
-          // background: {
-          //   enabled: true,
-          //   foreColor: '#000',
-          // },
+          background: {
+            enabled: true,
+            foreColor: this.themeService.textColor,
+            borderColor: this.themeService.textColor,
+          },
         },
       };
     });
@@ -146,6 +150,18 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
             },
             tooltip: {
               theme: theme.split('-')[0],
+            },
+            dataLabels: {
+              ...this.chartOptions.dataLabels,
+              style: {
+                ...this.chartOptions.dataLabels.style,
+                colors: [this.themeService.surfaceColor],
+              },
+              background: {
+                ...this.chartOptions.dataLabels.background,
+                foreColor: this.themeService.textColor,
+                borderColor: this.themeService.textColor,
+              },
             },
           };
         }
