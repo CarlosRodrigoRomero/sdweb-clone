@@ -12,12 +12,12 @@ import {
   ApexResponsive,
   ApexXAxis,
   ApexLegend,
-  ApexFill,
   ApexTooltip,
   ApexStroke,
 } from 'ng-apexcharts';
 
 import { ThemeService } from '@data/services/theme.service';
+import { ReportControlService } from '@data/services/report-control.service';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -26,7 +26,6 @@ export type ChartOptions = {
   plotOptions: ApexPlotOptions;
   responsive: ApexResponsive[];
   xaxis: ApexXAxis;
-  fill: ApexFill;
   stroke: ApexStroke;
   tooltip: ApexTooltip;
   colors: string[];
@@ -34,28 +33,33 @@ export type ChartOptions = {
 };
 
 @Component({
-  selector: 'app-chart-mae-report',
-  templateUrl: './chart-mae-report.component.html',
-  styleUrls: ['./chart-mae-report.component.css'],
+  selector: 'app-chart-prediction-num-anoms-report',
+  templateUrl: './chart-prediction-num-anoms-report.component.html',
+  styleUrls: ['./chart-prediction-num-anoms-report.component.css'],
 })
-export class ChartMaeReportComponent implements OnInit, OnDestroy {
+export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy {
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private themeService: ThemeService) {}
+  constructor(private themeService: ThemeService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
     const greyColor = '#64748B';
     const lightOrangeColor = '#FED7AA';
+
+    const numAnomsData = [
+      this.reportControlService.allAnomalias.length,
+      this.reportControlService.allAnomalias.length * 1.2,
+    ];
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => {
       this.chartOptions = {
         series: [
           {
             name: 'Actual',
-            data: [300, 350],
+            data: numAnomsData,
           },
         ],
         chart: {
@@ -72,20 +76,14 @@ export class ChartMaeReportComponent implements OnInit, OnDestroy {
             columnWidth: '25%',
             borderRadius: 8,
             distributed: true,
-            // dataLabels: {
-            //   position: 'top', // top, center, bottom
-            // },
+            dataLabels: {
+              position: 'top', // top, center, bottom
+            },
           },
         },
         dataLabels: {
-          enabled: false,
-          //   formatter: (val) => {
-          //     return val + '%';
-          //   },
-          //   offsetY: -20,
-          //   style: {
-          //     fontSize: '12px',
-          //   },
+          enabled: true,
+          offsetY: 5,
         },
         xaxis: {
           categories: ['Actual', 'Próximo año'],
@@ -95,17 +93,13 @@ export class ChartMaeReportComponent implements OnInit, OnDestroy {
             },
           },
         },
-        colors: [greyColor, lightOrangeColor],
-        // fill: {
-        //   opacity: 1,
-        //   colors: [greyColor, lightOrangeColor],
-        // },
-        // stroke: {
-        //   show: true,
-        //   dashArray: 10,
-        //   width: 5,
-        //   colors: ['transparent', lightOrangeColor],
-        // },
+        colors: [greyColor, 'transparent'],
+        stroke: {
+          show: true,
+          dashArray: 10,
+          width: 6,
+          colors: ['transparent', lightOrangeColor],
+        },
         tooltip: {
           theme: theme.split('-')[0],
         },
