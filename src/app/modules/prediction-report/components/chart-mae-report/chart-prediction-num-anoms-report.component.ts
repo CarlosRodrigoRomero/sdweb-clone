@@ -19,6 +19,8 @@ import {
 import { ThemeService } from '@data/services/theme.service';
 import { ReportControlService } from '@data/services/report-control.service';
 
+import { COLOR } from '@data/constants/color';
+
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
@@ -46,9 +48,6 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
   constructor(private themeService: ThemeService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    const greyColor = '#64748B';
-    const lightOrangeColor = '#FED7AA';
-
     const numAnomsData = [
       this.reportControlService.allAnomalias.length,
       this.reportControlService.allAnomalias.length * 1.2,
@@ -89,16 +88,16 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
           categories: ['Actual', 'Próximo año'],
           labels: {
             style: {
-              colors: [null, lightOrangeColor],
+              colors: [null, COLOR.lightOrange],
             },
           },
         },
-        colors: [greyColor, 'transparent'],
+        colors: [COLOR.neutralGrey, 'transparent'],
         stroke: {
           show: true,
           dashArray: 10,
           width: 6,
-          colors: ['transparent', lightOrangeColor],
+          colors: ['transparent', COLOR.lightOrange],
         },
         tooltip: {
           theme: theme.split('-')[0],

@@ -1,108 +1,191 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
-declare let google: any;
+import { Subscription } from 'rxjs';
+
+import { GoogleCharts } from 'google-charts';
+
+import { ThemeService } from '@data/services/theme.service';
+import { ReportControlService } from '@data/services/report-control.service';
+
+import { MathOperations } from '@core/classes/math-operations';
+import { Colors } from '@core/classes/colors';
+
+import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
 
 @Component({
   selector: 'app-chart-sankey-report',
   templateUrl: './chart-sankey-report.component.html',
   styleUrls: ['./chart-sankey-report.component.css'],
 })
-export class ChartSankeyReportComponent implements OnInit, AfterViewInit {
-  labels = ['Actual', 'Próximo año'];
+export class ChartSankeyReportComponent implements OnInit {
+  lightOrange = COLOR.lightOrange;
+  @ViewChild('sankeyChart', { static: true }) sankeyChartElement: ElementRef;
 
-  constructor() {}
+  chartData: any[][] = [
+    ['From', 'To', '#'],
+    // ['Célula caliente', 'Célula caliente.', 101],
+    // ['Célula caliente', 'Varias células calientes.', 2],
+    // ['Célula caliente', 'String', 2],
+    // ['Varias células calientes', 'Varias células calientes.', 28],
+    // ['Varias células calientes', 'Substring en CA.', 1],
+    // ['Substring en CA', 'Substring en CA.', 9],
+    // ['Substring en CA', '2x Substring en CA.', 2],
+    // ['Nuevas', 'Célula caliente.', 10],
+    // ['Nuevas', 'Varias células calientes.', 4],
+    // ['Nuevas', 'String', 15],
+    // ['Nuevas', 'Substring en CA.', 1],
+    // ['Célula caliente', 'unknown', 30],
+    // ['Varias células calientes', 'unknown', 2],
+  ];
+  colors_nodes = [
+    // '#00E396', // 'Célula caliente'
+    //   '#00E396', // 'Célula caliente.',
+    //   '#128254', // 'Varias células calientes.',
+    //   '#FF0000', // 'String',
+    //   '#128254', // 'Varias células calientes',
+    //   '#FEB019', // 'Substring en CA.',
+    //   '#FEB019', // 'Substring en CA',
+    //   '#00BEBE', // '2x Substring en CA.',
+    //   '#474747', // 'Nuevas',
+    //   '#000', // 'Unknown',
+  ];
+  chartOptions = {
+    width: '100%',
+    height: 400,
+    interactivity: true,
+    sankey: {
+      node: {
+        nodePadding: 16,
+        width: 10,
+        colors: this.colors_nodes,
+        label: { fontSize: 12, color: '#fff', bold: false, italic: false },
+      },
+      link: {
+        color: {
+          // fill: '#efd', // Color of the link.
+          fillOpacity: 0.8, // Transparency of the link.
+          // stroke: 'black', // Color of the link border.
+          // strokeWidth: 1, // Thickness of the link border (default 0).
+        },
+        colors: this.colors_nodes,
+        colorMode: 'gradient',
+      },
+    },
+    tooltip: {
+      // isHtml: true,
+      textStyle: {
+        fontSize: 12,
+      },
+      showColorCode: true,
+    },
+  };
 
-  ngOnInit(): void {}
+  private subscriptions: Subscription = new Subscription();
 
-  ngAfterViewInit(): void {
-    google.charts.load('current', { packages: ['sankey'] });
-    google.charts.setOnLoadCallback(this.drawChart);
+  constructor(private themeService: ThemeService, private reportControlService: ReportControlService) {}
+
+  ngOnInit(): void {
+    this.loadData();
+
+    // this.setChartHeight();
+
+    // this.setColors();
+
+    this.loadChart();
+
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        if (this.chartOptions) {
+          this.chartOptions.sankey.node.label.color = this.themeService.textColor;
+
+          this.loadChart();
+        }
+      })
+    );
   }
 
-  drawChart() {
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'From');
-    data.addColumn('string', 'To');
-    data.addColumn('number', 'Weight');
-    data.addRows([
-      ['Célula caliente', 'Célula caliente.', 101],
-      ['Célula caliente', 'Varias células calientes.', 2],
-      ['Célula caliente', 'String', 2],
-      ['Varias células calientes', 'Varias células calientes.', 28],
-      ['Varias células calientes', 'Substring en CA.', 1],
-      ['Substring en CA', 'Substring en CA.', 9],
-      ['Substring en CA', '2x Substring en CA.', 2],
-      ['Nuevas', 'Célula caliente.', 10],
-      ['Nuevas', 'Varias células calientes.', 4],
-      ['Nuevas', 'String', 15],
-      ['Nuevas', 'Substring en CA.', 1],
-      ['Célula caliente', 'unknown', 30],
-      ['Varias células calientes', 'unknown', 2],
-    ]);
+  private loadData() {
+    const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
+    const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
 
-    // Sets chart options.
-    // [
-    //   'Célula caliente',
-    //   'Célula caliente.',
-    //   'Varias células calientes.',
-    //   'String',
-    //   'Varias células calientes',
-    //   'Substring en CA.',
-    //   'Substring en CA',
-    //   '2x Substring en CA.',
-    //   'Nuevas',
-    // ];
-    const colors_nodes = [
-      '#00E396', // 'Célula caliente'
-      '#00E396', // 'Célula caliente.',
-      '#128254', // 'Varias células calientes.',
-      '#FF0000', // 'String',
-      '#128254', // 'Varias células calientes',
-      '#FEB019', // 'Substring en CA.',
-      '#FEB019', // 'Substring en CA',
-      '#00BEBE', // '2x Substring en CA.',
-      '#474747', // 'Nuevas',
-      '#000', // 'Unknown',
-    ];
-    const colors_link = [
-      '#bfbfbf', // 'Célula caliente',
-      '#bfbfbf', // 'Célula caliente.',
-      '#bfbfbf', // 'Varias células calientes.',
-      '#bfbfbf', // 'String',
-      '#bfbfbf', // 'Varias células calientes',
-      '#bfbfbf', // 'Substring en CA.',
-      '#bfbfbf', // 'Substring en CA',
-      '#bfbfbf', // '2x Substring en CA.',
-      '#fff', // 'Nuevas',
-      '#fff', // 'unknown',
-    ];
+    // DEMO
+    lastReportAnoms.forEach((anom) => {
+      anom.tipoNextYear = this.tipoRandom();
+    });
 
-    const options = {
-      width: '100%',
-      height: 400,
-      interactivity: true,
-      sankey: {
-        node: {
-          nodePadding: 60,
-          width: 10,
-          colors: colors_nodes,
-          label: { fontSize: 14, color: '#fff', bold: false, italic: false },
-        },
-        link: {
-          color: {
-            // fill: '#efd', // Color of the link.
-            fillOpacity: 0.8, // Transparency of the link.
-            // stroke: 'black', // Color of the link border.
-            // strokeWidth: 1, // Thickness of the link border (default 0).
-          },
-          colors: colors_nodes,
-          colorMode: 'gradient',
-        },
+    GLOBAL.sortedAnomsTipos.forEach((tipo, index) => {
+      const anomsTipo = lastReportAnoms.filter((anom) => anom.tipo === tipo);
+
+      if (anomsTipo.length > 0) {
+        const uniqueNextTipos = MathOperations.getUniqueElemsArray(anomsTipo.map((anom) => anom.tipoNextYear));
+
+        if (uniqueNextTipos.length > 0) {
+          // checkeamos si el color se ha añadido ya y si no lo añadimos
+          this.addColor(tipo);
+
+          uniqueNextTipos.forEach((uniqueNextTipo) => {
+            const anomsTipoNext = anomsTipo.filter((anom) => anom.tipoNextYear === uniqueNextTipo);
+            const count = anomsTipoNext.length;
+            const from = GLOBAL.labels_tipos[tipo];
+            const to = GLOBAL.labels_tipos[uniqueNextTipo];
+            // console.log(from, to, count);
+            this.chartData.push([from, to, count]);
+
+            // checkeamos si el color se ha añadido ya y si no lo añadimos
+            this.addColor(uniqueNextTipo);
+          });
+        }
+      }
+    });
+  }
+
+  private setChartHeight() {
+    const numRows = this.chartData.length - 1;
+    const height = numRows * 16;
+
+    this.chartOptions.height = height;
+  }
+
+  private addColor(tipo: number) {
+    const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
+    if (!this.colors_nodes.includes(color)) {
+      this.colors_nodes.push(color);
+    }
+  }
+
+  private setColors() {
+    const colorRules: any[] = [];
+    this.chartData.forEach((row, index) => {
+      if (index > 0) {
+        console.log(row[0]);
+        const colorRule = {
+          from: row[0],
+          to: row[1],
+          color: Colors.rgbaToHex(COLOR.colores_tipos[GLOBAL.labels_tipos.indexOf(row[0])]),
+        };
+        this.colors_nodes.push(colorRule);
+      }
+    });
+  }
+
+  private loadChart() {
+    GoogleCharts.load(
+      () => {
+        const chart = new GoogleCharts.api.visualization.Sankey(this.sankeyChartElement.nativeElement);
+        const dataTable = new GoogleCharts.api.visualization.arrayToDataTable(this.chartData);
+        chart.draw(dataTable, this.chartOptions);
       },
-    };
+      { packages: ['sankey'] }
+    );
+  }
 
-    // Instantiates and draws our chart, passing in some options.
-    var chart = new google.visualization.Sankey(document.getElementById('sankey'));
-    chart.draw(data, options);
+  private tipoRandom(): number {
+    // Crea un array con los números 4, 8, 9 y 10
+    var numeros = [4, 12, 20, 21];
+
+    // Genera un número aleatorio entre los elementos del array
+    var indiceAleatorio = Math.floor(Math.random() * numeros.length);
+    return numeros[indiceAleatorio];
   }
 }

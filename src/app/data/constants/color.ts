@@ -14,6 +14,8 @@ export let COLOR = {
   light_on_background: '#0F172A',
   dark_background: '#0F172A',
   dark_on_background: '#F3F4F6',
+  neutralGrey: '#64748B',
+  lightOrange: '#FED7AA',
   colores_tipos: [
     'rgba(0,0,0,1)', // '0',
     'rgba(0,200,0)', // 'PC',
