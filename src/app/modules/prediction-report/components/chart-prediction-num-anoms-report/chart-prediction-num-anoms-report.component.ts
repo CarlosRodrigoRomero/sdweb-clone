@@ -72,8 +72,8 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
         plotOptions: {
           bar: {
             horizontal: false,
-            columnWidth: '25%',
-            borderRadius: 8,
+            columnWidth: '30%',
+            // borderRadius: 8,
             distributed: true,
             dataLabels: {
               position: 'top', // top, center, bottom
@@ -82,7 +82,7 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
         },
         dataLabels: {
           enabled: true,
-          offsetY: 5,
+          offsetY: -25,
         },
         xaxis: {
           categories: ['Actual', 'Próximo año'],
@@ -96,7 +96,7 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
         stroke: {
           show: true,
           dashArray: 10,
-          width: 6,
+          width: 2,
           colors: ['transparent', COLOR.lightOrange],
         },
         tooltip: {

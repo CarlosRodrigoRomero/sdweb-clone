@@ -156,6 +156,11 @@ export class AnomaliaService {
             data.id = doc.payload.doc.id;
             data.tipo = Number(data.tipo);
 
+            // DEMO
+            const tiposDemo = [data.tipo, 12];
+            const indiceAleatorio = Math.floor(Math.random() * tiposDemo.length);
+            data.tipoNextYear = tiposDemo[indiceAleatorio];
+
             // Parche para Casas de Don Pedro Jun22 y Alqueva Sep22
             if (Patches.checkId(informeId)) {
               data = Patches.applyPatches(informeId, data);

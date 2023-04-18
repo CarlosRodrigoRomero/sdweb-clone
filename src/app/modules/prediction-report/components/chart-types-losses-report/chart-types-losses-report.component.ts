@@ -18,6 +18,7 @@ import {
   ApexAnnotations,
   ApexTooltip,
   ApexPlotOptions,
+  ApexFill,
 } from 'ng-apexcharts';
 
 import { ReportControlService } from '@data/services/report-control.service';
@@ -34,6 +35,7 @@ export type ChartOptions = {
   chart: ApexChart;
   xaxis: ApexXAxis;
   stroke: ApexStroke;
+  fill: ApexFill;
   dataLabels: ApexDataLabels;
   markers: ApexMarkers;
   colors: string[];
@@ -68,7 +70,8 @@ export class ChartTypesLossesReportComponent implements OnInit {
   public chartOptionsTypes: Partial<ChartOptions>;
   public chartOptionsLosses: Partial<ChartOptions>;
   public labelsCategoria: string[] = [];
-  public coloresCategoria: string[] = [];
+  public coloresFillCategoria: string[] = [];
+  public coloresStrokeCategoria: string[] = [];
   public numsCategoria: number[] = [];
   public dataPlot: DataPlot[];
 
@@ -87,6 +90,7 @@ export class ChartTypesLossesReportComponent implements OnInit {
     this.getAllCategorias(anomaliasLastReport);
 
     this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport));
+    this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport, true));
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => this.initChart(theme.split('-')[0]));
 
@@ -138,11 +142,9 @@ export class ChartTypesLossesReportComponent implements OnInit {
         offsetX: 0,
         offsetY: -25,
       },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent'],
-      },
+      // fill: {
+      //   colors: this.coloresFillCategoria,
+      // },
       toolbar: {
         show: false,
       },
@@ -152,19 +154,20 @@ export class ChartTypesLossesReportComponent implements OnInit {
       plotOptions: {
         bar: {
           barHeight: '100%',
-          columnWidth: '45%',
+          columnWidth: '60%',
           distributed: true,
-          endingShape: 'rounded',
           dataLabels: {
             position: 'top',
           },
         },
       },
       xaxis: {
-        categories: ['Actual', 'Próximo año'],
+        categories: this.labelsCategoria,
         type: 'category',
         labels: {
-          // rotate: 0,
+          style: {
+            fontSize: '10px',
+          },
         },
       },
       tooltip: {
@@ -193,7 +196,7 @@ export class ChartTypesLossesReportComponent implements OnInit {
 
       this.chartOptionsTypes = {
         series: seriesNumCat,
-        colors: this.coloresCategoria,
+        colors: [COLOR.gris],
         title: {
           text: '# Anomalías por tipo',
           align: 'left',
@@ -209,7 +212,6 @@ export class ChartTypesLossesReportComponent implements OnInit {
             show: false,
           },
         },
-
         yaxis: {
           max: (v) => {
             return Math.round(1.1 * v);
@@ -219,6 +221,12 @@ export class ChartTypesLossesReportComponent implements OnInit {
             minWidth: 10,
           },
         },
+        stroke: {
+          show: true,
+          width: 2,
+          dashArray: [0, 10],
+          colors: this.coloresStrokeCategoria,
+        },
       };
 
       const seriesMaeCat: ApexAxisChartSeries = [];
@@ -227,7 +235,7 @@ export class ChartTypesLossesReportComponent implements OnInit {
       this.chartOptionsLosses = {
         series: seriesMaeCat,
         title: {
-          text: 'Pérdidas por tipo de anomalía',
+          text: 'MAE por tipo de anomalía',
           align: 'left',
         },
         chart: {
@@ -255,6 +263,12 @@ export class ChartTypesLossesReportComponent implements OnInit {
             },
           },
         },
+        stroke: {
+          show: true,
+          width: 2,
+          dashArray: [0, 10],
+          colors: [COLOR.lightOrange],
+        },
       };
 
       this.chartLoaded = true;
@@ -265,22 +279,33 @@ export class ChartTypesLossesReportComponent implements OnInit {
     const allNumCategorias = GLOBAL.sortedAnomsTipos;
 
     const labelsCategoria = Array<string>();
-    const coloresCategoria = Array<string>();
+    const coloresFillCategoria = Array<string>();
+    const coloresStrokeCategoria = Array<string>();
     const numsCategoria = Array<number>();
 
     allNumCategorias.forEach((i) => {
       if (anomalias.filter((anom) => anom.tipo === i).length > 0) {
         labelsCategoria.push(GLOBAL.labels_tipos[i]);
-        coloresCategoria.push(Colors.rgbaToHex(COLOR.colores_tipos[i]));
+        coloresFillCategoria.push('transparent');
+        coloresStrokeCategoria.push(Colors.rgbaToHex(COLOR.colores_tipos[i]));
+        numsCategoria.push(i);
+      } else if (
+        anomalias[0].hasOwnProperty('tipoNextYear') &&
+        anomalias.filter((anom) => anom.tipoNextYear === i).length > 0
+      ) {
+        labelsCategoria.push(GLOBAL.labels_tipos[i]);
+        coloresFillCategoria.push(`transparent`);
+        coloresStrokeCategoria.push(Colors.rgbaToHex(COLOR.colores_tipos[i]));
         numsCategoria.push(i);
       }
     });
     this.labelsCategoria = labelsCategoria;
-    this.coloresCategoria = coloresCategoria;
+    this.coloresFillCategoria = coloresFillCategoria;
+    this.coloresStrokeCategoria = coloresStrokeCategoria;
     this.numsCategoria = numsCategoria;
   }
 
-  private calculateDataPlot(anomalias): DataPlot {
+  private calculateDataPlot(anomalias: Anomalia[], prediction = false): DataPlot {
     let filtroCategoria: Anomalia[];
     let perdidasCategoria: number;
 
@@ -288,7 +313,12 @@ export class ChartTypesLossesReportComponent implements OnInit {
     const perdidasPorCategoria = Array();
 
     this.numsCategoria.forEach((i) => {
-      filtroCategoria = anomalias.filter((anom) => anom.tipo === i);
+      if (prediction) {
+        filtroCategoria = anomalias.filter((anom) => anom.tipoNextYear === i);
+      } else {
+        filtroCategoria = anomalias.filter((anom) => anom.tipo === i);
+      }
+
       if (filtroCategoria.length > 0) {
         perdidasCategoria = this._getMAEAnomalias(filtroCategoria);
 
@@ -305,7 +335,7 @@ export class ChartTypesLossesReportComponent implements OnInit {
       numPorCategoria,
       perdidasPorCategoria,
       labelsCategoria: this.labelsCategoria,
-      coloresCategoria: this.coloresCategoria,
+      coloresCategoria: this.coloresFillCategoria,
     };
   }
 
