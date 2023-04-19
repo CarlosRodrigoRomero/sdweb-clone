@@ -401,7 +401,7 @@ export class ReportControlService {
   private checkFixedPowerLossInformes(): void {
     if (this.allAnomalias.length > 0) {
       this.informes.forEach((informe) => {
-        if (this.checkIfNumberValueWrong(informe.fixedPowerLoss)) {
+        if (this.checkIfNumberValueWrong(informe.fixablePower)) {
           const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informe.id);
 
           const fixedLossReport = this.getFixedLossReport(anomaliasInforme, informe);
@@ -435,7 +435,7 @@ export class ReportControlService {
   }
 
   setFixedLossReport(fixedLossReport: number, informeId: string) {
-    this.informeService.updateInformeField(informeId, 'fixedPowerLoss', fixedLossReport);
+    this.informeService.updateInformeField(informeId, 'fixablePower', fixedLossReport);
   }
 
   private setNumberOfModules(seguidores: Seguidor[]) {

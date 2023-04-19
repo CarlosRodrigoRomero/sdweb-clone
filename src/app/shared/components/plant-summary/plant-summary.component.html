@@ -73,8 +73,8 @@
       >
       <span class="titulo">Potencia reparable</span>
       <span class="valor-mae"
-        >{{ informe.fixedPowerLoss * planta.potencia | number : '1.0-2' }} MW ({{
-          (informe.fixedPowerLoss / informe.mae) * 100 | number : '1.0-2'
+        >{{ informe.fixablePower * planta.potencia | number : '1.0-2' }} MW ({{
+          (informe.fixablePower / informe.mae) * 100 | number : '1.0-2'
         }}%)</span
       >
       <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->

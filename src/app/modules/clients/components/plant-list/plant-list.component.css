@@ -78,9 +78,14 @@ h4 {
 
 .sorted-column-header {
   font-size: 14px;
-  color: aqua;
+  color: #FED7AA;
 }
 
 .sorted-column-row {
-  color: aqua;
+  color: #fed7aa;
+}
+
+.cell-centered {
+  display: flex;
+  justify-content: center;
 }

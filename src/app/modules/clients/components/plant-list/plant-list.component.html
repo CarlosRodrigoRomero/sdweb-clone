@@ -59,7 +59,9 @@
               *matCellDef="let row"
               [ngClass]="{ 'sorted-column-row': sortedColumn === 'potencia' }"
             >
-              {{ row.potencia | number : '1.2-2' }}
+              <div class="cell-centered">
+                {{ row.potencia | number : '1.2-2' }}
+              </div>
             </td>
           </ng-container>
 
@@ -80,12 +82,14 @@
               *matCellDef="let row"
               [ngClass]="{ 'sorted-column-row': sortedColumn === 'mae' }"
             >
-              {{ row.mae * 100 | number : '1.2-2' }}
+              <div class="cell-centered">
+                {{ row.mae * 100 | number : '1.2-2' }}
+              </div>
             </td>
           </ng-container>
 
           <!-- Pérdidad potencia -->
-          <ng-container matColumnDef="powerLoss">
+          <!-- <ng-container matColumnDef="powerLoss">
             <th
               mat-header-cell
               *matHeaderCellDef
@@ -103,16 +107,16 @@
             >
               {{ row.powerLoss | number : '1.2-2' }}
             </td>
-          </ng-container>
+          </ng-container> -->
 
           <!-- Potencia reparable -->
-          <ng-container matColumnDef="fixedPowerLoss">
+          <ng-container matColumnDef="fixablePower">
             <th
               mat-header-cell
               *matHeaderCellDef
               mat-sort-header
-              [ngClass]="{ 'sorted-column-header': sortedColumn === 'fixedPowerLoss' }"
-              (click)="selectSortColumn('fixedPowerLoss')"
+              [ngClass]="{ 'sorted-column-header': sortedColumn === 'fixablePower' }"
+              (click)="selectSortColumn('fixablePower')"
             >
               Potencia reparable (MW)
             </th>
@@ -120,9 +124,11 @@
               mat-cell
               (click)="onClick(row)"
               *matCellDef="let row"
-              [ngClass]="{ 'sorted-column-row': sortedColumn === 'fixedPowerLoss' }"
+              [ngClass]="{ 'sorted-column-row': sortedColumn === 'fixablePower' }"
             >
-              {{ row.fixedPowerLoss | number : '1.2-2' }}
+              <div class="cell-centered">
+                {{ row.fixablePower | number : '1.2-2' }}
+              </div>
             </td>
           </ng-container>
 
@@ -143,7 +149,9 @@
               *matCellDef="let row"
               [ngClass]="{ 'sorted-column-row': sortedColumn === 'tipo' }"
             >
-              {{ row.tipo }}
+              <div class="cell-centered">
+                {{ row.tipo }}
+              </div>
             </td>
           </ng-container>
 
