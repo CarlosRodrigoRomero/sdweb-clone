@@ -15,7 +15,7 @@
         <!-- <a *ngIf="!isShared" mat-list-item (click)="navigateTo('loss')">
           <div class="item-content">
             <mat-icon>dashboard</mat-icon>
-            <span>Pérdidas</span>
+            <span>{{ 'perdidas' | translate | titlecase }}</span>
           </div>
         </a> -->
         <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('map')">
@@ -29,19 +29,19 @@
         <a *ngIf="isPortfolio" mat-list-item>
           <div class="item-content">
             <mat-icon>list</mat-icon>
-            <span>Listado</span>
+            <span>{{ 'listado' | translate | titlecase }}</span>
           </div>
         </a>
         <!-- <a mat-list-item>
           <div class="item-content">
             <mat-icon>insights</mat-icon>
-            <span>Gráficos</span>
+            <span>{{ 'graficos' | translate | titlecase }}</span>
           </div>
         </a> -->
         <a *ngIf="!isPortfolio && showPrediction" mat-list-item (click)="navigateTo('prediction')">
           <div class="item-content">
             <mat-icon>insights</mat-icon>
-            <span>Predicción</span>
+            <span>{{ 'prediccion' | translate | titlecase }}</span>
           </div>
         </a>
       </div>

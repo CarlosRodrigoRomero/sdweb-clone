@@ -11,8 +11,7 @@ import { ValidateElementoPlantaPipe } from './pipes/validate-elemento-planta.pip
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ClipboardModule } from 'ngx-clipboard';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { MaterialModule } from '@shared/modules/material/material.module';
 import { ChartsModule } from './modules/charts/charts.module';
@@ -34,10 +33,6 @@ import { SdCompleteLogoComponent } from './components/sd-complete-logo/sd-comple
 import { RecommendedActionComponent } from './components/recommended-action/recommended-action.component';
 import { RecommendedActionsComponent } from './components/recommended-actions/recommended-actions.component';
 import { SelectLanguageComponent } from './components/select-language/select-language.component';
-
-export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}
 
 const components = [
   SpinnerComponent,
@@ -74,13 +69,7 @@ const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlan
     OlMapsModule,
     ChartsModule,
     HttpClientModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: createTranslateLoader,
-        deps: [HttpClient],
-      },
-    }),
+    TranslateModule.forChild({ isolate: false }),
   ],
   exports: [
     ...components,

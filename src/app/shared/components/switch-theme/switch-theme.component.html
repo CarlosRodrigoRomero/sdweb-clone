@@ -4,11 +4,11 @@
     *ngIf="!darkMode"
     mat-stroked-button
     (click)="onSetTheme('dark-theme')"
-    matTooltip="Modo oscuro"
+    matTooltip="{{ 'Modo oscuro' | translate }}"
   >
     <div class="btn-content">
       <mat-icon>dark_mode</mat-icon>
-      <span class="label">Cambiar a modo oscuro</span>
+      <span class="label">{{ 'Cambiar a modo oscuro' | translate }}</span>
     </div>
   </button>
   <button
@@ -16,11 +16,11 @@
     *ngIf="darkMode"
     mat-stroked-button
     (click)="onSetTheme('light-theme')"
-    matTooltip="Modo claro"
+    matTooltip="{{ 'Modo claro' | translate }}"
   >
     <div class="btn-content">
       <mat-icon>light_mode</mat-icon>
-      <span class="label">Cambiar a modo claro</span>
+      <span class="label">{{ 'Cambiar a modo claro' | translate }}</span>
     </div>
   </button>
 </div>

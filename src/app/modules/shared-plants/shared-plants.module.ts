@@ -8,7 +8,7 @@ import { ProgressBarPdfComponent } from './components/download-progress-bar/down
 import { DownloadReportComponent } from './components/download-report/download-report.component';
 import { DialogFilteredReportComponent } from './components/dialog-filtered-report/dialog-filtered-report.component';
 import { ShareReportComponent } from './components/share-report/share-report.component';
-import { SelectLanguageComponent } from './components/select-language/select-language.component';
+import { SelectDownloadsLanguageComponent } from './components/select-downloads-language/select-downloads-language.component';
 import { DownloadExcelComponent } from './components/download-excel/download-excel.component';
 import { ZonesComponent } from './components/zones/zones.component';
 import { SliderTemporalComponent } from './components/slider-temporal/slider-temporal.component';
@@ -32,7 +32,7 @@ import { ShareReportDialogComponent } from './components/share-report-dialog/sha
     DownloadReportComponent,
     DialogFilteredReportComponent,
     ShareReportComponent,
-    SelectLanguageComponent,
+    SelectDownloadsLanguageComponent,
     DownloadExcelComponent,
     ZonesComponent,
     SliderTemporalComponent,

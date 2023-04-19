@@ -1,11 +1,11 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Listado de plantas</mat-card-title>
+    <mat-card-title>{{ 'Listado de plantas' | translate }}</mat-card-title>
   </mat-card-header>
   <mat-card-content>
     <div class="filtro">
       <mat-form-field class="buscar-input" appearance="outline">
-        <mat-label>Buscar</mat-label>
+        <mat-label>{{ 'buscar' | translate | titlecase }}</mat-label>
         <input matInput (keyup)="applyFilter($event)" #input />
       </mat-form-field>
 
@@ -30,7 +30,7 @@
               [ngClass]="{ 'sorted-column-header': sortedColumn === 'nombre' }"
               (click)="selectSortColumn('nombre')"
             >
-              Planta
+              {{ 'planta' | translate | titlecase }}
             </th>
             <td
               mat-cell
@@ -51,7 +51,7 @@
               [ngClass]="{ 'sorted-column-header': sortedColumn === 'potencia' }"
               (click)="selectSortColumn('potencia')"
             >
-              Potencia (MW)
+              {{ 'potencia' | translate | titlecase }} (MW)
             </th>
             <td
               mat-cell
@@ -74,7 +74,7 @@
               [ngClass]="{ 'sorted-column-header': sortedColumn === 'mae' }"
               (click)="selectSortColumn('mae')"
             >
-              MAE (%)
+              {{ 'MAE' | translate }} (%)
             </th>
             <td
               mat-cell
@@ -118,7 +118,7 @@
               [ngClass]="{ 'sorted-column-header': sortedColumn === 'fixablePower' }"
               (click)="selectSortColumn('fixablePower')"
             >
-              Potencia reparable (MW)
+              {{ 'Potencia reparable' | translate }} (MW)
             </th>
             <td
               mat-cell
@@ -141,7 +141,7 @@
               [ngClass]="{ 'sorted-column-header': sortedColumn === 'tipo' }"
               (click)="selectSortColumn('tipo')"
             >
-              Tipo
+              {{ 'tipo' | translate | titlecase }}
             </th>
             <td
               mat-cell
@@ -164,7 +164,7 @@
               [ngClass]="{ 'sorted-column-header': sortedColumn === 'ultimaInspeccion' }"
               (click)="selectSortColumn('ultimaInspeccion')"
             >
-              Última inspección
+              {{ 'Ultima inspeccion' | translate }}
             </th>
             <td
               mat-cell
@@ -185,7 +185,7 @@
               [ngClass]="{ 'sorted-column-header': sortedColumn === 'inspeccionesAntiguas' }"
               (click)="selectSortColumn('inspeccionesAntiguas')"
             >
-              Inspec. antiguas
+              {{ 'Inspecciones antiguas' | translate }}
             </th>
             <td mat-cell *matCellDef="let row">
               <button
