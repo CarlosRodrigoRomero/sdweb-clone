@@ -9,6 +9,6 @@
   <app-criticidad-filter></app-criticidad-filter>
   <app-area-filter-container></app-area-filter-container>
   <button *ngIf="filtrosActivos" class="clean-filters" mat-button (click)="clickCleanFilters()" color="primary">
-    Limpiar filtros
+    {{ 'Limpiar filtros' | translate }}
   </button>
 </div>

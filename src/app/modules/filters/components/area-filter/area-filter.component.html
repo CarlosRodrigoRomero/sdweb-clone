@@ -2,11 +2,11 @@
   <div *ngIf="!activeDelete">
     <mat-icon *ngIf="!activeDraw">format_shapes</mat-icon>
     <mat-icon class="filter-active" *ngIf="activeDraw">disabled_by_default</mat-icon>
-    <span *ngIf="!activeDraw">Dibujar área</span>
-    <span class="filter-active" *ngIf="activeDraw">Cancelar dibujo</span>
+    <span *ngIf="!activeDraw">{{ 'Dibujar area' | translate }}</span>
+    <span class="filter-active" *ngIf="activeDraw">{{ 'Cancelar dibujo' | translate }}</span>
   </div>
   <div *ngIf="activeDelete">
     <mat-icon class="filter-active">delete</mat-icon>
-    <span class="filter-active">Borrar área</span>
+    <span class="filter-active">{{ 'Borrar area' | translate }}</span>
   </div>
 </button>

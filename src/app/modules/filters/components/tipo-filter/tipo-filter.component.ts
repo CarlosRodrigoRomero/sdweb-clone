@@ -6,6 +6,8 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { switchMap, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
+import { TranslateService } from '@ngx-translate/core';
+
 import { FilterService } from '@data/services/filter.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { FilterControlService } from '@data/services/filter-control.service';
@@ -62,7 +64,8 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
     private anomaliaService: AnomaliaService,
     private filterControlService: FilterControlService,
     private reportControlService: ReportControlService,
-    private plantaService: PlantaService
+    private plantaService: PlantaService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -120,6 +123,12 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
     // nos suscribimos al estado en el control de filtros
     this.subscriptions.add(
       this.filterControlService.labelTipoDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value))
+    );
+
+    this.subscriptions.add(
+      this.translate.stream('Tipo de anomalia').subscribe((res: string) => {
+        this.defaultSelectLabel = res;
+      })
     );
   }
 

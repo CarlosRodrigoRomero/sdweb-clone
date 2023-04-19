@@ -1,5 +1,5 @@
 <div class="filtro">
-  <h5>Tipo</h5>
+  <h5>{{ 'tipo' | translate | titlecase }}</h5>
   <button class="tipo-select" mat-stroked-button [matMenuTriggerFor]="menu">
     <span *ngIf="defaultLabelStatus" class="filter-default">{{ defaultSelectLabel }}</span>
     <span *ngIf="!defaultLabelStatus" class="filter-selected">{{ selectedLabels.toString() }}</span>
@@ -16,7 +16,7 @@
           (change)="onChangeFiltroTipo($event)"
         >
           <span style="font-size: 15px">
-            {{ tipoElem.label }}
+            {{ tipoElem.label | translate }}
           </span>
         </mat-checkbox>
       </li>

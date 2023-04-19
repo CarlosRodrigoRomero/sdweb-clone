@@ -2,14 +2,14 @@
   <mat-horizontal-stepper #stepper>
     <mat-step>
       <div class="step-content">
-        <span class="titulo-principal">Configura el PDF como prefieras</span>
+        <span class="titulo-principal">{{ 'Configura el PDF como prefieras' | translate }}</span>
 
         <!-- FILTRADAS O TODAS -->
         <div *ngIf="numElems > 0">
-          <span class="titulo">Anomalías a incluir</span>
+          <span class="titulo">{{ 'Anomalías a incluir' | translate }}</span>
           <mat-radio-group class="radio-btns" [value]="'all'" (change)="setFilteredPdf($event)">
-            <mat-radio-button value="all">Todas</mat-radio-button>
-            <mat-radio-button value="filtered">Solo filtradas</mat-radio-button>
+            <mat-radio-button value="all">{{ 'todas' | translate | titlecase }}</mat-radio-button>
+            <mat-radio-button value="filtered">{{ 'Solo filtradas' | translate }}</mat-radio-button>
           </mat-radio-group>
         </div>
 
@@ -53,7 +53,7 @@
           >
             <mat-expansion-panel-header>
               <mat-panel-title>
-                <span class="titulo-2">Avanzado</span>
+                <span class="titulo-2">{{ 'avanzado' | translate | titlecase }}</span>
               </mat-panel-title>
             </mat-expansion-panel-header>
 

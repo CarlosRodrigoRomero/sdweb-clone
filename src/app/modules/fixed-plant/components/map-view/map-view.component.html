@@ -20,7 +20,7 @@
         position="start"
       >
         <div class="titulo">
-          <h4>Filtros</h4>
+          <h4>{{ 'filtros' | translate | titlecase }}</h4>
         </div>
         <app-filters-panel-container></app-filters-panel-container>
       </mat-sidenav>
@@ -31,7 +31,7 @@
         class="right-sidenav"
         position="end"
         disableClose
-        (openedChange)="(rightOpened = !rightOpened)"
+        (openedChange)="rightOpened = !rightOpened"
       >
         <div class="titulo">
           <h4>Listado de anomalías</h4>
