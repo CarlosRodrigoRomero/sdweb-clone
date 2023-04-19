@@ -122,6 +122,11 @@ export class Patches {
       tempMin = 20;
       tempMax = 65;
     }
+    // EL MAZO MARZO 2023
+    if (informeId === 'tCxadlmdKDoc310rY2H2') {
+      tempMin = 25;
+      tempMax = 65;
+    }
 
     return [tempMin, tempMax];
   }
