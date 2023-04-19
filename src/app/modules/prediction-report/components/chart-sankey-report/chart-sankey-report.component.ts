@@ -50,6 +50,13 @@ export class ChartSankeyReportComponent implements OnInit {
     //   '#474747', // 'Nuevas',
     //   '#000', // 'Unknown',
   ];
+  colors = {
+    'Módulo en CA (string)': 'red',
+    '2x Substring CA': 'yellow',
+    'Substring en CA': 'orange',
+    'Módulo en CC': 'blue',
+    'PID regular': 'black',
+  };
   chartOptions = {
     width: '100%',
     height: 400,
@@ -58,22 +65,21 @@ export class ChartSankeyReportComponent implements OnInit {
       node: {
         nodePadding: 16,
         width: 10,
-        colors: this.colors_nodes,
+        colors: [COLOR.lightOrange],
         label: { fontSize: 12, color: '#fff', bold: false, italic: false },
       },
       link: {
-        color: {
-          // fill: '#efd', // Color of the link.
-          fillOpacity: 0.8, // Transparency of the link.
-          // stroke: 'black', // Color of the link border.
-          // strokeWidth: 1, // Thickness of the link border (default 0).
-        },
-        colors: this.colors_nodes,
+        // color: {
+        //   // fill: '#efd', // Color of the link.
+        //   fillOpacity: 0.8, // Transparency of the link.
+        //   // stroke: 'black', // Color of the link border.
+        //   // strokeWidth: 1, // Thickness of the link border (default 0).
+        // },
+        colors: [COLOR.neutralGrey],
         colorMode: 'gradient',
       },
     },
     tooltip: {
-      // isHtml: true,
       textStyle: {
         fontSize: 12,
       },
@@ -122,7 +128,7 @@ export class ChartSankeyReportComponent implements OnInit {
 
         if (uniqueNextTipos.length > 0) {
           // checkeamos si el color se ha añadido ya y si no lo añadimos
-          this.addColor(tipo);
+          // this.addColor(tipo);
 
           uniqueNextTipos.forEach((uniqueNextTipo) => {
             const anomsTipoNext = anomsTipo.filter((anom) => anom.tipoNextYear === uniqueNextTipo);
@@ -133,7 +139,7 @@ export class ChartSankeyReportComponent implements OnInit {
             this.chartData.push([from, to, count]);
 
             // checkeamos si el color se ha añadido ya y si no lo añadimos
-            this.addColor(uniqueNextTipo);
+            // this.addColor(uniqueNextTipo);
           });
         }
       }
@@ -155,29 +161,45 @@ export class ChartSankeyReportComponent implements OnInit {
   }
 
   private setColors() {
-    const colorRules: any[] = [];
-    this.chartData.forEach((row, index) => {
-      if (index > 0) {
-        console.log(row[0]);
-        const colorRule = {
-          from: row[0],
-          to: row[1],
-          color: Colors.rgbaToHex(COLOR.colores_tipos[GLOBAL.labels_tipos.indexOf(row[0])]),
-        };
-        this.colors_nodes.push(colorRule);
-      }
+    const nodes: string[] = [];
+    const colors: any[] = [];
+
+    // añadimos primero los nodos de la izquierda
+    this.chartData
+      .filter((_, index) => index > 0)
+      .map((row) => row[0])
+      .forEach((from) => {
+        if (!nodes.includes(from)) {
+          nodes.push(from);
+        }
+      });
+
+    // después los de la derecha
+    this.chartData
+      .filter((_, index) => index > 0)
+      .map((row) => row[1])
+      .forEach((from) => {
+        if (!nodes.includes(from)) {
+          nodes.push(from);
+        }
+      });
+
+    // añadimos los colores
+    nodes.forEach((node) => {
+      const tipo = GLOBAL.labels_tipos.indexOf(node);
+      const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
+      this.colors_nodes.push(color);
     });
   }
 
   private loadChart() {
-    GoogleCharts.load(
-      () => {
-        const chart = new GoogleCharts.api.visualization.Sankey(this.sankeyChartElement.nativeElement);
-        const dataTable = new GoogleCharts.api.visualization.arrayToDataTable(this.chartData);
-        chart.draw(dataTable, this.chartOptions);
-      },
-      { packages: ['sankey'] }
-    );
+    GoogleCharts.load(() => this.drawChart(), { packages: ['sankey'] });
+  }
+
+  private drawChart() {
+    const chart = new GoogleCharts.api.visualization.Sankey(this.sankeyChartElement.nativeElement);
+    const dataTable = new GoogleCharts.api.visualization.arrayToDataTable(this.chartData);
+    chart.draw(dataTable, this.chartOptions);
   }
 
   private tipoRandom(): number {
