@@ -1,0 +1,16 @@
+<!-- <label>
+  change
+  <select #langSelect (change)="changeLang(langSelect.value)">
+    <option *ngFor="let lang of langs" [value]="lang">
+      {{ lang }}
+    </option>
+  </select>
+</label> -->
+
+<button mat-menu-item [matMenuTriggerFor]="languages">
+  {{ 'idioma' | translate | titlecase }}: {{ selectLanguage | translate | titlecase }}
+</button>
+
+<mat-menu #languages="matMenu">
+  <button mat-menu-item *ngFor="let lang of langs" (click)="changeLang(lang)">{{ lang }}</button>
+</mat-menu>

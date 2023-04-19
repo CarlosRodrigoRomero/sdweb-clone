@@ -2,19 +2,21 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 import { GetNombreSeguidorPipe } from './pipes/get-nombre-seguidor.pipe';
 import { GetNumeroModulosPipe } from './pipes/get-numero-modulos.pipe';
 import { ValidateElementoPlantaPipe } from './pipes/validate-elemento-planta.pipe';
 
-import { MaterialModule } from '@shared/modules/material/material.module';
-import { ChartsModule } from './modules/charts/charts.module';
-import { OlMapsModule } from './modules/ol-maps/ol-maps.module';
-
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ClipboardModule } from 'ngx-clipboard';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
+import { MaterialModule } from '@shared/modules/material/material.module';
+import { ChartsModule } from './modules/charts/charts.module';
+import { OlMapsModule } from './modules/ol-maps/ol-maps.module';
 
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { ThermalSliderComponent } from './components/thermal-slider/thermal-slider.component';
@@ -31,6 +33,11 @@ import { SdLogoComponent } from './components/sd-logo/sd-logo.component';
 import { SdCompleteLogoComponent } from './components/sd-complete-logo/sd-complete-logo.component';
 import { RecommendedActionComponent } from './components/recommended-action/recommended-action.component';
 import { RecommendedActionsComponent } from './components/recommended-actions/recommended-actions.component';
+import { SelectLanguageComponent } from './components/select-language/select-language.component';
+
+export function createTranslateLoader(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 const components = [
   SpinnerComponent,
@@ -48,25 +55,48 @@ const components = [
   SdCompleteLogoComponent,
   RecommendedActionComponent,
   RecommendedActionsComponent,
+  SelectLanguageComponent,
 ];
-const modules = [
-  CommonModule,
-  RouterModule,
-  MaterialModule,
-  NgxSliderModule,
-  FormsModule,
-  ReactiveFormsModule,
-  NgxMatSelectSearchModule,
-  ClipboardModule,
-  OlMapsModule,
-  ChartsModule,
-  HttpClientModule,
-];
+
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
 
 @NgModule({
   declarations: [...components, ...pipes],
-  imports: [...modules],
-  exports: [...components, ...modules, ...pipes],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MaterialModule,
+    NgxSliderModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxMatSelectSearchModule,
+    ClipboardModule,
+    OlMapsModule,
+    ChartsModule,
+    HttpClientModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: createTranslateLoader,
+        deps: [HttpClient],
+      },
+    }),
+  ],
+  exports: [
+    ...components,
+    ...pipes,
+    CommonModule,
+    RouterModule,
+    MaterialModule,
+    NgxSliderModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxMatSelectSearchModule,
+    ClipboardModule,
+    OlMapsModule,
+    ChartsModule,
+    HttpClientModule,
+    TranslateModule,
+  ],
 })
 export class SharedModule {}
