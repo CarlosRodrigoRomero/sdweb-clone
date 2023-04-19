@@ -19,6 +19,7 @@ export class NavComponent implements OnInit {
   id: string;
   isPortfolio = false;
   isShared = false;
+  showPrediction = false;
 
   constructor(private breakpointObserver: BreakpointObserver, private router: Router) {
     this.router.events.subscribe((event) => {
@@ -33,6 +34,13 @@ export class NavComponent implements OnInit {
           this.isShared = true;
         } else {
           this.isShared = false;
+        }
+
+        // SOLO PARA CLIENTE INTERNACIONAL
+        if (this.router.url.split('/').includes('IJjoEdwZm4qgfhZblS2i')) {
+          this.showPrediction = true;
+        } else {
+          this.showPrediction = false;
         }
       }
     });
