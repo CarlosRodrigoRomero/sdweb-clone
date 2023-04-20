@@ -190,5 +190,8 @@
   "Próximo año": "Próximo año",
   "Predicción evolución número de anomalías": "Predicción evolución número de anomalías",
   "Reparables": "Reparables",
-  "No reparables": "No reparables"
+  "No reparables": "No reparables",
+  "MAE total": "MAE total",
+  "MAE reparable": "MAE reparable",
+  "MAE no reparable": "MAE no reparable"
 }

@@ -190,5 +190,8 @@
   "Próximo año": "Next year",
   "Predicción evolución número de anomalías": "Prediction of evolution of number of abnormalities",
   "Reparables": "Fixables",
-  "No reparables": "Unfixables"
+  "No reparables": "Unfixables",
+  "MAE total": "Total ESM",
+  "MAE reparable": "ESM fixable",
+  "MAE no reparable": "ESM unfixable"
 }
