@@ -3,6 +3,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
+import { TranslateService } from '@ngx-translate/core';
+
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -20,6 +22,7 @@ import { ThemeService } from '@data/services/theme.service';
 import { ReportControlService } from '@data/services/report-control.service';
 
 import { COLOR } from '@data/constants/color';
+import { GLOBAL } from '@data/constants/global';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -43,27 +46,52 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
 
+  private currentLabel: string;
+  private nextYearLabel: string;
+  private fixableLabel: string;
+  private unfixableLabel: string;
+
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private themeService: ThemeService, private reportControlService: ReportControlService) {}
+  constructor(
+    private themeService: ThemeService,
+    private reportControlService: ReportControlService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
-    const numAnomsData = [
-      this.reportControlService.allAnomalias.length,
-      this.reportControlService.allAnomalias.length * 1.2,
+    this.checkTranslate();
+
+    const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
+    const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
+
+    const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+    const lastReportData = [fixableLastReportAnoms.length, lastReportAnoms.length - fixableLastReportAnoms.length];
+
+    const nextYearFixableLastReportAnoms = lastReportAnoms.filter((anom) =>
+      GLOBAL.fixableTypes.includes(anom.tipoNextYear)
+    );
+    const nextYearLastReportData = [
+      nextYearFixableLastReportAnoms.length,
+      lastReportAnoms.length - nextYearFixableLastReportAnoms.length,
     ];
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => {
       this.chartOptions = {
         series: [
           {
-            name: 'Actual',
-            data: numAnomsData,
+            name: this.fixableLabel,
+            data: lastReportData,
+          },
+          {
+            name: this.unfixableLabel,
+            data: nextYearLastReportData,
           },
         ],
         chart: {
           type: 'bar',
           height: 250,
+          stacked: true,
           foreColor: this.themeService.textColor,
           toolbar: {
             show: false,
@@ -74,36 +102,37 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
             horizontal: false,
             columnWidth: '30%',
             // borderRadius: 8,
-            distributed: true,
-            dataLabels: {
-              position: 'top', // top, center, bottom
-            },
+            // distributed: true,
+            // dataLabels: {
+            //   position: 'top', // top, center, bottom
+            // },
           },
         },
         dataLabels: {
           enabled: true,
-          offsetY: -25,
+          // offsetY: -25,
         },
         xaxis: {
-          categories: ['Actual', 'Próximo año'],
-          labels: {
-            style: {
-              colors: [null, COLOR.lightOrange],
-            },
-          },
+          categories: [this.currentLabel, this.nextYearLabel],
+          // labels: {
+          //   style: {
+          //     colors: [null, COLOR.lightOrange],
+          //   },
+          // },
         },
-        colors: [COLOR.neutralGrey, 'transparent'],
-        stroke: {
-          show: true,
-          dashArray: 10,
-          width: 2,
-          colors: ['transparent', COLOR.lightOrange],
-        },
+        colors: [COLOR.lightOrange, COLOR.neutralGrey],
+        // stroke: {
+        //   show: true,
+        //   dashArray: 10,
+        //   width: 2,
+        //   colors: ['transparent', COLOR.lightOrange],
+        // },
         tooltip: {
           theme: theme.split('-')[0],
         },
         legend: {
-          show: false,
+          show: true,
+          position: 'top',
         },
       };
     });
@@ -124,6 +153,36 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
         }
       })
     );
+  }
+
+  private checkTranslate(): void {
+    this.translate
+      .get('Actual')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.currentLabel = res;
+      });
+
+    this.translate
+      .get('Próximo año')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.nextYearLabel = res;
+      });
+
+    this.translate
+      .get('Reparables')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.fixableLabel = res;
+      });
+
+    this.translate
+      .get('No reparables')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.unfixableLabel = res;
+      });
   }
 
   ngOnDestroy(): void {

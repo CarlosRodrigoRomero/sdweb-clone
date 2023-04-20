@@ -187,5 +187,8 @@
   "Francés": "French",
   "Predicción evolución anomalías": "Prediction of evolution of abnormalities",
   "Actual": "Current",
-  "Próximo año": "Next year"
+  "Próximo año": "Next year",
+  "Predicción evolución número de anomalías": "Prediction of evolution of number of abnormalities",
+  "Reparables": "Fixables",
+  "No reparables": "Unfixables"
 }
