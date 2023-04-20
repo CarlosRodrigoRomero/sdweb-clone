@@ -38,6 +38,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { ReportContentComponent } from './modules/fixed-plant/components/report-content/report-content.component';
 import { SimpleBackgroundComponent } from './layout/components/simple-background/simple-background.component';
+import { PredictionDialogComponent } from './modules/prediction-report/components/prediction-dialog/prediction-dialog.component';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -51,6 +52,7 @@ export function createTranslateLoader(http: HttpClient) {
     NavComponent,
     ReportContentComponent,
     SimpleBackgroundComponent,
+    PredictionDialogComponent,
   ],
   imports: [
     BrowserModule,

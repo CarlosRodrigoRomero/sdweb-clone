@@ -2,8 +2,6 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { TranslateService } from '@ngx-translate/core';
-
 import { GoogleCharts } from 'google-charts';
 
 import { ThemeService } from '@data/services/theme.service';
@@ -14,14 +12,13 @@ import { Colors } from '@core/classes/colors';
 
 import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
-import { switchMap, take } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-chart-sankey-report',
-  templateUrl: './chart-sankey-report.component.html',
-  styleUrls: ['./chart-sankey-report.component.css'],
+  selector: 'app-chart-sankey-power-report',
+  templateUrl: './chart-sankey-power-report.component.html',
+  styleUrls: ['./chart-sankey-power-report.component.css'],
 })
-export class ChartSankeyReportComponent implements OnInit {
+export class ChartSankeyPowerReportComponent implements OnInit {
   lightOrange = COLOR.lightOrange;
   @ViewChild('sankeyChart', { static: true }) sankeyChartElement: ElementRef;
 
@@ -66,11 +63,7 @@ export class ChartSankeyReportComponent implements OnInit {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(
-    private themeService: ThemeService,
-    private reportControlService: ReportControlService,
-    private translate: TranslateService
-  ) {}
+  constructor(private themeService: ThemeService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
     this.loadData();
@@ -105,6 +98,8 @@ export class ChartSankeyReportComponent implements OnInit {
       const anomsTipo = lastReportAnoms.filter((anom) => anom.tipo === tipo);
 
       if (anomsTipo.length > 0) {
+        // const powerTipo = this.getPotenciaPorTipo(lastReport.numeroModulos, anomsTipo.length, tipo);
+
         const uniqueNextTipos = MathOperations.getUniqueElemsArray(anomsTipo.map((anom) => anom.tipoNextYear));
 
         if (uniqueNextTipos.length > 0) {
@@ -113,29 +108,17 @@ export class ChartSankeyReportComponent implements OnInit {
 
           uniqueNextTipos.forEach((uniqueNextTipo) => {
             const anomsTipoNext = anomsTipo.filter((anom) => anom.tipoNextYear === uniqueNextTipo);
-            const count = anomsTipoNext.length;
-            let from: string;
-
-            this.translate
-              .get(GLOBAL.labels_tipos[tipo])
-              .pipe(
-                take(1),
-                switchMap((res: string) => {
-                  from = res;
-
-                  return this.translate.get(GLOBAL.labels_tipos[uniqueNextTipo]);
-                }),
-                take(1)
-              )
-              .subscribe((res: string) => {
-                const to = res;
-
-                this.chartData.push([from, to, count]);
-              });
-
-            // const from = GLOBAL.labels_tipos[tipo];
-            // const to = GLOBAL.labels_tipos[uniqueNextTipo];
+            const powerNextTipo = this.getPotenciaPorTipo(
+              lastReport.numeroModulos,
+              anomsTipoNext.length,
+              uniqueNextTipo
+            );
+            console.log(anomsTipoNext.length, powerNextTipo);
+            // const count = anomsTipoNext.length;
+            const from = GLOBAL.labels_tipos[tipo];
+            const to = GLOBAL.labels_tipos[uniqueNextTipo];
             // console.log(from, to, count);
+            this.chartData.push([from, to, powerNextTipo]);
 
             // checkeamos si el color se ha añadido ya y si no lo añadimos
             // this.addColor(uniqueNextTipo);
@@ -145,7 +128,9 @@ export class ChartSankeyReportComponent implements OnInit {
     });
   }
 
-  getPotenciaPorTipo(tipo: number) {}
+  private getPotenciaPorTipo(numModulos: number, numAnomsTipo: number, tipo: number) {
+    return ((numAnomsTipo * GLOBAL.pcPerdidas[tipo]) / numModulos) * this.reportControlService.planta.potencia;
+  }
 
   private setChartHeight() {
     const numRows = this.chartData.length - 1;

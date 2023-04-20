@@ -1,0 +1,13 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Predicción evolución potencia perdida por tipo de anomalía</mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="card-content">
+    <div #sankeyChart class="text-center"></div>
+
+    <div class="x-axis">
+      <span class="label">Actual</span>
+      <span class="label" [ngStyle]="{ color: lightOrange }">Próximo año</span>
+    </div>
+  </mat-card-content>
+</mat-card>
