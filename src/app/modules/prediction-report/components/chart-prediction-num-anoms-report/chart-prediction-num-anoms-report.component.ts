@@ -66,13 +66,14 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
     const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
 
     const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
-    const lastReportData = [fixableLastReportAnoms.length, lastReportAnoms.length - fixableLastReportAnoms.length];
 
     const nextYearFixableLastReportAnoms = lastReportAnoms.filter((anom) =>
       GLOBAL.fixableTypes.includes(anom.tipoNextYear)
     );
-    const nextYearLastReportData = [
-      nextYearFixableLastReportAnoms.length,
+
+    const fixableAnomsData = [fixableLastReportAnoms.length, nextYearFixableLastReportAnoms.length];
+    const unfixableAnomsData = [
+      lastReportAnoms.length - fixableLastReportAnoms.length,
       lastReportAnoms.length - nextYearFixableLastReportAnoms.length,
     ];
 
@@ -81,11 +82,11 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
         series: [
           {
             name: this.fixableLabel,
-            data: lastReportData,
+            data: fixableAnomsData,
           },
           {
             name: this.unfixableLabel,
-            data: nextYearLastReportData,
+            data: unfixableAnomsData,
           },
         ],
         chart: {
@@ -148,6 +149,13 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
             },
             tooltip: {
               theme: theme.split('-')[0],
+            },
+            dataLabels: {
+              ...this.chartOptions.dataLabels,
+              style: {
+                ...this.chartOptions.dataLabels.style,
+                colors: [this.themeService.textColor],
+              },
             },
           };
         }

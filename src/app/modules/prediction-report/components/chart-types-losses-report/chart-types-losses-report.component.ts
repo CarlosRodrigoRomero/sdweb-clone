@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+
+import { TranslateService } from '@ngx-translate/core';
 
 import {
   ChartComponent,
@@ -63,7 +65,7 @@ export interface DataPlot {
   templateUrl: './chart-types-losses-report.component.html',
   styleUrls: ['./chart-types-losses-report.component.css'],
 })
-export class ChartTypesLossesReportComponent implements OnInit {
+export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
   public chartLoaded = false;
   private lastReport: InformeInterface;
   public chartOptionsCommon: Partial<ChartOptions>;
@@ -75,11 +77,20 @@ export class ChartTypesLossesReportComponent implements OnInit {
   public numsCategoria: number[] = [];
   public dataPlot: DataPlot[];
 
+  private anomsTipoLabel: string;
+  private maeTipoLabel: string;
+
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private reportControlService: ReportControlService, private themeService: ThemeService) {}
+  constructor(
+    private reportControlService: ReportControlService,
+    private themeService: ThemeService,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
+    this.checkTranslate();
+
     this.lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
 
     const anomaliasLastReport = this.reportControlService.allAnomalias.filter(
@@ -196,9 +207,9 @@ export class ChartTypesLossesReportComponent implements OnInit {
 
       this.chartOptionsTypes = {
         series: seriesNumCat,
-        colors: [COLOR.gris],
+        colors: [COLOR.neutralGrey],
         title: {
-          text: '# Anomalías por tipo',
+          text: '# ' + this.anomsTipoLabel,
           align: 'left',
         },
         chart: {
@@ -235,7 +246,7 @@ export class ChartTypesLossesReportComponent implements OnInit {
       this.chartOptionsLosses = {
         series: seriesMaeCat,
         title: {
-          text: 'MAE por tipo de anomalía',
+          text: this.maeTipoLabel,
           align: 'left',
         },
         chart: {
@@ -249,7 +260,7 @@ export class ChartTypesLossesReportComponent implements OnInit {
             show: false,
           },
         },
-        colors: [COLOR.gris],
+        colors: [COLOR.neutralGrey],
         yaxis: {
           max: (v) => {
             return Math.round(1.1 * v);
@@ -285,18 +296,28 @@ export class ChartTypesLossesReportComponent implements OnInit {
 
     allNumCategorias.forEach((i) => {
       if (anomalias.filter((anom) => anom.tipo === i).length > 0) {
-        labelsCategoria.push(GLOBAL.labels_tipos[i]);
-        coloresFillCategoria.push('transparent');
-        coloresStrokeCategoria.push(Colors.rgbaToHex(COLOR.colores_tipos[i]));
-        numsCategoria.push(i);
+        this.translate
+          .get(GLOBAL.labels_tipos[i])
+          .pipe(take(1))
+          .subscribe((res: string) => {
+            labelsCategoria.push(res);
+            coloresFillCategoria.push('transparent');
+            coloresStrokeCategoria.push(Colors.rgbaToHex(COLOR.colores_tipos[i]));
+            numsCategoria.push(i);
+          });
       } else if (
         anomalias[0].hasOwnProperty('tipoNextYear') &&
         anomalias.filter((anom) => anom.tipoNextYear === i).length > 0
       ) {
-        labelsCategoria.push(GLOBAL.labels_tipos[i]);
-        coloresFillCategoria.push(`transparent`);
-        coloresStrokeCategoria.push(Colors.rgbaToHex(COLOR.colores_tipos[i]));
-        numsCategoria.push(i);
+        this.translate
+          .get(GLOBAL.labels_tipos[i])
+          .pipe(take(1))
+          .subscribe((res: string) => {
+            labelsCategoria.push(res);
+            coloresFillCategoria.push('transparent');
+            coloresStrokeCategoria.push(Colors.rgbaToHex(COLOR.colores_tipos[i]));
+            numsCategoria.push(i);
+          });
       }
     });
     this.labelsCategoria = labelsCategoria;
@@ -356,5 +377,25 @@ export class ChartTypesLossesReportComponent implements OnInit {
         return GLOBAL.pcPerdidas[anom.tipo] * numeroModulos;
       })
       .reduce((a, b) => a + b, 0);
+  }
+
+  private checkTranslate(): void {
+    this.translate
+      .get('Anomalías por tipo')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.anomsTipoLabel = res;
+      });
+
+    this.translate
+      .get('MAE por tipo de anomalía')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.maeTipoLabel = res;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

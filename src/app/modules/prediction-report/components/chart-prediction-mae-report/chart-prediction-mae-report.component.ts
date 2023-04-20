@@ -198,18 +198,13 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
             tooltip: {
               theme: theme.split('-')[0],
             },
-            // dataLabels: {
-            //   ...this.chartOptions.dataLabels,
-            //   style: {
-            //     ...this.chartOptions.dataLabels.style,
-            //     colors: [this.themeService.surfaceColor],
-            //   },
-            //   background: {
-            //     ...this.chartOptions.dataLabels.background,
-            //     foreColor: this.themeService.textColor,
-            //     borderColor: this.themeService.textColor,
-            //   },
-            // },
+            dataLabels: {
+              ...this.chartOptions.dataLabels,
+              style: {
+                ...this.chartOptions.dataLabels.style,
+                colors: [this.themeService.textColor],
+              },
+            },
           };
         }
       })

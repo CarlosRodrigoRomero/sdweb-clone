@@ -193,5 +193,7 @@
   "No reparables": "Unfixables",
   "MAE total": "Total ESM",
   "MAE reparable": "ESM fixable",
-  "MAE no reparable": "ESM unfixable"
+  "MAE no reparable": "ESM unfixable",
+  "Predicción de la evolución de las anomalías por tipo y su MAE asociado": "Prediction of the evolution of the abnormalities by type and its associated ESM",
+  "Anomalías por tipo": "Abnormalities by type"
 }
