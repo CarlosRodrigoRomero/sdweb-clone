@@ -31,6 +31,7 @@ export type ChartOptions = {
   plotOptions: ApexPlotOptions;
   responsive: ApexResponsive[];
   xaxis: ApexXAxis;
+  yaxis: ApexXAxis;
   stroke: ApexStroke;
   tooltip: ApexTooltip;
   colors: string[];
@@ -62,30 +63,41 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
   ngOnInit(): void {
     this.checkTranslate();
 
-    const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
-    const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
+    // const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
+    // const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
 
-    const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+    // const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
 
-    const nextYearFixableLastReportAnoms = lastReportAnoms.filter((anom) =>
-      GLOBAL.fixableTypes.includes(anom.tipoNextYear)
-    );
+    // const nextYearFixableLastReportAnoms = lastReportAnoms.filter((anom) =>
+    //   GLOBAL.fixableTypes.includes(anom.tipoNextYear)
+    // );
 
-    const fixableAnomsData = [fixableLastReportAnoms.length, nextYearFixableLastReportAnoms.length];
-    const unfixableAnomsData = [
-      lastReportAnoms.length - fixableLastReportAnoms.length,
-      lastReportAnoms.length - nextYearFixableLastReportAnoms.length,
-    ];
+    // const fixableAnomsData = [fixableLastReportAnoms.length, nextYearFixableLastReportAnoms.length];
+    // const unfixableAnomsData = [
+    //   lastReportAnoms.length - fixableLastReportAnoms.length,
+    //   lastReportAnoms.length - nextYearFixableLastReportAnoms.length,
+    // ];
+
+    const totalAnomsData = [1599, 1705];
+    const fixableAnomsData = [259, 315];
+    const unfixableAnomsData = [1340, 1390];
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => {
       this.chartOptions = {
         series: [
           {
+            name: '',
+            type: 'line',
+            data: totalAnomsData,
+          },
+          {
             name: this.fixableLabel,
+            type: 'column',
             data: fixableAnomsData,
           },
           {
             name: this.unfixableLabel,
+            type: 'column',
             data: unfixableAnomsData,
           },
         ],
@@ -121,7 +133,14 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
           //   },
           // },
         },
-        colors: [COLOR.dark_orange, COLOR.neutralGrey],
+        yaxis: {
+          min: 0,
+          max:
+            Math.max(...totalAnomsData) * 1.1 < Math.max(...totalAnomsData) + 1.1
+              ? Math.max(...totalAnomsData) * 1.1
+              : Math.max(...totalAnomsData) + 1.1,
+        },
+        colors: ['transparent', COLOR.dark_orange, COLOR.neutralGrey],
         // stroke: {
         //   show: true,
         //   dashArray: 10,

@@ -100,8 +100,11 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
     this.dataPlot = [];
     this.getAllCategorias(anomaliasLastReport);
 
-    this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport));
-    this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport, true));
+    this.dataPlot.push(this.calculateFakeDataPlot(anomaliasLastReport));
+    this.dataPlot.push(this.calculateFakeDataPlot(anomaliasLastReport, true));
+
+    // this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport));
+    // this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport, true));
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => this.initChart(theme.split('-')[0]));
 
@@ -235,7 +238,7 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
         stroke: {
           show: true,
           width: 2,
-          dashArray: [0, 10],
+          dashArray: [0, 6],
           colors: this.coloresStrokeCategoria,
         },
       };
@@ -324,6 +327,34 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
     this.coloresFillCategoria = coloresFillCategoria;
     this.coloresStrokeCategoria = coloresStrokeCategoria;
     this.numsCategoria = numsCategoria;
+  }
+
+  private calculateFakeDataPlot(anomalias: Anomalia[], prediction = false): DataPlot {
+    let numPorCategoria = Array();
+    let perdidasPorCategoria = Array();
+
+    const tipos = [18, 17, 10, 3, 7, 14, 15];
+
+    if (prediction) {
+      numPorCategoria = [1399, 150, 2, 69, 1, 20, 37];
+      numPorCategoria.forEach((num, index) => {
+        perdidasPorCategoria.push(num * GLOBAL.pcPerdidas[tipos[index]]);
+      });
+    } else {
+      numPorCategoria = [1339, 140, 2, 62, 1, 18, 37];
+      numPorCategoria.forEach((num, index) => {
+        perdidasPorCategoria.push(num * GLOBAL.pcPerdidas[tipos[index]]);
+      });
+    }
+
+    return {
+      anomalias,
+      informeId: this.lastReport.id,
+      numPorCategoria,
+      perdidasPorCategoria,
+      labelsCategoria: this.labelsCategoria,
+      coloresCategoria: this.coloresFillCategoria,
+    };
   }
 
   private calculateDataPlot(anomalias: Anomalia[], prediction = false): DataPlot {

@@ -90,9 +90,9 @@ export class ChartSankeyPowerReportComponent implements OnInit {
     const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
 
     // DEMO
-    lastReportAnoms.forEach((anom) => {
-      anom.tipoNextYear = this.tipoRandom();
-    });
+    // lastReportAnoms.forEach((anom) => {
+    //   anom.tipoNextYear = this.tipoRandom();
+    // });
 
     GLOBAL.sortedAnomsTipos.forEach((tipo, index) => {
       const anomsTipo = lastReportAnoms.filter((anom) => anom.tipo === tipo);

@@ -54,18 +54,18 @@ export let GLOBAL = {
     '0',
     'PC',
     'VPV',
-    'Substring en CA',
+    'Substring en CA', // 3
     'String',
-    'Módulo en CA',
-    'Substring en CC',
-    'Módulo en CC',
-    'Célula',
-    'Varias células',
-    '2x Substring CA', // nunca más largo que esto, por estética en tabla anexos
-    'Suciedad',
-    'Vidrio roto',
+    'Módulo en CA', // 5
+    'Substring en CC', // 6
+    'Módulo en CC', // 7
+    'Célula', // 8
+    'Varias células', // 9
+    '2x Substring CA', // 10
+    'Suciedad', // 11
+    'Vidrio roto', // 12
     'Resist. anómala',
-    'Caja conexiones',
+    'Caja conexiones', // 14
     'Sombras', // 15
     'Yellowing', // 16
     'Módulo en CA (string)', // 17

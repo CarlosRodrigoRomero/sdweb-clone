@@ -73,11 +73,13 @@ export class ChartSankeyReportComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadData();
+    // this.loadData();
 
     // this.setChartHeight();
 
     // this.setColors();
+
+    this.loadFakeData();
 
     this.loadChart();
 
@@ -97,9 +99,9 @@ export class ChartSankeyReportComponent implements OnInit {
     const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
 
     // DEMO
-    lastReportAnoms.forEach((anom) => {
-      anom.tipoNextYear = this.tipoRandom();
-    });
+    // lastReportAnoms.forEach((anom) => {
+    //   anom.tipoNextYear = this.tipoRandom();
+    // });
 
     GLOBAL.sortedAnomsTipos.forEach((tipo, index) => {
       const anomsTipo = lastReportAnoms.filter((anom) => anom.tipo === tipo);
@@ -145,7 +147,33 @@ export class ChartSankeyReportComponent implements OnInit {
     });
   }
 
-  getPotenciaPorTipo(tipo: number) {}
+  private loadFakeData() {
+    const data = [
+      ['PID fase temprana', 'PID fase temprana.', 1399],
+      ['Módulo en CA (string)', 'Módulo en CA (string).', 140],
+      ['2x Substring CA', '2x Substring CA.', 2],
+      ['Substring en CA', 'Substring en CA.', 62],
+      ['Módulo en CC', 'Módulo en CC.', 1],
+      ['Caja conexiones', 'Caja conexiones.', 16],
+      ['Sombras', 'Sombras.', 37],
+      ['Nuevas', 'Substring en CA.', 7],
+      ['Nuevas', 'Caja conexiones.', 2],
+      ['Nuevas', 'Módulo en CA (string).', 10],
+      ['Nuevas', 'PID fase temprana.', 50],
+    ];
+
+    data.forEach((row) => {
+      const translateData = [];
+      this.translate.get(row[0] as string).subscribe((res: string) => {
+        translateData.push(res);
+        this.translate.get((row[1] as string).slice(0, -1)).subscribe((res2: string) => {
+          translateData.push(res2 + '.');
+          translateData.push(row[2]);
+          this.chartData.push(translateData);
+        });
+      });
+    });
+  }
 
   private setChartHeight() {
     const numRows = this.chartData.length - 1;

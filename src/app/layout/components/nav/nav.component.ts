@@ -54,7 +54,7 @@ export class NavComponent implements OnInit {
         }
 
         // SOLO PARA CLIENTE INTERNACIONAL
-        if (this.router.url.split('/').includes('IJjoEdwZm4qgfhZblS2i')) {
+        if (this.router.url.split('/').includes('eyeSNsK6pKzfNLuacWdn')) {
           this.showPrediction = true;
         } else {
           this.showPrediction = false;

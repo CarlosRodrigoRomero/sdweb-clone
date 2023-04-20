@@ -63,12 +63,12 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
 
         if (object) {
           if (this.reportControlService.plantaFija) {
-            // this.anomaliaService.updateAnomaliaField(anom.id, 'tipoNextYear', object.tipo2);
+            this.anomaliaService.updateAnomaliaField(anom.id, 'tipoNextYear', anom.tipo);
           } else {
             // this.pcService.updatePcField(anom.id, 'tipoNextYear', object.tipo2);
           }
+          // }
         }
-        // }
       });
     });
   }
