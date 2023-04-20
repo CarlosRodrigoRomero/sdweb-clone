@@ -5,6 +5,10 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
+import { ThemeService } from '@data/services/theme.service';
+
+import { COLOR } from '@data/constants/color';
+
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
@@ -21,8 +25,13 @@ export class NavComponent implements OnInit {
   isShared = false;
   showPrediction = false;
   itemSelected = 'list';
+  itemColor = COLOR.light_orange;
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router) {
+  constructor(
+    private breakpointObserver: BreakpointObserver,
+    private router: Router,
+    private themeService: ThemeService
+  ) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         if (this.router.url.split('/').includes('plants')) {
@@ -54,7 +63,15 @@ export class NavComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.themeService.themeSelected$.subscribe((theme) => {
+      if (theme === 'dark-theme') {
+        this.itemColor = COLOR.dark_orange;
+      } else {
+        this.itemColor = COLOR.light_orange;
+      }
+    });
+  }
 
   navigateTo(page: string) {
     const url = this.router.url.split('/');

@@ -19,7 +19,7 @@ import { COLOR } from '@data/constants/color';
   styleUrls: ['./chart-sankey-power-report.component.css'],
 })
 export class ChartSankeyPowerReportComponent implements OnInit {
-  lightOrange = COLOR.lightOrange;
+  lightOrange = COLOR.dark_orange;
   @ViewChild('sankeyChart', { static: true }) sankeyChartElement: ElementRef;
 
   chartData: any[][] = [['From', 'To', '#']];
@@ -39,7 +39,7 @@ export class ChartSankeyPowerReportComponent implements OnInit {
       node: {
         nodePadding: 16,
         width: 10,
-        colors: [COLOR.lightOrange],
+        colors: [COLOR.dark_orange],
         label: { fontSize: 12, color: '#fff', bold: false, italic: false },
       },
       link: {

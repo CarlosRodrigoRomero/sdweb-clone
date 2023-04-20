@@ -20,15 +20,23 @@
         </a> -->
         <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('map')">
           <!-- <a *ngIf="!isPortfolio" mat-list-item> -->
-          <div class="item-content" [ngClass]="{ 'item-selected': itemSelected === 'map' }">
+          <div *ngIf="itemSelected === 'map'" class="item-content" [ngStyle]="{ color: itemColor }">
+            <mat-icon>map</mat-icon>
+            <span>{{ 'mapa' | translate | titlecase }}</span>
+          </div>
+          <div *ngIf="itemSelected !== 'map'" class="item-content">
             <mat-icon>map</mat-icon>
             <span>{{ 'mapa' | translate | titlecase }}</span>
           </div>
         </a>
         <!-- <a *ngIf="isPortfolio" mat-list-item (click)="navigateTo('list')"> -->
         <a *ngIf="isPortfolio" mat-list-item>
-          <div class="item-content" [ngClass]="{ 'item-selected': itemSelected === 'list' }">
+          <div *ngIf="itemSelected === 'list'" class="item-content" [ngStyle]="{ color: itemColor }">
             <mat-icon>list</mat-icon>
+            <span>{{ 'listado' | translate | titlecase }}</span>
+          </div>
+          <div *ngIf="itemSelected !== 'list'" class="item-content">
+            <mat-icon>map</mat-icon>
             <span>{{ 'listado' | translate | titlecase }}</span>
           </div>
         </a>
@@ -39,7 +47,11 @@
           </div>
         </a> -->
         <a *ngIf="!isPortfolio && showPrediction" mat-list-item (click)="navigateTo('prediction')">
-          <div class="item-content" [ngClass]="{ 'item-selected': itemSelected === 'prediction' }">
+          <div *ngIf="itemSelected === 'prediction'" class="item-content" [ngStyle]="{ color: itemColor }">
+            <mat-icon>insights</mat-icon>
+            <span>{{ 'prediccion' | translate | titlecase }}</span>
+          </div>
+          <div *ngIf="itemSelected !== 'prediction'" class="item-content">
             <mat-icon>insights</mat-icon>
             <span>{{ 'prediccion' | translate | titlecase }}</span>
           </div>

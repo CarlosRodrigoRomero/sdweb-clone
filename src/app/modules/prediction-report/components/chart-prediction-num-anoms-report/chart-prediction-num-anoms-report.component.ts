@@ -121,7 +121,7 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
           //   },
           // },
         },
-        colors: [COLOR.lightOrange, COLOR.neutralGrey],
+        colors: [COLOR.dark_orange, COLOR.neutralGrey],
         // stroke: {
         //   show: true,
         //   dashArray: 10,

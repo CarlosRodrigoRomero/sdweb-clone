@@ -135,7 +135,7 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
               ? Math.max(...maeTotalData) * 1.1
               : Math.max(...maeTotalData) + 1.1,
         },
-        colors: ['transparent', COLOR.lightOrange, COLOR.neutralGrey],
+        colors: ['transparent', COLOR.dark_orange, COLOR.neutralGrey],
         legend: {
           show: true,
           position: 'top',

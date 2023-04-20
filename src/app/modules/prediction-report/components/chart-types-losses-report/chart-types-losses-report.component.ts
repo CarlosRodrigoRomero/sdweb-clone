@@ -278,7 +278,7 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
           show: true,
           width: 2,
           dashArray: [0, 10],
-          colors: [COLOR.lightOrange],
+          colors: [COLOR.dark_orange],
         },
       };
 
