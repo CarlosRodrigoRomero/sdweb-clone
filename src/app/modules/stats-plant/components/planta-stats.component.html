@@ -4,7 +4,7 @@
 </button>
 
 <mat-tab-group>
-  <mat-tab label="MAE">
+  <mat-tab label="{{ 'MAE' | translate }}">
     <div class="mae-grid">
       <div class="mae-content-izq">
         <!-- MAE GLOBAL -->
@@ -22,7 +22,7 @@
     </div>
   </mat-tab>
 
-  <mat-tab *ngIf="thereAreCCs" class="mat-tab-stats" label="Células calientes (CC)">
+  <mat-tab *ngIf="thereAreCCs" class="mat-tab-stats" label="{{ 'Células calientes' | translate }}">
     <div class="cc-grid">
       <div class="cc-content-izq">
         <!-- MODULOS CON CC -->

@@ -34,7 +34,7 @@
         (openedChange)="rightOpened = !rightOpened"
       >
         <div class="titulo">
-          <h4>Listado de anomalías</h4>
+          <h4>{{ 'Listado de anomalías' | translate }}</h4>
         </div>
 
         <ng-template appDynamicAnomaliaList></ng-template>
@@ -97,7 +97,7 @@
             mat-raised-button
             class="btn-right"
             (click)="loadAnomList(); sidenavRight.toggle()"
-            matTooltip="Lista anomalías"
+            matTooltip="{{ 'Lista anomalías' | translate }}"
             matTooltipClass="tooltip-style"
           >
             <mat-icon>list_alt</mat-icon>
@@ -111,7 +111,7 @@
             mat-raised-button
             class="btn-right-stats stats"
             (click)="loadStats(); sidenavStats.toggle()"
-            matTooltip="Estadísticas"
+            matTooltip="{{ 'Estadísticas' | translate }}"
             matTooltipClass="tooltip-style"
             [disabled]="noAnomsReport"
           >

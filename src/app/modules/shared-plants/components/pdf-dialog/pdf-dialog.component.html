@@ -20,7 +20,7 @@
             [checked]="anexoAnomalias.completed"
             (change)="anexoAnomalias.completed = !anexoAnomalias.completed"
           >
-            <span class="checkbox-titulo">{{ anexoAnomalias.label }}</span>
+            <span class="checkbox-titulo">{{ anexoAnomalias.label | translate }}</span>
           </mat-checkbox>
 
           <!-- ANEXO SEGUIDORES -->
@@ -30,13 +30,13 @@
               [indeterminate]="someComplete(elemAnexoSeguidores.id)"
               (change)="setAll($event.checked, elemAnexoSeguidores.id)"
             >
-              <span class="titulo">{{ elemAnexoSeguidores.label }}</span>
+              <span class="titulo">{{ elemAnexoSeguidores.label | translate }}</span>
             </mat-checkbox>
 
             <li *ngFor="let elem of elemAnexoSeguidores.elems">
               <mat-checkbox [(ngModel)]="elem.completed" (ngModelChange)="updateAllComplete(elemAnexoSeguidores.id)">
                 <span style="font-size: 15px">
-                  {{ elem.label }}
+                  {{ elem.label | translate }}
                 </span>
               </mat-checkbox>
             </li>
@@ -65,13 +65,13 @@
                   [indeterminate]="someComplete(elemIntroduccion.id)"
                   (change)="setAll($event.checked, elemIntroduccion.id)"
                 >
-                  <span class="titulo">{{ elemIntroduccion.label }}</span>
+                  <span class="titulo">{{ elemIntroduccion.label | translate }}</span>
                 </mat-checkbox>
 
                 <li *ngFor="let elem of elemIntroduccion.elems">
                   <mat-checkbox [(ngModel)]="elem.completed" (ngModelChange)="updateAllComplete(elemIntroduccion.id)">
                     <span style="font-size: 15px">
-                      {{ elem.label }}
+                      {{ elem.label | translate }}
                     </span>
                   </mat-checkbox>
                 </li>
@@ -83,7 +83,7 @@
                 [checked]="elemOrtofotos.elems[0].completed"
                 (change)="elemOrtofotos.elems[0].completed = !elemOrtofotos.elems[0].completed"
               >
-                <span class="checkbox-titulo">{{ elemOrtofotos.elems[0].label }}</span>
+                <span class="checkbox-titulo">{{ elemOrtofotos.elems[0].label | translate }}</span>
               </mat-checkbox>
               <div *ngIf="elemOrtofotos.elems.length > 1 && !noOrtofotos">
                 <mat-checkbox
@@ -91,13 +91,13 @@
                   [indeterminate]="someComplete(elemOrtofotos.id)"
                   (change)="setAll($event.checked, elemOrtofotos.id)"
                 >
-                  <span class="titulo">{{ elemOrtofotos.label }}</span>
+                  <span class="titulo">{{ elemOrtofotos.label | translate }}</span>
                 </mat-checkbox>
 
                 <li *ngFor="let elem of elemOrtofotos.elems">
                   <mat-checkbox [(ngModel)]="elem.completed" (ngModelChange)="updateAllComplete(elemOrtofotos.id)">
                     <span style="font-size: 15px">
-                      {{ elem.label }}
+                      {{ elem.label | translate }}
                     </span>
                   </mat-checkbox>
                 </li>
@@ -110,12 +110,12 @@
                   [indeterminate]="someComplete(elemResultados.id)"
                   (change)="setAll($event.checked, elemResultados.id)"
                 >
-                  <span class="titulo">{{ elemResultados.label }}</span>
+                  <span class="titulo">{{ elemResultados.label | translate }}</span>
                 </mat-checkbox>
                 <li *ngFor="let elem of elemResultados.elems">
                   <mat-checkbox [(ngModel)]="elem.completed" (ngModelChange)="updateAllComplete(elemResultados.id)">
                     <span style="font-size: 15px">
-                      {{ elem.label }}
+                      {{ elem.label | translate }}
                     </span>
                   </mat-checkbox>
                 </li>
@@ -123,13 +123,13 @@
 
               <!-- ANEXO LISTA -->
               <mat-checkbox [checked]="anexoLista.completed" (change)="anexoLista.completed = !anexoLista.completed">
-                <span class="checkbox-titulo">{{ anexoLista.label }}</span>
+                <span class="checkbox-titulo">{{ anexoLista.label | translate }}</span>
               </mat-checkbox>
             </div>
           </mat-expansion-panel>
         </mat-accordion>
 
-        <button mat-stroked-button matStepperNext>Siguiente</button>
+        <button mat-stroked-button matStepperNext>{{ 'siguiente' | translate | titlecase }}</button>
       </div>
     </mat-step>
 
@@ -144,8 +144,8 @@
           <span>¿Quieres continuar? </span>
         </div>
         <div class="btns">
-          <button mat-stroked-button matStepperPrevious>Volver atrás</button>
-          <button mat-stroked-button matStepperNext>Continuar</button>
+          <button mat-stroked-button matStepperPrevious>{{ 'Volver atras' | translate }}</button>
+          <button mat-stroked-button matStepperNext>{{ 'continuar' | translate | titlecase }}</button>
         </div>
       </div>
     </mat-step>
@@ -164,67 +164,58 @@
           <span>¿Quieres continuar? </span>
         </div>
         <div class="btns">
-          <button mat-stroked-button matStepperPrevious>Volver atrás</button>
-          <button mat-stroked-button matStepperNext>Continuar</button>
+          <button mat-stroked-button matStepperPrevious>{{ 'Volver atras' | translate }}</button>
+          <button mat-stroked-button matStepperNext>{{ 'continuar' | translate | titlecase }}</button>
         </div>
       </div>
     </mat-step>
     <mat-step>
       <div class="step-content">
-        <span class="titulo-principal">Selecciona destino</span>
+        <span class="titulo-principal">{{ 'Selecciona destino' | translate }}</span>
         <div class="text-explain">
-          <span
-            >Tras solicitar el PDF, cuando esté generado te llegará un correo al email con el que has iniciado
-            sesión.</span
-          >
+          <span>{{ 'Selecciona destino 1' | translate }}</span>
           <span
             ><b>( {{ emailUser }} )</b>
           </span>
-          <span
-            >Si prefieres que te llegue a otro email, activa la siguiente casilla en introduce el que prefieras.</span
-          >
+          <span>{{ 'Selecciona destino 2' | translate }}</span>
         </div>
         <mat-checkbox id="check-select-email" [checked]="selectEmail" (change)="selectEmail = !selectEmail">
-          <span class="checkbox-titulo">Elegir otro email</span>
+          <span class="checkbox-titulo">{{ 'Elegir otro email' | translate }}</span>
         </mat-checkbox>
         <form *ngIf="selectEmail" [formGroup]="form" (ngSubmit)="onSubmit($event)">
           <mat-form-field appearance="fill" class="email-input">
-            <mat-label>Introduce email</mat-label>
+            <mat-label>{{ 'Introduce email' | translate }}</mat-label>
             <input matInput formControlName="email" />
           </mat-form-field>
           <div class="btns">
-            <button mat-stroked-button matStepperPrevious>Volver atrás</button>
+            <button mat-stroked-button matStepperPrevious>{{ 'Volver atras' | translate }}</button>
             <button mat-stroked-button class="btn-generate" [disabled]="form.invalid" matStepperNext type="submit">
-              Solicitar PDF
+              {{ 'Solicitar PDF' | translate }}
             </button>
           </div>
         </form>
         <div class="btns" *ngIf="!selectEmail">
-          <button mat-stroked-button matStepperPrevious>Volver atrás</button>
-          <button mat-stroked-button class="btn-generate" matStepperNext (click)="generate()">Solicitar PDF</button>
+          <button mat-stroked-button matStepperPrevious>{{ 'Volver atras' | translate }}</button>
+          <button mat-stroked-button class="btn-generate" matStepperNext (click)="generate()">
+            {{ 'Solicitar PDF' | translate }}
+          </button>
         </div>
       </div>
     </mat-step>
     <mat-step>
       <div class="step-content">
-        <span class="titulo-principal">PDF solicitado</span>
+        <span class="titulo-principal">{{ 'PDF solicitado' | translate }}</span>
         <div *ngIf="plantaFija" class="text-explain">
-          <span>En breve recibiras un correo con un enlace para descargar tu PDF.</span>
-          <span *ngIf="anexoAnomalias !== undefined">
-            Como has seleccionado el apartado que incluye imágenes de las anomalías, ten en cuenta que el tiempo podría
-            dilatarse si el número de anomalias es elevado.</span
-          >
-          <span>Puedes seguir utilizando la aplicación sin ningún problema.</span>
+          <span>{{ 'PDF solicitado 1' | translate }}</span>
+          <span *ngIf="anexoAnomalias !== undefined"> {{ 'PDF solicitado 2' | translate }}</span>
+          <span>{{ 'PDF solicitado 3' | translate }}</span>
         </div>
         <div *ngIf="!plantaFija" class="text-explain">
-          <span>En breve recibiras un correo con un enlace para descargar tu PDF.</span>
-          <span *ngIf="elemAnexoSeguidores !== undefined">
-            Como has seleccionado el apartado que incluye imágenes de los seguidores, ten en cuenta que el tiempo podría
-            dilatarse si el número de seguidores es elevado.</span
-          >
-          <span>Puedes seguir utilizando la aplicación sin ningún problema.</span>
+          <span>{{ 'PDF solicitado 1' | translate }}</span>
+          <span *ngIf="elemAnexoSeguidores !== undefined"> {{ 'PDF solicitado 4' | translate }}</span>
+          <span>{{ 'PDF solicitado 3' | translate }}</span>
         </div>
-        <button mat-stroked-button mat-dialog-close>Cerrar</button>
+        <button mat-stroked-button mat-dialog-close>{{ 'cerrar' | translate | titlecase }}</button>
       </div>
     </mat-step>
   </mat-horizontal-stepper>

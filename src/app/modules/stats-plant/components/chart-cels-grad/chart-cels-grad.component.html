@@ -1,8 +1,10 @@
 <div *ngIf="dataLoaded" id="chart">
   <mat-card>
     <mat-card-header>
-      <mat-card-title>Módulos con cel. calientes por gradiente</mat-card-title>
-      <mat-card-subtitle>Clasificación de los módulos con céls calientes por gradiente</mat-card-subtitle>
+      <mat-card-title>{{ 'Módulos con cel. calientes por gradiente' | translate }}</mat-card-title>
+      <mat-card-subtitle>{{
+        'Clasificación de los módulos con céls calientes por gradiente' | translate
+      }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <apx-chart
