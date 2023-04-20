@@ -20,14 +20,14 @@
         </a> -->
         <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('map')">
           <!-- <a *ngIf="!isPortfolio" mat-list-item> -->
-          <div class="item-content">
+          <div class="item-content" [ngClass]="{ 'item-selected': itemSelected === 'map' }">
             <mat-icon>map</mat-icon>
             <span>{{ 'mapa' | translate | titlecase }}</span>
           </div>
         </a>
-        <!-- <a *ngIf="isPortfolio" mat-list-item (click)="navigateTo('map')"> -->
+        <!-- <a *ngIf="isPortfolio" mat-list-item (click)="navigateTo('list')"> -->
         <a *ngIf="isPortfolio" mat-list-item>
-          <div class="item-content">
+          <div class="item-content" [ngClass]="{ 'item-selected': itemSelected === 'list' }">
             <mat-icon>list</mat-icon>
             <span>{{ 'listado' | translate | titlecase }}</span>
           </div>
@@ -39,7 +39,7 @@
           </div>
         </a> -->
         <a *ngIf="!isPortfolio && showPrediction" mat-list-item (click)="navigateTo('prediction')">
-          <div class="item-content">
+          <div class="item-content" [ngClass]="{ 'item-selected': itemSelected === 'prediction' }">
             <mat-icon>insights</mat-icon>
             <span>{{ 'prediccion' | translate | titlecase }}</span>
           </div>
