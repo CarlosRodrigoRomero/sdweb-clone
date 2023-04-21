@@ -205,5 +205,7 @@
   "Entrar": "Enter",
   "Hemos enviado un email para restablecer su contraseña. Revise su correo.": "We have sent an email to reset your password. Check your email.",
   "Enviar": "Send",
-  "¿Volver atrás?": "Go back?"
+  "¿Volver atrás?": "Go back?",
+  "Datos del vuelo": "Flight data",
+  "octavas": "octaves"
 }

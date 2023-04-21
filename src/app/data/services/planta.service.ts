@@ -27,6 +27,8 @@ import { UserAreaInterface } from '@core/models/userArea';
 import { CritCriticidad } from '@core/models/critCriticidad';
 import { InformeInterface } from '@core/models/informe';
 
+import { Translation } from '@shared/utils/translations/translations';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -41,6 +43,7 @@ export class PlantaService {
   private filteredLocAreasSource = new BehaviorSubject<LocationAreaInterface[]>(new Array<LocationAreaInterface>());
   public currentFilteredLocAreas$ = this.filteredLocAreasSource.asObservable();
   public locAreaList: LocationAreaInterface[];
+  private translation: Translation;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -393,10 +396,22 @@ export class PlantaService {
     return this.planta;
   }
 
-  getLabelNombreGlobalCoords(planta: PlantaInterface): string {
+  getLabelNombreGlobalCoords(planta: PlantaInterface, language?: string): string {
+    this.translation = new Translation(language);
+
     let label = '';
     if (planta.nombreGlobalCoords.length > 0) {
-      label = planta.nombreGlobalCoords.join('.');
+      if (language) {
+        planta.nombreGlobalCoords.forEach((coord, index, coords) => {
+          if (index < coords.length - 1) {
+            label += this.translation.t(coord) + '.';
+          } else {
+            label += this.translation.t(coord);
+          }
+        });
+      } else {
+        label = planta.nombreGlobalCoords.join('.');
+      }
     }
 
     return label;
