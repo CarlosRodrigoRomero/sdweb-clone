@@ -24,7 +24,7 @@
       </div>
       <div class="elemento">
         <span class="titulo">{{ 'perdidas' | translate | titlecase }} (beta)</span>
-        <span class="subtitulo">{{ anomaliaHover.perdidas * 100 | number : '1.0-0' }}%</span>
+        <span class="subtitulo">{{ perdidas | translate }}</span>
       </div>
       <div class="elemento">
         <span class="titulo">{{ 'clase' | translate | titlecase }}</span>
@@ -73,7 +73,7 @@
             </div>
             <div class="elemento">
               <span class="titulo">{{ 'perdidas' | translate | titlecase }} (beta)</span>
-              <span class="subtitulo">{{ anomaliaSelect.perdidas * 100 | number : '1.0-0' }}%</span>
+              <span class="subtitulo">{{ perdidas | translate }}</span>
               <!-- <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" /> -->
             </div>
             <div class="elemento">

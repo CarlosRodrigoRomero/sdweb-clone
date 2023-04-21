@@ -111,6 +111,13 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptionsCommon && this.chartOptionsTypes && this.chartOptionsLosses) {
+          let colorStroke = COLOR.dark_orange;
+          if (theme === 'dark-theme') {
+            colorStroke = COLOR.dark_orange;
+          } else {
+            colorStroke = COLOR.light_orange;
+          }
+
           this.chartOptionsCommon = {
             ...this.chartOptionsCommon,
             tooltip: {
@@ -138,6 +145,10 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
             chart: {
               ...this.chartOptionsLosses.chart,
               foreColor: this.themeService.textColor,
+            },
+            stroke: {
+              ...this.chartOptionsLosses.stroke,
+              colors: [colorStroke],
             },
           };
         }

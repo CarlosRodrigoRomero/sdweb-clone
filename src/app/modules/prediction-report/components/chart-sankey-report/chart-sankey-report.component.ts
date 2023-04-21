@@ -86,7 +86,15 @@ export class ChartSankeyReportComponent implements OnInit {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
+          let color = COLOR.dark_orange;
+          if (theme === 'dark-theme') {
+            color = COLOR.dark_orange;
+          } else {
+            color = COLOR.light_orange;
+          }
+
           this.chartOptions.sankey.node.label.color = this.themeService.textColor;
+          this.chartOptions.sankey.node.colors = [color];
 
           this.loadChart();
         }

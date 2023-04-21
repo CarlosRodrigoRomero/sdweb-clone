@@ -168,11 +168,11 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
             fontSize: '12px',
             // colors: [this.themeService.surfaceColor],
           },
-          // background: {
-          //   enabled: true,
-          //   foreColor: this.themeService.textColor,
-          //   borderColor: this.themeService.textColor,
-          // },
+          background: {
+            enabled: true,
+            foreColor: this.themeService.surfaceColor,
+            // borderColor: this.themeService.textColor,
+          },
         },
         plotOptions: {
           bar: {
@@ -191,6 +191,13 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
+          let color = COLOR.dark_orange;
+          if (theme === 'dark-theme') {
+            color = COLOR.dark_orange;
+          } else {
+            color = COLOR.light_orange;
+          }
+
           this.chartOptions = {
             ...this.chartOptions,
             chart: {
@@ -206,7 +213,12 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
                 ...this.chartOptions.dataLabels.style,
                 colors: [this.themeService.textColor],
               },
+              background: {
+                ...this.chartOptions.dataLabels.background,
+                foreColor: this.themeService.surfaceColor,
+              },
             },
+            colors: ['transparent', color, COLOR.neutralGrey],
           };
         }
       })

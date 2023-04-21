@@ -195,5 +195,6 @@
   "MAE reparable": "MAE reparable",
   "MAE no reparable": "MAE no reparable",
   "Predicción de la evolución de las anomalías por tipo y su MAE asociado": "Predicción de la evolución de las anomalías por tipo y su MAE asociado",
-  "Anomalías por tipo": "Anomalías por tipo"
+  "Anomalías por tipo": "Anomalías por tipo",
+  "Grave": "Grave"
 }

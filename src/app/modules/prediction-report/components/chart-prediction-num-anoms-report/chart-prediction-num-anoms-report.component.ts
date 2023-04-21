@@ -123,7 +123,14 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
         },
         dataLabels: {
           enabled: true,
-          // offsetY: -25,
+          // style: {
+          //   // colors: [null, 'black', 'white'],
+          // },
+          background: {
+            enabled: true,
+            foreColor: this.themeService.surfaceColor,
+            // borderColor: this.themeService.textColor,
+          },
         },
         xaxis: {
           categories: [this.currentLabel, this.nextYearLabel],
@@ -160,6 +167,13 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
+          let color = COLOR.dark_orange;
+          if (theme === 'dark-theme') {
+            color = COLOR.dark_orange;
+          } else {
+            color = COLOR.light_orange;
+          }
+
           this.chartOptions = {
             ...this.chartOptions,
             chart: {
@@ -175,7 +189,12 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
                 ...this.chartOptions.dataLabels.style,
                 colors: [this.themeService.textColor],
               },
+              background: {
+                ...this.chartOptions.dataLabels.background,
+                foreColor: this.themeService.surfaceColor,
+              },
             },
+            colors: ['transparent', color, COLOR.neutralGrey],
           };
         }
       })
