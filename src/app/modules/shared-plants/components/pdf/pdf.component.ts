@@ -62,12 +62,16 @@ export class PdfComponent implements OnInit, OnDestroy {
   openDialog() {
     this.dialog.open(PdfDialogComponent);
 
+    // reseteamos el valor de filteredPdf
+    this.pdfService.filteredPdf = false;
+
     // reseteamos el valor de generatePdf
     this.pdfService.generatePdf = false;
   }
 
   download() {
     const json = this.generateJson();
+
     this.saveJson(json);
   }
 
