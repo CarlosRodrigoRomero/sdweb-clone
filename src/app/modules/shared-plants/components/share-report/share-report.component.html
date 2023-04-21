@@ -1,31 +1,9 @@
 <button
   mat-raised-button
   class="btn-share"
-  [matMenuTriggerFor]="menu"
-  matTooltip="Compartir"
+  matTooltip="{{ 'compartir' | translate | titlecase }}"
   matTooltipClass="tooltip-style"
+  (click)="openDialog()"
 >
   <mat-icon>share</mat-icon>
 </button>
-<mat-menu #menu="matMenu" class="menu">
-  <div class="contenedor-menu">
-    <div mat-menu-item class="row" (click)="$event.stopPropagation()">
-      <span class="title">Obtener enlace</span>
-    </div>
-    <div mat-menu-item class="row" (click)="$event.stopPropagation()">
-      <mat-checkbox class="editable-check" [(ngModel)]="versionTecnicos" (click)="stopPropagation($event)"
-        >Versión móvil para técnicos de campo</mat-checkbox
-      >
-    </div>
-    <div mat-menu-item class="row" (click)="$event.stopPropagation()">
-      <mat-checkbox class="editable-check" [(ngModel)]="onlyFiltered" (click)="stopPropagation($event)"
-        >Solo anomalías filtradas</mat-checkbox
-      >
-    </div>
-    <div class="row">
-      <button mat-stroked-button class="btn-enviar" color="primary" (click)="copyLink()">
-        <span>Copiar enlace</span>
-      </button>
-    </div>
-  </div>
-</mat-menu>

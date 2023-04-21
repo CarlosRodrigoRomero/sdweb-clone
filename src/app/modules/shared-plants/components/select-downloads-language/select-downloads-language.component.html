@@ -3,12 +3,12 @@
     (click)="$event.stopPropagation()"
     [(ngModel)]="!englishSelected"
     (ngModelChange)="downloadReportService.englishLang = !downloadReportService.englishLang"
-    >Español</mat-checkbox
+    >{{ 'español' | translate | titlecase }}</mat-checkbox
   >
   <mat-checkbox
     (click)="$event.stopPropagation()"
     [(ngModel)]="englishSelected"
     (ngModelChange)="downloadReportService.englishLang = !downloadReportService.englishLang"
-    >Inglés</mat-checkbox
+    >{{ 'ingles' | translate | titlecase }}</mat-checkbox
   >
 </div>

@@ -75,3 +75,17 @@ h4 {
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+.sorted-column-header {
+  font-size: 14px;
+  color: #FED7AA;
+}
+
+.sorted-column-row {
+  color: #fed7aa;
+}
+
+.cell-centered {
+  display: flex;
+  justify-content: center;
+}

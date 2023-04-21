@@ -1,5 +1,5 @@
 <div class="filtro">
-  <h5>Criticidad</h5>
+  <h5>{{ 'criticidad' | translate | titlecase }}</h5>
   <mat-button-toggle-group class="criticidad-group" #group="matButtonToggleGroup" multiple="true">
     <mat-button-toggle
       class="criticidad-toggle"
@@ -8,7 +8,7 @@
       [name]="elem.label"
       [checked]="criticidadSelected[i]"
       (change)="onChangeCriticidadFilter($event)"
-      >{{ elem.label }}
+      >{{ elem.label | translate }}
     </mat-button-toggle>
   </mat-button-toggle-group>
 </div>

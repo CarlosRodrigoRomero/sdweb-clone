@@ -29,7 +29,7 @@ export class LeyendaContainerComponent implements OnInit, OnDestroy {
     cc: {
       labelsZone: ['Bueno', 'Medio', 'Alto'],
       labelsAnoms: ['10ºC < ΔT', '10ºC ≤ ΔT < 40ºC', '40ºC ≤ ΔT'],
-      titleZone: ' % Cels. Calientes',
+      titleZone: '% Cels. Calientes',
       titleAnoms: 'Clasificación por ΔTª Max (norm)',
       color: COLOR.colores_severity,
     },

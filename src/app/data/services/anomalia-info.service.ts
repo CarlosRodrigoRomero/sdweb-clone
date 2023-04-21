@@ -3,6 +3,8 @@ import { formatNumber, formatDate } from '@angular/common';
 
 import { Subscription } from 'rxjs';
 
+import { TranslateService } from '@ngx-translate/core';
+
 import proj4 from 'proj4';
 
 import { DownloadReportService } from './download-report.service';
@@ -18,6 +20,7 @@ import { CritCriticidad } from '@core/models/critCriticidad';
 
 import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +31,11 @@ export class AnomaliaInfoService {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(@Inject(LOCALE_ID) public locale: string, private downloadReportService: DownloadReportService) {
+  constructor(
+    @Inject(LOCALE_ID) public locale: string,
+    private downloadReportService: DownloadReportService,
+    private translate: TranslateService
+  ) {
     this.subscriptions.add(
       this.downloadReportService.englishLang$.subscribe((lang) => {
         if (lang) {
@@ -62,7 +69,15 @@ export class AnomaliaInfoService {
   }
 
   getPerdidasLabel(anomalia: Anomalia): string {
-    return `${formatNumber(anomalia.perdidas * 100, this.locale, '1.0-0')}%`;
+    if (anomalia.perdidas < 0.1) {
+      return 'Bajas';
+    } else if (anomalia.perdidas < 0.3) {
+      return 'Medias';
+    } else {
+      return 'Altas';
+    }
+
+    // return `${formatNumber(anomalia.perdidas * 100, this.locale, '1.0-0')}%`;
   }
 
   getTempMaxLabel(anomalia: Anomalia): string {
@@ -163,6 +178,48 @@ export class AnomaliaInfoService {
     }
 
     return elems;
+  }
+
+  getLocalizacionCompleteTranslateLabel(anomalia: Anomalia, planta: PlantaInterface) {
+    let label = '';
+
+    const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
+
+    globals.forEach((coord, index) => {
+      if (coord !== undefined && coord !== null && coord !== '') {
+        if (planta.hasOwnProperty('nombreGlobalCoords')) {
+          this.subscriptions.add(
+            this.translate.get(planta.nombreGlobalCoords[index]).subscribe((res: string) => {
+              label += `${res}: ${coord} / `;
+            })
+          );
+        } else {
+          label += `${coord} / `;
+        }
+      }
+    });
+
+    const numModulo = this.getNumeroModulo(anomalia, planta);
+    if (numModulo !== null) {
+      label += `${this.translation.t('Nº módulo')}: ${numModulo.toString()}`;
+    } else {
+      const altura = this.getAlturaAnom(anomalia, planta);
+      const columna = this.getColumnaAnom(anomalia, planta);
+      let fila: string;
+      this.translate
+        .get('Fila')
+        .pipe(
+          switchMap((res: string) => {
+            fila = res;
+            return this.translate.get('Columna');
+          })
+        )
+        .subscribe((res: string) => {
+          label += `${fila}: ${altura} / ${res}: ${columna}`;
+        });
+    }
+
+    return label;
   }
 
   getLocalizacionCompleteLabel(anomalia: Anomalia, planta: PlantaInterface) {

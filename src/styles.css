@@ -9,3 +9,8 @@ body {
   font-size: small;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
+
+/* Elementos Material */
+.mat-card {
+  border-radius: 8px !important;
+}

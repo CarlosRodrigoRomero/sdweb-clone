@@ -6,6 +6,7 @@
 .popup-desktop {
   width: max-content;
   padding: 0px;
+  border-radius: 8px;
 }
 
 :host ::ng-deep .mat-tab-label {
@@ -33,6 +34,7 @@
 
 .popup-hover {
   width: max-content;
+  border-radius: 8px;
 }
 
 .popup-hover-content {

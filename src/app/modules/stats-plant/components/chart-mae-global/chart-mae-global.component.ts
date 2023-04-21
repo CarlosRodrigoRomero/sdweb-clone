@@ -4,6 +4,8 @@ import { DecimalPipe } from '@angular/common';
 import { switchMap, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
+import { TranslateService } from '@ngx-translate/core';
+
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -19,6 +21,7 @@ import {
   ApexAnnotations,
   ApexTooltip,
   ChartType,
+  ApexPlotOptions,
 } from 'ng-apexcharts';
 
 import { ReportControlService } from '@data/services/report-control.service';
@@ -43,6 +46,7 @@ export type ChartOptions = {
   title: ApexTitleSubtitle;
   annotations: ApexAnnotations;
   tooltip: ApexTooltip;
+  plotOptions: ApexPlotOptions;
 };
 
 @Component({
@@ -61,6 +65,8 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
   private maeSigma: number;
   private typeChart: ChartType = 'line';
   private dateLabels: string[] = [];
+  private mediaLabel: string;
+  private maeLabel: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -71,10 +77,13 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private decimalPipe: DecimalPipe,
     private cdr: ChangeDetectorRef,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.checkTranslate();
+
     this.authService.user$
       .pipe(
         take(1),
@@ -119,7 +128,7 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
         this.chartOptions = {
           series: [
             {
-              name: 'MAE %',
+              name: this.maeLabel + ' %',
               data: this.maeData,
             },
           ],
@@ -147,6 +156,7 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
             style: {
               fontSize: '16px',
             },
+            offsetY: -20,
           },
           markers: {
             size: 1,
@@ -189,13 +199,23 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
                     color: '#fff',
                     background: '#053e86',
                   },
-                  text: 'Media MAE Portfolio ' + this.decimalPipe.transform(this.maeMedio, '1.0-2') + '%',
+                  text: this.mediaLabel + ' ' + this.decimalPipe.transform(this.maeMedio, '1.0-2') + '%',
                 },
               },
             ],
           },
           tooltip: {
             theme: theme.split('-')[0],
+          },
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '20%',
+              // borderRadius: 8,
+              dataLabels: {
+                position: 'top', // top, center, bottom
+              },
+            },
           },
         };
         this.loadChart = true;
@@ -220,6 +240,22 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  private checkTranslate(): void {
+    this.translate
+      .get('Media MAE Portfolio')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.mediaLabel = res;
+      });
+
+    this.translate
+      .get('MAE')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.maeLabel = res;
+      });
   }
 
   ngOnDestroy(): void {

@@ -3,6 +3,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
+import { TranslateService } from '@ngx-translate/core';
+
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -59,6 +61,8 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
   chartData: number[][];
   chartLoaded = false;
   private dateLabels: string[];
+  private celsCalientesLabel: string;
+  private zonaLabel: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -67,10 +71,13 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
     private plantaService: PlantaService,
     private informeService: InformeService,
     private zonesService: ZonesService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.checkTranslate();
+
     this.zones = this.zonesService.zonesBySize[0];
 
     // filtramos por si hay zonas con el mismo nombre
@@ -174,10 +181,15 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
       });
     }
 
-    let titleXAxis = 'Zona';
+    let titleXAxis = this.zonaLabel;
 
     if (this.reportControlService.nombreGlobalCoords.length > 0) {
-      titleXAxis = this.reportControlService.nombreGlobalCoords[0];
+      this.translate
+        .get(this.reportControlService.nombreGlobalCoords[0])
+        .pipe(take(1))
+        .subscribe((res: string) => {
+          titleXAxis = res;
+        });
     }
 
     // espera a que el charData tenga datos
@@ -239,7 +251,7 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
           forceNiceScale: true,
           tickAmount: 3,
           title: {
-            text: '# CC',
+            text: '# ' + this.celsCalientesLabel,
           },
           labels: {
             minWidth: 10,
@@ -268,6 +280,22 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
       };
       this.chartLoaded = true;
     }
+  }
+
+  private checkTranslate(): void {
+    this.translate
+      .get('Céls. calientes')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.celsCalientesLabel = res;
+      });
+
+    this.translate
+      .get('zona')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.zonaLabel = res;
+      });
   }
 
   ngOnDestroy(): void {

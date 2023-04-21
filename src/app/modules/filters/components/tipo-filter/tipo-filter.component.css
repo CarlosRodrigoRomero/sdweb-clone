@@ -30,11 +30,6 @@ h5 {
   min-width: 280px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 80% 20%;
-}
-
 li {
   list-style-type: none;
   margin-left: 10px;

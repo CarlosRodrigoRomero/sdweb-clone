@@ -88,4 +88,8 @@ export class MathOperations {
   static kmhToMs(kmh: number): number {
     return (kmh * 1000) / 3600;
   }
+
+  static getUniqueElemsArray(array: any[]): any[] {
+    return [...new Set(array)];
+  }
 }

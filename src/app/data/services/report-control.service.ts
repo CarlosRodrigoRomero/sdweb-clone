@@ -87,7 +87,7 @@ export class ReportControlService {
   initService(): Promise<boolean> {
     if (!this.router.url.includes('shared')) {
       // obtenemos plantaId de la url
-      this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+      this.plantaId = this.router.url.split('/')[this.router.url.split('/').length - 2];
 
       return new Promise((initService) => {
         // iniciamos anomalia service antes de obtener las anomalias
@@ -174,11 +174,14 @@ export class ReportControlService {
                 } else {
                   this.allFilterableElements = elems;
 
-                  (this.allFilterableElements as Seguidor[]).forEach((seg) => {
+                  const seguidores = this.allFilterableElements as Seguidor[];
+                  seguidores.forEach((seg) => {
                     if (seg.anomaliasCliente.length > 0) {
                       this.allAnomalias.push(...seg.anomaliasCliente);
                     }
                   });
+
+                  this.setNumberOfModules(seguidores);
                 }
 
                 return this.comentariosService.getComentariosInformes(this.informes);
@@ -214,6 +217,9 @@ export class ReportControlService {
               this.checkMaeInformes(this.allFilterableElements);
               this.checkCCInformes(this.allFilterableElements);
 
+              // calculamos la Potencia reparable de los informes si no tuviesen
+              this.checkFixedPowerLossInformes();
+
               // iniciamos filter service
               this.filterService.initService(this.allFilterableElements).then((filtersInit) => {
                 // enviamos respuesta de servicio iniciado
@@ -231,7 +237,7 @@ export class ReportControlService {
         this.sharedReportWithFilters = false;
       }
       // obtenemos el ID de la URL
-      this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 1];
+      this.sharedId = this.router.url.split('/')[this.router.url.split('/').length - 2];
 
       // iniciamos el servicio share-report
       this.shareReportService.initService(this.sharedId);
@@ -358,15 +364,27 @@ export class ReportControlService {
   }
 
   setMaeInformeSeguidores(seguidores: Seguidor[], informe: InformeInterface) {
+    const mae = this.getMaeInformeSeguidores(seguidores, informe);
+
+    this.informeService.updateInformeField(informe.id, 'mae', mae);
+  }
+
+  getMaeInformeSeguidores(seguidores: Seguidor[], informe: InformeInterface): number {
     const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
     let mae = 0;
     seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
     mae = mae / seguidoresInforme.length;
 
-    this.informeService.updateInformeField(informe.id, 'mae', mae);
+    return mae;
   }
 
   setMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
+    const mae = this.getMaeInformeFija(anomalias, informe);
+
+    this.informeService.updateInformeField(informe.id, 'mae', mae);
+  }
+
+  getMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface): number {
     const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
     let mae = 0;
     if (anomaliasInforme.length > 0) {
@@ -377,7 +395,55 @@ export class ReportControlService {
       mae = perdidasTotales / informe.numeroModulos;
     }
 
-    this.informeService.updateInformeField(informe.id, 'mae', mae);
+    return mae;
+  }
+
+  private checkFixedPowerLossInformes(): void {
+    if (this.allAnomalias.length > 0) {
+      this.informes.forEach((informe) => {
+        if (this.checkIfNumberValueWrong(informe.fixablePower)) {
+          const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informe.id);
+
+          const fixedLossReport = this.getFixedLossReport(anomaliasInforme, informe);
+
+          this.setFixedLossReport(fixedLossReport, informe.id);
+        }
+      });
+    }
+  }
+
+  getLossReport(anomalias: Anomalia[], informe: InformeInterface): number {
+    const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
+    let loss = 0;
+    if (anomaliasInforme.length > 0) {
+      const perdidas = anomaliasInforme.map((anom) => anom.perdidas);
+      let totalLoss = 0;
+      perdidas.forEach((perd) => (totalLoss += perd));
+
+      loss = totalLoss / informe.numeroModulos;
+    }
+
+    return loss;
+  }
+
+  getFixedLossReport(anomalias: Anomalia[], informe: InformeInterface): number {
+    const fixedAnomalias = anomalias.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+
+    const loss = this.getLossReport(fixedAnomalias, informe);
+
+    return loss;
+  }
+
+  setFixedLossReport(fixedLossReport: number, informeId: string) {
+    this.informeService.updateInformeField(informeId, 'fixablePower', fixedLossReport);
+  }
+
+  private setNumberOfModules(seguidores: Seguidor[]) {
+    this.informes.map((informe) => {
+      const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
+
+      informe.numeroModulos = seguidoresInforme.length * this.planta.filas * this.planta.columnas;
+    });
   }
 
   private checkCCInformes(elems: FilterableElement[]): void {

@@ -33,7 +33,7 @@ table {
 
 .tabla-container {
   position: relative;
-  height: calc(100vh - 280px);
+  height: calc(100vh - 306px);
   overflow: auto;
 }
 

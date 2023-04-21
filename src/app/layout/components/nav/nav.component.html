@@ -7,38 +7,55 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="(isHandset$ | async) === false"
   >
-    <mat-toolbar *ngIf="showNavbar" class="logo">
+    <mat-toolbar class="logo">
       <app-sd-logo></app-sd-logo>
     </mat-toolbar>
     <mat-nav-list class="list-items">
       <div class="top-items">
-        <!-- <a mat-list-item (click)="navigateTo('dashboard')"> -->
-     <!--    <a mat-list-item>
+        <!-- <a *ngIf="!isShared" mat-list-item (click)="navigateTo('loss')">
           <div class="item-content">
             <mat-icon>dashboard</mat-icon>
-            <span>Pérdidas</span>
+            <span>{{ 'perdidas' | translate | titlecase }}</span>
           </div>
         </a> -->
-        <!-- <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('map')"> -->
-        <a *ngIf="!isPortfolio" mat-list-item>
-          <div class="item-content">
+        <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('map')">
+          <!-- <a *ngIf="!isPortfolio" mat-list-item> -->
+          <div *ngIf="itemSelected === 'map'" class="item-content" [ngStyle]="{ color: itemColor }">
             <mat-icon>map</mat-icon>
-            <span>Mapa</span>
+            <span>{{ 'mapa' | translate | titlecase }}</span>
+          </div>
+          <div *ngIf="itemSelected !== 'map'" class="item-content">
+            <mat-icon>map</mat-icon>
+            <span>{{ 'mapa' | translate | titlecase }}</span>
           </div>
         </a>
-        <!-- <a *ngIf="isPortfolio" mat-list-item (click)="navigateTo('map')"> -->
+        <!-- <a *ngIf="isPortfolio" mat-list-item (click)="navigateTo('list')"> -->
         <a *ngIf="isPortfolio" mat-list-item>
-          <div class="item-content">
+          <div *ngIf="itemSelected === 'list'" class="item-content" [ngStyle]="{ color: itemColor }">
             <mat-icon>list</mat-icon>
-            <span>Listado</span>
+            <span>{{ 'listado' | translate | titlecase }}</span>
+          </div>
+          <div *ngIf="itemSelected !== 'list'" class="item-content">
+            <mat-icon>map</mat-icon>
+            <span>{{ 'listado' | translate | titlecase }}</span>
           </div>
         </a>
         <!-- <a mat-list-item>
           <div class="item-content">
             <mat-icon>insights</mat-icon>
-            <span>Gráficos</span>
+            <span>{{ 'graficos' | translate | titlecase }}</span>
           </div>
         </a> -->
+        <a *ngIf="!isPortfolio && showPrediction" mat-list-item (click)="navigateTo('prediction')">
+          <div *ngIf="itemSelected === 'prediction'" class="item-content" [ngStyle]="{ color: itemColor }">
+            <mat-icon>insights</mat-icon>
+            <span>{{ 'prediccion' | translate | titlecase }}</span>
+          </div>
+          <div *ngIf="itemSelected !== 'prediction'" class="item-content">
+            <mat-icon>insights</mat-icon>
+            <span>{{ 'prediccion' | translate | titlecase }}</span>
+          </div>
+        </a>
       </div>
       <div class="bottom-items">
         <app-switch-theme></app-switch-theme>

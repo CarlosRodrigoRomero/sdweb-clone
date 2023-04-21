@@ -1,7 +1,7 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>MAE global</mat-card-title>
-    <mat-card-subtitle>Módulos Apagados Equivalentes por año</mat-card-subtitle>
+    <mat-card-title>{{ 'MAE global' | translate }}</mat-card-title>
+    <mat-card-subtitle>{{ 'Módulos Apagados Equivalentes por año' | translate }}</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
     <div class="mae-global">
@@ -21,6 +21,7 @@
         [yaxis]="chartOptions.yaxis"
         [title]="chartOptions.title"
         [tooltip]="chartOptions.tooltip"
+        [plotOptions]="chartOptions.plotOptions"
       ></apx-chart>
     </div>
   </mat-card-content>

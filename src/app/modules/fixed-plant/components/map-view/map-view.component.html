@@ -1,10 +1,5 @@
-<app-loading *ngIf="!mapLoaded"></app-loading>
-<mat-sidenav-container
-  *ngIf="anomaliasLoaded"
-  class="stats-container"
-  [hasBackdrop]="true"
-  (backdropClick)="sidenavStats.toggle()"
->
+<!-- <app-loading *ngIf="!mapLoaded"></app-loading> -->
+<mat-sidenav-container class="stats-container" [hasBackdrop]="true" (backdropClick)="sidenavStats.toggle()">
   <!-- SIDENAV STATS -->
   <mat-sidenav #sidenavStats class="stats-sidenav" position="end">
     <!-- cargamos el modulo Stats -->
@@ -21,19 +16,25 @@
         mode="side"
         [fixedInViewport]="true"
         class="left-sidenav"
-        [fixedTopGap]="64"
+        [fixedTopGap]="80"
         position="start"
       >
         <div class="titulo">
-          <h4>Filtros</h4>
+          <h4>{{ 'filtros' | translate | titlecase }}</h4>
         </div>
         <app-filters-panel-container></app-filters-panel-container>
       </mat-sidenav>
 
       <!-- SIDENAV LISTA ANOMALIAS -->
-      <mat-sidenav #sidenavRight class="right-sidenav" position="end" disableClose>
+      <mat-sidenav
+        #sidenavRight
+        class="right-sidenav"
+        position="end"
+        disableClose
+        (openedChange)="rightOpened = !rightOpened"
+      >
         <div class="titulo">
-          <h4>Listado de anomalías</h4>
+          <h4>{{ 'Listado de anomalías' | translate }}</h4>
         </div>
 
         <ng-template appDynamicAnomaliaList></ng-template>
@@ -42,7 +43,7 @@
       </mat-sidenav>
 
       <mat-sidenav-content>
-        <div *ngIf="anomaliasLoaded" class="rel">
+        <div class="rel">
           <!-- MAPA -->
           <app-map></app-map>
 
@@ -90,13 +91,13 @@
           </div>
         </div>
 
-        <div *ngIf="anomaliasLoaded">
+        <div>
           <!-- BOTON SIDENAV LISTA ANOMALIAS -->
           <button
             mat-raised-button
             class="btn-right"
             (click)="loadAnomList(); sidenavRight.toggle()"
-            matTooltip="Lista anomalías"
+            matTooltip="{{ 'Lista anomalías' | translate }}"
             matTooltipClass="tooltip-style"
           >
             <mat-icon>list_alt</mat-icon>
@@ -110,7 +111,7 @@
             mat-raised-button
             class="btn-right-stats stats"
             (click)="loadStats(); sidenavStats.toggle()"
-            matTooltip="Estadísticas"
+            matTooltip="{{ 'Estadísticas' | translate }}"
             matTooltipClass="tooltip-style"
             [disabled]="noAnomsReport"
           >

@@ -7,7 +7,7 @@
         [indeterminate]="someComplete()"
         (change)="setVisibilityAllLayers.emit($event.checked)"
       >
-        {{ task.name }}
+        {{ task.name | translate }}
       </mat-checkbox>
     </span>
     <div *ngIf="numAreas > 1">
@@ -23,7 +23,7 @@
                 [(ngModel)]="subtask.completed"
                 (ngModelChange)="setVisibilityLayer.emit(i)"
               >
-                {{ subtask.name }}
+                {{ subtask.name | translate }}
               </mat-checkbox>
             </li>
           </span>

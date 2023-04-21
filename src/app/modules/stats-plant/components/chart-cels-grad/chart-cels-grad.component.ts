@@ -2,6 +2,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
+import { TranslateService } from '@ngx-translate/core';
+
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -56,6 +58,7 @@ export class ChartCelsGradComponent implements OnInit, OnDestroy {
   dateLabels: string[];
   private gradienteMinimoCriterio = 0;
   private categories: string[];
+  private celsCalientesLabel: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -63,10 +66,18 @@ export class ChartCelsGradComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private informeService: InformeService,
     private anomaliaService: AnomaliaService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.translate
+      .get('Céls. calientes')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.celsCalientesLabel = res;
+      });
+
     this.informesIdList = this.reportControlService.informesIdList;
 
     this.allAnomalias = this.reportControlService.allAnomalias;
@@ -203,7 +214,7 @@ export class ChartCelsGradComponent implements OnInit, OnDestroy {
       },
       yaxis: {
         title: {
-          text: '# CC',
+          text: '# ' + this.celsCalientesLabel,
         },
         labels: {
           minWidth: 10,

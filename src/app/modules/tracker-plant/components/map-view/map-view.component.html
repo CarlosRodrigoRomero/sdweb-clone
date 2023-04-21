@@ -1,4 +1,3 @@
-<app-loading *ngIf="!mapLoaded"></app-loading>
 <mat-sidenav-container class="seguidor-container" (backdropClick)="resetSeguidorView()">
   <!-- SIDENAV SEGUIDOR VIEW -->
   <mat-sidenav #sidenavSeguidorView [(opened)]="seguidorViewOpened" class="seguidor-sidenav" position="end">
@@ -6,7 +5,7 @@
     <app-seguidor-view></app-seguidor-view>
   </mat-sidenav>
   <mat-sidenav-content>
-    <mat-sidenav-container *ngIf="seguidoresLoaded" class="stats-container">
+    <mat-sidenav-container class="stats-container">
       <!-- SIDENAV STATS -->
       <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end">
         <!-- cargamos el modulo Stats -->
@@ -23,7 +22,7 @@
             mode="side"
             [fixedInViewport]="true"
             class="left-sidenav"
-            [fixedTopGap]="64"
+            [fixedTopGap]="80"
             position="start"
           >
             <div class="titulo">
@@ -34,7 +33,6 @@
 
           <!-- SIDENAV LISTA SEGUIDORES -->
           <mat-sidenav
-            *ngIf="seguidoresLoaded"
             #sidenavRight
             [(opened)]="rightOpened"
             class="right-sidenav"
@@ -51,7 +49,7 @@
           </mat-sidenav>
 
           <mat-sidenav-content>
-            <div *ngIf="seguidoresLoaded" class="rel">
+            <div class="rel">
               <!-- MAPA -->
               <app-map-seguidores></app-map-seguidores>
 
@@ -93,7 +91,7 @@
             </div>
 
             <!-- BOTON SIDENAV FILTROS -->
-            <div *ngIf="seguidoresLoaded">
+            <div>
               <!-- BOTON SIDENAV LISTA SEGUIDORES -->
               <button
                 mat-raised-button

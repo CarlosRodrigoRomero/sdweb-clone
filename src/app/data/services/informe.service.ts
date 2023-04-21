@@ -502,20 +502,7 @@ export class InformeService {
   private unixToDateLabel(unix: number): string {
     const date = new Date(unix * 1000);
     const year = date.getFullYear();
-    const monthNames = [
-      'Ene',
-      'Feb',
-      'Mar',
-      'Abr',
-      'May',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dic',
-    ];
+    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     const month = monthNames[date.getMonth()];
 
     return month + ' ' + year;

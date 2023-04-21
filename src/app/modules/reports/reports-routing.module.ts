@@ -11,12 +11,22 @@ const routes: Routes = [
     component: ReportsContentComponent,
     children: [
       { path: '', redirectTo: 'map', pathMatch: 'full' },
-      // { path: 'map', component: MapTestComponent },
-      // { path: 'dashboard', component: LostDashboardComponent },
       {
         path: 'map',
+        // loadChildren: () =>
+        //   import('@modules/map-list-report/map-list-report.module').then((m) => m.MapListReportModule),
+        loadChildren: () => import('@modules/fixed-plant/fixed-plant.module').then((m) => m.FixedPlantModule),
+        // canActivate: [AuthGuard],
+      },
+      {
+        path: 'loss',
+        loadChildren: () => import('@modules/loss-report/loss-report.module').then((m) => m.LossReportModule),
+        canActivate: [AuthGuard],
+      },
+      {
+        path: 'prediction',
         loadChildren: () =>
-          import('@modules/map-list-report/map-list-report.module').then((m) => m.MapListReportModule),
+          import('@modules/prediction-report/prediction-report.module').then((m) => m.PredictionReportModule),
         canActivate: [AuthGuard],
       },
     ],

@@ -15,6 +15,7 @@ export class ChartSankeyComponent implements AfterViewInit {
     google.charts.load('current', { packages: ['sankey'] });
     google.charts.setOnLoadCallback(this.drawChart);
   }
+  
   drawChart() {
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'From');

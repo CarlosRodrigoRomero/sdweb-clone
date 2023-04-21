@@ -10,12 +10,12 @@
 }
 
 .titulo {
-  font-size: 20px;
+  font-size: 16px;
   margin-right: 0.6rem;
 }
 
 .subtitulo {
-  font-size: 20px;
+  font-size: 16px;
   margin-right: 1em;
   font-weight: 400;
 }
@@ -59,24 +59,24 @@
 }
 
 .titulo-mae {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 400;
   margin-right: 0.5rem;
 }
 
 .valor-mae {
-  font-size: 30px;
+  font-size: 20px;
   font-weight: 300;
 }
 
 .titulo-cc {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 400;
   margin-right: 0.5rem;
 }
 
 .valor-cc {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 300;
 }
 
@@ -92,7 +92,7 @@
 }
 
 .fecha {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 300;
 }
 
@@ -135,5 +135,5 @@
   height: 34px;
   display: flex;
   align-items: center;
-  cursor: unset
+  cursor: unset;
 }

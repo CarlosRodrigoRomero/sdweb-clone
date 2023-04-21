@@ -2,6 +2,9 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
 import { Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
+
+import { TranslateService } from '@ngx-translate/core';
 
 import { ApexAxisChartSeries, ApexDataLabels, ApexChart, ChartComponent, ApexYAxis, ApexTooltip } from 'ng-apexcharts';
 
@@ -14,7 +17,6 @@ import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
 
 import { COLOR } from '@data/constants/color';
-import { switchMap, take } from 'rxjs/operators';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -38,6 +40,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   dataLoaded = false;
   private planta: PlantaInterface;
   chartOptions: Partial<ChartOptions>;
+  private filaLabel: string;
 
   private series2019: ApexAxisChartSeries = [
     {
@@ -145,10 +148,18 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
     private informeService: InformeService,
     private decimalPipe: DecimalPipe,
     private anomaliaInfoService: AnomaliaInfoService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.translate
+      .get('Fila')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.filaLabel = res;
+      });
+
     this.allAnomalias = this.reportControlService.allAnomalias;
 
     // tslint:disable-next-line: triple-equals
@@ -177,7 +188,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
             colors: [COLOR.gris],
             yaxis: {
               title: {
-                text: 'Fila',
+                text: this.filaLabel,
               },
               labels: {
                 minWidth: 50,

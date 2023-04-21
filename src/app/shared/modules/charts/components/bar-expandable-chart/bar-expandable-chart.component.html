@@ -6,7 +6,7 @@
     (click)="updateOptions('all')"
   >
     <mat-icon>zoom_in_map</mat-icon>
-    <span class="btn-label">Ver todas</span>
+    <span class="btn-label">{{ 'Ver todas' | translate }}</span>
   </button>
   <button
     mat-raised-button
@@ -15,7 +15,7 @@
     (click)="updateOptions('start')"
   >
     <mat-icon>zoom_out_map</mat-icon>
-    <span class="btn-label">Ampliar</span>
+    <span class="btn-label">{{ 'ampliar' | translate | titlecase }}</span>
   </button>
 </div>
 <div class="direction-btns">

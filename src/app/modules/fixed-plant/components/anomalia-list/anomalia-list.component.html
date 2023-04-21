@@ -1,6 +1,6 @@
 <div class="lista">
   <mat-form-field class="buscar-input" appearance="outline">
-    <mat-label>Buscar por <b>#</b> de anomalía</mat-label>
+    <mat-label>{{ 'Buscar por # de anomalía' | translate }}</mat-label>
     <input matInput (keyup)="applyFilter($event)" #input autocomplete="off" />
   </mat-form-field>
 
@@ -24,8 +24,8 @@
 
       <!-- Tipo de anomalía -->
       <ng-container matColumnDef="tipo" class="col-anomalia">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
-        <td mat-cell *matCellDef="let row">{{ row.tipoLabel }}</td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'tipo' | translate | titlecase }}</th>
+        <td mat-cell *matCellDef="let row">{{ row.tipoLabel | translate }}</td>
       </ng-container>
 
       <!-- Temperatura Máxima -->
@@ -33,17 +33,17 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>T Max</th>
         <td mat-cell *matCellDef="let row">
           <div class="row-data">
-            <span>{{ row.temperaturaMax | number: '1.0-1' }}ºC</span>
+            <span>{{ row.temperaturaMax | number : '1.0-1' }}ºC</span>
           </div>
         </td>
       </ng-container>
 
       <!-- Pérdidas -->
       <ng-container matColumnDef="perdidas">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Pérdidas</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'perdidas' | translate | titlecase }}</th>
         <td mat-cell *matCellDef="let row">
           <div class="row-data">
-            <span>{{ row.perdidas * 100 | number: '1.0-2' }}%</span>
+            <span>{{ row.perdidas * 100 | number : '1.0-2' }}%</span>
           </div>
         </td>
       </ng-container>
@@ -53,7 +53,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>&nabla;T Norm.</th>
         <td mat-cell *matCellDef="let row">
           <div class="row-data">
-            <span>{{ row.gradiente | number: '1.0-1' }}ºC</span>
+            <span>{{ row.gradiente | number : '1.0-1' }}ºC</span>
           </div>
         </td>
       </ng-container>

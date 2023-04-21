@@ -24,31 +24,17 @@ export class Colors {
       .join('')}`;
   }
 
-  static rgbaToHex(rgba: string) {
-    // Convertir la cadena RGBA en un arreglo de valores
-    const values = rgba.slice(5, -1).split(',');
-    const red = Number(values[0]);
-    const green = Number(values[1]);
-    const blue = Number(values[2]);
-    const alpha = parseFloat(values[3]);
+  static rgbaToHex(rgba: string, includeAlpha = false) {
+    const [r, g, b, a] = rgba.match(/\d+/g).map(Number);
 
-    // Asegurarse de que los valores estén dentro del rango correcto
-    const validRed = Math.max(0, Math.min(255, red));
-    const validGreen = Math.max(0, Math.min(255, green));
-    const validBlue = Math.max(0, Math.min(255, blue));
-    const validAlpha = Math.max(0, Math.min(1, alpha));
+    const hex = (r << 16) | (g << 8) | b;
+    const alpha = a === undefined ? 255 : Math.round(a * 255);
 
-    // Convertir los valores en hexadecimal
-    const hexRed = validRed.toString(16).padStart(2, '0');
-    const hexGreen = validGreen.toString(16).padStart(2, '0');
-    const hexBlue = validBlue.toString(16).padStart(2, '0');
-    const hexAlpha = Math.round(validAlpha * 255)
-      .toString(16)
-      .padStart(2, '0');
-
-    // Concatenar los valores
-    const hex = `#${hexRed}${hexGreen}${hexBlue}${hexAlpha}`;
-    return hex;
+    if (includeAlpha) {
+      return `#${(hex | (1 << 24)).toString(16).slice(1)}${(alpha | (1 << 8)).toString(16).slice(1)}`;
+    } else {
+      return `#${(hex | (1 << 24)).toString(16).slice(1)}`;
+    }
   }
 
   static getColor(value: number, range: number[], opacity: number): string {

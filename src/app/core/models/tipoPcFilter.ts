@@ -17,11 +17,7 @@ export class TipoElemFilter implements FilterInterface {
   }
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
-    return elems.filter(
-      (elem) =>
-        // tslint:disable-next-line: triple-equals
-        elem.tipo == this.tipo
-    );
+    return elems.filter((elem) => elem.tipo == this.tipo);
   }
   unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
     return null;
