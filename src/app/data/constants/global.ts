@@ -167,7 +167,7 @@ export let GLOBAL = {
     0.02, // "Módulo afectado por sombras" // 15
     0, // Yellowing //16
     1, // "String en CA", // 17
-    0.05, // "PID fase temprana" // 18
+    0.15, // "PID fase temprana" // 18
     0, // Falta modulo // 19
     0.55, // PID regular // 20
     0.2, // PID irregular // 21

@@ -23,7 +23,7 @@
         <span *ngIf="anomaliaHover.gradienteNormalizado === 0" class="subtitulo">Pronto disponible</span>
       </div>
       <div class="elemento">
-        <span class="titulo">{{ 'perdidas' | translate | titlecase }} (beta)</span>
+        <span class="titulo">{{ 'perdidas' | translate | titlecase }}</span>
         <span class="subtitulo">{{ perdidas | translate }}</span>
       </div>
       <div class="elemento">
@@ -72,7 +72,7 @@
               <span *ngIf="anomaliaSelect.gradienteNormalizado === 0" class="subtitulo">Pronto disponible</span>
             </div>
             <div class="elemento">
-              <span class="titulo">{{ 'perdidas' | translate | titlecase }} (beta)</span>
+              <span class="titulo">{{ 'perdidas' | translate | titlecase }}</span>
               <span class="subtitulo">{{ perdidas | translate }}</span>
               <!-- <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" /> -->
             </div>
@@ -141,7 +141,7 @@
               <span class="titulo">{{ 'Hora' | translate }}</span>
               <span class="subtitulo">{{ infoAdicional.vuelo.hora }}</span>
             </div>
-            <div class="elemento" *ngIf="infoAdicional.vuelo.irradiancia">
+            <div class="elemento" *ngIf="infoAdicional.vuelo.irradiancia !== undefined">
               <span class="titulo">{{ 'Irradiancia (calculada)' | translate }}(beta)</span>
               <span class="subtitulo">{{ infoAdicional.vuelo.irradiancia | number : '1.0-0' }} W/m<sup>2</sup></span>
             </div>
