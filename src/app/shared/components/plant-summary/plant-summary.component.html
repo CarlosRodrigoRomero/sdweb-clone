@@ -5,13 +5,18 @@
     <span class="subtitulo">({{ potenciaPlanta | number : '1.0-2' }} MW)</span>
     <span class="fecha">{{ fechaSelectedInforme }}</span>
   </div>
-  <div class="grupo2" [matMenuTriggerFor]="menu" matTooltip="Datos del vuelo" matTooltipClass="tooltip-style">
+  <div
+    class="grupo2"
+    [matMenuTriggerFor]="menu"
+    matTooltip="{{ 'Datos del vuelo' | translate }}"
+    matTooltipClass="tooltip-style"
+  >
     <mat-icon>info</mat-icon>
     <mat-icon>expand_more</mat-icon>
     <mat-menu #menu="matMenu" class="menu">
       <div class="menu-grupo2">
         <div mat-menu-item class="elemento">
-          <h5>Datos del vuelo</h5>
+          <h5>{{ 'Datos del vuelo' | translate }}</h5>
         </div>
         <div mat-menu-item class="elemento">
           <mat-icon color="secondary">today</mat-icon>
@@ -23,7 +28,7 @@
         </div>
         <div mat-menu-item class="elemento">
           <mat-icon color="secondary">cloud_queue</mat-icon>
-          <h5 class="subtitulo">{{ informe.nubosidad | number : '1.0-0' }}/8 octavas</h5>
+          <h5 class="subtitulo">{{ informe.nubosidad | number : '1.0-0' }}/8 {{ 'octavas' | translate }}</h5>
         </div>
         <div mat-menu-item class="elemento">
           <mat-icon color="secondary">window</mat-icon>

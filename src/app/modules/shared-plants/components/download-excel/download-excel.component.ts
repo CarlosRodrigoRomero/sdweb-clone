@@ -222,7 +222,10 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     if (this.reportControlService.plantaFija) {
       this.columnas[2].push(
-        this.translation.t('Localización') + ' (' + this.plantaService.getLabelNombreGlobalCoords(this.planta) + ')'
+        this.translation.t('Localización') +
+          ' (' +
+          this.plantaService.getLabelNombreGlobalCoords(this.planta, this.language) +
+          ')'
       );
     } else {
       this.columnas[2].push(this.translation.t('Seguidor'));

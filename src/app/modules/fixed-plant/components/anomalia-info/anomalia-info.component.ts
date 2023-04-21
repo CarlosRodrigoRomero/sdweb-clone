@@ -145,13 +145,19 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       if (this.anomaliaHover !== undefined) {
         this.dataSource = [this.anomaliaHover];
         this.perdidas = this.anomaliaInfoService.getPerdidasLabel(this.anomaliaHover);
-        this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(this.anomaliaHover, this.planta);
+        this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(
+          this.anomaliaHover,
+          this.planta
+        );
       } else {
         this.dataSource = null;
       }
     } else {
       this.dataSource = [this.anomaliaSelect];
-      this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(this.anomaliaSelect, this.planta);
+      this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(
+        this.anomaliaSelect,
+        this.planta
+      );
 
       setTimeout(() => {
         // obtenemos la info adicional
@@ -198,6 +204,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       irradiancia = irrad;
     } else if (this.planta.tipo === 'fija') {
       irradiancia = this.anomaliaService.getIrradiancia(datetime);
+      console.log(irradiancia);
     }
     let emis = this.informeSelected.emisividad;
     if (emis === undefined) {
