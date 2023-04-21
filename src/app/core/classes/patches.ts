@@ -107,6 +107,11 @@ export class Patches {
       tempMin = 30;
       tempMax = 60;
     }
+    // PARCHE AVALADES ABR 2022
+    if (informeId === 'oGkheNZi1UqP4MCjPnqd') {
+      tempMin = 40;
+      tempMax = 60;
+    }
 
     return [tempMin, tempMax];
   }
