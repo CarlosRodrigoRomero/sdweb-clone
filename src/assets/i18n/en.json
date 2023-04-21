@@ -196,5 +196,14 @@
   "MAE no reparable": "ESM unfixable",
   "Predicción de la evolución de las anomalías por tipo y su MAE asociado": "Prediction of the evolution of the abnormalities by type and its associated ESM",
   "Anomalías por tipo": "Abnormalities by type",
-  "Grave": "Serious"
+  "Grave": "Serious",
+  "Iniciar sesión": "Log in",
+  "Correo electrónico": "Email address",
+  "Contraseña": "Password",
+  "Datos de acceso incorrectos": "Incorrect access data",
+  "¿Has olvidado la contraseña?": "Have you forgotten your password?",
+  "Entrar": "Enter",
+  "Hemos enviado un email para restablecer su contraseña. Revise su correo.": "We have sent an email to reset your password. Check your email.",
+  "Enviar": "Send",
+  "¿Volver atrás?": "Go back?"
 }

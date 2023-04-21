@@ -10,11 +10,12 @@ import { TranslateService } from '@ngx-translate/core';
 export class SelectLanguageComponent implements OnInit {
   langs: string[] = [];
   languages: any = {
-    en: 'English',
     es: 'Español',
+    en: 'English',
     pt: 'Portugués',
     fr: 'Francés',
   };
+  languagesValues = Object.values(this.languages);
   selectLanguage: string;
 
   constructor(private translate: TranslateService) {}

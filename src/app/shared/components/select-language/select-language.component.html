@@ -3,5 +3,7 @@
 </button>
 
 <mat-menu #languages="matMenu">
-  <button mat-menu-item *ngFor="let lang of langs" (click)="changeLang(lang)">{{ lang }}</button>
+  <button mat-menu-item *ngFor="let lang of langs; index as i" (click)="changeLang(lang)">
+    {{ languagesValues[i] }}
+  </button>
 </mat-menu>

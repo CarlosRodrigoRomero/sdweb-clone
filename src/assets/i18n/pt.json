@@ -196,5 +196,14 @@
   "MAE no reparable": "EMA irreparável",
   "Predicción de la evolución de las anomalías por tipo y su MAE asociado": "Previsão da evolução das anomalias por tipo e seu EMA associado",
   "Anomalías por tipo": "Anomalias por tipo",
-  "Grave": "Grave"
+  "Grave": "Grave",
+  "Iniciar sesión": "Iniciar sessão",
+  "Correo electrónico": "Endereço de e-mail",
+  "Contraseña": "Senha",
+  "Datos de acceso incorrectos": "Dados de acesso incorretos",
+  "¿Has olvidado la contraseña?": "Esqueceu a senha?",
+  "Entrar": "Entrar",
+  "Hemos enviado un email para restablecer su contraseña. Revise su correo.": "Enviamos um e-mail para redefinir sua senha. Verifique seu e-mail.",
+  "Enviar": "Enviar",
+  "¿Volver atrás?": "Voltar?"
 }

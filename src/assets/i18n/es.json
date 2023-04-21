@@ -196,5 +196,14 @@
   "MAE no reparable": "MAE no reparable",
   "Predicción de la evolución de las anomalías por tipo y su MAE asociado": "Predicción de la evolución de las anomalías por tipo y su MAE asociado",
   "Anomalías por tipo": "Anomalías por tipo",
-  "Grave": "Grave"
+  "Grave": "Grave",
+  "Iniciar sesión": "Iniciar sesión",
+  "Correo electrónico": "Correo electrónico",
+  "Contraseña": "Contraseña",
+  "Datos de acceso incorrectos": "Datos de acceso incorrectos",
+  "¿Has olvidado la contraseña?": "¿Has olvidado la contraseña?",
+  "Entrar": "Entrar",
+  "Hemos enviado un email para restablecer su contraseña. Revise su correo.": "Hemos enviado un email para restablecer su contraseña. Revise su correo.",
+  "Enviar": "Enviar",
+  "¿Volver atrás?": "¿Volver atrás?"
 }

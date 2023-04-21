@@ -50,7 +50,7 @@ export class AppComponent implements OnInit {
     this.translate.setDefaultLang('es');
 
     // añadimos los idiomas que acepta la web
-    this.translate.addLangs(['es', 'en']);
+    this.translate.addLangs(['es', 'en', 'pt', 'fr']);
 
     // Obtén el idioma almacenado en la memoria local, si existe
     const storedLanguage = localStorage.getItem('language');
