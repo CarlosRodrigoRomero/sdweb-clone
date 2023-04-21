@@ -78,10 +78,8 @@ export class FilterService {
     }
     this.filters$.next(this.filters);
 
-    if (!this.otherFilters.includes(filter.type)) {
-      // añadimos parametros para compartir
-      this.shareReportService.setParams(filter);
-    }
+    // añadimos parametros para compartir
+    this.addFilterToShare(filter);
 
     this.processFilters();
   }
@@ -90,7 +88,18 @@ export class FilterService {
     this.filters = filters;
     this.filters$.next(this.filters);
 
+    this.filters.forEach((filter) => {
+      // añadimos parametros para compartir
+      this.addFilterToShare(filter);
+    });
+
     this.processFilters();
+  }
+
+  addFilterToShare(filter: FilterInterface) {
+    if (!this.otherFilters.includes(filter.type)) {
+      this.shareReportService.setParams(filter);
+    }
   }
 
   processFilters() {

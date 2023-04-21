@@ -29,7 +29,6 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public rightOpened = false;
   public statsOpened: boolean;
   public seguidorViewOpened: boolean;
-  public seguidoresLoaded = false;
   public notSharedReport = true;
   completeView = false;
   public showFilters = true;
@@ -65,11 +64,7 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.reportControlService.initService().then((res) => {
-      this.seguidoresLoaded = res;
-
-      this.numInformes = this.reportControlService.informes.length;
-    });
+    this.numInformes = this.reportControlService.informes.length;
 
     this.subscriptions.add(
       this.reportControlService.sharedReportWithFilters$.subscribe((value) => (this.showFilters = value))
@@ -145,8 +140,8 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.seguidorViewService.sidenav = undefined;
 
-    // reseteamos los servicios a sus valores por defecto
-    this.resetServices.resetServices();
+    // reseteamos los servicios relacionados con los informes a sus valores por defecto
+    this.resetServices.resetReportsServices();
     this.mapSeguidoresService.resetService();
   }
 }

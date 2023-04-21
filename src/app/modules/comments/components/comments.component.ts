@@ -131,6 +131,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
 
     this.networkStatus$.unsubscribe();
 
-    this.resetServices.resetServices();
+    this.resetServices.resetAllServices();
   }
 }

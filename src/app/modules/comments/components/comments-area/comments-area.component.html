@@ -1,12 +1,12 @@
 <div class="content">
   <mat-tab-group mat-align-tabs="center" (selectedTabChange)="setTipoComentario($event)">
-    <mat-tab label="Comentarios">
+    <mat-tab label="{{ 'Comentarios' | translate }}">
       <div class="tab-content">
         <app-comments-list></app-comments-list>
       </div>
     </mat-tab>
 
-    <mat-tab label="Curva IV">
+    <mat-tab label="{{ 'Curva IV' | translate }}">
       <div class="tab-content">
         <app-comments-list></app-comments-list>
       </div>

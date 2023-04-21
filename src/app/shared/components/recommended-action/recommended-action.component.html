@@ -1,0 +1,15 @@
+<div class="content">
+  <mat-checkbox (change)="changeState.emit($event.checked)">
+    <div class="check-content">
+      <div class="content-row">
+        <span class="row-title">{{ title }}</span>
+        <span class="cantidad">{{ cantidad }}</span>
+      </div>
+      <div class="content-row">
+        <span class="row-subtitle">Pérdidas</span>
+        <span class="perdidas">{{ perdidas }} MW</span>
+      </div>
+      <div class="bar-row" [style.width]="porcentajeBarra"></div>
+    </div>
+  </mat-checkbox>
+</div>

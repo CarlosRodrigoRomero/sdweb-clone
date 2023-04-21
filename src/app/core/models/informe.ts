@@ -10,6 +10,8 @@ export interface InformeInterface {
   carpetaBase?: string;
   mae?: number;
   cc?: number;
+  fixablePower?: number;
+  predMae?: number;
   alturaVuelo?: number;
   nubosidad?: number;
   numeroModulos?: number;

@@ -2,16 +2,16 @@
   <div class="form-material">
     <app-sd-complete-logo></app-sd-complete-logo>
     <form [formGroup]="form" align="center" (ngSubmit)="signIn()">
-      <h3 class="titulo">Iniciar sesión</h3>
+      <h3 class="titulo">{{ 'Iniciar sesión' | translate }}</h3>
       <div>
         <mat-form-field class="email-input" appearance="outline">
-          <mat-label>Correo electrónico</mat-label>
+          <mat-label>{{ 'Correo electrónico' | translate }}</mat-label>
           <input matInput formControlName="email" />
         </mat-form-field>
       </div>
       <div>
         <mat-form-field class="password-input" appearance="outline">
-          <mat-label>Contraseña</mat-label>
+          <mat-label>{{ 'Contraseña' | translate }}</mat-label>
           <input matInput formControlName="password" [type]="hide ? 'password' : 'text'" />
           <button
             mat-icon-button
@@ -24,12 +24,14 @@
           </button>
         </mat-form-field>
       </div>
-      <div *ngIf="showWarning" class="alert alert-danger">Datos de acceso incorrectos</div>
+      <div *ngIf="showWarning" class="alert alert-danger">{{ 'Datos de acceso incorrectos' | translate }}</div>
       <button mat-raised-button class="boton-entrar" color="warn" [disabled]="form.invalid" type="submit">
-        Entrar
+        {{ 'Entrar' | translate }}
       </button>
       <div class="forgotPassword">
-        <a mat-button color="primary" routerLink="../forgot-password">¿Has olvidado la contraseña?</a>
+        <a mat-button color="primary" routerLink="../forgot-password">{{
+          '¿Has olvidado la contraseña?' | translate
+        }}</a>
       </div>
     </form>
   </div>

@@ -12,8 +12,13 @@ export let COLOR = {
   colores_clase: ['#20B2AA', '#FF4500', '#b70000'],
   light_background: '#F3F4F6',
   light_on_background: '#0F172A',
+  light_surface: '#FFFFFF',
   dark_background: '#0F172A',
   dark_on_background: '#F3F4F6',
+  dark_surface: '#37474F',
+  neutralGrey: '#64748B',
+  dark_orange: '#FED7AA',
+  light_orange: '#EA580C',
   colores_tipos: [
     'rgba(0,0,0,1)', // '0',
     'rgba(0,200,0)', // 'PC',

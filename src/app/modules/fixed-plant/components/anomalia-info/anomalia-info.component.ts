@@ -82,6 +82,7 @@ interface Zona {
 export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   displayedColumns: string[] = ['clase', 'tipo', 'tempMax', 'gradienteNormalizado', 'perdidas'];
   dataSource: Anomalia[];
+  perdidas: string;
   localizacion: string;
   pcDescripcion: string[];
   criticidadLabels: string[];
@@ -143,13 +144,14 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       this.infoAdicional = undefined;
       if (this.anomaliaHover !== undefined) {
         this.dataSource = [this.anomaliaHover];
-        this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteLabel(this.anomaliaHover, this.planta);
+        this.perdidas = this.anomaliaInfoService.getPerdidasLabel(this.anomaliaHover);
+        this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(this.anomaliaHover, this.planta);
       } else {
         this.dataSource = null;
       }
     } else {
       this.dataSource = [this.anomaliaSelect];
-      this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteLabel(this.anomaliaSelect, this.planta);
+      this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(this.anomaliaSelect, this.planta);
 
       setTimeout(() => {
         // obtenemos la info adicional

@@ -10,6 +10,7 @@ export class Anomalia implements FilterableElement {
   plantaId: string;
   informeId: string;
   tipo: number;
+  tipoNextYear?: number;
   globalCoords: string[];
   clase?: number;
   perdidas?: number;

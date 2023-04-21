@@ -1,14 +1,14 @@
 <div class="summary">
   <div class="titulo">
     <!-- <mat-icon color="primary">home</mat-icon> -->
-    <span class="title">Resumen</span>
+    <span class="title">{{ 'resumen' | translate | titlecase }}</span>
   </div>
   <div class="datos">
     <mat-icon color="primary">tag</mat-icon>
-    <span class="subtitulo">Nº plantas</span>
+    <span class="subtitulo">{{ 'Nº plantas' | translate }}</span>
     <span class="dato">{{ numPlantas }}</span>
     <mat-icon color="primary">bolt</mat-icon>
-    <span class="subtitulo">Potencia total</span>
-    <span class="dato">{{ potenciaTotal | number: '1.0-0' }} MW</span>
+    <span class="subtitulo">{{ 'Potencia total' | translate }}</span>
+    <span class="dato">{{ potenciaTotal | number : '1.0-0' }} MW</span>
   </div>
 </div>

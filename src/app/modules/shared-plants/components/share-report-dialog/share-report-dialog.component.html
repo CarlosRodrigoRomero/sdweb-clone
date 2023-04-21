@@ -1,0 +1,15 @@
+<div class="content">
+  <span class="title">{{ 'Compartir informe' | translate }}</span>
+  <mat-checkbox class="editable-check" [(ngModel)]="versionTecnicos">{{
+    'version tecnicos campo' | translate
+  }}</mat-checkbox>
+  <mat-checkbox class="editable-check" [(ngModel)]="onlyFiltered">{{
+    'Solo anomalías filtradas' | translate
+  }}</mat-checkbox>
+  <button mat-raised-button mat-dialog-close class="btn-enviar" color="primary" (click)="copyLink()">
+    <div class="btn-enviar-content">
+      <mat-icon>link</mat-icon>
+      <span>{{ 'Copiar enlace' | translate }}</span>
+    </div>
+  </button>
+</div>

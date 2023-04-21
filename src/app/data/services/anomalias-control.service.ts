@@ -216,17 +216,19 @@ export class AnomaliasControlService {
   }
 
   private removeSelectAnomaliaInteractions() {
-    // eliminamos solo las interacciones 'select'
-    this.map
-      .getInteractions()
-      .getArray()
-      .forEach((interaction) => {
-        if (interaction.getListeners('select') !== undefined) {
-          if (interaction.getProperties().id === 'selectAnomalia') {
-            this.map.removeInteraction(interaction);
+    if (this.map !== undefined) {
+      // eliminamos solo las interacciones 'select'
+      this.map
+        .getInteractions()
+        .getArray()
+        .forEach((interaction) => {
+          if (interaction.getListeners('select') !== undefined) {
+            if (interaction.getProperties().id === 'selectAnomalia') {
+              this.map.removeInteraction(interaction);
+            }
           }
-        }
-      });
+        });
+    }
   }
 
   private addPointerOnHover() {
@@ -321,33 +323,35 @@ export class AnomaliasControlService {
 
     select.setProperties({ id: 'selectAnomalia' });
 
-    this.map.addInteraction(select);
-    select.on('select', (e) => {
-      this.anomaliaHover = undefined;
+    if (this.map) {
+      this.map.addInteraction(select);
+      select.on('select', (e) => {
+        this.anomaliaHover = undefined;
 
-      if (this.anomaliaSelect !== undefined) {
-        this.setExternalStyle(this.anomaliaSelect.id, false);
-        this.anomaliaSelect = undefined;
-      }
-
-      if (e.selected.length > 0) {
-        if (e.selected[0].getProperties().hasOwnProperty('properties')) {
-          const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
-          const anomalia = this.listaAnomalias.find((anom) => anom.id === anomaliaId);
-
-          this.anomaliaSelect = anomalia;
-
-          // aplicamos estilos
-          this.setExternalStyle(anomaliaId, true);
-
-          if (this.prevAnomaliaSelect !== undefined && this.prevAnomaliaSelect.id !== anomaliaId) {
-            this.setExternalStyle(this.prevAnomaliaSelect.id, false);
-          }
-
-          this.prevAnomaliaSelect = anomalia;
+        if (this.anomaliaSelect !== undefined) {
+          this.setExternalStyle(this.anomaliaSelect.id, false);
+          this.anomaliaSelect = undefined;
         }
-      }
-    });
+
+        if (e.selected.length > 0) {
+          if (e.selected[0].getProperties().hasOwnProperty('properties')) {
+            const anomaliaId = e.selected[0].getProperties().properties.anomaliaId;
+            const anomalia = this.listaAnomalias.find((anom) => anom.id === anomaliaId);
+
+            this.anomaliaSelect = anomalia;
+
+            // aplicamos estilos
+            this.setExternalStyle(anomaliaId, true);
+
+            if (this.prevAnomaliaSelect !== undefined && this.prevAnomaliaSelect.id !== anomaliaId) {
+              this.setExternalStyle(this.prevAnomaliaSelect.id, false);
+            }
+
+            this.prevAnomaliaSelect = anomalia;
+          }
+        }
+      });
+    }
 
     // hacemos el poligono editable
     // this.canModifyPolygon(select);

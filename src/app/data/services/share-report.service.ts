@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { AngularFirestore } from '@angular/fire/firestore';
 
 import { AnomaliaService } from './anomalia.service';
+import { FilterControlService } from './filter-control.service';
 
 import { FilterInterface } from '@core/models/filter';
 import { GradientFilter } from '@core/models/gradientFilter';
@@ -28,7 +29,11 @@ export class ShareReportService {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private afs: AngularFirestore, private anomaliaService: AnomaliaService) {}
+  constructor(
+    private afs: AngularFirestore,
+    private anomaliaService: AnomaliaService,
+    private filterControlService: FilterControlService
+  ) {}
 
   initService(id: string) {
     this.subscriptions.add(
@@ -59,6 +64,11 @@ export class ShareReportService {
   setSelectedInformeId(informeId: string) {
     this.params.informeId = informeId;
     this.params$.next(this.params);
+  }
+
+  getCreateDate(): number {
+    const date = new Date();
+    return date.getTime();
   }
 
   setCreatedDate() {
@@ -94,6 +104,14 @@ export class ShareReportService {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  createRecommendedActionsParams(tipos: number[]): ParamsFilterShare {
+    const params: ParamsFilterShare = {};
+
+    params.tipo = tipos;
+
+    return params;
   }
 
   setParams(filter: FilterInterface) {
@@ -201,13 +219,17 @@ export class ShareReportService {
     });
   }
 
-  saveParams() {
+  saveParams(params?: ParamsFilterShare) {
+    let paramsToSave = this.params;
+    if (params) {
+      paramsToSave = params;
+    }
     // guarda los params en la DB
     this.idDB = this.afs.createId();
     this.afs
       .collection('share')
       .doc(this.idDB)
-      .set(this.params)
+      .set(paramsToSave)
       .then(() => {
         console.log('Params guardados correctamente ' + this.idDB);
       })
@@ -286,7 +308,6 @@ export class ShareReportService {
               this.params.criticidad.forEach((crit, index) => {
                 if (crit) {
                   const criticidadFilter = new CriticidadFilter(index.toString(), 'criticidad', index);
-
                   filters.push(criticidadFilter);
                 }
               });
@@ -300,12 +321,17 @@ export class ShareReportService {
           }
           if (Object.keys(this.params).includes('tipo')) {
             if (this.params.tipo !== null) {
+              let tiposSelected = this.filterControlService.tiposSelected;
               this.params.tipo.forEach((tipo, index, tipos) => {
                 if (tipo !== undefined && tipo !== null) {
-                  const tipoFilter = new TipoElemFilter('', 'tipo', tipo, tipos.length, index);
+                  const tipoFilter = new TipoElemFilter(`tipo_${tipo}`, 'tipo', tipo, tipos.length, index);
                   filters.push(tipoFilter);
+
+                  tiposSelected[tipo] = true;
                 }
               });
+
+              this.filterControlService.tiposSelected = tiposSelected;
             }
           }
           if (Object.keys(this.params).includes('zona')) {

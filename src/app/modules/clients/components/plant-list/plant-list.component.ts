@@ -6,17 +6,19 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { AuthService } from '@data/services/auth.service';
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
-import { GLOBAL } from '@data/constants/global';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+
+import { GLOBAL } from '@data/constants/global';
 
 interface PlantsData {
   nombre: string;
   potencia: number;
   mae: number;
+  powerLoss: number;
+  fixablePower: number;
   ultimaInspeccion: number;
   informesAntiguos: InformeInterface[];
   plantaId: string;
@@ -35,19 +37,19 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     'nombre',
     'potencia',
     'mae',
-    'tipo',
-    'ultimaInspeccion',
-    'inspeccionesAntiguas',
+    // 'powerLoss',
+    // 'fixablePower',
+    // 'inspeccionesAntiguas',
   ];
   public dataSource = new MatTableDataSource<PlantsData>();
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
+  sortedColumn = 'mae';
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(
-    public auth: AuthService,
     private portfolioControlService: PortfolioControlService,
     private router: Router,
     private _snackBar: MatSnackBar
@@ -72,6 +74,8 @@ export class PlantListComponent implements OnInit, AfterViewInit {
         nombre: planta.nombre,
         potencia: planta.potencia,
         mae: informeReciente.mae,
+        powerLoss: planta.potencia * informeReciente.mae,
+        fixablePower: this.getFixablePower(informeReciente, planta),
         ultimaInspeccion: informeReciente.fecha,
         informesAntiguos,
         plantaId: planta.id,
@@ -81,12 +85,43 @@ export class PlantListComponent implements OnInit, AfterViewInit {
       });
     });
 
+    this.checkFixablePower(plantsData);
+
+    this.addOtherColumns();
+
+    this.checkOldReports(plantsData);
+
     this.dataSource.data = plantsData;
+  }
+
+  private getFixablePower(informe: InformeInterface, planta: PlantaInterface) {
+    if (informe.fixablePower) {
+      return informe.fixablePower * planta.potencia;
+    } else {
+      return null;
+    }
+  }
+
+  private addOtherColumns() {
+    this.displayedColumns.push('tipo');
+    this.displayedColumns.push('ultimaInspeccion');
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+  }
+
+  private checkFixablePower(plantsData: PlantsData[]) {
+    if (plantsData.filter((data) => data.fixablePower).length > 0) {
+      this.displayedColumns.push('fixablePower');
+    }
+  }
+
+  private checkOldReports(plantsData: PlantsData[]) {
+    if (plantsData.filter((data) => data.informesAntiguos.length > 0).length > 0) {
+      this.displayedColumns.push('inspeccionesAntiguas');
+    }
   }
 
   applyFilter(event: Event) {
@@ -161,5 +196,9 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
   unhoverPlanta(row) {
     this.portfolioControlService.plantaHovered = undefined;
+  }
+
+  selectSortColumn(column: string) {
+    this.sortedColumn = column;
   }
 }

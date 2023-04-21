@@ -1,0 +1,41 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Acciones recomendadas</mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="card-content">
+    <mat-accordion>
+      <mat-expansion-panel expanded="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title> Anomalías reparables </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-recommended-actions
+          [recomendedActions]="fixableFilter(recomendedActions)"
+          (changeRecommendedActions)="changeRecommendedActions.emit($event)"
+        ></app-recommended-actions>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title> Anomalías no reparables </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="panel-content">
+          <app-recommended-actions
+            [recomendedActions]="notFixableFilter(recomendedActions)"
+            (changeRecommendedActions)="changeRecommendedActions.emit($event)"
+          ></app-recommended-actions>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <button class="btn" mat-flat-button color="primary" (click)="navigateToMapFiltered()">
+      <div class="btn-content">
+        <mat-icon>map</mat-icon>
+        <span>Ver seleccionadas en el mapa</span>
+      </div>
+    </button>
+    <button class="btn" mat-flat-button color="primary" (click)="openDialog()">
+      <div class="btn-content">
+        <mat-icon>share</mat-icon>
+        <span>Compartir informe seleccionadas</span>
+      </div>
+    </button>
+  </mat-card-content>
+</mat-card>

@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+
+import { take } from 'rxjs/operators';
 
 import {
   ApexAxisChartSeries,
@@ -16,6 +18,8 @@ import {
   ApexTooltip,
   ApexGrid,
 } from 'ng-apexcharts';
+
+import { TranslateService } from '@ngx-translate/core';
 
 export interface ChartOptions {
   series: ApexAxisChartSeries;
@@ -64,11 +68,19 @@ export class BarExpandableChartComponent implements OnInit {
   public chartStart = true;
   public chartEnd = false;
   private endChart: number;
+  private mediaLabel: string;
 
-  constructor(private decimalPipe: DecimalPipe) {}
+  constructor(private decimalPipe: DecimalPipe, private translate: TranslateService) {}
 
   ngOnInit(): void {
     this.endChart = this.amplitude;
+
+    this.translate
+      .get('Media MAE Portfolio')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.mediaLabel = res;
+      });
 
     this.initChart();
   }
@@ -130,7 +142,7 @@ export class BarExpandableChartComponent implements OnInit {
                 color: '#fff',
                 background: '#053e86',
               },
-              text: 'Media MAE Portfolio ' + this.decimalPipe.transform(this.dataAverage * 100, '1.0-2') + this.units,
+              text: this.mediaLabel + ' ' + this.decimalPipe.transform(this.dataAverage * 100, '1.0-2') + this.units,
             },
           },
         ],

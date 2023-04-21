@@ -1,0 +1,43 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{
+      'Predicción de la evolución de las anomalías por tipo y su MAE asociado' | translate
+    }}</mat-card-title>
+    <!-- <mat-card-subtitle>Encuentra la relación entre el tipo de anomalía y las pérdidas que provoca</mat-card-subtitle> -->
+  </mat-card-header>
+  <mat-card-content>
+    <div class="mae-tipo">
+      <apx-chart
+        *ngIf="chartLoaded"
+        [title]="chartOptionsTypes.title"
+        [series]="chartOptionsTypes.series"
+        [chart]="chartOptionsTypes.chart"
+        [colors]="chartOptionsTypes.colors"
+        [yaxis]="chartOptionsTypes.yaxis"
+        [stroke]="chartOptionsTypes.stroke"
+        [dataLabels]="chartOptionsCommon.dataLabels"
+        [grid]="chartOptionsCommon.grid"
+        [xaxis]="chartOptionsCommon.xaxis"
+        [tooltip]="chartOptionsCommon.tooltip"
+        [plotOptions]="chartOptionsCommon.plotOptions"
+        [legend]="chartOptionsCommon.legend"
+      ></apx-chart>
+
+      <apx-chart
+        *ngIf="chartLoaded"
+        [title]="chartOptionsLosses.title"
+        [series]="chartOptionsLosses.series"
+        [chart]="chartOptionsLosses.chart"
+        [colors]="chartOptionsLosses.colors"
+        [yaxis]="chartOptionsLosses.yaxis"
+        [stroke]="chartOptionsLosses.stroke"
+        [dataLabels]="chartOptionsCommon.dataLabels"
+        [grid]="chartOptionsCommon.grid"
+        [xaxis]="chartOptionsCommon.xaxis"
+        [tooltip]="chartOptionsCommon.tooltip"
+        [plotOptions]="chartOptionsCommon.plotOptions"
+        [legend]="chartOptionsCommon.legend"
+      ></apx-chart>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -1,5 +1,5 @@
 .map {
-  height: calc(100vh - 64px);
+  height: calc(100vh - 96px);
   width: 100%;
 }
 
@@ -20,7 +20,7 @@
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-::ng-deep .ol-control button {
-  background-color: white;
-  color: black;
-}
+// ::ng-deep .ol-control button {
+//   background-color: white;
+//   color: black;
+// }

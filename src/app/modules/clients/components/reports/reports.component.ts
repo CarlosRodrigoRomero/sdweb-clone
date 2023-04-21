@@ -29,6 +29,6 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
 
     // reseteamos los servicios a sus valores por defecto
-    this.resetServices.resetServices();
+    this.resetServices.resetAllServices();
   }
 }

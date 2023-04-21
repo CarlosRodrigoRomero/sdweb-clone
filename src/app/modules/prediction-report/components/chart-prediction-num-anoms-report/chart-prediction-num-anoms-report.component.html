@@ -1,0 +1,22 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ 'Predicción evolución número de anomalías' | translate }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div id="chart">
+      <apx-chart
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [dataLabels]="chartOptions.dataLabels"
+        [plotOptions]="chartOptions.plotOptions"
+        [responsive]="chartOptions.responsive"
+        [xaxis]="chartOptions.xaxis"
+        [yaxis]="chartOptions.yaxis"
+        [stroke]="chartOptions.stroke"
+        [tooltip]="chartOptions.tooltip"
+        [colors]="chartOptions.colors"
+        [legend]="chartOptions.legend"
+      ></apx-chart>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -69,6 +69,7 @@
 
 .stats-container {
   position: relative;
+  border-radius: 8px;
 }
 
 .main-container {
@@ -79,7 +80,7 @@
   position: absolute;
   top: 10px;
   right: 180px;
-  z-index: 999;
+  z-index: 99;
 }
 
 app-share-report {
@@ -107,6 +108,8 @@ app-download-progress-bar {
   display: flex;
   padding: 0.5rem;
   width: fit-content;
+  height: calc(100vh - 96px);
+  border-radius: 8px 0 0 8px;
 }
 
 @media (max-width: 420px) {
@@ -120,7 +123,7 @@ app-download-progress-bar {
   display: flex;
   margin: 60px 10px 10px;
   padding: 10px;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .btn-close {
@@ -134,7 +137,7 @@ app-download-progress-bar {
   display: flex;
   margin: 10px 10px 10px;
   padding: 10px;
-  border-radius: 4px;
+  border-radius: 8px;
   width: 80%;
 }
 

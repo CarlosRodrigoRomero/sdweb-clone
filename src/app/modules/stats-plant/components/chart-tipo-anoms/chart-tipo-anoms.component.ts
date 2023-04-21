@@ -3,6 +3,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { switchMap, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
+import { TranslateService } from '@ngx-translate/core';
+
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -82,13 +84,17 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
   public chartHeight = 300;
 
   private labelDatesReports: string;
+  private anomaliasLabel: string;
+  private maeLabel: string;
+  private maeAnomsLabel: string;
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private reportControlService: ReportControlService,
     private informeService: InformeService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -152,9 +158,11 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.checkTranslate();
   }
 
-  private getAllCategorias(anomalias): void {
+  private getAllCategorias(anomalias: Anomalia[]): void {
     const allNumCategorias = GLOBAL.sortedAnomsTipos;
 
     const labelsCategoria = Array<string>();
@@ -163,10 +171,14 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
 
     allNumCategorias.forEach((i) => {
       if (anomalias.filter((anom) => anom.tipo === i).length > 0) {
-        labelsCategoria.push(GLOBAL.labels_tipos[i]);
-        // coloresCategoria.push(this.anomaliaInfoService.getPerdidasColor(GLOBAL.pcPerdidas[i]));
-        coloresCategoria.push(Colors.rgbaToHex(COLOR.colores_tipos[i]));
-        numsCategoria.push(i);
+        this.translate
+          .get(GLOBAL.labels_tipos[i])
+          .pipe(take(1))
+          .subscribe((res: string) => {
+            labelsCategoria.push(res);
+            coloresCategoria.push(Colors.rgbaToHex(COLOR.colores_tipos[i]));
+            numsCategoria.push(i);
+          });
       }
     });
     this.labelsCategoria = labelsCategoria;
@@ -284,13 +296,15 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
     // espera a que el dataPlot tenga datos
     if (this.dataPlot[0] !== undefined) {
       const seriesNumCat: ApexAxisChartSeries = [];
-      this.dataPlot.forEach((data) => seriesNumCat.push({ name: '# Anomalías', data: data.numPorCategoria }));
+      this.dataPlot.forEach((data) =>
+        seriesNumCat.push({ name: '# ' + this.anomaliasLabel, data: data.numPorCategoria })
+      );
 
       this.chartOptions1 = {
         series: seriesNumCat,
         colors: this.coloresCategoria,
         title: {
-          text: '# Anomalías     (' + this.labelDatesReports + ')',
+          text: '# ' + this.anomaliasLabel + ' (' + this.labelDatesReports + ')',
           align: 'left',
         },
         chart: {
@@ -317,12 +331,12 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
       };
 
       const seriesMaeCat: ApexAxisChartSeries = [];
-      this.dataPlot.forEach((data) => seriesMaeCat.push({ name: 'MAE Anomalías', data: data.perdidasPorCategoria }));
+      this.dataPlot.forEach((data) => seriesMaeCat.push({ name: this.maeAnomsLabel, data: data.perdidasPorCategoria }));
 
       this.chartOptions2 = {
         series: seriesMaeCat,
         title: {
-          text: 'MAE     (' + this.labelDatesReports + ')',
+          text: this.maeLabel + ' (' + this.labelDatesReports + ')',
           align: 'left',
         },
         chart: {
@@ -354,6 +368,29 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
 
       this.chartLoaded = true;
     }
+  }
+
+  private checkTranslate(): void {
+    this.translate
+      .get('MAE')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.maeLabel = res;
+      });
+
+    this.translate
+      .get('MAE Anomalías')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.maeAnomsLabel = res;
+      });
+
+    this.translate
+      .get('Anomalías')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.anomaliasLabel = res;
+      });
   }
 
   ngOnDestroy(): void {

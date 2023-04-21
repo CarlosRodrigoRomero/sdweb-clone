@@ -3,6 +3,8 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@ang
 import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
+import { TranslateService } from '@ngx-translate/core';
+
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -61,6 +63,8 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
   chartData: number[][];
   chartLoaded = false;
   private dateLabels: string[];
+  private maeLabel: string;
+  private zonaLabel: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -69,10 +73,18 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
     private plantaService: PlantaService,
     private informeService: InformeService,
     private cdr: ChangeDetectorRef,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.translate
+      .get('MAE')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.maeLabel = res;
+      });
+
     this.subscriptions.add(
       this.plantaService
         .getLocationsArea(this.reportControlService.plantaId)
@@ -217,10 +229,15 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
       colors[index] = Colors.hexToRgb(COLOR.gris, op);
     });
 
-    let titleXAxis = 'Zona';
+    let titleXAxis = this.zonaLabel;
 
     if (this.reportControlService.nombreGlobalCoords.length > 0) {
-      titleXAxis = this.reportControlService.nombreGlobalCoords[0];
+      this.translate
+        .get(this.reportControlService.nombreGlobalCoords[0])
+        .pipe(take(1))
+        .subscribe((res: string) => {
+          titleXAxis = res;
+        });
     }
 
     // espera a que el dataPlot tenga datos
@@ -279,7 +296,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
           forceNiceScale: true,
           tickAmount: 3,
           title: {
-            text: 'MAE',
+            text: this.maeLabel,
           },
           labels: {
             minWidth: 10,

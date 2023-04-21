@@ -1,5 +1,5 @@
 <div class="filtro">
-  <h5>Clase</h5>
+  <h5>{{ 'clase' | translate | titlecase }}</h5>
   <mat-button-toggle-group class="class-group" #group="matButtonToggleGroup" multiple="true">
     <mat-button-toggle
       *ngFor="let elem of claseElems; index as i"

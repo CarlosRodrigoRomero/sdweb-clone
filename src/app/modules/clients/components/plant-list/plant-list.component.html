@@ -1,11 +1,11 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Listado de plantas</mat-card-title>
+    <mat-card-title>{{ 'Listado de plantas' | translate }}</mat-card-title>
   </mat-card-header>
   <mat-card-content>
     <div class="filtro">
       <mat-form-field class="buscar-input" appearance="outline">
-        <mat-label>Buscar</mat-label>
+        <mat-label>{{ 'buscar' | translate | titlecase }}</mat-label>
         <input matInput (keyup)="applyFilter($event)" #input />
       </mat-form-field>
 
@@ -23,39 +23,170 @@
 
           <!-- Nombre -->
           <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Planta</th>
-            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.nombre }}</td>
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              [ngClass]="{ 'sorted-column-header': sortedColumn === 'nombre' }"
+              (click)="selectSortColumn('nombre')"
+            >
+              {{ 'planta' | translate | titlecase }}
+            </th>
+            <td
+              mat-cell
+              (click)="onClick(row)"
+              *matCellDef="let row"
+              [ngClass]="{ 'sorted-column-row': sortedColumn === 'nombre' }"
+            >
+              {{ row.nombre }}
+            </td>
           </ng-container>
 
           <!-- Potencia -->
           <ng-container matColumnDef="potencia">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia</th>
-            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.potencia | number: '1.2-2' }} MW</td>
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              [ngClass]="{ 'sorted-column-header': sortedColumn === 'potencia' }"
+              (click)="selectSortColumn('potencia')"
+            >
+              {{ 'potencia' | translate | titlecase }} (MW)
+            </th>
+            <td
+              mat-cell
+              (click)="onClick(row)"
+              *matCellDef="let row"
+              [ngClass]="{ 'sorted-column-row': sortedColumn === 'potencia' }"
+            >
+              <div class="cell-centered">
+                {{ row.potencia | number : '1.2-2' }}
+              </div>
+            </td>
           </ng-container>
 
           <!-- MAE -->
           <ng-container matColumnDef="mae">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>MAE</th>
-            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.mae * 100 | number: '1.2-2' }}%</td>
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              [ngClass]="{ 'sorted-column-header': sortedColumn === 'mae' }"
+              (click)="selectSortColumn('mae')"
+            >
+              {{ 'MAE' | translate }} (%)
+            </th>
+            <td
+              mat-cell
+              (click)="onClick(row)"
+              *matCellDef="let row"
+              [ngClass]="{ 'sorted-column-row': sortedColumn === 'mae' }"
+            >
+              <div class="cell-centered">
+                {{ row.mae * 100 | number : '1.2-2' }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Pérdidad potencia -->
+          <!-- <ng-container matColumnDef="powerLoss">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              [ngClass]="{ 'sorted-column-header': sortedColumn === 'powerLoss' }"
+              (click)="selectSortColumn('powerLoss')"
+            >
+              Pérdidas de potencia (MW)
+            </th>
+            <td
+              mat-cell
+              (click)="onClick(row)"
+              *matCellDef="let row"
+              [ngClass]="{ 'sorted-column-row': sortedColumn === 'powerLoss' }"
+            >
+              {{ row.powerLoss | number : '1.2-2' }}
+            </td>
+          </ng-container> -->
+
+          <!-- Potencia reparable -->
+          <ng-container matColumnDef="fixablePower">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              [ngClass]="{ 'sorted-column-header': sortedColumn === 'fixablePower' }"
+              (click)="selectSortColumn('fixablePower')"
+            >
+              {{ 'Potencia reparable' | translate }} (MW)
+            </th>
+            <td
+              mat-cell
+              (click)="onClick(row)"
+              *matCellDef="let row"
+              [ngClass]="{ 'sorted-column-row': sortedColumn === 'fixablePower' }"
+            >
+              <div class="cell-centered">
+                {{ row.fixablePower | number : '1.2-2' }}
+              </div>
+            </td>
           </ng-container>
 
           <!-- Tipo -->
           <ng-container matColumnDef="tipo">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
-            <td mat-cell (click)="onClick(row)" *matCellDef="let row">{{ row.tipo }}</td>
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              [ngClass]="{ 'sorted-column-header': sortedColumn === 'tipo' }"
+              (click)="selectSortColumn('tipo')"
+            >
+              {{ 'tipo' | translate | titlecase }}
+            </th>
+            <td
+              mat-cell
+              (click)="onClick(row)"
+              *matCellDef="let row"
+              [ngClass]="{ 'sorted-column-row': sortedColumn === 'tipo' }"
+            >
+              <div class="cell-centered">
+                {{ row.tipo }}
+              </div>
+            </td>
           </ng-container>
 
           <!-- Fecha última inspección -->
           <ng-container matColumnDef="ultimaInspeccion">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Última inspección</th>
-            <td mat-cell (click)="onClick(row)" *matCellDef="let row">
-              {{ row.ultimaInspeccion * 1000 | date: 'dd/MM/yyyy' }}
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              [ngClass]="{ 'sorted-column-header': sortedColumn === 'ultimaInspeccion' }"
+              (click)="selectSortColumn('ultimaInspeccion')"
+            >
+              {{ 'Ultima inspeccion' | translate }}
+            </th>
+            <td
+              mat-cell
+              (click)="onClick(row)"
+              *matCellDef="let row"
+              [ngClass]="{ 'sorted-column-row': sortedColumn === 'ultimaInspeccion' }"
+            >
+              {{ row.ultimaInspeccion * 1000 | date : 'dd/MM/yyyy' }}
             </td>
           </ng-container>
 
           <!-- Informes antiguos -->
           <ng-container matColumnDef="inspeccionesAntiguas">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Inspec. antiguas</th>
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              [ngClass]="{ 'sorted-column-header': sortedColumn === 'inspeccionesAntiguas' }"
+              (click)="selectSortColumn('inspeccionesAntiguas')"
+            >
+              {{ 'Inspecciones antiguas' | translate }}
+            </th>
             <td mat-cell *matCellDef="let row">
               <button
                 *ngIf="row.informesAntiguos.length > 0"
@@ -67,7 +198,7 @@
               </button>
               <mat-menu #menu="matMenu" class="menu">
                 <button mat-menu-item *ngFor="let item of row.informesAntiguos">
-                  <span (click)="navigateOldReport(item.id)">{{ item.fecha * 1000 | date: 'dd/MM/yyyy' }}</span>
+                  <span (click)="navigateOldReport(item.id)">{{ item.fecha * 1000 | date : 'dd/MM/yyyy' }}</span>
                 </button>
               </mat-menu>
             </td>
