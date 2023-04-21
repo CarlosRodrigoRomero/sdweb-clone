@@ -211,11 +211,11 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
               ...this.chartOptions.dataLabels,
               style: {
                 ...this.chartOptions.dataLabels.style,
-                colors: [this.themeService.textColor],
+                colors: [this.themeService.surfaceColor],
               },
               background: {
                 ...this.chartOptions.dataLabels.background,
-                foreColor: this.themeService.surfaceColor,
+                foreColor: this.themeService.textColor,
               },
             },
             colors: ['transparent', color, COLOR.neutralGrey],

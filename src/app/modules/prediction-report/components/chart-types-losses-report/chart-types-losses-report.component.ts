@@ -123,13 +123,6 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
             tooltip: {
               theme: theme.split('-')[0],
             },
-            dataLabels: {
-              ...this.chartOptionsCommon.dataLabels,
-              style: {
-                ...this.chartOptionsCommon.dataLabels.style,
-                colors: [this.themeService.textColor],
-              },
-            },
           };
 
           this.chartOptionsTypes = {
@@ -161,7 +154,7 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
       dataLabels: {
         enabled: true,
         style: {
-          fontSize: '14px',
+          fontSize: '12px',
           colors: [this.themeService.textColor],
         },
         offsetX: 0,
