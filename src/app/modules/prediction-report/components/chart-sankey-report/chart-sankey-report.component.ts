@@ -162,7 +162,7 @@ export class ChartSankeyReportComponent implements OnInit {
       ['2x Substring CA', '2x Substring CA.', 2],
       ['Substring en CA', 'Substring en CA.', 62],
       ['Módulo en CC', 'Módulo en CC.', 1],
-      ['Caja conexiones', 'Caja conexiones.', 16],
+      ['Caja conexiones', 'Caja conexiones.', 6],
       ['Sombras', 'Sombras.', 37],
       ['Nuevas', 'Substring en CA.', 7],
       ['Nuevas', 'Caja conexiones.', 2],

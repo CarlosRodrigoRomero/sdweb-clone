@@ -227,8 +227,8 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
 
   private calculateFakeData(moduleNumber: number) {
     const tipos = [3, 7, 10, 14, 15, 17, 18];
-    const numByTipo = [62, 1, 2, 18, 37, 140, 1399];
-    const newNumByTipo = [69, 1, 2, 20, 37, 150, 1399];
+    const numByTipo = [62, 1, 2, 6, 37, 140, 1399];
+    const newNumByTipo = [69, 1, 2, 8, 37, 150, 1399];
 
     const fixableTipos = tipos.filter((tipo) => GLOBAL.fixableTypes.includes(tipo));
 
