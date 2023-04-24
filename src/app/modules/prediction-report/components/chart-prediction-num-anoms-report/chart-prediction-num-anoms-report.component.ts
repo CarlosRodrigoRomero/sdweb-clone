@@ -78,8 +78,8 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
     //   lastReportAnoms.length - nextYearFixableLastReportAnoms.length,
     // ];
 
-    const totalAnomsData = [1599, 1705];
-    const fixableAnomsData = [259, 315];
+    const totalAnomsData = [1586, 1689];
+    const fixableAnomsData = [246, 299];
     const unfixableAnomsData = [1340, 1390];
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => {

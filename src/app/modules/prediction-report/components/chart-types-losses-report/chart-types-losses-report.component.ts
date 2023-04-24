@@ -340,12 +340,12 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
     const tipos = [18, 17, 10, 3, 7, 14, 15];
 
     if (prediction) {
-      numPorCategoria = [1399, 150, 2, 69, 1, 20, 37];
+      numPorCategoria = [1399, 150, 2, 69, 1, 8, 37];
       numPorCategoria.forEach((num, index) => {
         perdidasPorCategoria.push(num * GLOBAL.pcPerdidas[tipos[index]]);
       });
     } else {
-      numPorCategoria = [1339, 140, 2, 62, 1, 18, 37];
+      numPorCategoria = [1339, 140, 2, 62, 1, 6, 37];
       numPorCategoria.forEach((num, index) => {
         perdidasPorCategoria.push(num * GLOBAL.pcPerdidas[tipos[index]]);
       });
