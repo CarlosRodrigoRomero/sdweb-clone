@@ -6,13 +6,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
+import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { PlantaService } from '@data/services/planta.service';
-import { UserService } from '@data/services/user.service';
+import { EmpresaService } from '@data/services/empresa.service';
 
 import { PlantaInterface } from '@core/models/planta';
-import { UserInterface } from '@core/models/user';
+import { Empresa } from '@core/models/empresa';
 
 @Component({
   selector: 'app-plant-create',
@@ -23,8 +24,8 @@ export class PlantCreateComponent implements OnInit, OnDestroy {
   form: FormGroup;
   planta: PlantaInterface = {};
   plantCreated = false;
-  empresas: UserInterface[];
-  empresaSelected: UserInterface;
+  empresas: Empresa[];
+  empresaSelected: Empresa;
   nombreGlobalCoords: string[] = [];
   tipo: string;
   vertical = false;
@@ -37,18 +38,23 @@ export class PlantCreateComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private plantaService: PlantaService,
     private _snackBar: MatSnackBar,
-    private userService: UserService
+    private empresaService: EmpresaService
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
-      this.userService.getAllUsers().subscribe((empresas) => {
-        this.empresas = empresas.filter(
-          (empresa) =>
-            empresa.empresaNombre !== undefined && empresa.empresaNombre !== null && empresa.empresaNombre !== ''
-        );
-      })
-    );
+    this.empresaService
+      .getEmpresas()
+      .pipe(take(1))
+      .subscribe((empresas) => (this.empresas = empresas));
+
+    // this.subscriptions.add(
+    //   this.userService.getAllUsers().subscribe((empresas) => {
+    //     this.empresas = empresas.filter(
+    //       (empresa) =>
+    //         empresa.empresaNombre !== undefined && empresa.empresaNombre !== null && empresa.empresaNombre !== ''
+    //     );
+    //   })
+    // );
 
     this.buildForm();
   }
@@ -90,7 +96,7 @@ export class PlantCreateComponent implements OnInit, OnDestroy {
         this.planta.columnaDchaPrimero = this.form.get('columnaDchaPrimero').value;
 
         this.planta.autoLocReady = this.form.get('autoLocReady').value;
-        this.planta.empresa = this.empresaSelected.uid;
+        this.planta.empresa = this.empresaSelected.id;
 
         if (this.form.get('stringConectorGlobals').value !== null) {
           this.planta.stringConectorGlobals = this.form.get('stringConectorGlobals').value;

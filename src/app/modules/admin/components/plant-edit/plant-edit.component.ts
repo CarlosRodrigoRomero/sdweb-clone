@@ -17,10 +17,10 @@ import { fromLonLat } from 'ol/proj';
 import { FullScreen, defaults as defaultControls } from 'ol/control';
 
 import { PlantaService } from '@data/services/planta.service';
-import { UserService } from '@data/services/user.service';
+import { EmpresaService } from '@data/services/empresa.service';
 
 import { PlantaInterface } from '@core/models/planta';
-import { UserInterface } from '@core/models/user';
+import { Empresa } from '@core/models/empresa';
 
 @Component({
   selector: 'app-plant-edit',
@@ -32,8 +32,8 @@ export class PlantEditComponent implements OnInit {
   private plantaId: string;
   planta: PlantaInterface = {};
   plantCreated = false;
-  empresas: UserInterface[];
-  empresaSelected: UserInterface;
+  empresas: Empresa[];
+  empresaSelected: Empresa;
   private map: Map;
   zoom = 5.65;
   latitud = 40;
@@ -49,7 +49,7 @@ export class PlantEditComponent implements OnInit {
     private formBuilder: FormBuilder,
     private plantaService: PlantaService,
     private _snackBar: MatSnackBar,
-    private userService: UserService
+    private empresaService: EmpresaService
   ) {
     this.buildForm();
   }
@@ -70,18 +70,15 @@ export class PlantEditComponent implements OnInit {
         this.form.patchValue(this.planta);
       });
 
-    this.userService
-      .getAllUsers()
+    this.empresaService
+      .getEmpresas()
       .pipe(take(1))
       .subscribe((empresas) => {
-        this.empresas = empresas.filter(
-          (empresa) =>
-            empresa.empresaNombre !== undefined && empresa.empresaNombre !== null && empresa.empresaNombre !== ''
-        );
+        this.empresas = empresas;
 
         // esperamos a enviar los datos seleccionados para que no se adelanten a las listas
         setTimeout(() => {
-          this.empresaSelected = this.empresas.find((empresa) => empresa.uid === this.planta.empresa);
+          this.empresaSelected = this.empresas.find((empresa) => empresa.id === this.planta.empresa);
         }, 1000);
       });
 
@@ -150,7 +147,7 @@ export class PlantEditComponent implements OnInit {
       this.planta.autoLocReady = this.form.get('autoLocReady').value;
     }
     if (this.empresaSelected !== undefined) {
-      this.planta.empresa = this.empresaSelected.uid;
+      this.planta.empresa = this.empresaSelected.id;
     }
     if (this.form.get('stringConectorGlobals').value !== null && this.form.get('stringConectorGlobals').value !== '') {
       this.planta.stringConectorGlobals = this.form.get('stringConectorGlobals').value;

@@ -15,7 +15,7 @@
           <app-mat-selected-search
             *ngIf="empresas !== undefined"
             [elements]="empresas"
-            [property]="'empresaNombre'"
+            [property]="'nombre'"
             [title]="'Empresa'"
             (elemSelected)="getElemSelected($event)"
           ></app-mat-selected-search>
