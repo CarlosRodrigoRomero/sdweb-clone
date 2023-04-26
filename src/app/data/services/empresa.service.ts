@@ -17,6 +17,10 @@ export class EmpresaService {
     return this.afs.collection('empresas').doc(empresa.id).set(empresa);
   }
 
+  getEmpresa(id: string): Observable<Empresa> {
+    return this.afs.collection<Empresa>('empresas').doc(id).valueChanges();
+  }
+
   getEmpresas(): Observable<Empresa[]> {
     return this.afs
       .collection('empresas')
@@ -30,5 +34,9 @@ export class EmpresaService {
           });
         })
       );
+  }
+
+  updateEmpresa(empresa: Empresa) {
+    return this.afs.collection('empresas').doc(empresa.id).update(empresa);
   }
 }

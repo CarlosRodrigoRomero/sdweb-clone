@@ -21,6 +21,7 @@ import { PlantEditComponent } from './components/plant-edit/plant-edit.component
 import { ReportsSharedComponent } from './components/reports-shared/reports-shared.component';
 import { EmpresasComponent } from './components/empresas/empresas.component';
 import { CreateEmpresaComponent } from './components/create-empresa/create-empresa.component';
+import { EmpresaEditComponent } from './components/empresa-edit/empresa-edit.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { CreateEmpresaComponent } from './components/create-empresa/create-empre
     ReportsSharedComponent,
     EmpresasComponent,
     CreateEmpresaComponent,
+    EmpresaEditComponent,
   ],
   imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule, LayoutModule],
 })

@@ -11,7 +11,7 @@ import { EmpresaService } from '@data/services/empresa.service';
   styleUrls: ['./empresas.component.css'],
 })
 export class EmpresasComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['nombre', 'id'];
+  displayedColumns: string[] = ['nombre', 'id', 'actions'];
   dataSource = new MatTableDataSource<any>();
 
   @ViewChild(MatSort) sort: MatSort;

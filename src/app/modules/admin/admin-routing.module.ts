@@ -19,6 +19,7 @@ import { PlantEditComponent } from './components/plant-edit/plant-edit.component
 import { ReportsSharedComponent } from './components/reports-shared/reports-shared.component';
 import { EmpresasComponent } from './components/empresas/empresas.component';
 import { CreateEmpresaComponent } from './components/create-empresa/create-empresa.component';
+import { EmpresaEditComponent } from './components/empresa-edit/empresa-edit.component';
 
 const routes: Routes = [
   {
@@ -77,6 +78,10 @@ const routes: Routes = [
       {
         path: 'companies/create',
         component: CreateEmpresaComponent,
+      },
+      {
+        path: 'companies/edit/:id',
+        component: EmpresaEditComponent,
       },
     ],
   },

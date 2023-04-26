@@ -1,0 +1,28 @@
+<div class="edit">
+  <h4>Editar empresa</h4>
+
+  <div class="edit-content">
+    <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+      <mat-card>
+        <mat-card-content class="card-content">
+          <!-- Nombre -->
+          <mat-form-field>
+            <mat-label>Nombre interno Solardrone</mat-label>
+            <input matInput formControlName="nombre" type="text" />
+          </mat-form-field>
+
+          <!-- Label nombre -->
+          <mat-form-field>
+            <mat-label>Label Nombre</mat-label>
+            <input matInput formControlName="labelNombre" type="text" />
+          </mat-form-field>
+
+          <div class="btns-actions">
+            <button mat-raised-button routerLink="../../">Cancelar</button>
+            <button mat-raised-button color="primary" type="submit">Enviar cambios</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+  </div>
+</div>
