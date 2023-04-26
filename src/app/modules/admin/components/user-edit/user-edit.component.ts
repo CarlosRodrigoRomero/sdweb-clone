@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { MatSelectChange } from '@angular/material/select';
 
 import { Subscription } from 'rxjs';
 
@@ -18,6 +19,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   emailVerified: boolean;
   id: string;
   user: UserInterface = {};
+  selectedRole: number;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -43,6 +45,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
         users.filter((user) => {
           if (user.uid === this.id) {
             this.user = user;
+            this.selectedRole = user.role;
             this.form.patchValue({ email: user.email, empresa: user.empresaNombre });
           }
         });
@@ -80,6 +83,10 @@ export class UserEditComponent implements OnInit, OnDestroy {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  onRoleChange(event: MatSelectChange) {
+    this.selectedRole = Number(event.value);
   }
 
   ngOnDestroy(): void {

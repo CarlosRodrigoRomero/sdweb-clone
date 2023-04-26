@@ -13,6 +13,10 @@ import { Empresa } from '@core/models/empresa';
 export class EmpresaService {
   constructor(private afs: AngularFirestore) {}
 
+  createEmpresa(empresa: Empresa) {
+    return this.afs.collection('empresas').doc(empresa.id).set(empresa);
+  }
+
   getEmpresas(): Observable<Empresa[]> {
     return this.afs
       .collection('empresas')

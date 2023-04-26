@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
@@ -6,7 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
-import { take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { PlantaService } from '@data/services/planta.service';
 import { UserService } from '@data/services/user.service';
@@ -19,7 +19,7 @@ import { UserInterface } from '@core/models/user';
   templateUrl: './plant-create.component.html',
   styleUrls: ['./plant-create.component.css'],
 })
-export class PlantCreateComponent implements OnInit {
+export class PlantCreateComponent implements OnInit, OnDestroy {
   form: FormGroup;
   planta: PlantaInterface = {};
   plantCreated = false;
@@ -31,6 +31,8 @@ export class PlantCreateComponent implements OnInit {
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   removable = true;
 
+  private subscriptions = new Subscription();
+
   constructor(
     private formBuilder: FormBuilder,
     private plantaService: PlantaService,
@@ -39,15 +41,14 @@ export class PlantCreateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.userService
-      .getAllUsers()
-      .pipe(take(1))
-      .subscribe((empresas) => {
+    this.subscriptions.add(
+      this.userService.getAllUsers().subscribe((empresas) => {
         this.empresas = empresas.filter(
           (empresa) =>
             empresa.empresaNombre !== undefined && empresa.empresaNombre !== null && empresa.empresaNombre !== ''
         );
-      });
+      })
+    );
 
     this.buildForm();
   }
@@ -136,5 +137,9 @@ export class PlantCreateComponent implements OnInit {
 
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.nombreGlobalCoords, event.previousIndex, event.currentIndex);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

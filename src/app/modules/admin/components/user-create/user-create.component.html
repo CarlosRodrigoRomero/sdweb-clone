@@ -1,5 +1,5 @@
 <div class="create-user">
-  <h3>Editar usuario</h3>
+  <h3>Crear usuario</h3>
 
   <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
     <mat-card>
@@ -29,7 +29,7 @@
 
         <mat-form-field appearance="fill">
           <mat-label>Tipo de usuario</mat-label>
-          <mat-select formControlName="role">
+          <mat-select formControlName="role" (selectionChange)="onRoleChange($event)">
             <mat-option value="0">Usuario (role 0)</mat-option>
             <mat-option value="1">Administrador (role 1)</mat-option>
             <mat-option value="2">Externo (role 2)</mat-option>
@@ -39,7 +39,10 @@
 
         <!-- Selector de plantas -->
 
-        <app-plantas-table (newPlantasUser)="user.plantas = $event"></app-plantas-table>
+        <app-plantas-table
+          *ngIf="selectedRole === 2"
+          (newPlantasUser)="user.plantas = $event"
+        ></app-plantas-table>
       </mat-card-content>
       <mat-card-actions>
         <button mat-raised-button routerLink="../../">Cancelar</button>
