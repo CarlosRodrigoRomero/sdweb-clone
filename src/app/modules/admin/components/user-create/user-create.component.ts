@@ -82,6 +82,7 @@ export class UserCreateComponent implements OnInit {
           const empresa = {
             id: user.uid,
             nombre: user.empresaNombre,
+            labelNombre: user.empresaNombre,
           };
 
           this.empresaService.createEmpresa(empresa);

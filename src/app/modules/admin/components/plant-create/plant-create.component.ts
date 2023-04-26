@@ -47,15 +47,6 @@ export class PlantCreateComponent implements OnInit, OnDestroy {
       .pipe(take(1))
       .subscribe((empresas) => (this.empresas = empresas));
 
-    // this.subscriptions.add(
-    //   this.userService.getAllUsers().subscribe((empresas) => {
-    //     this.empresas = empresas.filter(
-    //       (empresa) =>
-    //         empresa.empresaNombre !== undefined && empresa.empresaNombre !== null && empresa.empresaNombre !== ''
-    //     );
-    //   })
-    // );
-
     this.buildForm();
   }
 

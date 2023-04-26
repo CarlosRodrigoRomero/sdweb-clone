@@ -1,0 +1,39 @@
+<div class="create-empresa">
+  <h4>Crear empresa</h4>
+
+  <div class="create-empresa-content">
+    <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+      <mat-card>
+        <mat-card-content class="card-content">
+          <!-- ID -->
+          <mat-form-field>
+            <mat-label>ID</mat-label>
+            <input matInput formControlName="id" type="text" />
+          </mat-form-field>
+
+          <!-- Nombre -->
+          <mat-form-field>
+            <mat-label>Nombre interno Solardrone</mat-label>
+            <input matInput formControlName="nombre" type="text" />
+          </mat-form-field>
+
+          <!-- Label nombre -->
+          <mat-form-field>
+            <mat-label>Label Nombre</mat-label>
+            <input matInput formControlName="labelNombre" type="text" />
+          </mat-form-field>
+
+          <div class="btns-actions">
+            <button mat-raised-button routerLink="../">
+              <span *ngIf="!empresaCreated">Cancelar</span>
+              <span *ngIf="empresaCreated">Volver atrás</span>
+            </button>
+            <button *ngIf="!empresaCreated" [disabled]="form.invalid" mat-raised-button color="primary" type="submit">
+              Crear
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
+  </div>
+</div>
