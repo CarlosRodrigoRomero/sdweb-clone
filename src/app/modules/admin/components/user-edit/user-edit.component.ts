@@ -1,10 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { MatSelectChange } from '@angular/material/select';
 
 import { Subscription } from 'rxjs';
 
-import { AdminService } from '@data/services/admin.service';
+import { UserService } from '@data/services/user.service';
 
 import { UserInterface } from '@core/models/user';
 
@@ -18,6 +19,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   emailVerified: boolean;
   id: string;
   user: UserInterface = {};
+  selectedRole: number;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -25,7 +27,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private adminService: AdminService
+    private userService: UserService
   ) {
     this.buildForm();
   }
@@ -39,10 +41,11 @@ export class UserEditComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.adminService.getAllUsers().subscribe((users) => {
+      this.userService.getAllUsers().subscribe((users) => {
         users.filter((user) => {
           if (user.uid === this.id) {
             this.user = user;
+            this.selectedRole = user.role;
             this.form.patchValue({ email: user.email, empresa: user.empresaNombre });
           }
         });
@@ -64,14 +67,14 @@ export class UserEditComponent implements OnInit, OnDestroy {
       this.user.email = this.form.get('email').value;
       this.user.empresaNombre = this.form.get('empresa').value;
       this.user.role = Number(this.form.get('role').value);
-      console.log(this.user);
+
       // Actualiza el usuario en la DB
       this.updateUser(this.user);
     }
   }
 
   updateUser(user: UserInterface) {
-    this.adminService
+    this.userService
       .updateUser(user)
       .then(() => {
         console.log('Usuario actualizado correctamente');
@@ -80,6 +83,10 @@ export class UserEditComponent implements OnInit, OnDestroy {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  onRoleChange(event: MatSelectChange) {
+    this.selectedRole = Number(event.value);
   }
 
   ngOnDestroy(): void {

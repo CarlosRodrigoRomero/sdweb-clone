@@ -16,8 +16,10 @@ import { ThermalLayerCreateComponent } from './components/thermal-layer-create/t
 import { PlantsComponent } from './components/plants/plants.component';
 import { PlantCreateComponent } from './components/plant-create/plant-create.component';
 import { PlantEditComponent } from './components/plant-edit/plant-edit.component';
-
 import { ReportsSharedComponent } from './components/reports-shared/reports-shared.component';
+import { EmpresasComponent } from './components/empresas/empresas.component';
+import { CreateEmpresaComponent } from './components/create-empresa/create-empresa.component';
+import { EmpresaEditComponent } from './components/empresa-edit/empresa-edit.component';
 
 const routes: Routes = [
   {
@@ -68,6 +70,18 @@ const routes: Routes = [
       {
         path: 'shared',
         component: ReportsSharedComponent,
+      },
+      {
+        path: 'companies',
+        component: EmpresasComponent,
+      },
+      {
+        path: 'companies/create',
+        component: CreateEmpresaComponent,
+      },
+      {
+        path: 'companies/edit/:id',
+        component: EmpresaEditComponent,
       },
     ],
   },

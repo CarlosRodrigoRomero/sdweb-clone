@@ -2,6 +2,7 @@ import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { formatNumber, formatDate } from '@angular/common';
 
 import { Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { TranslateService } from '@ngx-translate/core';
 
@@ -20,7 +21,6 @@ import { CritCriticidad } from '@core/models/critCriticidad';
 
 import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
-import { switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',

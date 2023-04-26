@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
@@ -7,47 +7,45 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { PlantaService } from '@data/services/planta.service';
-import { AdminService } from '@data/services/admin.service';
+import { EmpresaService } from '@data/services/empresa.service';
 
 import { PlantaInterface } from '@core/models/planta';
-import { UserInterface } from '@core/models/user';
+import { Empresa } from '@core/models/empresa';
 
 @Component({
   selector: 'app-plant-create',
   templateUrl: './plant-create.component.html',
   styleUrls: ['./plant-create.component.css'],
 })
-export class PlantCreateComponent implements OnInit {
+export class PlantCreateComponent implements OnInit, OnDestroy {
   form: FormGroup;
   planta: PlantaInterface = {};
   plantCreated = false;
-  empresas: UserInterface[];
-  empresaSelected: UserInterface;
+  empresas: Empresa[];
+  empresaSelected: Empresa;
   nombreGlobalCoords: string[] = [];
   tipo: string;
   vertical = false;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   removable = true;
 
+  private subscriptions = new Subscription();
+
   constructor(
     private formBuilder: FormBuilder,
     private plantaService: PlantaService,
     private _snackBar: MatSnackBar,
-    private adminService: AdminService
+    private empresaService: EmpresaService
   ) {}
 
   ngOnInit(): void {
-    this.adminService
-      .getAllUsers()
+    this.empresaService
+      .getEmpresas()
       .pipe(take(1))
-      .subscribe((empresas) => {
-        this.empresas = empresas.filter(
-          (empresa) =>
-            empresa.empresaNombre !== undefined && empresa.empresaNombre !== null && empresa.empresaNombre !== ''
-        );
-      });
+      .subscribe((empresas) => (this.empresas = empresas));
 
     this.buildForm();
   }
@@ -89,7 +87,7 @@ export class PlantCreateComponent implements OnInit {
         this.planta.columnaDchaPrimero = this.form.get('columnaDchaPrimero').value;
 
         this.planta.autoLocReady = this.form.get('autoLocReady').value;
-        this.planta.empresa = this.empresaSelected.uid;
+        this.planta.empresa = this.empresaSelected.id;
 
         if (this.form.get('stringConectorGlobals').value !== null) {
           this.planta.stringConectorGlobals = this.form.get('stringConectorGlobals').value;
@@ -136,5 +134,9 @@ export class PlantCreateComponent implements OnInit {
 
   drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.nombreGlobalCoords, event.previousIndex, event.currentIndex);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

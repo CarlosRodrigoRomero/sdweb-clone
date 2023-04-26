@@ -10,7 +10,7 @@ import { Coordinate } from 'ol/coordinate';
 import Polygon from 'ol/geom/Polygon';
 
 import { PlantaService } from '@data/services/planta.service';
-import { AdminService } from '@data/services/admin.service';
+import { UserService } from './user.service';
 import { OlMapService } from './ol-map.service';
 import { AnomaliaInfoService } from './anomalia-info.service';
 import { ZonesService } from './zones.service';
@@ -48,10 +48,10 @@ export class AnomaliaService {
     public afs: AngularFirestore,
     private storage: AngularFireStorage,
     private plantaService: PlantaService,
-    private adminService: AdminService,
     private olMapService: OlMapService,
     private anomaliaInfoService: AnomaliaInfoService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private userService: UserService
   ) {}
 
   initService(plantaId: string): Promise<void> {
@@ -305,7 +305,7 @@ export class AnomaliaService {
   getCriterioId(planta: PlantaInterface) {
     let criterioId: string;
 
-    return this.adminService.getUser(planta.empresa).pipe(
+    return this.userService.getUser(planta.empresa).pipe(
       take(1),
       map((user) => {
         // comprobamos primero que exista el usuario
