@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { AdminService } from '@data/services/admin.service';
 import { AuthService } from '@data/services/auth.service';
+import { UserService } from '@data/services/user.service';
 
 import { UserInterface } from '@core/models/user';
 
@@ -18,9 +18,9 @@ export class UserCreateComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private adminService: AdminService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {
     this.buildForm();
   }
@@ -53,7 +53,7 @@ export class UserCreateComponent implements OnInit {
   }
 
   createUser(user: UserInterface) {
-    return this.adminService
+    return this.userService
       .createUser(user)
       .then(() => {
         console.log('Usuario creado correctamente');

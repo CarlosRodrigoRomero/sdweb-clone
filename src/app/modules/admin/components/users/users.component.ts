@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { AdminService } from '@data/services/admin.service';
+import { UserService } from '@data/services/user.service';
 
 import { UserInterface } from '@core/models/user';
 
@@ -23,14 +23,14 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('search') search: ElementRef;
 
-  constructor(private adminService: AdminService) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(this.adminService.getAllUsers().subscribe((users) => (this.users = users)));
+    this.subscriptions.add(this.userService.getAllUsers().subscribe((users) => (this.users = users)));
 
     const usersTable: any[] = [];
     this.subscriptions.add(
-      this.adminService.getAllUsers().subscribe((users) => {
+      this.userService.getAllUsers().subscribe((users) => {
         users.filter((user) => {
           usersTable.push({ email: user.email, empresa: user.empresaNombre, id: user.uid });
         });

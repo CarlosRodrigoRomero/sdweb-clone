@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { AngularFirestore } from '@angular/fire/firestore';
 
 import { UserInterface } from '@core/models/user';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -12,8 +13,16 @@ import { UserInterface } from '@core/models/user';
 export class UserService {
   constructor(private afs: AngularFirestore) {}
 
-  getUser(userId: string) {
-    const userRef = this.afs.collection('users').doc(userId);
+  createUser(user: UserInterface) {
+    return this.afs.collection('users').add(user);
+  }
+
+  updateUser(user: UserInterface) {
+    return this.afs.collection('users').doc(user.uid).update(user);
+  }
+
+  getUser(id: string): Observable<UserInterface> {
+    const userRef = this.afs.collection<UserInterface>('users').doc(id);
 
     return userRef.snapshotChanges().pipe(
       map((action) => {
@@ -22,10 +31,26 @@ export class UserService {
           data.uid = action.payload.id;
           return data;
         } else {
-          console.log('No existe el usuario');
           return null;
         }
       })
     );
+  }
+
+  getAllUsers(): Observable<UserInterface[]> {
+    return this.afs.collection('users').valueChanges();
+  }
+
+  deleteUser(user: UserInterface) {
+    this.afs
+      .collection('users')
+      .doc(user.uid)
+      .delete()
+      .then(() => {
+        console.log('Usuario eliminado correctamente');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }

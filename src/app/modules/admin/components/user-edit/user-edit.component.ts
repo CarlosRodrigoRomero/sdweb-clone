@@ -4,7 +4,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
-import { AdminService } from '@data/services/admin.service';
+import { UserService } from '@data/services/user.service';
 
 import { UserInterface } from '@core/models/user';
 
@@ -25,7 +25,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private adminService: AdminService
+    private userService: UserService
   ) {
     this.buildForm();
   }
@@ -39,7 +39,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.adminService.getAllUsers().subscribe((users) => {
+      this.userService.getAllUsers().subscribe((users) => {
         users.filter((user) => {
           if (user.uid === this.id) {
             this.user = user;
@@ -64,14 +64,14 @@ export class UserEditComponent implements OnInit, OnDestroy {
       this.user.email = this.form.get('email').value;
       this.user.empresaNombre = this.form.get('empresa').value;
       this.user.role = Number(this.form.get('role').value);
-      console.log(this.user);
+
       // Actualiza el usuario en la DB
       this.updateUser(this.user);
     }
   }
 
   updateUser(user: UserInterface) {
-    this.adminService
+    this.userService
       .updateUser(user)
       .then(() => {
         console.log('Usuario actualizado correctamente');

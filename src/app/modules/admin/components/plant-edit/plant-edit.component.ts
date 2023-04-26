@@ -17,7 +17,7 @@ import { fromLonLat } from 'ol/proj';
 import { FullScreen, defaults as defaultControls } from 'ol/control';
 
 import { PlantaService } from '@data/services/planta.service';
-import { AdminService } from '@data/services/admin.service';
+import { UserService } from '@data/services/user.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
@@ -49,7 +49,7 @@ export class PlantEditComponent implements OnInit {
     private formBuilder: FormBuilder,
     private plantaService: PlantaService,
     private _snackBar: MatSnackBar,
-    private adminService: AdminService
+    private userService: UserService
   ) {
     this.buildForm();
   }
@@ -70,7 +70,7 @@ export class PlantEditComponent implements OnInit {
         this.form.patchValue(this.planta);
       });
 
-    this.adminService
+    this.userService
       .getAllUsers()
       .pipe(take(1))
       .subscribe((empresas) => {

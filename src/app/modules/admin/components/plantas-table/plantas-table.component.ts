@@ -37,13 +37,12 @@ export class PlantasTableComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private plantaService: PlantaService) {}
 
   ngOnInit(): void {
-    // Guarda todas las plantas en un array local
-    this.subscriptions.add(this.plantaService.getAllPlantas().subscribe((plantas) => (this.plantas = plantas)));
-
     // Filtra en un array los datos a mostrar en la tabla
     const plantasTable: any[] = [];
     this.subscriptions.add(
       this.plantaService.getAllPlantas().subscribe((plantas) => {
+        this.plantas = plantas;
+
         plantas.filter((planta) => {
           plantasTable.push({
             name: planta.nombre,

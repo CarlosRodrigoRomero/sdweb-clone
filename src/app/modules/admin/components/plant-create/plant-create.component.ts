@@ -9,7 +9,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { take } from 'rxjs/operators';
 
 import { PlantaService } from '@data/services/planta.service';
-import { AdminService } from '@data/services/admin.service';
+import { UserService } from '@data/services/user.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { UserInterface } from '@core/models/user';
@@ -35,11 +35,11 @@ export class PlantCreateComponent implements OnInit {
     private formBuilder: FormBuilder,
     private plantaService: PlantaService,
     private _snackBar: MatSnackBar,
-    private adminService: AdminService
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
-    this.adminService
+    this.userService
       .getAllUsers()
       .pipe(take(1))
       .subscribe((empresas) => {

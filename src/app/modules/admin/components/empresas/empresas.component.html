@@ -1,0 +1,39 @@
+<div class="empresas">
+  <div class="empresas__title">
+    <h3>Listado de empresas</h3>
+    <button mat-raised-button color="warn" routerLink="create">Crear planta</button>
+  </div>
+
+  <mat-form-field>
+    <mat-label>Buscar</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Empresa" #search />
+  </mat-form-field>
+
+  <div class="tabla-container">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <!-- Nombre -->
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+        <td mat-cell *matCellDef="let element">{{ element.nombre }}</td>
+      </ng-container>
+
+      <!-- ID -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+      </ng-container>
+
+      <!-- <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let element">
+          <a mat-button mat-icon-button [routerLink]="['./edit', element.id]" matTooltip="Acceder a la planta">
+            <mat-icon>edit</mat-icon>
+          </a>
+        </td>
+      </ng-container> -->
+    </table>
+  </div>
+</div>
