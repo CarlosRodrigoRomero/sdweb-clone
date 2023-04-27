@@ -253,5 +253,18 @@
   "Nubosidad": "Cloudiness",
   "Tª ambiente": "Ambient temperature",
   "Nº módulo": "Module no.",
-  "Info Anomalía": "Anomaly Info"
+  "Info Anomalía": "Anomaly Info",
+  "Seguidor": "Tracker",
+  "Nº Anomalias": "No. of Abnormalities",
+  "Listado de seguidores": "List of trackers",
+  "Lista seguidores": "List of trackers",
+  "Térmica": "Thermal",
+  "Visual": "Visual",
+  "Origen": "Origin",
+  "CCs": "HCs",
+  "Descargar imágenes": "Download images",
+  "Descargas": "Downloads",
+  "Imagen térmica": "Thermal image",
+  "Imagen visual": "Visual image",
+  "Ningún módulo con celulas calientes": "No module with hot cells"
 }

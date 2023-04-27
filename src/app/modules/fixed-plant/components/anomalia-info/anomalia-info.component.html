@@ -5,7 +5,7 @@
         <span class="titulo-resalt">{{ 'anomalia' | translate | titlecase }} #{{ anomaliaHover.numAnom }}</span>
       </div>
       <div class="elemento">
-        <span class="titulo">{{ 'tipo' | translate | titlecase }}</span>
+        <span class="titulo">{{ 'Tipo' | translate }}</span>
         <span class="subtitulo">{{ pcDescripcion[anomaliaHover.tipo] | translate }}</span>
       </div>
       <div class="elemento">
@@ -23,7 +23,7 @@
         <span *ngIf="anomaliaHover.gradienteNormalizado === 0" class="subtitulo">Pronto disponible</span>
       </div>
       <div class="elemento">
-        <span class="titulo">{{ 'perdidas' | translate | titlecase }}</span>
+        <span class="titulo">{{ 'Pérdidas' | translate }}</span>
         <span class="subtitulo">{{ perdidas | translate }}</span>
       </div>
       <div class="elemento">
@@ -52,7 +52,7 @@
               <span class="titulo-resalt">{{ 'anomalia' | translate | titlecase }} #{{ anomaliaSelect.numAnom }}</span>
             </div>
             <div class="elemento">
-              <span class="titulo">{{ 'tipo' | translate | titlecase }}</span>
+              <span class="titulo">{{ 'Tipo' | translate }}</span>
               <span class="subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] | translate }}</span>
             </div>
             <div class="elemento">
@@ -72,7 +72,7 @@
               <span *ngIf="anomaliaSelect.gradienteNormalizado === 0" class="subtitulo">Pronto disponible</span>
             </div>
             <div class="elemento">
-              <span class="titulo">{{ 'perdidas' | translate | titlecase }}</span>
+              <span class="titulo">{{ 'Pérdidas' | translate }}</span>
               <span class="subtitulo">{{ perdidas | translate }}</span>
               <!-- <input (change)="onEdit($event, 'perdidas')" type="text" matImput [(ngModel)]="anomaliaSelect.perdidas" /> -->
             </div>

@@ -24,7 +24,7 @@
 
       <!-- Tipo de anomalía -->
       <ng-container matColumnDef="tipo" class="col-anomalia">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'tipo' | translate | titlecase }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'Tipo' | translate }}</th>
         <td mat-cell *matCellDef="let row">{{ row.tipoLabel | translate }}</td>
       </ng-container>
 
@@ -40,7 +40,7 @@
 
       <!-- Pérdidas -->
       <ng-container matColumnDef="perdidas">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'perdidas' | translate | titlecase }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'Pérdidas' | translate }}</th>
         <td mat-cell *matCellDef="let row">
           <div class="row-data">
             <span>{{ row.perdidas * 100 | number : '1.0-2' }}%</span>

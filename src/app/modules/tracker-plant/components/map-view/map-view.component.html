@@ -40,7 +40,7 @@
             position="end"
           >
             <div class="titulo">
-              <h4>Listado de seguidores</h4>
+              <h4>{{ 'Listado de seguidores' | translate }}</h4>
             </div>
 
             <ng-template appDynamicSeguidorList></ng-template>
@@ -97,7 +97,7 @@
                 mat-raised-button
                 class="btn-right"
                 (click)="loadSegList(); sidenavRight.toggle()"
-                matTooltip="Lista seguidores"
+                matTooltip="{{ 'Lista seguidores' | translate }}"
                 matTooltipClass="tooltip-style"
               >
                 <mat-icon>list_alt</mat-icon>
@@ -111,7 +111,7 @@
                 mat-raised-button
                 class="btn-right-stats"
                 (click)="loadStats(); sidenavStats.toggle()"
-                matTooltip="Estadísticas"
+                matTooltip="{{ 'Estadísticas' | translate }}"
                 matTooltipClass="tooltip-style"
                 [disabled]="noAnomsReport"
               >

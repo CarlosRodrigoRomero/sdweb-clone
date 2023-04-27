@@ -253,5 +253,18 @@
   "Nubosidad": "Nubosidad",
   "Tª ambiente": "Tª ambiente",
   "Nº módulo": "Nº módulo",
-  "Info Anomalía": "Info Anomalía"
+  "Info Anomalía": "Info Anomalía",
+  "Seguidor": "Seguidor",
+  "Nº Anomalias": "Nº Anomalias",
+  "Listado de seguidores": "Listado de seguidores",
+  "Lista seguidores": "Lista seguidores",
+  "Térmica": "Térmica",
+  "Visual": "Visual",
+  "Origen": "Origen",
+  "CCs": "CCs",
+  "Descargar imágenes": "Descargar imágenes",
+  "Descargas": "Descargas",
+  "Imagen térmica": "Imagen térmica",
+  "Imagen visual": "Imagen visual",
+  "Ningún módulo con celulas calientes": "Ningún módulo con celulas calientes"
 }
