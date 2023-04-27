@@ -1,12 +1,15 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { OverlayContainer } from '@angular/cdk/overlay';
+
+import { Subscription } from 'rxjs';
 
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
+import { ThemeService } from '@data/services/theme.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
@@ -45,6 +48,9 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
   sortedColumn = 'mae';
+  theme: string;
+
+  private subscriptions: Subscription = new Subscription();
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -52,7 +58,9 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   constructor(
     private portfolioControlService: PortfolioControlService,
     private router: Router,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private themeService: ThemeService,
+    private overlayContainer: OverlayContainer
   ) {}
 
   ngOnInit(): void {
@@ -92,6 +100,25 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     this.checkOldReports(plantsData);
 
     this.dataSource.data = plantsData;
+
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        this.theme = theme;
+
+        this.changeTheme();
+      })
+    );
+  }
+
+  private changeTheme() {
+    const overlayContainer = this.overlayContainer.getContainerElement();
+    if (this.theme === 'dark-theme') {
+      document.body.classList.add('dark-theme');
+      overlayContainer.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+      overlayContainer.classList.remove('dark-theme');
+    }
   }
 
   private getFixablePower(informe: InformeInterface, planta: PlantaInterface) {
