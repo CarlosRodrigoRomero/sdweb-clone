@@ -15,7 +15,7 @@ import { PlantaService } from '@data/services/planta.service';
   styleUrls: ['./plants.component.css'],
 })
 export class PlantsComponent implements OnInit, AfterViewInit, OnDestroy {
-  displayedColumns: string[] = ['nombre', 'id', 'tipo', 'empresa', 'potencia', 'actions'];
+  displayedColumns: string[] = ['nombre', 'id', 'tipo', 'empresa', 'empresaId', 'potencia', 'actions'];
   dataSource = new MatTableDataSource<any>();
   private destroy$ = new Subject<void>();
 
@@ -43,6 +43,7 @@ export class PlantsComponent implements OnInit, AfterViewInit, OnDestroy {
                   id: planta.id,
                   tipo: planta.tipo,
                   empresa,
+                  empresaId: planta.empresa,
                   potencia: planta.potencia,
                 };
               })

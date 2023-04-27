@@ -1,14 +1,14 @@
-<button mat-raised-button class="btn-downloads" [matMenuTriggerFor]="menu" matTooltip="Descargas">
+<button mat-raised-button class="btn-downloads" [matMenuTriggerFor]="menu" matTooltip="{{ 'Descargas' | translate }}">
   <mat-icon>download</mat-icon>
 </button>
 <mat-menu #menu="matMenu">
   <div class="contenedor-menu">
-    <h5>Descargar imagenes</h5>
+    <h5 mat-menu-item>{{ 'Descargar imágenes' | translate }}</h5>
     <button mat-menu-item (click)="downloadRjpg()">
-      <span>Imagen radiométrica</span>
+      <span>{{ 'Imagen térmica' | translate }}</span>
     </button>
     <button mat-menu-item (click)="downloadJpgVisual()">
-      <span>Imagen visual</span>
+      <span>{{ 'Imagen visual' | translate }}</span>
     </button>
   </div>
 </mat-menu>

@@ -1,6 +1,8 @@
 <mat-button-toggle-group appearance="standard" value="{{ viewSelected }}">
-  <mat-button-toggle value="tipo" (change)="onToggleChange($event.value)">Tipo</mat-button-toggle>
-  <mat-button-toggle value="mae" (change)="onToggleChange($event.value)">Pérdidas</mat-button-toggle>
-  <mat-button-toggle value="cc" (change)="onToggleChange($event.value)">CCs</mat-button-toggle>
+  <mat-button-toggle value="tipo" (change)="onToggleChange($event.value)">{{ 'Tipo' | translate }}</mat-button-toggle>
+  <mat-button-toggle value="mae" (change)="onToggleChange($event.value)">{{
+    'Pérdidas' | translate
+  }}</mat-button-toggle>
+  <mat-button-toggle value="cc" (change)="onToggleChange($event.value)">{{ 'CCs' | translate }}</mat-button-toggle>
   <mat-button-toggle value="grad" (change)="onToggleChange($event.value)">&Delta;T Max (norm)</mat-button-toggle>
 </mat-button-toggle-group>

@@ -1,13 +1,25 @@
 <div class="anomalia-info" *ngIf="anomaliaSelected">
-  <button *ngIf="!showComments" class="btn-comments" mat-stroked-button (click)="showHideComments()">
+  <button
+    *ngIf="!showComments"
+    class="btn-comments"
+    mat-stroked-button
+    (click)="showHideComments()"
+    matTooltip="{{ 'Comentarios' | translate }} O&M"
+  >
     <mat-icon matBadge="{{ anomaliaInfo.numComentarios }}" matBadgeColor="primary">message</mat-icon>
   </button>
-  <button *ngIf="showComments" class="btn-comments" mat-stroked-button (click)="showHideComments()">
+  <button
+    *ngIf="showComments"
+    class="btn-comments"
+    mat-stroked-button
+    (click)="showHideComments()"
+    matTooltip="{{ 'Info Anomalía' | translate }}"
+  >
     <mat-icon>list</mat-icon>
   </button>
 
   <h5 *ngIf="!showComments" class="title">
-    Anomalía <b>{{ anomaliaInfo.numAnom }}</b>
+    {{ 'anomalia' | translate | titlecase }} <b>{{ anomaliaInfo.numAnom }}</b>
     <span *ngIf="anomaliaInfo.clase !== undefined" [ngStyle]="{ color: anomaliaInfo.claseColor }">
       ({{ anomaliaInfo.clase }})</span
     >
@@ -24,11 +36,11 @@
         "
       >
         <mat-icon>thermostat</mat-icon>
-        <span class="subtitle-label">Temperaturas:</span>
+        <span class="subtitle-label">{{ 'Temperaturas' | translate }}:</span>
       </div>
       <div class="line-content">
         <div class="line-sub-content" *ngIf="anomaliaInfo.temperaturaMax !== undefined">
-          <span>T. Máx:</span>
+          <span>T. Max:</span>
           <span
             ><b>{{ anomaliaInfo.temperaturaMax | number : '1.0-1' }}ºC</b></span
           >
@@ -50,21 +62,21 @@
     <div class="line-info">
       <div class="subtitle">
         <mat-icon>flag</mat-icon>
-        <span class="subtitle-label">Causa: </span>
+        <span class="subtitle-label">{{ 'Causa' | translate }}: </span>
       </div>
-      <span class="line-content">{{ anomaliaInfo.causa }}</span>
+      <span class="line-content">{{ anomaliaInfo.causa | translate }}</span>
     </div>
     <div class="line-info">
       <div class="subtitle">
         <mat-icon>check_circle</mat-icon>
-        <span class="subtitle-label">Actuación recomendada: </span>
+        <span class="subtitle-label">{{ 'Actuación recomendada' | translate }}: </span>
       </div>
-      <span class="line-content">{{ anomaliaInfo.recomendacion }}</span>
+      <span class="line-content">{{ anomaliaInfo.recomendacion | translate }}</span>
     </div>
     <div class="line-info">
       <div class="subtitle">
         <mat-icon>assistant_direction</mat-icon>
-        <span class="subtitle-label">Localización: </span>
+        <span class="subtitle-label">{{ 'localizacion' | translate | titlecase }}: </span>
       </div>
       <div class="line-content">
         <span>{{ anomaliaInfo.localizacion }}</span>
@@ -101,7 +113,7 @@
     <div class="line-info">
       <div class="subtitle">
         <mat-icon>today</mat-icon>
-        <span class="subtitle-label">Fecha de captura: </span>
+        <span class="subtitle-label">{{ 'Fecha de captura' | translate }}: </span>
       </div>
       <span class="line-content">{{ anomaliaInfo.fecha * 1000 | date : 'dd/MM/yyyy HH:mm' }}</span>
     </div>
@@ -122,7 +134,8 @@
       <div class="meteo-two-lines">
         <div class="meteo-line">
           <span *ngIf="anomaliaInfo.irradiancia !== undefined" class="meteo-content"
-            >Irradiancia: <b>{{ anomaliaInfo.irradiancia | number : '1.0-0' }} W/m<sup>2</sup></b></span
+            >{{ 'Irradiancia' | translate }}:
+            <b>{{ anomaliaInfo.irradiancia | number : '1.0-0' }} W/m<sup>2</sup></b></span
           >
           <!-- <span *ngIf="anomaliaInfo.vientoDireccion !== undefined" class="meteo-content"
             >Direc. viento: <b>{{ anomaliaInfo.vientoDireccion }}º</b></span
@@ -131,15 +144,15 @@
             >Veloc. viento: <b>{{ anomaliaInfo.vientoVelocidad }} (Beaufort)</b></span
           > -->
           <span *ngIf="anomaliaInfo.viento !== undefined" class="meteo-content"
-            >Viento: <b>{{ anomaliaInfo.viento }}</b></span
+            >{{ 'Viento' | translate }}: <b>{{ anomaliaInfo.viento }}</b></span
           >
         </div>
         <div class="meteo-line">
           <span *ngIf="anomaliaInfo.temperaturaAire !== undefined" class="meteo-content"
-            >T. ambiente: <b>{{ anomaliaInfo.temperaturaAire }}ºC</b></span
+            >{{ 'Tª ambiente' | translate }}: <b>{{ anomaliaInfo.temperaturaAire }}ºC</b></span
           >
           <span *ngIf="anomaliaInfo.nubosidad !== undefined" class="meteo-content"
-            >Nubosidad: <b>{{ anomaliaInfo.nubosidad }} octavas</b></span
+            >{{ 'Nubosidad' | translate }}: <b>{{ anomaliaInfo.nubosidad }} octavas</b></span
           >
         </div>
       </div>

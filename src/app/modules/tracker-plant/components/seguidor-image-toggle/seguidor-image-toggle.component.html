@@ -1,4 +1,4 @@
 <mat-button-toggle-group appearance="standard" value="{{ imageSelected }}">
-  <mat-button-toggle value="0" (change)="onToggleChange($event.value)">Térmico</mat-button-toggle>
-  <mat-button-toggle value="1" (change)="onToggleChange($event.value)">Visual</mat-button-toggle>
+  <mat-button-toggle value="0" (change)="onToggleChange($event.value)">{{ 'Térmica' | translate }}</mat-button-toggle>
+  <mat-button-toggle value="1" (change)="onToggleChange($event.value)">{{ 'Visual' | translate }}</mat-button-toggle>
 </mat-button-toggle-group>

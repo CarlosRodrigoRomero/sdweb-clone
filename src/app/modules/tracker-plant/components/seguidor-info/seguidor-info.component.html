@@ -6,31 +6,31 @@
         <span *ngIf="numAnomalias == 0" class="no-anom">(Sin anomalías)</span>
       </div>
       <div *ngIf="numAnomalias > 0" class="elemento">
-        <span class="titulo">MAE</span>
-        <span class="subtitulo">{{ seguidorHovered.mae * 100 | number: '1.0-2' }}%</span>
+        <span class="titulo">{{ 'MAE' | translate }}</span>
+        <span class="subtitulo">{{ seguidorHovered.mae * 100 | number : '1.0-2' }}%</span>
       </div>
       <div *ngIf="numAnomalias > 0" class="elemento">
-        <span class="titulo">&Delta;T Max (normalizado)</span>
+        <span class="titulo">&Delta;T Max {{ '(normalizado)' | translate }}</span>
         <span class="subtitulo">{{ seguidorHovered.gradienteNormalizado }}ºC</span>
       </div>
       <div *ngIf="numAnomalias > 0" class="elemento">
-        <span class="titulo">Cels. Calientes</span>
-        <span class="subtitulo">{{ seguidorHovered.celsCalientes * 100 | number: '1.0-0' }}%</span>
+        <span class="titulo">{{ 'Cels. Calientes' | translate }}</span>
+        <span class="subtitulo">{{ seguidorHovered.celsCalientes * 100 | number : '1.0-0' }}%</span>
       </div>
       <div *ngIf="numAnomalias > 0" class="elemento">
-        <span class="titulo">Temperatura Max</span>
+        <span class="titulo">{{ 'Temperatura Max' | translate }}</span>
         <span class="subtitulo">{{ seguidorHovered.temperaturaMax }}ºC</span>
       </div>
       <div *ngIf="numAnomalias > 0" class="elemento">
-        <span class="titulo">Nº anomalías</span>
+        <span class="titulo">{{ 'Nº anomalías' | translate }}</span>
         <span class="subtitulo">{{ numAnomalias }}</span>
       </div>
       <div class="elemento">
-        <span class="titulo">Módulo</span>
+        <span class="titulo">{{ 'Módulo' | translate }}</span>
         <span class="subtitulo">{{ seguidorHovered.moduloLabel }}</span>
       </div>
       <div class="elemento">
-        <span class="titulo">Localización</span>
+        <span class="titulo">{{ 'localizacion' | translate | titlecase }}</span>
         <span class="subtitulo">{{ localizacion }}</span>
       </div>
     </mat-card-content>

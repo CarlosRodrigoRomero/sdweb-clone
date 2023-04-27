@@ -9,6 +9,7 @@ import { AuthService } from '@data/services/auth.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
+
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
 
@@ -77,7 +78,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
               temperaturaAire: (this.anomaliaSelected as PcInterface).temperaturaAire,
               nubosidad: (this.anomaliaSelected as PcInterface).nubosidad,
               numComentarios,
-              localizacion: this.anomaliaInfoService.getPosicionModuloLabel(
+              localizacion: this.anomaliaInfoService.getPosicionModuloSeguidorLabel(
                 this.anomaliaSelected,
                 this.reportControlService.planta
               ),

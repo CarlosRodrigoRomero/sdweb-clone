@@ -1,10 +1,10 @@
-<mat-card *ngIf="theme === 'light'" class="origin-icons" matTooltip="Origen">
+<mat-card *ngIf="theme === 'light'" class="origin-icons" matTooltip="{{ 'Origen' | translate }}">
   <mat-icon *ngIf="origin === 'bL'" class="origin-icon" svgIcon="axis_bl_light"></mat-icon>
   <mat-icon *ngIf="origin === 'tL'" class="origin-icon" svgIcon="axis_tl_light"></mat-icon>
   <mat-icon *ngIf="origin === 'tR'" class="origin-icon" svgIcon="axis_tr_light"></mat-icon>
   <mat-icon *ngIf="origin === 'bR'" class="origin-icon" svgIcon="axis_br_light"></mat-icon>
 </mat-card>
-<mat-card *ngIf="theme === 'dark'" class="origin-icons" matTooltip="Origen">
+<mat-card *ngIf="theme === 'dark'" class="origin-icons" matTooltip="{{ 'Origen' | translate }}">
   <mat-icon *ngIf="origin === 'bL'" class="origin-icon" svgIcon="axis_bl_dark"></mat-icon>
   <mat-icon *ngIf="origin === 'tL'" class="origin-icon" svgIcon="axis_tl_dark"></mat-icon>
   <mat-icon *ngIf="origin === 'tR'" class="origin-icon" svgIcon="axis_tr_dark"></mat-icon>

@@ -5,14 +5,16 @@ import { MatTableDataSource } from '@angular/material/table';
 
 import { combineLatest, Subscription } from 'rxjs';
 
-import { GLOBAL } from '@data/constants/global';
 import { SeguidoresControlService } from '@data/services/seguidores-control.service';
 import { SeguidorViewService } from '../../services/seguidor-view.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Seguidor } from '@core/models/seguidor';
 import { Anomalia } from '@core/models/anomalia';
 
 import { Colors } from '@core/classes/colors';
+
+import { GLOBAL } from '@data/constants/global';
 
 interface AnomaliaData {
   id: string;
@@ -41,7 +43,8 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
-    private seguidorViewService: SeguidorViewService
+    private seguidorViewService: SeguidorViewService,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   ngOnInit(): void {
@@ -73,7 +76,7 @@ export class SeguidorAnomaliasListComponent implements OnInit, AfterViewInit, On
             anomalias.forEach((anom) => {
               let perdidas;
               if (anom.perdidas !== undefined) {
-                perdidas = anom.perdidas * 100 + '%';
+                perdidas = this.anomaliaInfoService.getPerdidasLabel(anom);
               }
               let tempMax;
               if (anom.temperaturaMax !== undefined) {
