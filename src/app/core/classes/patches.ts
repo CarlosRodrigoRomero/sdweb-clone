@@ -127,10 +127,15 @@ export class Patches {
       tempMin = 25;
       tempMax = 65;
     }
-    // PARCHE AVALADES ABR 2022
+    // PARCHE AVALADES ABR 2023
     if (informeId === 'oGkheNZi1UqP4MCjPnqd') {
       tempMin = 40;
       tempMax = 60;
+    }
+    // PARCHE TORDESILLAS ABR 2023
+    if (informeId === 'vt5pz8iT03kB0x6QRPRz') {
+      tempMin = 20;
+      tempMax = 65;
     }
 
     return [tempMin, tempMax];
