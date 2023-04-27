@@ -4,13 +4,13 @@
     <span *ngIf="seguidorSelected !== null">{{ seguidorSelected.nombre }}</span>
     <span *ngIf="seguidorSelected !== null" class="modulo-label">({{ seguidorSelected.moduloLabel }})</span>
     <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
-      <span class="line-content-title">MAE</span>
-      <span>{{ seguidorSelected.mae * 100 | number: '1.0-2' }}%</span>
+      <span class="line-content-title">{{ 'MAE' | translate }}</span>
+      <span>{{ seguidorSelected.mae * 100 | number : '1.0-2' }}%</span>
     </div>
-    <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
+    <!-- <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
       <span class="line-content-title">CC</span>
-      <span>{{ seguidorSelected.celsCalientes * 100 | number: '1.0-2' }}%</span>
-    </div>
+      <span>{{ seguidorSelected.celsCalientes * 100 | number : '1.0-2' }}%</span>
+    </div> -->
     <div *ngIf="seguidorSelected.anomaliasCliente.length > 0" class="line-content">
       <span class="line-content-title">&Delta;T Max (norm)</span>
       <span>{{ seguidorSelected.gradienteNormalizado }}ºC</span>
@@ -24,7 +24,7 @@
       <span>{{ seguidorSelected.anomaliasCliente.length }}</span>
     </div>
     <div *ngIf="seguidorSelected.anomaliasCliente.length === 0" class="line-content">
-      <span>Sin anomalías</span>
+      <span>{{ 'Sin anomalias' | translate }}</span>
     </div>
     <button mat-icon-button class="btn-close-seguidor-view" (click)="closeSidenav()">
       <mat-icon>close</mat-icon>

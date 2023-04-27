@@ -210,5 +210,7 @@
   "octavas": "octavas",
   "Predicción evolución MAE": "Predicción evolución MAE",
   "Nuevas": "Nuevas",
-  "Agrupar por zonas": "Agrupar por zonas"
+  "Agrupar por zonas": "Agrupar por zonas",
+  "Nº anomalías": "Nº anomalías",
+  "(normalizado)": "(normalizado)"
 }

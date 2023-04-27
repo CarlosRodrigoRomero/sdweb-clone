@@ -210,5 +210,7 @@
   "octavas": "octaves",
   "Predicción evolución MAE": "Prediction of evolution of ESM",
   "Nuevas": "New",
-  "Agrupar por zonas": "Group by zones"
+  "Agrupar por zonas": "Group by zones",
+  "Nº anomalías": "No. of abnormalities",
+  "(normalizado)": "(normalized)"
 }
