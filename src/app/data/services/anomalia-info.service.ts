@@ -1,8 +1,8 @@
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { formatNumber, formatDate } from '@angular/common';
 
-import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Subscription, combineLatest } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 
 import { TranslateService } from '@ngx-translate/core';
 
@@ -259,6 +259,31 @@ export class AnomaliaInfoService {
       const altura = this.getAlturaAnom(anomalia, planta);
       const columna = this.getColumnaAnom(anomalia, planta);
       label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`;
+    }
+
+    return label;
+  }
+
+  getPosicionModuloSeguidorLabel(anomalia: Anomalia, planta: PlantaInterface) {
+    let label = '';
+
+    const numModulo = this.getNumeroModulo(anomalia, planta);
+    if (numModulo !== null) {
+      this.translate
+        .get('Nº módulo')
+        .pipe(take(1))
+        .subscribe((res: string) => {
+          label += `${res}: ${numModulo.toString()}`;
+        });
+    } else {
+      combineLatest([this.translate.get('Fila'), this.translate.get('Columna')])
+        .pipe(take(1))
+        .subscribe(([fil, col]) => {
+          const altura = this.getAlturaAnom(anomalia, planta);
+          const columna = this.getColumnaAnom(anomalia, planta);
+
+          label += `${fil}: ${altura} / ${col}: ${columna}`;
+        });
     }
 
     return label;
