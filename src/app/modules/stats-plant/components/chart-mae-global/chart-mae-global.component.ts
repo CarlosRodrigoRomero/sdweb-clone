@@ -156,7 +156,7 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
             style: {
               fontSize: '16px',
             },
-            offsetY: -20,
+            // offsetY: -20,
           },
           markers: {
             size: 1,
@@ -166,7 +166,7 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
           },
           yaxis: {
             title: {
-              text: 'MAE %',
+              text: this.maeLabel + ' %',
             },
             labels: {
               formatter: (value) => {
