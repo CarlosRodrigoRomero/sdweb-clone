@@ -119,7 +119,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
     this.networkStatus$ = merge(of(null), fromEvent(window, 'online'), fromEvent(window, 'offline'))
       .pipe(map(() => navigator.onLine))
       .subscribe((status) => {
-        console.log('status', status);
         this.networkStatus = status;
       });
   }
