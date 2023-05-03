@@ -72,6 +72,15 @@ export class Patches {
     return informesCliente;
   }
 
+  static plantsNoGroupByZones(plantaId: string) {
+    // PARCHE TORDESILLAS ABRIL 2023
+    if (plantaId === 'bCP2jafTWweluZ7VfrDt') {
+      return false;
+    }
+
+    return true;
+  }
+
   static thermalTempsPatchs(informeId: string, tempMin: number, tempMax: number): number[] {
     // PARCHE PARA SIRUELA MAYO 2022
     if (informeId === 'M3PTkSUQfjPEd898haeR') {
