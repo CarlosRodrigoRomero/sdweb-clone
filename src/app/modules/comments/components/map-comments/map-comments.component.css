@@ -10,14 +10,19 @@
 }
 
 .map {
-  height: calc(100vh - 70px);
+  height: calc(100vh - 64px);
   width: 100%;
+}
+
+/* ocultamos el zoom porque en mobile no se usa */
+::ng-deep .ol-zoom {
+  display: none;
 }
 
 #center-btn {
   position: absolute;
-  top: 6rem;
-  left: 0.5rem;
+  bottom: 1rem;
+  right: 1rem;
 }
 
 .thermal-btn {
@@ -31,4 +36,10 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .map {
+    height: calc(100vh - 56px);
+  }
 }

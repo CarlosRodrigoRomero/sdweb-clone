@@ -32,14 +32,32 @@
 }
 
 .tabla-container {
-  margin: 4px;
+  /* margin: 4px; */
   position: relative;
-  height: calc(100vh - 170px);
+  height: calc(100vh - 152px);
   overflow: auto;
 }
 
-table {
+/* table {
   width: 100%;
+} */
+
+.mat-table {
+  min-width: 100%;
+  display: inline-flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.mat-header-row,
+.mat-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.mat-header-cell,
+.mat-cell {
+  flex: 1;
 }
 
 .loc-header {
