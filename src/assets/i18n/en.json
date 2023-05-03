@@ -266,5 +266,11 @@
   "Descargas": "Downloads",
   "Imagen térmica": "Thermal image",
   "Imagen visual": "Visual image",
-  "Ningún módulo con celulas calientes": "No module with hot cells"
+  "Ningún módulo con celulas calientes": "No module with hot cells",
+  "Ocultar térmica": "Hide thermal",
+  "Buscar anomalía": "Search abnormality",
+  "Tipo": "Type",
+  "Localización": "Location",
+  "Último comentario": "Last comment",
+  "Fil": "Row"
 }

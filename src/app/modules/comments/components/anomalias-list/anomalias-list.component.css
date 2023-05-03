@@ -57,7 +57,7 @@
 
 .mat-header-cell,
 .mat-cell {
-  flex: 1;
+  flex: auto;
 }
 
 .loc-header {
@@ -66,7 +66,7 @@
 }
 
 .mat-row.selected {
-  background-color: lightgrey;
+  background-color: grey;
 }
 
 .row-data {
@@ -81,6 +81,7 @@
 
 .cell-content {
   margin-left: 0.5rem;
+  max-width: 80px;
 }
 
 .num-comentarios {
@@ -96,6 +97,10 @@
 .num-comentarios span {
   color: white;
   font-weight: 500;
+}
+
+.btn-map-anom {
+  width: 24px;
 }
 
 @media (max-width: 768px) {

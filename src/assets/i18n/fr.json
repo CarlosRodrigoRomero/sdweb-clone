@@ -18,7 +18,7 @@
   "MAE": "MES",
   "Modulos Apagados Equivalentes": "Modules équivalents arrêtés",
   "Potencia reparable": "Puissance réparable",
-  "Tipo": "Type",
+  "tipo": "Type",
   "Ultima inspeccion": "Dernière inspection",
   "Inspecciones antiguas": "Inspections anciennes",
   "buscar": "rechercher",
@@ -265,5 +265,11 @@
   "Descargas": "Téléchargements",
   "Imagen térmica": "Image thermique",
   "Imagen visual": "Image visuelle",
-  "Ningún módulo con celulas calientes": "Aucun module avec des cellules chaudes"
+  "Ningún módulo con celulas calientes": "Aucun module avec des cellules chaudes",
+  "Ocultar térmica": "Cacher thermique",
+  "Buscar anomalía": "Rechercher une anomalie",
+  "Tipo": "Type",
+  "Localización": "Emplacement",
+  "Último comentario": "Dernier commentaire",
+  "Fil": "Lig"
 }
