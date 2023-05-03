@@ -272,5 +272,11 @@
   "Tipo": "Type",
   "Localización": "Location",
   "Último comentario": "Last comment",
-  "Fil": "Row"
+  "Fil": "Row",
+  "Mostrar térmica": "Show thermal",
+  "Anomalía": "Abnormality",
+  "Nº de serie": "Serial number",
+  "Desconocido": "Unknown",
+  "Nº serie": "Serial number",
+  "Ir al mapa": "Go to map"
 }

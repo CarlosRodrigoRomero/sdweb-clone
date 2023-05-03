@@ -1,24 +1,26 @@
 <div *ngIf="anomaliaSelected" class="content">
   <h5 class="title">
-    Anomalía {{ anomaliaInfo.numAnom }} <b>({{ anomaliaInfo.tipo }})</b>
+    {{ 'Anomalía' | translate }} {{ anomaliaInfo.numAnom }} <b>({{ anomaliaInfo.tipo | translate }})</b>
   </h5>
 
   <div *ngIf="plantaFija" class="elem-info">
-    <span class="titulo">Localización</span>
+    <span class="titulo">{{ 'Localización' | translate }}</span>
     <span class="subtitulo">{{ anomaliaInfo.localizacion }}</span>
   </div>
 
   <div class="elem-info">
-    <span>Nº de serie</span>
+    <span>{{ 'Nº de serie' | translate }}</span>
     <div *ngIf="!editInput" class="read-input">
-      <span>{{ anomaliaSelected.hasOwnProperty('numeroSerie') ? anomaliaSelected.numeroSerie : 'Desconocido' }}</span>
+      <span>{{
+        anomaliaSelected.hasOwnProperty('numeroSerie') ? anomaliaSelected.numeroSerie : ('Desconocido' | translate)
+      }}</span>
       <button mat-icon-button (click)="editInput = true">
         <mat-icon>edit</mat-icon>
       </button>
     </div>
     <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
       <mat-form-field *ngIf="editInput" appearance="fill">
-        <mat-label>Nº serie</mat-label>
+        <mat-label>{{ 'Nº serie' | translate }}</mat-label>
         <input matInput formControlName="numeroSerie" />
         <button mat-icon-button matSuffix type="submit" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
           <mat-icon>done</mat-icon>
@@ -28,7 +30,7 @@
   </div>
 
   <div id="pos-map" class="elem-info">
-    <span class="titulo">Ir al mapa</span>
+    <span class="titulo">{{ 'Ir al mapa' | translate }}</span>
     <button mat-icon-button (click)="goToAnomMap()">
       <mat-icon>place</mat-icon>
     </button>

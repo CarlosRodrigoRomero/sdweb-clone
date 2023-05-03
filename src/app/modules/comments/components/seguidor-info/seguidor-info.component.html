@@ -3,11 +3,11 @@
     <app-spinner></app-spinner>
   </div>
 
-  <div  class="seguidor-name" *ngIf="seguidorSelected">
-    <span>Seguidor {{ seguidorSelected.nombre }}</span>
-  </div>
+  <mat-card class="seguidor-name" *ngIf="seguidorSelected">
+    <span>{{ 'Seguidor' | translate }} {{ seguidorSelected.nombre }}</span>
+  </mat-card>
 
-  <button id="map-btn"  class="map-btn" mat-raised-button (click)="goToSegMap()">
+  <button id="map-btn" class="map-btn" mat-raised-button (click)="goToSegMap()">
     <mat-icon>place</mat-icon>
   </button>
 

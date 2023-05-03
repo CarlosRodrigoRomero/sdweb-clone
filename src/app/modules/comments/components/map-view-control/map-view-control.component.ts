@@ -88,9 +88,9 @@ export class MapViewControlComponent implements OnInit, OnDestroy {
   }
 
   private setLayersVisibility() {
-    if (this.zonesService.thereAreZones) {
-      this.setZonesLayersVisibility();
-    }
+    // if (this.zonesService.thereAreZones) {
+    //   this.setZonesLayersVisibility();
+    // }
 
     if (this.reportControlService.plantaFija) {
       this.setAnomaliaLayersVisibility();

@@ -271,5 +271,11 @@
   "Tipo": "Type",
   "Localización": "Emplacement",
   "Último comentario": "Dernier commentaire",
-  "Fil": "Lig"
+  "Fil": "Lig",
+  "Mostrar térmica": "Afficher thermique",
+  "Anomalía": "Anomalie",
+  "Nº de serie": "Nº de série",
+  "Desconocido": "Inconnu",
+  "Nº serie": "Nº série",
+  "Ir al mapa": "Aller à la carte"
 }
