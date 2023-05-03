@@ -231,10 +231,10 @@ export class ShareReportService {
       .doc(this.idDB)
       .set(paramsToSave)
       .then(() => {
-        console.log('Params guardados correctamente ' + this.idDB);
+        console.log('Params guardados correctamente');
       })
       .catch((error) => {
-        console.error('Error writing document: ', error);
+        console.error('Error al guardar params: ', error);
       });
   }
 
