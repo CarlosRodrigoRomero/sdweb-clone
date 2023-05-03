@@ -16,6 +16,8 @@ import { DynamicAnomaliaListDirective } from '@modules/fixed-plant/directives/dy
 import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
 import { AnomaliaListContainer } from '@modules/fixed-plant/containers/anomalia-list-container/anomalia-list-container.component';
 
+import { Patches } from '@core/classes/patches';
+
 @Component({
   selector: 'app-map-view',
   templateUrl: './map-view.component.html',
@@ -37,6 +39,7 @@ export class MapViewComponent implements OnInit, OnDestroy {
   selectedInformeId: string;
   numInformes = 1;
   viewSelected: string;
+  groupPlant = true;
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
@@ -96,6 +99,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.groupPlant = Patches.plantsNoGroupByZones(this.reportControlService.plantaId);
   }
 
   showControls() {
