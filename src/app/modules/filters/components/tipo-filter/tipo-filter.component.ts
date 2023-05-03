@@ -139,7 +139,7 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
         'tipo',
         GLOBAL.labels_tipos.indexOf(event.source.name),
         this.tiposElem.length,
-        Number(event.source.id.replace('tipo_', ''))
+        Number(event.source.value)
       );
       this.filterService.addFilter(this.filtroTipo);
 

@@ -12,7 +12,7 @@
           [checked]="tiposSelected[tipoElem.tipo]"
           [id]="'tipo_' + tipoElem.tipo"
           [name]="tipoElem.label"
-          [tipo]="tipoElem.tipo"
+          [value]="i"
           (change)="onChangeFiltroTipo($event)"
         >
           <span style="font-size: 15px">
