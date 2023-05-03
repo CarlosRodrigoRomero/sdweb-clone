@@ -62,7 +62,7 @@ export class AnomaliaInfoComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.anomaliaSelected !== undefined) {
           this.anomaliaInfo = {
             numAnom: this.anomaliaSelected.numAnom,
-            localizacion: this.anomaliaInfoService.getLocalizacionCompleteLabel(
+            localizacion: this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(
               this.anomaliaSelected,
               this.reportControlService.planta
             ),

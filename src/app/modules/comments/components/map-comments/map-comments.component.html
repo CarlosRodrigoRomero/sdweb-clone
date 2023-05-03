@@ -10,11 +10,11 @@
   <button mat-raised-button (click)="setThermalVisibility()">
     <div *ngIf="!thermalVisible" class="thermal-btn-content">
       <mat-icon>visibility</mat-icon>
-      <span>Mostrar térmica</span>
+      <span>{{ 'Mostrar térmica' | translate }}</span>
     </div>
     <div *ngIf="thermalVisible" class="thermal-btn-content">
       <mat-icon>visibility_off</mat-icon>
-      <span>Ocultar térmica</span>
+      <span>{{ 'Ocultar térmica' | translate }}</span>
     </div>
   </button>
 </div>

@@ -7,7 +7,7 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import VectorImageLayer from 'ol/layer/VectorImage';
 
-        import { OlMapService } from '@data/services/ol-map.service';
+import { OlMapService } from '@data/services/ol-map.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesCommentControlService } from '@data/services/zones-comment-control.service';

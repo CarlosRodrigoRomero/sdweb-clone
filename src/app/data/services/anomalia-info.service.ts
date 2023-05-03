@@ -150,7 +150,15 @@ export class AnomaliaInfoService {
   }
 
   getPosicionReducLabel(anomalia: Anomalia): string {
-    return 'Fil: ' + anomalia.localY + ' / Col: ' + anomalia.localX;
+    let label: string;
+    this.translate
+      .get('Fil')
+      .pipe(take(1))
+      .subscribe((res: string[]) => {
+        label = `${res}: ${anomalia.localY} / Col: ${anomalia.localX}`;
+      });
+
+    return label;
   }
 
   getLocalizacionCompleteElems(anomalia: Anomalia, planta: PlantaInterface): string[] {

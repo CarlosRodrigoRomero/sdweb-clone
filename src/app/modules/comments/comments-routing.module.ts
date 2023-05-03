@@ -7,6 +7,13 @@ const routes: Routes = [
   {
     path: ':id',
     component: CommentsComponent,
+    children: [
+      { path: '', redirectTo: 'map', pathMatch: 'full' },
+      {
+        path: 'map',
+        component: CommentsComponent,
+      },
+    ],
   },
 ];
 

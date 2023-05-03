@@ -32,14 +32,32 @@
 }
 
 .tabla-container {
-  margin: 4px;
+  /* margin: 4px; */
   position: relative;
-  height: calc(100vh - 170px);
+  height: calc(100vh - 152px);
   overflow: auto;
 }
 
-table {
+/* table {
   width: 100%;
+} */
+
+.mat-table {
+  min-width: 100%;
+  display: inline-flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.mat-header-row,
+.mat-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.mat-header-cell,
+.mat-cell {
+  flex: auto;
 }
 
 .loc-header {
@@ -48,7 +66,7 @@ table {
 }
 
 .mat-row.selected {
-  background-color: lightgrey;
+  background-color: grey;
 }
 
 .row-data {
@@ -63,6 +81,7 @@ table {
 
 .cell-content {
   margin-left: 0.5rem;
+  max-width: 80px;
 }
 
 .num-comentarios {
@@ -78,6 +97,10 @@ table {
 .num-comentarios span {
   color: white;
   font-weight: 500;
+}
+
+.btn-map-anom {
+  width: 24px;
 }
 
 @media (max-width: 768px) {

@@ -5,7 +5,6 @@
 .seguidor-name {
   position: absolute;
   top: 0.5rem;
-  background: white;
   z-index: 10;
   left: 100px;
   display: flex;

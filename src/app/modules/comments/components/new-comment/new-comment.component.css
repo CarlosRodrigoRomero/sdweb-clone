@@ -4,7 +4,6 @@
 
 .send-input {
   width: 400px;
-  background: white;
 }
 
 @media (max-width: 768px) {

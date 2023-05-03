@@ -14,8 +14,13 @@
   z-index: 1;
 }
 
+/* ocultamos el zoom porque en mobile no se usa */
+::ng-deep .ol-zoom {
+  display: none;
+}
+
 #center-btn {
   position: absolute;
-  top: 6rem;
-  left: 0.5rem;
+  bottom: 1rem;
+  right: 1rem;
 }

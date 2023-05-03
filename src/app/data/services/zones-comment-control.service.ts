@@ -10,6 +10,8 @@ import { Fill, Stroke, Style, Text } from 'ol/style';
 import { Select } from 'ol/interaction';
 import VectorImageLayer from 'ol/layer/VectorImage';
 
+import { TranslateService } from '@ngx-translate/core';
+
 import { OlMapService } from './ol-map.service';
 import { FilterService } from './filter.service';
 import { ZonesControlService } from './zones-control.service';
@@ -23,6 +25,7 @@ import { FilterableElement } from '@core/models/filterableInterface';
 import { Colors } from '@core/classes/colors';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
+import { take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -39,7 +42,8 @@ export class ZonesCommentControlService {
     private zonesControlService: ZonesControlService,
     private viewCommentsService: ViewCommentsService,
     private reportControlService: ReportControlService,
-    private comentariosControlService: ComentariosControlService
+    private comentariosControlService: ComentariosControlService,
+    private translate: TranslateService
   ) {}
 
   initService(): Promise<boolean> {
@@ -138,7 +142,12 @@ export class ZonesCommentControlService {
 
     let nombreGlobal = '';
     if (this.reportControlService.planta.hasOwnProperty('nombreGlobalCoords')) {
-      nombreGlobal = this.reportControlService.planta.nombreGlobalCoords[indexGlobal];
+      this.translate
+        .get(this.reportControlService.planta.nombreGlobalCoords[indexGlobal])
+        .pipe(take(1))
+        .subscribe((res: string) => {
+          nombreGlobal = res;
+        });
     }
 
     let label = notNullGlobals[indexGlobal].toString();
