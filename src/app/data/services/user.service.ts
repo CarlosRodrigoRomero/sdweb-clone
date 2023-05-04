@@ -14,7 +14,7 @@ export class UserService {
   constructor(private afs: AngularFirestore) {}
 
   createUser(user: UserInterface) {
-    return this.afs.collection('users').add(user);
+    return this.afs.collection('users').doc(user.uid).set(user);
   }
 
   updateUser(user: UserInterface) {
