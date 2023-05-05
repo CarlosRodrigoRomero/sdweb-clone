@@ -6,8 +6,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { map, switchMap, take, takeUntil } from 'rxjs/operators';
 import { Subject, combineLatest } from 'rxjs';
 
-import { UserService } from '@data/services/user.service';
 import { PlantaService } from '@data/services/planta.service';
+import { EmpresaService } from '@data/services/empresa.service';
 
 @Component({
   selector: 'app-plants',
@@ -22,7 +22,7 @@ export class PlantsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('search') search: ElementRef;
 
-  constructor(private plantaService: PlantaService, private userService: UserService) {}
+  constructor(private plantaService: PlantaService, private empresaService: EmpresaService) {}
 
   ngOnInit(): void {
     this.plantaService
@@ -31,18 +31,18 @@ export class PlantsComponent implements OnInit, AfterViewInit, OnDestroy {
         take(1),
         switchMap((plantas) => {
           const plantasObservables = plantas.map((planta) =>
-            combineLatest([this.userService.getUser(planta.empresa).pipe(take(1))]).pipe(
-              map(([user]) => {
-                let empresa = planta.empresa;
-                if (user !== null) {
-                  empresa = user.empresaNombre;
+            combineLatest([this.empresaService.getEmpresa(planta.empresa).pipe(take(1))]).pipe(
+              map(([empresa]) => {
+                let empresaNombre = planta.empresa;
+                if (empresa !== undefined && empresa !== null) {
+                  empresaNombre = empresa.nombre;
                 }
 
                 return {
                   nombre: planta.nombre,
                   id: planta.id,
                   tipo: planta.tipo,
-                  empresa,
+                  empresa: empresaNombre,
                   empresaId: planta.empresa,
                   potencia: planta.potencia,
                 };
