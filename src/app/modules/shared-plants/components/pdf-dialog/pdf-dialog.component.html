@@ -189,14 +189,21 @@
           </mat-form-field>
           <div class="btns">
             <button mat-stroked-button matStepperPrevious>{{ 'Volver atras' | translate }}</button>
-            <button mat-stroked-button class="btn-generate" [disabled]="form.invalid" matStepperNext type="submit">
+            <button
+              mat-stroked-button
+              class="btn-generate"
+              color="primary"
+              [disabled]="form.invalid"
+              matStepperNext
+              type="submit"
+            >
               {{ 'Solicitar PDF' | translate }}
             </button>
           </div>
         </form>
         <div class="btns" *ngIf="!selectEmail">
           <button mat-stroked-button matStepperPrevious>{{ 'Volver atras' | translate }}</button>
-          <button mat-stroked-button class="btn-generate" matStepperNext (click)="generate()">
+          <button mat-stroked-button class="btn-generate" color="primary" matStepperNext (click)="generate()">
             {{ 'Solicitar PDF' | translate }}
           </button>
         </div>

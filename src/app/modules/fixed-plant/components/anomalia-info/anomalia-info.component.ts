@@ -204,7 +204,6 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
       irradiancia = irrad;
     } else if (this.planta.tipo === 'fija') {
       irradiancia = this.anomaliaService.getIrradiancia(datetime);
-      console.log(irradiancia);
     }
     let emis = this.informeSelected.emisividad;
     if (emis === undefined) {
