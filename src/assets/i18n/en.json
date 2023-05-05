@@ -282,5 +282,6 @@
   "fija": "fixed",
   "seguidores": "trackers",
   "Análisis": "Analysis",
-  "MAE que solo tiene en cuenta las anomalías que son reparables": "ESM that only takes into account the abnormalities that are fixable"
+  "MAE que solo tiene en cuenta las anomalías que son reparables": "ESM that only takes into account the abnormalities that are fixable",
+  "Leve": "Mild"
 }
