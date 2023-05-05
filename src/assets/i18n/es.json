@@ -278,5 +278,10 @@
   "Nº de serie": "Nº de serie",
   "Desconocido": "Desconocido",
   "Nº serie": "Nº serie",
-  "Ir al mapa": "Ir al mapa"
+  "Ir al mapa": "Ir al mapa",
+  "fija": "fija",
+  "seguidores": "seguidores",
+  "Análisis": "Análisis",
+  "MAE que solo tiene en cuenta las anomalías que son reparables": "MAE que solo tiene en cuenta las anomalías que son reparables",
+  "Leve": "Leve"
 }
