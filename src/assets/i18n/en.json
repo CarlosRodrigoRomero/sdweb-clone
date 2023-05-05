@@ -278,5 +278,9 @@
   "Nº de serie": "Serial number",
   "Desconocido": "Unknown",
   "Nº serie": "Serial number",
-  "Ir al mapa": "Go to map"
+  "Ir al mapa": "Go to map",
+  "fija": "fixed",
+  "seguidores": "trackers",
+  "Análisis": "Analysis",
+  "MAE que solo tiene en cuenta las anomalías que son reparables": "ESM that only takes into account the abnormalities that are fixable"
 }

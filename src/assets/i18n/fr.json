@@ -15,7 +15,7 @@
   "Listado de plantas": "Liste des centrales",
   "planta": "centrale",
   "potencia": "puissance",
-  "MAE": "MES",
+  "MAE": "MEA",
   "Modulos Apagados Equivalentes": "Modules équivalents arrêtés",
   "Potencia reparable": "Puissance réparable",
   "tipo": "Type",
@@ -26,11 +26,10 @@
   "ampliar": "agrandir",
   "Descargar Portfolio": "Télécharger le portefeuille",
   "Cerrar sesion": "Déconnexion",
-  "info MAE": "Modules équivalents arrêtés. Chaque anomalie thermique détectée a une perte d'énergie associée. Le MES quantifie la somme de ces pertes accumulées dans la centrale.",
-  "info Potencia reparable": "Puissance équivalente des anomalies que nous avons classées comme réparables.",
+  "info MAE": "Modules équivalents arrêtés. Chaque anomalie thermique détectée a une perte d'énergie associée. Le MEA quantifie la somme de ces pertes accumulées dans la centrale.",
   "anomalias": "anomalies",
   "info num Anoms": "Nb d'anomalies filtrées / Nb d'anomalies totales",
-  "Media MAE Portfolio": "Moyenne du portefeuille MES",
+  "Media MAE Portfolio": "Moyenne du portefeuille MEA",
   "Limpiar filtros": "Effacer les filtres",
   "Temperatura maxima": "Température maximale",
   "normalizado": "normalisé",
@@ -277,5 +276,9 @@
   "Nº de serie": "Nº de série",
   "Desconocido": "Inconnu",
   "Nº serie": "Nº série",
-  "Ir al mapa": "Aller à la carte"
+  "Ir al mapa": "Aller à la carte",
+  "fija": "fixe",
+  "seguidores": "trackers",
+  "Análisis": "Analyse",
+  "MAE que solo tiene en cuenta las anomalías que son reparables": "MEA qui ne tient compte que des anomalies réparables"
 }
