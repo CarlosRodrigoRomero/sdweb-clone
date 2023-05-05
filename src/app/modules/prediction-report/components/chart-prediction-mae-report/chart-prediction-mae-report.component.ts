@@ -19,7 +19,6 @@ import {
   ApexTooltip,
   ApexStroke,
   ApexYAxis,
-  ApexMarkers,
 } from 'ng-apexcharts';
 
 import { ThemeService } from '@data/services/theme.service';
