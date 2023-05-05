@@ -1,9 +1,7 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { Subscription } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
-
-import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import {
   ApexAxisChartSeries,
@@ -11,68 +9,65 @@ import {
   ChartComponent,
   ApexDataLabels,
   ApexPlotOptions,
-  ApexYAxis,
-  ApexLegend,
-  ApexStroke,
+  ApexResponsive,
   ApexXAxis,
+  ApexLegend,
   ApexFill,
   ApexTooltip,
-  ApexTitleSubtitle,
+  ApexStroke,
+  ApexYAxis,
 } from 'ng-apexcharts';
 
+import { TranslateService } from '@ngx-translate/core';
+
+import { ThemeService } from '@data/services/theme.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
-import { InformeService } from '@data/services/informe.service';
-import { ThemeService } from '@data/services/theme.service';
 
 import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
 
-import { Colors } from '@core/classes/colors';
-
 import { COLOR } from '@data/constants/color';
 import { GLOBAL } from '@data/constants/global';
+import { Colors } from '@core/classes/colors';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
   dataLabels: ApexDataLabels;
-  plotOptions: ApexPlotOptions;
-  yaxis: ApexYAxis;
+  responsive: ApexResponsive[];
   xaxis: ApexXAxis;
-  fill: ApexFill;
-  tooltip: ApexTooltip;
-  stroke: ApexStroke;
+  yaxis: ApexYAxis;
   legend: ApexLegend;
-  title: ApexTitleSubtitle;
+  fill: ApexFill;
+  stroke: ApexStroke;
+  tooltip: ApexTooltip;
   colors: string[];
+  plotOptions: ApexPlotOptions;
 };
 
 @Component({
-  selector: 'app-chart-mae-zonas',
-  templateUrl: './chart-mae-zonas.component.html',
-  styleUrls: ['./chart-mae-zonas.component.css'],
+  selector: 'app-chart-losses-by-zone',
+  templateUrl: './chart-losses-by-zone.component.html',
+  styleUrls: ['./chart-losses-by-zone.component.css'],
 })
-export class ChartMaeZonasComponent implements OnInit, OnDestroy {
-  @ViewChild('chart-anomalias-zonas') chart: ChartComponent;
-  public chartOptions: Partial<ChartOptions>;
-  informesIdList: string[];
-  allAnomalias: Anomalia[] = [];
-  dataPlot: any[];
-  zones: LocationAreaInterface[];
+export class ChartLossesByZoneComponent implements OnInit {
+  @ViewChild('chart') chart: ChartComponent;
+  chartOptions: Partial<ChartOptions>;
   chartData: number[][];
+  zones: LocationAreaInterface[];
+  allAnomalias: Anomalia[] = [];
+  theme: string;
+  private seriesLabels = ['Reparables', 'No reparables'];
   chartLoaded = false;
-  private dateLabels: string[];
   private maeLabel: string;
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
+    private themeService: ThemeService,
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
-    private informeService: InformeService,
-    private cdr: ChangeDetectorRef,
-    private themeService: ThemeService,
     private translate: TranslateService
   ) {}
 
@@ -101,63 +96,77 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
             // filtramos por si hay zonas con el mismo nombre
             this.zones = this.plantaService.getUniqueLargestLocAreas(this.zones);
 
-            this.informesIdList = this.reportControlService.informesIdList;
-
             this.allAnomalias = this.reportControlService.allAnomalias;
-
-            return this.informeService.getDateLabelsInformes(this.informesIdList);
-          }),
-          switchMap((dateLabels) => {
-            this.dateLabels = dateLabels;
 
             return this.themeService.themeSelected$;
           }),
-          take(1)
-        )
-        .subscribe((theme) => {
-          this.chartData = [];
-          this.informesIdList.forEach((informeId) => {
-            const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
+          take(1),
+          switchMap((theme) => {
+            this.theme = theme;
 
-            this.chartData.push(this._calculateChartData(anomaliasInforme));
-          });
-          this._initChart(theme.split('-')[0]);
+            return this.reportControlService.selectedInformeId$;
+          })
+        )
+        .subscribe((informeId) => {
+          this.chartData = [];
+
+          const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
+
+          // añadimos las anomalias reaprables y las no reparables
+          this.chartData.push(this.calculateChartData(anomaliasInforme, true));
+          this.chartData.push(this.calculateChartData(anomaliasInforme));
+
+          this.initChart(this.theme.split('-')[0]);
         })
     );
 
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
+          let color = COLOR.dark_orange;
+          if (theme === 'dark-theme') {
+            color = COLOR.dark_orange;
+          } else {
+            color = COLOR.light_orange;
+          }
+
           this.chartOptions = {
             ...this.chartOptions,
             chart: {
-              type: 'bar',
+              ...this.chartOptions.chart,
               foreColor: this.themeService.textColor,
             },
             tooltip: {
               theme: theme.split('-')[0],
             },
+            colors: [COLOR.dark_orange, COLOR.neutralGrey],
           };
         }
       })
     );
   }
 
-  private _calculateChartData(anomalias: Anomalia[]): number[] {
+  private calculateChartData(anomalias: Anomalia[], fixables = false): number[] {
     // ordenamos las zonas por nombre
     this.zones = this.reportControlService.sortLocAreas(this.zones);
 
     const result = Array<number>();
     this.zones.forEach((zone) => {
       // tslint:disable-next-line: triple-equals
-      const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
+      const anomsZone = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
 
-      result.push(this._getMAEAnomalias(filtered));
+      let filtered: Anomalia[] = anomsZone.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipo));
+      if (fixables) {
+        filtered = anomsZone.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+      }
+
+      result.push(this.getMAEAnomalias(filtered));
     });
+
     return result;
   }
 
-  private _getMAEAnomalias(anomalias: Anomalia[]): number {
+  private getMAEAnomalias(anomalias: Anomalia[]): number {
     return (
       0.1 *
       Math.round(
@@ -182,41 +191,10 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
     );
   }
 
-  private _initChart(theme: string): void {
-    let series;
-    // excluimos DEMO
-    if (this.reportControlService.plantaId === 'egF0cbpXnnBnjcrusoeR') {
-      if (this.dateLabels.length > 1) {
-        series = [
-          {
-            name: 'MAE por Zonas 2019',
-            data: [1, 3, 3],
-          },
-          {
-            name: 'MAE por Zonas 2020',
-            data: [2, 1, 1],
-          },
-        ];
-      } else if (this.dateLabels[0] === 'Jul 2019') {
-        series = [
-          {
-            name: 'MAE por Zonas 2019',
-            data: [1, 3, 3],
-          },
-        ];
-      } else {
-        series = [
-          {
-            name: 'MAE por Zonas 2020',
-            data: [2, 1, 1],
-          },
-        ];
-      }
-    } else {
-      series = this.dateLabels.map((dateLabel, index) => {
-        return { name: dateLabel, data: this.chartData[index] };
-      });
-    }
+  private initChart(theme: string): void {
+    const series = this.seriesLabels.map((label, index) => {
+      return { name: label, data: this.chartData[index] };
+    });
 
     const opacity = new Array(series.length);
     for (let index = 0; index < opacity.length; index++) {
@@ -245,37 +223,35 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
         chart: {
           type: 'bar',
           foreColor: this.themeService.textColor,
-          width: '100%',
           height: 250,
+          stacked: true,
           toolbar: {
             show: false,
           },
         },
         legend: {
           show: true,
-          showForSingleSeries: true,
-          markers: {
-            fillColors: colors,
-          },
-          onItemHover: {
-            highlightDataSeries: false,
-          },
+          position: 'top',
         },
         plotOptions: {
           bar: {
             horizontal: false,
-            columnWidth: '75%',
-            endingShape: 'rounded',
+            columnWidth: '30%',
+            // borderRadius: 8,
+            distributed: false,
+            dataLabels: {
+              position: 'center', // top, center, bottom
+            },
           },
         },
         dataLabels: {
           enabled: false,
         },
         fill: {
-          colors,
+          // colors,
         },
         stroke: {
-          show: true,
+          show: false,
           width: 2,
           colors: ['transparent'],
         },
@@ -285,7 +261,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
             text: titleXAxis,
           },
         },
-        colors: [COLOR.gris],
+        colors: [COLOR.dark_orange, COLOR.neutralGrey],
         yaxis: {
           decimalsInFloat: 0,
           max: (v) => {
@@ -319,9 +295,6 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
         },
       };
       this.chartLoaded = true;
-
-      // detectamos cambios porque estamos utilizando la estrategia OnPush
-      this.cdr.detectChanges();
     }
   }
 

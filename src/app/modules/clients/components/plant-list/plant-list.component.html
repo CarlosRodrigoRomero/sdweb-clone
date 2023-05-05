@@ -141,7 +141,7 @@
               [ngClass]="{ 'sorted-column-header': sortedColumn === 'tipo' }"
               (click)="selectSortColumn('tipo')"
             >
-              {{ 'Tipo' | translate  }}
+              {{ 'Tipo' | translate }}
             </th>
             <td
               mat-cell
@@ -150,7 +150,7 @@
               [ngClass]="{ 'sorted-column-row': sortedColumn === 'tipo' }"
             >
               <div class="cell-centered">
-                {{ row.tipo }}
+                {{ row.tipo | translate }}
               </div>
             </td>
           </ng-container>

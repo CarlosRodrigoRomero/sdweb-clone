@@ -19,7 +19,7 @@ const routes: Routes = [
         component: MapViewComponent,
       },
       {
-        path: 'loss',
+        path: 'analysis',
         loadChildren: () => import('@modules/loss-report/loss-report.module').then((m) => m.LossReportModule),
         canActivate: [AuthGuard],
       },

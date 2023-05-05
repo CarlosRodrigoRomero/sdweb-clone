@@ -51,6 +51,8 @@ export class NavComponent implements OnInit {
           this.itemSelected = 'map';
         } else if (this.router.url.split('/').includes('prediction')) {
           this.itemSelected = 'prediction';
+        } else if (this.router.url.split('/').includes('analysis')) {
+          this.itemSelected = 'analysis';
         }
 
         // SOLO PARA CLIENTE INTERNACIONAL
