@@ -161,8 +161,9 @@ export class PdfComponent implements OnInit, OnDestroy {
   }
 
   downloadPdf() {
-    // const url = 'https://node-pdf-rcpywurt6q-uc.a.run.app';
-    const url = 'http://localhost:8080';
+    // para pruebas en local
+    const url = 'https://node-pdf-rcpywurt6q-uc.a.run.app';
+    // const url = 'http://localhost:8080';
 
     const params = new HttpParams().set('informeId', this.reportControlService.selectedInformeId);
 
