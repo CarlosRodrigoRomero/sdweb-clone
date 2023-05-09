@@ -1,13 +1,8 @@
 const gulp = require('gulp');
-const cachebust = require('gulp-cache-bust');
+const file = require('gulp-file');
 
-gulp.task('cache', () =>
-  gulp
-    .src('./dist/*/*.html')
-    .pipe(
-      cachebust({
-        type: 'timestamp',
-      })
-    )
-    .pipe(gulp.dest('./dist'))
-);
+gulp.task('update-version', () => {
+  const version = new Date().toISOString(); // Utiliza la fecha y hora actuales como identificador único de la versión
+
+  return file('version.txt', version, { src: true }).pipe(gulp.dest('./'));
+});

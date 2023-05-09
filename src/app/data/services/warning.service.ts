@@ -656,7 +656,7 @@ export class WarningService {
 
           return true;
         } else {
-          // añadimos el aviso de que faltan los modulos de la planta
+          // añadimos el aviso de que faltan areas tipoSeguidor en localizaciones
           const warning: Warning = {
             type: 'tiposSeguidor',
             visible: true,
