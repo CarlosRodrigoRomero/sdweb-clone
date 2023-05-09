@@ -162,7 +162,7 @@ export class ThermalLayerSliderComponent implements OnInit, OnChanges, OnDestroy
     const thermalLayerDB = this.thermalLayersDB.find((layer) => layer.informeId === informeId);
 
     let tempMin = tempRefMedia - THERMAL.rangeMin;
-    let tempMax = tempRefMedia + THERMAL.rangeMax;
+    let tempMax = this.getTempMax(informeId);
     if (this.thermalLayersDB) {
       // asignamos los valores de forma automatica
       if (tempMin < thermalLayerDB.rangeTempMin) {
@@ -184,6 +184,19 @@ export class ThermalLayerSliderComponent implements OnInit, OnChanges, OnDestroy
     const anomaliasInforme = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId);
     const tempRefMedia = Math.round(MathOperations.average(anomaliasInforme.map((anom) => anom.temperaturaRef)));
     return tempRefMedia;
+  }
+
+  private getTempMax(informeId: string) {
+    const tempMax = this.reportControlService.allAnomalias.reduce((maxTemp, anom) => {
+      if (anom.informeId === informeId) {
+        return Math.max(maxTemp, anom.temperaturaMax);
+      }
+      return maxTemp;
+    }, Number.NEGATIVE_INFINITY);
+
+    console.log(tempMax);
+
+    return tempMax;
   }
 
   onChangeTemperatureSlider(lowValue: number, highValue: number) {

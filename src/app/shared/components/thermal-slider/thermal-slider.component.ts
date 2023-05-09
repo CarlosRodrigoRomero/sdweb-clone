@@ -187,7 +187,8 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     const thermalLayerDB = this.thermalLayersDB.find((layer) => layer.informeId === informeId);
 
     let tempMin = tempRefMedia - THERMAL.rangeMin;
-    let tempMax = tempRefMedia + THERMAL.rangeMax;
+    let tempMax = this.getTempMax(tempRefMedia, informeId);
+    // let tempMax = tempRefMedia + THERMAL.rangeMax;
     if (this.thermalLayersDB) {
       // asignamos los valores de forma automatica
       if (tempMin < thermalLayerDB.rangeTempMin) {
@@ -206,9 +207,21 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private getTempRefMedia(informeId: string) {
-    const anomaliasInforme = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId);
-    const tempRefMedia = Math.round(MathOperations.average(anomaliasInforme.map((anom) => anom.temperaturaRef)));
+    const anomaliasInformeSinSombras = this.reportControlService.allAnomalias.filter(anom => anom.tipo !== 15).filter((anom) => anom.informeId === informeId);
+    const tempRefMedia = Math.round(MathOperations.average(anomaliasInformeSinSombras.map((anom) => anom.temperaturaRef)));
     return tempRefMedia;
+  }
+
+  private getTempMax(tempRefMedia: number, informeId: string) {
+    const tempMax = tempRefMedia + THERMAL.rangeMax;
+    const tempMaxAnom = this.reportControlService.allAnomalias.reduce((maxTemp, anom) => {
+      if (anom.informeId === informeId) {
+        return Math.max(maxTemp, anom.temperaturaMax);
+      }
+      return maxTemp;
+    }, Number.NEGATIVE_INFINITY);
+
+    return Math.max(tempMax, tempMaxAnom);
   }
 
   onChangeTemperatureSlider(lowValue: number, highValue: number) {

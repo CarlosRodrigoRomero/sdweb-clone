@@ -14,7 +14,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "deploy:dev": "firebase use dev && ng build --outputHashing=all && firebase deploy --only hosting",
-    "deploy": "firebase use prod && ng build --prod --outputHashing=all && firebase deploy --only hosting",
+    "deploy": "firebase use prod && gulp update-version && ng build --prod --outputHashing=all && firebase deploy --only hosting",
     "analyzer": "npx webpack-bundle-analyzer dist/sdweb/stats.json"
   },
   "private": true,
@@ -97,7 +97,6 @@
     "firebase-tools": "^7.12.0",
     "fuzzy": "^0.1.3",
     "gulp": "^4.0.2",
-    "gulp-cache-bust": "^1.4.1",
     "inquirer": "^6.2.2",
     "inquirer-autocomplete-prompt": "^1.0.1",
     "jasmine": "^3.6.3",
