@@ -53,9 +53,9 @@
               <app-view-toggle></app-view-toggle>
 
               <!-- MOSTRAR / OCULTAR VISTA ZONAS -->
-              <app-group-by-zones-view
+              <!-- <app-group-by-zones-view
                 *ngIf="groupPlant && viewSelected !== 'tipo' && thereAreZones"
-              ></app-group-by-zones-view>
+              ></app-group-by-zones-view> -->
 
               <!-- LEYENDA -->
               <app-leyenda-container class="leyenda-tipo" *ngIf="viewSelected === 'tipo'"></app-leyenda-container>
@@ -74,7 +74,7 @@
               <mat-icon>tune</mat-icon>
             </button>
 
-            <app-zones *ngIf="groupPlant && thereAreZones"></app-zones>
+            <!-- <app-zones *ngIf="groupPlant && thereAreZones"></app-zones> -->
             <app-view-control></app-view-control>
 
             <div id="map-control" class="map-control">
