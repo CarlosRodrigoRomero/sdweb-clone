@@ -52,3 +52,4 @@ package-lock.json
 .firebase/hosting.*.cache
 .firebase/hosting.ZGlzdFxzZHdlYg.cache
 package-lock.json
+version.txt
