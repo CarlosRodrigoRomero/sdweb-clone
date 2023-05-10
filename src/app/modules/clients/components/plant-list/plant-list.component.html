@@ -30,7 +30,9 @@
               [ngClass]="{ 'sorted-column-header': sortedColumn === 'nombre' }"
               (click)="selectSortColumn('nombre')"
             >
-              {{ 'planta' | translate | titlecase }}
+              <div class="mobile-left-header">
+                {{ 'planta' | translate | titlecase }}
+              </div>
             </th>
             <td
               mat-cell
@@ -38,7 +40,9 @@
               *matCellDef="let row"
               [ngClass]="{ 'sorted-column-row': sortedColumn === 'nombre' }"
             >
-              {{ row.nombre }}
+              <div class="mobile-left-cell">
+                {{ row.nombre }}
+              </div>
             </td>
           </ng-container>
 
@@ -109,7 +113,7 @@
             </td>
           </ng-container> -->
 
-          <!-- Potencia reparable -->
+          <!-- MAE reparable -->
           <ng-container matColumnDef="fixablePower">
             <th
               mat-header-cell
@@ -118,7 +122,7 @@
               [ngClass]="{ 'sorted-column-header': sortedColumn === 'fixablePower' }"
               (click)="selectSortColumn('fixablePower')"
             >
-              {{ 'Potencia reparable' | translate }} (MW)
+              {{ 'MAE reparable' | translate }} (%)
             </th>
             <td
               mat-cell
@@ -127,7 +131,7 @@
               [ngClass]="{ 'sorted-column-row': sortedColumn === 'fixablePower' }"
             >
               <div class="cell-centered">
-                {{ row.fixablePower | number : '1.2-2' }}
+                {{ row.fixablePower * 100 | number : '1.2-2' }}
               </div>
             </td>
           </ng-container>

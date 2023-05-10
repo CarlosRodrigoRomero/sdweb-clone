@@ -83,7 +83,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
         potencia: planta.potencia,
         mae: informeReciente.mae,
         powerLoss: planta.potencia * informeReciente.mae,
-        fixablePower: this.getFixablePower(informeReciente, planta),
+        fixablePower: informeReciente.fixablePower,
         ultimaInspeccion: informeReciente.fecha,
         informesAntiguos,
         plantaId: planta.id,
@@ -93,7 +93,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
       });
     });
 
-    this.checkFixablePower(plantsData);
+    this.checkFixableMae(plantsData);
 
     this.addOtherColumns();
 
@@ -139,7 +139,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
-  private checkFixablePower(plantsData: PlantsData[]) {
+  private checkFixableMae(plantsData: PlantsData[]) {
     if (plantsData.filter((data) => data.fixablePower).length > 0) {
       this.displayedColumns.push('fixablePower');
     }
