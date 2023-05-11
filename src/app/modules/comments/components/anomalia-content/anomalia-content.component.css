@@ -1,4 +1,9 @@
+
 .content {
+  position: fixed;
+}
+
+.anomalia-content {
   width: 100%;
   height: calc(100vh - 86px);
   display: grid;
