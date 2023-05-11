@@ -226,7 +226,7 @@ export class ShareReportService {
     }
     // guarda los params en la DB
     this.idDB = this.afs.createId();
-    this.afs
+    return this.afs
       .collection('share')
       .doc(this.idDB)
       .set(paramsToSave)

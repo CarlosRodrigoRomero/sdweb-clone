@@ -49,28 +49,18 @@
   font-weight: 500;
 }
 
-@media (max-width: 1000px) {
-  .summary {
-    display: grid;
+@media (max-width: 600px) {
+  .datos {
+    justify-content: space-between;
   }
+}
 
+@media (max-width: 1000px) {
   .titulo {
     display: none;
   }
 
   .subtitulo {
     margin-left: 0.5rem;
-  }
-
-  .datos mat-icon {
-    margin: 0;
-    margin-right: 0.5rem;
-  }
-}
-
-@media (max-width: 700px) {
-  .datos {
-    display: grid;
-    grid-template-columns: 28px auto auto;
   }
 }

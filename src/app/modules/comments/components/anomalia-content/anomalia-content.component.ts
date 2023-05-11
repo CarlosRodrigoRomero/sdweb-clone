@@ -24,7 +24,7 @@ export class AnomaliaContentComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     if (!this.reportControlService.plantaFija) {
-      const htmlView = document.getElementById('content');
+      const htmlView = document.getElementById('anomalia-content');
       htmlView.style.marginTop = this.seguidorViewCommentsService.imagesHeight - 60 + 'px';
     }
   }
