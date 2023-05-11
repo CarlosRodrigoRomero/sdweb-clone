@@ -172,11 +172,9 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
   async onClick(row: any) {
     if (this.screenWidth <= 600) {
-      // await this.setMobileReportId(row);
+      await this.setMobileReportId(row);
 
-      // const id = this.shareReportService.getParamsDbId();
-
-      const id = 'FvYGNy46DuFy8hrXF5tf';
+      const id = this.shareReportService.getParamsDbId();
 
       this.navigateMobileReport(row, id);
     } else {

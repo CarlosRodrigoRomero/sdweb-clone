@@ -28,8 +28,6 @@ export class CommentsListComponent implements OnInit, AfterViewInit, OnDestroy {
           if (anomalia.hasOwnProperty('comentarios') && anomalia.comentarios.length > 0) {
             const comentarios = anomalia.comentarios;
 
-            console.log(comentarios.length);
-
             // filtramos por tipo y  ordenamos de más reciente a más antiguo
             this.comentariosAnomalia = comentarios
               .filter((com) => com.tipo === tipo)

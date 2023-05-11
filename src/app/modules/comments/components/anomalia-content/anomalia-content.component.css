@@ -1,4 +1,3 @@
-
 .content {
   position: fixed;
 }
@@ -23,8 +22,8 @@
 
 .back-btn {
   display: none;
-  position: absolute;
-  top: 1rem;
+  position: fixed;
+  top: 72px;
   left: 1rem;
   z-index: 10;
   height: 60px;
