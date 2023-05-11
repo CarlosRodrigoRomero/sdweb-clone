@@ -38,7 +38,6 @@ export class AnomaliasListComponent implements OnInit, OnChanges {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @Input() dataSource: MatTableDataSource<RowAnomData>;
-  @Input() anomalias: Anomalia[];
   @Input() anomsData: RowAnomData[];
   @Input() anomaliaSelected: Anomalia;
   displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'numComs', 'map'];
@@ -64,9 +63,6 @@ export class AnomaliasListComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.hasOwnProperty('anomaliaSelected')) {
       this.anomaliaSelected = changes.anomaliaSelected.currentValue;
-    }
-    if (changes.hasOwnProperty('anomalias')) {
-      this.anomalias = changes.anomalias.currentValue;
     }
     if (changes.hasOwnProperty('dataSource') && changes.dataSource.currentValue !== undefined) {
       this.dataSource = changes.dataSource.currentValue;

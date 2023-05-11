@@ -10,11 +10,13 @@ import { Subscription } from 'rxjs';
 
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
 import { ThemeService } from '@data/services/theme.service';
+import { ShareReportService } from '@data/services/share-report.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
 
 import { GLOBAL } from '@data/constants/global';
+import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 
 interface PlantsData {
   nombre: string;
@@ -49,6 +51,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   private informes: InformeInterface[];
   sortedColumn = 'mae';
   theme: string;
+  private screenWidth: number;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -60,10 +63,13 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     private router: Router,
     private _snackBar: MatSnackBar,
     private themeService: ThemeService,
-    private overlayContainer: OverlayContainer
+    private overlayContainer: OverlayContainer,
+    private shareReportService: ShareReportService
   ) {}
 
   ngOnInit(): void {
+    this.screenWidth = window.innerWidth;
+
     this.plantas = this.portfolioControlService.listaPlantas;
     this.informes = this.portfolioControlService.listaInformes;
 
@@ -164,16 +170,26 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     event.stopPropagation();
   }
 
-  onClick(row: any) {
-    if (!this.checkFake(row.plantaId)) {
-      // comprobamos si es una planta que solo se ve en el informe antiguo
-      if (this.portfolioControlService.checkPlantaSoloWebAntigua(row.plantaId)) {
-        this.navigateOldReport(row.informeReciente.id);
-      } else {
-        this.navegateNewReport(row);
-      }
+  async onClick(row: any) {
+    if (this.screenWidth <= 600) {
+      await this.setMobileReportId(row);
+
+      const id = this.shareReportService.getParamsDbId();
+
+      // const id = 'FvYGNy46DuFy8hrXF5tf';
+
+      this.navigateMobileReport(row, id);
     } else {
-      this.openSnackBarDemo();
+      if (!this.checkFake(row.plantaId)) {
+        // comprobamos si es una planta que solo se ve en el informe antiguo
+        if (this.portfolioControlService.checkPlantaSoloWebAntigua(row.plantaId)) {
+          this.navigateOldReport(row.informeReciente.id);
+        } else {
+          this.navegateNewReport(row);
+        }
+      } else {
+        this.openSnackBarDemo();
+      }
     }
   }
 
@@ -200,6 +216,27 @@ export class PlantListComponent implements OnInit, AfterViewInit {
       return true;
     } else {
       return false;
+    }
+  }
+
+  private async setMobileReportId(row: any) {
+    const params: ParamsFilterShare = {};
+    params.informeId = row.informeReciente.id;
+    params.plantaId = row.informeReciente.plantaId;
+
+    await this.shareReportService.saveParams(params);
+  }
+
+  private navigateMobileReport(row: any, id: string) {
+    // navegamos con window.location.href para forzar la recarga de la pagina porque no funciona el router correctamente
+    if (row.tipo === 'seguidores') {
+      window.location.href = 'comments-tracker-shared/' + id;
+    } else {
+      if (row.ultimaInspeccion > GLOBAL.newReportsDate) {
+        window.location.href = 'comments-fixed-shared/' + id;
+      } else {
+        this.openSnackBar();
+      }
     }
   }
 
