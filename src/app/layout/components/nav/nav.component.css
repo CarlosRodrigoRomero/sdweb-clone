@@ -36,6 +36,12 @@
   gap: 2rem;
 }
 
+.bottom-items {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+}
+
 .item-content {
   display: flex;
   flex-direction: column;
@@ -108,7 +114,11 @@ app-navbar-container {
   }
 
   .list-items {
-    height: calc(100vh - 80px);
+    height: max-content;
     padding: 2rem 1rem;
+  }
+
+  .bottom-items {
+    left: 42px;
   }
 }

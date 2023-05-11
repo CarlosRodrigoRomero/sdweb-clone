@@ -1,3 +1,7 @@
+.content {
+  padding: 0;
+}
+
 :host ::ng-deep .send-input .mat-form-field-wrapper {
   padding-bottom: 0px;
 }

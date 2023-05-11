@@ -1,4 +1,4 @@
-<div class="card">
+<mat-card class="card">
   <div class="delete">
     <button mat-icon-button (click)="deleteComentario()">
       <mat-icon>close</mat-icon>
@@ -6,6 +6,6 @@
   </div>
   <span>{{ comentario.texto }}</span>
   <div class="date">
-    <span>{{ comentario.datetime | date: 'dd/MM/yyyy HH:mm' }}</span>
+    <span>{{ comentario.datetime | date : 'dd/MM/yyyy HH:mm' }}</span>
   </div>
-</div>
+</mat-card>

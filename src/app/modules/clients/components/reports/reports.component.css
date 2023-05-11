@@ -36,6 +36,28 @@
   }
 }
 
+@media (max-width: 600px) {
+  .row_1 {
+    display: none;
+  }
+
+  .row_2 {
+    gap: 0;
+  }
+
+  app-map-all-plants {
+    display: none;
+  }
+
+  app-download-excel-portfolio {
+    display: none;
+  }
+
+  .barra-titulo {
+    display: none;
+  }
+}
+
 @media (max-width: 1000px) {
   .grid {
     display: grid;
@@ -44,10 +66,11 @@
 
   .barra-titulo {
     padding: 1rem;
+    max-height: 60px;
   }
 
-  app-download-excel-portfolio {
+  /* app-download-excel-portfolio {
     display: flex;
     justify-content: flex-end;
-  }
+  } */
 }

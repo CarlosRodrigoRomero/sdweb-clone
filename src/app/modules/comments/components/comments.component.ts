@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 
 import { MatTableDataSource } from '@angular/material/table';
 
@@ -41,6 +41,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // agregamos una entrada en el historial de navegación al cargar la aplicación para poder volver a la página anterior
+    window.history.pushState(null, '', window.location.href);
+
     this.reportControlService.initService().then((res) => {
       this.anomaliasLoaded = res;
 
@@ -121,6 +124,32 @@ export class CommentsComponent implements OnInit, OnDestroy {
       .subscribe((status) => {
         this.networkStatus = status;
       });
+  }
+
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event: PopStateEvent) {
+    if (this.listOpened && this.infoOpened) {
+      this.comentariosControlService.infoOpened = false;
+
+      // Evita la navegación hacia atrás agregando otra entrada en el historial de navegación
+      window.history.pushState(null, '', window.location.href);
+    } else if (this.listOpened) {
+      this.comentariosControlService.listOpened = false;
+
+      // Evita la navegación hacia atrás agregando otra entrada en el historial de navegación
+      window.history.pushState(null, '', window.location.href);
+    } else if (this.infoOpened) {
+      this.comentariosControlService.infoOpened = false;
+
+      // Evita la navegación hacia atrás agregando otra entrada en el historial de navegación
+      window.history.pushState(null, '', window.location.href);
+    }
+
+    // Evita la navegación hacia atrás agregando otra entrada en el historial de navegación
+    window.history.pushState(null, '', window.location.href);
+
+    // Cancela el evento para evitar la navegación hacia atrás
+    event.preventDefault();
   }
 
   ngOnDestroy(): void {

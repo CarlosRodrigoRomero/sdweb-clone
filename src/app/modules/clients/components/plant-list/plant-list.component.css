@@ -80,3 +80,37 @@ h4 {
   display: flex;
   justify-content: center;
 }
+
+@media (max-width: 600px) {
+  mat-card {
+    height: auto;
+  }
+
+  .tabla-container {
+    max-height: calc(100vh - 264px);
+  }
+
+  .mat-column-color {
+    display: none;
+  }
+
+  .mat-column-tipo {
+    display: none;
+  }
+
+  .mat-column-ultimaInspeccion {
+    display: none;
+  }
+
+  .mat-column-inspeccionesAntiguas {
+    display: none;
+  }
+
+  .mobile-left-header {
+    margin-left: 16px;
+  }
+
+  .mobile-left-cell {
+    margin-left: 16px;
+  }
+}
