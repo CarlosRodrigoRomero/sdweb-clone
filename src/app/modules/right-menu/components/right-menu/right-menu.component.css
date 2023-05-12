@@ -17,6 +17,11 @@
     display: flex;
     flex-direction: column;
     width: calc(100vw - 32px);
-    height: calc(100vh - 78px);
+    height: calc(100vh - 188px);
   }
+
+  /* .mat-menu-panel.right-menu {
+    max-height: calc(100vh - 188px);
+    overflow-y: auto;
+  } */
 }
