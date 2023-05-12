@@ -43,6 +43,7 @@
 
   .row_2 {
     gap: 0;
+    position: fixed;
   }
 
   app-map-all-plants {
