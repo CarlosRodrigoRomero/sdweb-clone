@@ -12,6 +12,7 @@ import { RecommendedActionsContainerComponent } from './containers/recommended-a
 import { TotalLossComponent } from './components/total-loss/total-loss.component';
 import { TotalLossContainerComponent } from './containers/total-loss-container/total-loss-container.component';
 import { ChartLossesByZoneComponent } from './components/chart-losses-by-zone/chart-losses-by-zone.component';
+import { ChartLossesByModulesComponent } from './components/chart-losses-by-modules/chart-losses-by-modules.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { ChartLossesByZoneComponent } from './components/chart-losses-by-zone/ch
     TotalLossComponent,
     TotalLossContainerComponent,
     ChartLossesByZoneComponent,
+    ChartLossesByModulesComponent,
   ],
   imports: [CommonModule, LossReportRoutingModule, SharedModule, NgApexchartsModule],
 })

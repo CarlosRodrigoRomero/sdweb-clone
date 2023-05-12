@@ -6,8 +6,8 @@
         <span class="cantidad">{{ cantidad }}</span>
       </div>
       <div class="content-row">
-        <span class="row-subtitle">Pérdidas</span>
-        <span class="perdidas">{{ perdidas }} MW</span>
+        <span class="row-subtitle">MAE</span>
+        <span class="perdidas">{{ perdidas * 100 | number: '1.0-2' }}%</span>
       </div>
       <div class="bar-row" [style.width]="porcentajeBarra"></div>
     </div>

@@ -52,7 +52,7 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
             });
           }
 
-          this.recomendedActions = this.calculateRecomendedActions(anomalias).sort((a, b) => b.loss - a.loss);
+          this.recomendedActions = this.calculateRecomendedActions(anomalias).sort((a, b) => b.mae - a.mae);
         })
     );
   }
@@ -62,7 +62,7 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
     let types: number[] = [];
     let titles: string[] = [];
     let quantities: number[] = [];
-    let losses: number[] = [];
+    let maes: number[] = [];
 
     GLOBAL.pcDescripcion.forEach((label, index) => {
       if (!GLOBAL.tipos_no_utilizados.includes(index)) {
@@ -72,11 +72,11 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
         types.push(index);
         titles.push(label);
         quantities.push(quantity);
-        losses.push(Number(this.getTypeLosses(quantity, index).toFixed(2)));
+        maes.push(Number(this.getTypeLosses(quantity, index)));
       }
     });
 
-    const maxLoss = Math.max(...losses);
+    const maxLoss = Math.max(...maes);
 
     const recomendedActions: RecomendedAction[] = [];
     fixables.forEach((fixable, index) => {
@@ -85,8 +85,8 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
         type: types[index],
         title: titles[index],
         quantity: quantities[index],
-        loss: losses[index],
-        barPercentage: `${(losses[index] / maxLoss) * 100}%`,
+        mae: maes[index],
+        barPercentage: `${(maes[index] / maxLoss) * 100}%`,
         active: false,
       };
       recomendedActions.push(recomendedAction);
@@ -100,7 +100,7 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
 
     const lossPercentage = totalLoss / this.selectedReport.numeroModulos;
 
-    return lossPercentage * this.reportControlService.planta.potencia;
+    return lossPercentage;
   }
 
   changeActions(event: any) {

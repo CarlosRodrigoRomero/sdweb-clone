@@ -45,7 +45,7 @@ export class RecommendedActionsPredictionContainerComponent implements OnInit {
     });
 
     // this.calculatePredictionRecommendedActions(nextYearNotFixableAnoms);
-    this.recomendedActions = this.calculatePredictionRecommendedActions(fixableAnoms).sort((a, b) => b.loss - a.loss);
+    this.recomendedActions = this.calculatePredictionRecommendedActions(fixableAnoms).sort((a, b) => b.mae - a.mae);
   }
 
   calculatePredictionRecommendedActions(anomalias: Anomalia[]): RecomendedAction[] {
@@ -76,7 +76,7 @@ export class RecommendedActionsPredictionContainerComponent implements OnInit {
         type: types[index],
         title: titles[index],
         quantity: quantities[index],
-        loss: losses[index],
+        mae: losses[index],
         barPercentage: `${(losses[index] / maxLoss) * 100}%`,
         active: false,
       };

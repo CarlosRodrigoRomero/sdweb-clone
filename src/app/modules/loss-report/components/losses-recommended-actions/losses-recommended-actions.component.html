@@ -1,12 +1,20 @@
 <mat-card>
   <mat-card-header>
     <mat-card-title>Acciones recomendadas</mat-card-title>
+    <mat-card-subtitle>
+      <p>
+        El <b>{{ 90 }}%</b> del MAE está compuesto por anomalías que son reparables. El otro <b>{{ 10 }}%</b> requieren
+        sustituir el módulo pudiendo ser reclamadas a garantía del fabricante si aun están en periodo.
+      </p>
+      <p>Selecciona las que quieras y elige si verlas en el mapa o compartirlas para su revisión en planta.</p>
+    </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content class="card-content">
     <mat-accordion>
       <mat-expansion-panel expanded="true">
         <mat-expansion-panel-header>
           <mat-panel-title> Anomalías reparables </mat-panel-title>
+          <mat-panel-description>{{ 38 }}</mat-panel-description>
         </mat-expansion-panel-header>
         <app-recommended-actions
           [recomendedActions]="fixableFilter(recomendedActions)"
@@ -16,6 +24,7 @@
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title> Anomalías no reparables </mat-panel-title>
+          <mat-panel-description>{{ 207 }}</mat-panel-description>
         </mat-expansion-panel-header>
         <div class="panel-content">
           <app-recommended-actions
