@@ -123,13 +123,6 @@ export class ChartLossesByZoneComponent implements OnInit {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          let color = COLOR.dark_orange;
-          if (theme === 'dark-theme') {
-            color = COLOR.dark_orange;
-          } else {
-            color = COLOR.light_orange;
-          }
-
           this.chartOptions = {
             ...this.chartOptions,
             chart: {
@@ -196,16 +189,6 @@ export class ChartLossesByZoneComponent implements OnInit {
       return { name: label, data: this.chartData[index] };
     });
 
-    const opacity = new Array(series.length);
-    for (let index = 0; index < opacity.length; index++) {
-      opacity[index] = 1 - (opacity.length - (index + 1)) * 0.25;
-    }
-
-    const colors = new Array(series.length);
-    opacity.forEach((op, index) => {
-      colors[index] = Colors.hexToRgb(COLOR.gris, op);
-    });
-
     let titleXAxis = 'Zona';
     if (this.reportControlService.nombreGlobalCoords.length > 0) {
       this.translate
@@ -223,7 +206,7 @@ export class ChartLossesByZoneComponent implements OnInit {
         chart: {
           type: 'bar',
           foreColor: this.themeService.textColor,
-          height: 250,
+          // height: 250,
           stacked: true,
           toolbar: {
             show: false,

@@ -1,5 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+
 import { switchMap, take } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 import {
   ApexAxisChartSeries,
@@ -16,13 +18,16 @@ import {
   ApexTitleSubtitle,
 } from 'ng-apexcharts';
 
-import { InformeService } from '@data/services/informe.service';
 import { ModuleService } from '@data/services/module.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { ThemeService } from '@data/services/theme.service';
 import { ZonesService } from '@data/services/zones.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
+import { Subscription } from 'rxjs';
+import { InformeInterface } from '@core/models/informe';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -44,24 +49,36 @@ export type ChartOptions = {
   templateUrl: './chart-losses-by-modules.component.html',
   styleUrls: ['./chart-losses-by-modules.component.css'],
 })
-export class ChartLossesByModulesComponent implements OnInit {
+export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
-  private modulesLabel: string[];
-  private dateLabels: string[];
+  modulesLabel: string[];
+  private seriesLabels = ['Reparables', 'No reparables'];
   chartData: number[][];
   chartLoaded = false;
   private anomalias: Anomalia[];
+  private theme: string;
+  private selectedInforme: InformeInterface;
+  private maeLabel: string;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private zonesService: ZonesService,
     private moduleService: ModuleService,
     private reportControlService: ReportControlService,
-    private informeService: InformeService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.translate
+      .get('MAE')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.maeLabel = res + ' (%)';
+      });
+
     const locAreasWithModules = this.zonesService.locAreas.filter(
       (locArea) => locArea.modulo !== null && locArea.modulo !== undefined
     );
@@ -71,64 +88,115 @@ export class ChartLossesByModulesComponent implements OnInit {
       this.moduleService.checkModule(anom.modulo)
     );
 
-    this.informeService
-      .getDateLabelsInformes(this.reportControlService.informesIdList)
+    this.themeService.themeSelected$
       .pipe(
         take(1),
-        switchMap((dateLabels) => {
-          this.dateLabels = dateLabels;
+        switchMap((theme) => {
+          this.theme = theme;
 
-          return this.themeService.themeSelected$;
-        }),
-        take(1)
+          return this.reportControlService.selectedInformeId$;
+        })
       )
-      .subscribe((theme) => {
-        this.chartData = [];
-        this.reportControlService.informesIdList.forEach((informeId) => {
-          const anomaliasInforme = this.anomalias.filter((anom) => anom.informeId === informeId);
+      .subscribe((informeId) => {
+        this.selectedInforme = this.reportControlService.informes.find((informe) => informe.id === informeId);
 
-          this.chartData.push(this.calculateChartData(anomaliasInforme));
-        });
-        this.initChart(theme.split('-')[0]);
+        this.chartData = [];
+
+        const anomaliasInforme = this.anomalias.filter((anom) => anom.informeId === informeId);
+
+        const fixableAnoms = anomaliasInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+        this.chartData.push(this.calculateChartData(fixableAnoms));
+
+        const unfixableAnoms = anomaliasInforme.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipo));
+        this.chartData.push(this.calculateChartData(unfixableAnoms));
+
+        this.sortChartData();
+
+        this.initChart(this.theme.split('-')[0]);
       });
+
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        if (this.chartOptions) {
+          let color = COLOR.dark_orange;
+          if (theme === 'dark-theme') {
+            color = COLOR.dark_orange;
+          } else {
+            color = COLOR.light_orange;
+          }
+
+          this.chartOptions = {
+            ...this.chartOptions,
+            chart: {
+              ...this.chartOptions.chart,
+              foreColor: this.themeService.textColor,
+            },
+            tooltip: {
+              theme: theme.split('-')[0],
+            },
+            dataLabels: {
+              ...this.chartOptions.dataLabels,
+              style: {
+                ...this.chartOptions.dataLabels.style,
+                colors: [this.themeService.surfaceColor],
+              },
+              background: {
+                ...this.chartOptions.dataLabels.background,
+                foreColor: this.themeService.textColor,
+              },
+            },
+            colors: [color, COLOR.neutralGrey],
+          };
+        }
+      })
+    );
   }
 
   private calculateChartData(anomalias: Anomalia[]): number[] {
     const result = Array<number>();
     this.modulesLabel.forEach((label) => {
-      // tslint:disable-next-line: triple-equals
-      const numAnoms = anomalias.filter((anom) => this.moduleService.getModuleBrandLabel(anom.modulo) === label).length;
+      const labelAnoms = anomalias.filter((anom) => this.moduleService.getModuleBrandLabel(anom.modulo) === label);
 
-      result.push(numAnoms);
+      result.push(this.getMAE(labelAnoms));
     });
 
     return result;
   }
 
+  private getMAE(anomalias: Anomalia[]): number {
+    return (
+      (anomalias.map((anom) => GLOBAL.pcPerdidas[anom.tipo]).reduce((a, b) => a + b, 0) /
+        this.selectedInforme.numeroModulos) *
+      100
+    );
+  }
+
+  private sortChartData() {
+    // Creamos un array de índices [0, 1, 2, ..., n-1]
+    let indices = Array.from({ length: this.chartData[0].length }, (_, i) => i);
+
+    // Ordenamos los índices según la suma de los elementos correspondientes en array1 y array2
+    indices.sort((a, b) => this.chartData[0][b] + this.chartData[1][b] - (this.chartData[0][a] + this.chartData[1][a]));
+
+    // ordenamos el chartData siguiendo el orden de los indices ya ordenados
+    this.chartData = [indices.map((i) => this.chartData[0][i]), indices.map((i) => this.chartData[1][i])];
+
+    // ordenamos tambien los labels
+    this.modulesLabel = indices.map((i) => this.modulesLabel[i]);
+  }
+
   private initChart(theme: string): void {
-    const series = this.dateLabels.map((dateLabel, index) => {
+    const series = this.seriesLabels.map((dateLabel, index) => {
       return { name: dateLabel, data: this.chartData[index] };
     });
 
-    const opacity = new Array(series.length);
-    for (let index = 0; index < opacity.length; index++) {
-      opacity[index] = 1 - (opacity.length - (index + 1)) * 0.25;
-    }
-
-    // const colors = new Array(series.length);
-    // opacity.forEach((op, index) => {
-    //   colors[index] = Colors.hexToRgb(COLOR.gris, op);
-    // });
-
-    let titleXAxis = 'Zona';
-    // if (this.reportControlService.nombreGlobalCoords.length > 0) {
-    //   this.translate
-    //     .get(this.reportControlService.nombreGlobalCoords[0])
-    //     .pipe(take(1))
-    //     .subscribe((res: string) => {
-    //       titleXAxis = res;
-    //     });
-    // }
+    let titleXAxis = 'Marca módulo';
+    this.translate
+      .get(titleXAxis)
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        titleXAxis = res;
+      });
 
     // espera a que el dataPlot tenga datos
     if (this.chartData[0] !== undefined) {
@@ -137,27 +205,23 @@ export class ChartLossesByModulesComponent implements OnInit {
         chart: {
           type: 'bar',
           foreColor: this.themeService.textColor,
-          width: '100%',
-          // height: 250,
+          stacked: true,
           toolbar: {
             show: false,
           },
         },
         legend: {
           show: true,
-          showForSingleSeries: true,
-          markers: {
-            // fillColors: colors,
-          },
-          onItemHover: {
-            highlightDataSeries: false,
-          },
+          position: 'top',
         },
         plotOptions: {
           bar: {
             horizontal: false,
-            columnWidth: '75%',
-            endingShape: 'rounded',
+            borderRadius: 8,
+            distributed: false,
+            dataLabels: {
+              position: 'center', // top, center, bottom
+            },
           },
         },
         dataLabels: {
@@ -176,26 +240,13 @@ export class ChartLossesByModulesComponent implements OnInit {
           title: {
             text: titleXAxis,
           },
-          labels: {
-            style: {
-              // Es necesario usar un fontFamily que soporte saltos de línea.
-              fontFamily: 'Courier New, monospace',
-            },
-          },
         },
-        // colors: [COLOR.gris],
+        colors: [COLOR.dark_orange, COLOR.neutralGrey],
         yaxis: {
-          decimalsInFloat: 0,
-          max: (v) => {
-            return Math.round(1.1 * v);
-          },
+          decimalsInFloat: 2,
           forceNiceScale: true,
-          tickAmount: 3,
           title: {
-            // text: this.maeLabel,
-          },
-          labels: {
-            minWidth: 10,
+            text: this.maeLabel,
           },
         },
         tooltip: {
@@ -218,5 +269,9 @@ export class ChartLossesByModulesComponent implements OnInit {
       };
       this.chartLoaded = true;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

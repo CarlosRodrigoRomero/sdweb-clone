@@ -1,10 +1,9 @@
 <mat-card>
   <mat-card-header>
     <mat-card-title>{{ 'MAE por modelo de módulo' | translate }}</mat-card-title>
-    <!-- <mat-card-subtitle>{{ 'Para visualizar dónde están los problemas de rendimiento' | translate }}</mat-card-subtitle> -->
     <mat-card-subtitle>
-      Vemos que los módulos <b>Canadian Solar</b> son los que mayores pérdidas están sufriendo, seguidos de los
-      <b>Trina</b> y los <b>JA Solar</b>.
+      Vemos que los módulos <b>{{ modulesLabel[0] }}</b> son los que mayores pérdidas están sufriendo, seguidos de los
+      <b>{{ modulesLabel[1] }}</b>
     </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
