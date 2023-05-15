@@ -11,7 +11,7 @@ const routes: Routes = [
     path: ':id',
     component: TrackerPlantComponent,
     children: [
-      { path: '', redirectTo: 'map', pathMatch: 'full' },
+      { path: '', redirectTo: 'analysis', pathMatch: 'full' },
       {
         path: 'map',
         // loadChildren: () =>
@@ -19,7 +19,7 @@ const routes: Routes = [
         component: MapViewComponent,
       },
       {
-        path: 'loss',
+        path: 'analysis',
         loadChildren: () => import('@modules/loss-report/loss-report.module').then((m) => m.LossReportModule),
         canActivate: [AuthGuard],
       },

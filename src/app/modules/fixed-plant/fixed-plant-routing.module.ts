@@ -11,7 +11,7 @@ const routes: Routes = [
     path: ':id',
     component: FixedPlantComponent,
     children: [
-      { path: '', redirectTo: 'map', pathMatch: 'full' },
+      { path: '', redirectTo: 'analysis', pathMatch: 'full' },
       {
         path: 'map',
         // loadChildren: () =>

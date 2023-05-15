@@ -8,20 +8,20 @@
     </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-    <!-- <div #chart *ngIf="chartLoaded">
-        <apx-chart
-          [series]="chartOptions.series"
-          [chart]="chartOptions.chart"
-          [dataLabels]="chartOptions.dataLabels"
-          [plotOptions]="chartOptions.plotOptions"
-          [yaxis]="chartOptions.yaxis"
-          [legend]="chartOptions.legend"
-          [fill]="chartOptions.fill"
-          [stroke]="chartOptions.stroke"
-          [tooltip]="chartOptions.tooltip"
-          [xaxis]="chartOptions.xaxis"
-          [colors]="chartOptions.colors"
-        ></apx-chart>
-      </div> -->
+    <div #chart *ngIf="chartLoaded">
+      <apx-chart
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [dataLabels]="chartOptions.dataLabels"
+        [plotOptions]="chartOptions.plotOptions"
+        [yaxis]="chartOptions.yaxis"
+        [legend]="chartOptions.legend"
+        [fill]="chartOptions.fill"
+        [stroke]="chartOptions.stroke"
+        [tooltip]="chartOptions.tooltip"
+        [xaxis]="chartOptions.xaxis"
+        [colors]="chartOptions.colors"
+      ></apx-chart>
+    </div>
   </mat-card-content>
 </mat-card>

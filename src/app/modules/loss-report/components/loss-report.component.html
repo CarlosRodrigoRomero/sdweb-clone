@@ -5,6 +5,6 @@
   </div>
   <div class="column">
     <app-chart-losses-by-zone></app-chart-losses-by-zone>
-    <app-chart-losses-by-modules></app-chart-losses-by-modules>
+    <app-chart-losses-by-modules *ngIf="thereAreModules"></app-chart-losses-by-modules>
   </div>
 </div>

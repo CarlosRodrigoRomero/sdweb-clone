@@ -28,6 +28,8 @@ export class ZonesService {
   thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
   private _thereAreLargestZones = false;
   thereAreLargestZones$ = new BehaviorSubject<boolean>(this._thereAreLargestZones);
+  private _thereAreModules = false;
+  thereAreModules$ = new BehaviorSubject<boolean>(this._thereAreModules);
 
   constructor(private plantaService: PlantaService, private olMapService: OlMapService) {}
 
@@ -50,6 +52,14 @@ export class ZonesService {
             this.zones = this.zonesBySize.flat();
           }
 
+          // comprobamos si hay más de un modelo de módulos
+          if (
+            locAreas.filter(
+              (locArea) => locArea.modulo !== undefined && locArea.modulo !== null && locArea.modulo !== null
+            ).length > 1
+          ) {
+            this.thereAreModules = true;
+          }
           initService(true);
         });
     });
@@ -303,5 +313,14 @@ export class ZonesService {
   set thereAreLargestZones(value: boolean) {
     this._thereAreLargestZones = value;
     this.thereAreLargestZones$.next(value);
+  }
+
+  get thereAreModules(): boolean {
+    return this._thereAreModules;
+  }
+
+  set thereAreModules(value: boolean) {
+    this._thereAreModules = value;
+    this.thereAreModules$.next(value);
   }
 }
