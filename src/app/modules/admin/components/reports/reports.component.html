@@ -31,7 +31,7 @@
       <!-- Fecha -->
       <ng-container matColumnDef="fecha">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
-        <td mat-cell *matCellDef="let element">{{ element.fecha * 1000 | date: 'dd/MM/yyyy' }}</td>
+        <td mat-cell *matCellDef="let element">{{ element.fecha * 1000 | date : 'dd/MM/yyyy' }}</td>
       </ng-container>
 
       <!-- Tipo -->
@@ -43,7 +43,7 @@
       <!-- Potencia -->
       <ng-container matColumnDef="potencia">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Potencia</th>
-        <td mat-cell *matCellDef="let element">{{ element.potencia | number: '1.0-2' }} MW</td>
+        <td mat-cell *matCellDef="let element">{{ element.potencia | number : '1.0-2' }} MW</td>
       </ng-container>
 
       <!-- Informe ID -->
@@ -74,21 +74,33 @@
             <mat-icon>edit</mat-icon>
           </a>
           <a mat-button [routerLink]="['../../clientes/auto-loc', element.plantaId]">Localizaciones</a>
-          <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../autogeo', element.informeId]"
+          <a
+            mat-button
+            *ngIf="element.tipo !== 'seguidores' || element.fecha > newS2EReportsData"
+            [routerLink]="['../../autogeo', element.informeId]"
             >AutoGeo</a
           >
-          <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../clusters', element.informeId]"
+          <a
+            mat-button
+            *ngIf="element.tipo !== 'seguidores' || element.fecha > newS2EReportsData"
+            [routerLink]="['../../clusters', element.informeId]"
             >Clusters</a
           >
-          <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../structures', element.informeId]"
+          <a
+            mat-button
+            *ngIf="element.tipo !== 'seguidores' || element.fecha > newS2EReportsData"
+            [routerLink]="['../../structures', element.informeId]"
             >Estructuras</a
           >
-          <a mat-button *ngIf="element.tipo !== 'seguidores'" [routerLink]="['../../classification', element.informeId]"
+          <a
+            mat-button
+            *ngIf="element.tipo !== 'seguidores' || element.fecha > newS2EReportsData"
+            [routerLink]="['../../classification', element.informeId]"
             >Clasificación</a
           >
           <a
             mat-button
-            *ngIf="element.tipo === 'seguidores'"
+            *ngIf="element.tipo === 'seguidores' && element.fecha < newS2EReportsData"
             [routerLink]="['../../clientes/informe-edit', element.informeId]"
             >Clasificación</a
           >
