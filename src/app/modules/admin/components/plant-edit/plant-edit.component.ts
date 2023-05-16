@@ -101,6 +101,7 @@ export class PlantEditComponent implements OnInit {
       tipo: [, [Validators.required]],
       vertical: [false, [Validators.required]],
       stringConectorGlobals: [],
+      largestZonesIndex: [, [Validators.min(0), Validators.max(2)]],
     });
   }
 
@@ -151,6 +152,9 @@ export class PlantEditComponent implements OnInit {
     }
     if (this.form.get('stringConectorGlobals').value !== null && this.form.get('stringConectorGlobals').value !== '') {
       this.planta.stringConectorGlobals = this.form.get('stringConectorGlobals').value;
+    }
+    if (this.form.get('largestZonesIndex').value !== null) {
+      this.planta.sizeZonesClusters = this.form.get('largestZonesIndex').value;
     }
 
     // Actualizamos la planta en la DB

@@ -1,9 +1,11 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>{{ 'MAE por modelo de módulo' | translate }}</mat-card-title>
+    <mat-card-title>{{ 'MAE por fabricante de módulo' | translate }}</mat-card-title>
     <mat-card-subtitle>
-      Vemos que los módulos <b>{{ modulesLabel[0] }}</b> son los que mayores pérdidas están sufriendo, seguidos de los
-      <b>{{ modulesLabel[1] }}</b>
+      <p>
+        Distribución de <b>MAE por {{ modulesLabel[0] | translate | lowercase }}</b> especificando que porcentaje son
+        anomalías reparables y que porcentaje no lo son.
+      </p>
     </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>

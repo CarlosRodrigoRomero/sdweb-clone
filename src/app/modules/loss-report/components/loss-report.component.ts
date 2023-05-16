@@ -9,10 +9,12 @@ import { ZonesService } from '@data/services/zones.service';
 })
 export class LossReportComponent implements OnInit {
   thereAreModules = false;
+  thereAreZones = false;
 
   constructor(private zonesService: ZonesService) {}
 
   ngOnInit(): void {
     this.thereAreModules = this.zonesService.thereAreModules;
+    this.thereAreZones = this.zonesService.thereAreZones;
   }
 }

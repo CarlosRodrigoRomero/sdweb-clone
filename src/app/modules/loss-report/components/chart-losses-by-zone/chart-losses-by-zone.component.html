@@ -1,15 +1,15 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>{{ 'MAE por Instalación' | translate }}</mat-card-title>
+    <mat-card-title>{{ 'MAE por ' | translate }}{{ titleZone | translate | lowercase }}</mat-card-title>
     <!-- <mat-card-subtitle>{{ 'Para visualizar dónde están los problemas de rendimiento' | translate }}</mat-card-subtitle> -->
     <mat-card-subtitle>
       <p>
-        Distribución de <b>MAE por {{ 'Instalación' }}</b> incluyendo si ese MAE está compuesto por anomalías reparables
-        o si por el contrario requieren sustituir el módulo.
+        Distribución de <b>MAE por {{ titleZone | translate | lowercase }}</b> especificando que porcentaje son
+        anomalías reparables y que porcentaje no lo son.
       </p>
-      <p>
-        También vemos que las <b>instalaciones 2.2 y 2.3</b> han sufrido un deterioro notable respecto al año pasado.
-      </p>
+      <!-- <p>
+        Pulsa la {{ titleZone | translate | lowercase }} que quieras para ir a ver sus anomalías filtradas en el mapa.
+      </p> -->
     </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>

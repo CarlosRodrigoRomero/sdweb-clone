@@ -256,6 +256,17 @@ export class ZonesService {
     }
   }
 
+  getUniqueIndexZones(locAreas: LocationAreaInterface[], indexSelected: number): LocationAreaInterface[] {
+    if (indexSelected === undefined || indexSelected === null) {
+      indexSelected = 0;
+    }
+
+    return locAreas.filter(
+      (locA, index, locAs) =>
+        locAs.map((loc) => loc.globalCoords[indexSelected]).indexOf(locA.globalCoords[indexSelected]) === index
+    );
+  }
+
   isZoneInsideLargestZone(zone: LocationAreaInterface, largestZone: LocationAreaInterface): boolean {
     const coordsLargestZone = this.olMapService.pathToCoordinate(largestZone.path);
     const polygonLargestZone = new Polygon([coordsLargestZone]);

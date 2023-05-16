@@ -283,5 +283,7 @@
   "seguidores": "seguidores",
   "Análisis": "Análisis",
   "MAE que solo tiene en cuenta las anomalías que son reparables": "MAE que solo tiene en cuenta las anomalías que son reparables",
-  "Leve": "Leve"
+  "Leve": "Leve",
+  "MAE por ": "MAE por ",
+  "MAE por fabricante de módulo": "MAE por fabricante de módulo"
 }

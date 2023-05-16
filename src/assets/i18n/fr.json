@@ -281,5 +281,7 @@
   "seguidores": "trackers",
   "Análisis": "Analyse",
   "MAE que solo tiene en cuenta las anomalías que son reparables": "MEA qui ne tient compte que des anomalies réparables",
-  "Leve": "Léger"
+  "Leve": "Léger",
+  "MAE por ": "MEA par ",
+  "MAE por fabricante de módulo": "MEA par fabricant de module"
 }

@@ -629,19 +629,23 @@ export class ReportControlService {
     }
   }
 
-  sortLocAreas(locAreas: LocationAreaInterface[]) {
+  sortLocAreas(locAreas: LocationAreaInterface[], index?: number): LocationAreaInterface[] {
+    if (index === undefined) {
+      index = 0;
+    }
+
     // comprobamos si el nombre de las zonas es un numero
-    if (!isNaN(parseFloat(locAreas[0].globalCoords[0]))) {
-      locAreas = locAreas.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
-    } else if (locAreas[0].globalCoords[0].match(/\d+/g) !== null) {
+    if (!isNaN(parseFloat(locAreas[0].globalCoords[index]))) {
+      locAreas = locAreas.sort((a, b) => parseFloat(a.globalCoords[index]) - parseFloat(b.globalCoords[0]));
+    } else if (locAreas[0].globalCoords[index].match(/\d+/g) !== null) {
       // si no es un numero buscamos si tiene alguno incluido para ordenarlo
       locAreas.sort((a, b) => {
         let numsA = '';
-        a.globalCoords[0].match(/\d+/g).forEach((element) => {
+        a.globalCoords[index].match(/\d+/g).forEach((element) => {
           numsA += element;
         });
         let numsB = '';
-        b.globalCoords[0].match(/\d+/g).forEach((element) => {
+        b.globalCoords[index].match(/\d+/g).forEach((element) => {
           numsB += element;
         });
 

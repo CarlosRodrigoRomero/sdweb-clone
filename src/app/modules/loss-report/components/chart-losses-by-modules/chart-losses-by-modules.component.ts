@@ -206,6 +206,7 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
           type: 'bar',
           foreColor: this.themeService.textColor,
           stacked: true,
+          height: 350,
           toolbar: {
             show: false,
           },
@@ -230,11 +231,11 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
         fill: {
           // colors,
         },
-        stroke: {
-          show: true,
-          width: 2,
-          colors: ['transparent'],
-        },
+        // stroke: {
+        //   show: true,
+        //   width: 2,
+        //   colors: ['transparent'],
+        // },
         xaxis: {
           categories: this.modulesLabel,
           title: {
@@ -244,7 +245,7 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
         colors: [COLOR.dark_orange, COLOR.neutralGrey],
         yaxis: {
           decimalsInFloat: 2,
-          forceNiceScale: true,
+          // forceNiceScale: true,
           title: {
             text: this.maeLabel,
           },
