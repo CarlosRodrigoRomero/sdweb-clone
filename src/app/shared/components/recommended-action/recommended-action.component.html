@@ -7,9 +7,10 @@
       </div>
       <div class="content-row">
         <span class="row-subtitle">MAE</span>
-        <span class="perdidas">{{ perdidas * 100 | number: '1.0-2' }}%</span>
+        <span class="perdidas">{{ perdidas * 100 | number : '1.0-2' }}%</span>
       </div>
-      <div class="bar-row" [style.width]="porcentajeBarra"></div>
+      <div *ngIf="fixable" class="bar-row highlight-background" [style.width]="porcentajeBarra"></div>
+      <div *ngIf="!fixable" class="bar-row neutral-background" [style.width]="porcentajeBarra"></div>
     </div>
   </mat-checkbox>
 </div>

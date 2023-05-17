@@ -10,6 +10,7 @@ export class RecommendedActionComponent {
   @Input() cantidad: number;
   @Input() perdidas: number;
   @Input() porcentajeBarra: string;
+  @Input() fixable: boolean;
   @Output() changeState = new EventEmitter<boolean>();
 
   constructor() {}

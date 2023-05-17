@@ -134,11 +134,14 @@ export class ChartLossesByZoneComponent implements OnInit {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          let color = COLOR.dark_orange;
+          let highlightColor = COLOR.dark_orange;
+          let neutralColor = COLOR.dark_neutral;
           if (theme === 'dark-theme') {
-            color = COLOR.dark_orange;
+            highlightColor = COLOR.dark_orange;
+            neutralColor = COLOR.dark_neutral;
           } else {
-            color = COLOR.light_orange;
+            highlightColor = COLOR.light_orange;
+            neutralColor = COLOR.light_neutral;
           }
 
           this.chartOptions = {
@@ -161,7 +164,7 @@ export class ChartLossesByZoneComponent implements OnInit {
                 foreColor: this.themeService.textColor,
               },
             },
-            colors: [color, COLOR.neutralGrey],
+            colors: [highlightColor, neutralColor],
           };
         }
       })
@@ -267,7 +270,7 @@ export class ChartLossesByZoneComponent implements OnInit {
             text: this.titleZone,
           },
         },
-        colors: [COLOR.dark_orange, COLOR.neutralGrey],
+        colors: [COLOR.dark_orange, COLOR.dark_neutral],
         yaxis: {
           decimalsInFloat: 2,
           forceNiceScale: true,

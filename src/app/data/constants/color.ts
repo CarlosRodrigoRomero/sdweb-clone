@@ -13,11 +13,12 @@ export let COLOR = {
   light_background: '#F3F4F6',
   light_on_background: '#0F172A',
   light_surface: '#FFFFFF',
+  light_neutral: '#546E7A',
   dark_background: '#0F172A',
   dark_on_background: '#F3F4F6',
   dark_surface: '#37474F',
-  neutralGrey: '#64748B',
   dark_orange: '#FED7AA',
+  dark_neutral: '#78909C',
   light_orange: '#EA580C',
   colores_tipos: [
     'rgba(0,0,0,1)', // '0',

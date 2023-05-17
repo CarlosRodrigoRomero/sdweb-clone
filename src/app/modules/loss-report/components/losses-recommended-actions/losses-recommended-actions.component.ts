@@ -21,6 +21,8 @@ import { GLOBAL } from '@data/constants/global';
 export class LossesRecommendedActionsComponent {
   @Input() recomendedActions: RecomendedAction[];
   @Input() tipos: number[];
+  @Input() numFixableAnoms: number;
+  @Input() numUnfixableAnoms: number;
   @Input() fixableLossesPercentage: number;
   @Output() changeRecommendedActions = new EventEmitter<RecomendedAction[]>();
   @Output() modifiedType = new EventEmitter<string>();

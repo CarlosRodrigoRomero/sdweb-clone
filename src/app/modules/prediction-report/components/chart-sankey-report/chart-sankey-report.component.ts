@@ -52,7 +52,7 @@ export class ChartSankeyReportComponent implements OnInit {
         //   // stroke: 'black', // Color of the link border.
         //   // strokeWidth: 1, // Thickness of the link border (default 0).
         // },
-        colors: [COLOR.neutralGrey],
+        colors: [COLOR.dark_neutral],
         colorMode: 'gradient',
       },
     },

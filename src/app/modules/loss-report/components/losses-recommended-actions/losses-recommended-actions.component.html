@@ -15,8 +15,8 @@
     <mat-accordion>
       <mat-expansion-panel expanded="true">
         <mat-expansion-panel-header>
-          <mat-panel-title> {{ 'Anomalías reparables' | translate }} </mat-panel-title>
-          <mat-panel-description>{{ 38 }}</mat-panel-description>
+          <mat-panel-title class="highlight-color"> {{ 'Anomalías reparables' | translate }} </mat-panel-title>
+          <mat-panel-description class="highlight-color">{{ numFixableAnoms }}</mat-panel-description>
         </mat-expansion-panel-header>
         <app-recommended-actions
           [recomendedActions]="fixableFilter(recomendedActions)"
@@ -26,7 +26,7 @@
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title> {{ 'Anomalías no reparables' | translate }} </mat-panel-title>
-          <mat-panel-description>{{ 207 }}</mat-panel-description>
+          <mat-panel-description>{{ numUnfixableAnoms }}</mat-panel-description>
         </mat-expansion-panel-header>
         <div class="panel-content">
           <app-recommended-actions

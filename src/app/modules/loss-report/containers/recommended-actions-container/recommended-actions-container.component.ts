@@ -24,6 +24,8 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
   tipos: number[];
   private selectedReport: InformeInterface;
   fixableLossesPercentage = 0;
+  numFixableAnoms = 0;
+  numUnfixableAnoms = 0;
 
   private subcriptions = new Subscription();
 
@@ -35,29 +37,22 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subcriptions.add(
-      this.reportControlService.selectedInformeId$
-        .pipe(
-          switchMap((id) => {
-            this.selectedReport = this.reportControlService.informes.find((informe) => informe.id === id);
+      this.reportControlService.selectedInformeId$.subscribe((id) => {
+        this.selectedReport = this.reportControlService.informes.find((informe) => informe.id === id);
 
-            return this.filterService.filteredElements$;
-          })
-        )
-        .subscribe((elems) => {
-          let anomalias: Anomalia[] = [];
-          if (this.reportControlService.plantaFija) {
-            anomalias = elems as Anomalia[];
-          } else {
-            elems.forEach((elem) => {
-              anomalias = anomalias.concat((elem as Seguidor).anomaliasCliente);
-            });
-          }
+        const anomalias = this.reportControlService.allAnomalias;
 
-          this.recomendedActions = this.calculateRecomendedActions(anomalias).sort((a, b) => b.mae - a.mae);
+        // obtenemos el numero de anomalias reparables
+        this.numFixableAnoms = this.getNumFixableAnoms(anomalias);
+        this.numUnfixableAnoms = anomalias.length - this.numFixableAnoms;
 
-          // calculamos el porcentaje de pérdidas que se pueden arreglar
-          this.calculateFixableLosses();
-        })
+        this.recomendedActions = this.calculateRecomendedActions(anomalias).sort((a, b) => b.mae - a.mae);
+
+        // calculamos el porcentaje de pérdidas que se pueden arreglar
+        this.calculateFixableLosses();
+
+        return this.filterService.filteredElements$;
+      })
     );
   }
 
@@ -97,6 +92,12 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
     });
 
     return recomendedActions;
+  }
+
+  private getNumFixableAnoms(anomalias: Anomalia[]): number {
+    const fixableAnoms = anomalias.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo));
+
+    return fixableAnoms.length;
   }
 
   private getTypeLosses(quantity: number, index: number): number {

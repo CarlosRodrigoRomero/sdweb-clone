@@ -214,7 +214,7 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
 
       this.chartOptionsTypes = {
         series: seriesNumCat,
-        colors: [COLOR.neutralGrey],
+        colors: [COLOR.dark_neutral],
         title: {
           text: '# ' + this.anomsTipoLabel,
           align: 'left',
@@ -267,7 +267,7 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
             show: false,
           },
         },
-        colors: [COLOR.neutralGrey],
+        colors: [COLOR.dark_neutral],
         yaxis: {
           max: (v) => {
             return Math.round(1.1 * v);

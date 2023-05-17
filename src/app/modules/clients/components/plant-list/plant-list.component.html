@@ -38,7 +38,7 @@
               mat-cell
               (click)="onClick(row)"
               *matCellDef="let row"
-              [ngClass]="{ 'highlight-elem': sortedColumn === 'nombre' }"
+              [ngClass]="{ 'highlight-color': sortedColumn === 'nombre' }"
             >
               <div class="mobile-left-cell">
                 {{ row.nombre }}
@@ -61,7 +61,7 @@
               mat-cell
               (click)="onClick(row)"
               *matCellDef="let row"
-              [ngClass]="{ 'highlight-elem': sortedColumn === 'potencia' }"
+              [ngClass]="{ 'highlight-color': sortedColumn === 'potencia' }"
             >
               <div class="cell-centered">
                 {{ row.potencia | number : '1.2-2' }}
@@ -84,7 +84,7 @@
               mat-cell
               (click)="onClick(row)"
               *matCellDef="let row"
-              [ngClass]="{ 'highlight-elem': sortedColumn === 'mae' }"
+              [ngClass]="{ 'highlight-color': sortedColumn === 'mae' }"
             >
               <div class="cell-centered">
                 {{ row.mae * 100 | number : '1.2-2' }}
@@ -107,7 +107,7 @@
               mat-cell
               (click)="onClick(row)"
               *matCellDef="let row"
-              [ngClass]="{ 'highlight-elem': sortedColumn === 'powerLoss' }"
+              [ngClass]="{ 'highlight-color': sortedColumn === 'powerLoss' }"
             >
               {{ row.powerLoss | number : '1.2-2' }}
             </td>
@@ -128,7 +128,7 @@
               mat-cell
               (click)="onClick(row)"
               *matCellDef="let row"
-              [ngClass]="{ 'highlight-elem': sortedColumn === 'fixablePower' }"
+              [ngClass]="{ 'highlight-color': sortedColumn === 'fixablePower' }"
             >
               <div class="cell-centered">
                 {{ row.fixablePower * 100 | number : '1.2-2' }}
@@ -151,7 +151,7 @@
               mat-cell
               (click)="onClick(row)"
               *matCellDef="let row"
-              [ngClass]="{ 'highlight-elem': sortedColumn === 'tipo' }"
+              [ngClass]="{ 'highlight-color': sortedColumn === 'tipo' }"
             >
               <div class="cell-centered">
                 {{ row.tipo | translate }}
@@ -174,7 +174,7 @@
               mat-cell
               (click)="onClick(row)"
               *matCellDef="let row"
-              [ngClass]="{ 'highlight-elem': sortedColumn === 'ultimaInspeccion' }"
+              [ngClass]="{ 'highlight-color': sortedColumn === 'ultimaInspeccion' }"
             >
               {{ row.ultimaInspeccion * 1000 | date : 'dd/MM/yyyy' }}
             </td>

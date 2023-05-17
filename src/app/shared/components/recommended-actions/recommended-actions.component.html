@@ -5,6 +5,7 @@
     [cantidad]="action.quantity"
     [perdidas]="action.mae"
     [porcentajeBarra]="action.barPercentage"
+    [fixable]="action.fixable"
     (changeState)="action.active = $event; emitChangedActions()"
   ></app-recommended-action>
 </div>

@@ -43,12 +43,14 @@ $custom-dark-theme-foreground: (
 $app-light-primary: mat-palette($mat-deep-orange, 600);
 $app-light-accent: mat-palette($mat-deep-orange, 900);
 $app-light-warn: mat-palette($mat-red, 900);
+$app-light-neutral: mat-palette($mat-blue-gray, 600);
 
 $app-light-background: mat-palette($mat-blue-grey, 50);
 
 $app-dark-primary: mat-palette($mat-orange, 200);
 $app-dark-accent: mat-palette($mat-orange, 600);
 $app-dark-warn: mat-palette($mat-deep-orange, 900);
+$app-dark-neutral: mat-palette($mat-blue-gray, 400);
 
 $app-dark-background: mat-palette($mat-blue-grey, 900);
 
@@ -78,8 +80,20 @@ $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dar
     color: mat-color($app-light-primary);
   }
 
-  .highlight-elem {
+  .highlight-color {
     color: mat-color($app-light-primary);
+  }
+
+  .highlight-background {
+    background-color: mat-color($app-light-primary);
+  }
+
+  .neutral-color {
+    color: mat-color($app-light-neutral);
+  }
+
+  .neutral-background {
+    background-color: mat-color($app-light-neutral);
   }
 }
 
@@ -91,7 +105,19 @@ $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dar
     color: mat-color($app-dark-primary);
   }
 
-  .highlight-elem {
+  .highlight-color {
     color: mat-color($app-dark-primary);
+  }
+
+  .highlight-background {
+    background-color: mat-color($app-dark-primary);
+  }
+
+  .neutral-color {
+    color: mat-color($app-dark-neutral);
+  }
+
+  .neutral-background {
+    background-color: mat-color($app-dark-neutral);
   }
 }
