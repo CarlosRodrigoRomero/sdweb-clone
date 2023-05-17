@@ -398,6 +398,10 @@ export class ReportControlService {
     return mae;
   }
 
+  getMae(anomalias: Anomalia[], numModules: number): number {
+    return (anomalias.map((anom) => GLOBAL.pcPerdidas[anom.tipo]).reduce((a, b) => a + b, 0) / numModules) * 100;
+  }
+
   private checkFixedPowerLossInformes(): void {
     if (this.allAnomalias.length > 0) {
       this.informes.forEach((informe) => {

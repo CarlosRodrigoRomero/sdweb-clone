@@ -6,12 +6,10 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./total-loss.component.css'],
 })
 export class TotalLossComponent {
-  @Input() totalLoss: number;
-  @Input() totalLossPercentage: number;
-  @Input() totalFixedLoss: number;
-  @Input() totalFixedLossPercentage: number;
-  @Input() totalNotFixedLoss: number;
-  @Input() totalNotFixedLossPercentage: number;
+  @Input() totalMae: number;
+  @Input() fixableMae: number;
+  @Input() numTotalAnoms: number;
+  @Input() numFixableAnoms: number;
 
   constructor() {}
 }

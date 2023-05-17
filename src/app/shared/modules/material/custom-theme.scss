@@ -78,7 +78,7 @@ $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dar
     color: mat-color($app-light-primary);
   }
 
-  .sorted-column-row {
+  .highlight-elem {
     color: mat-color($app-light-primary);
   }
 }
@@ -91,7 +91,7 @@ $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dar
     color: mat-color($app-dark-primary);
   }
 
-  .sorted-column-row {
+  .highlight-elem {
     color: mat-color($app-dark-primary);
   }
 }

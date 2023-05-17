@@ -1,7 +1,7 @@
 <div class="content">
   <div class="column">
-    <app-recommended-actions-container></app-recommended-actions-container>
     <app-total-loss-container></app-total-loss-container>
+    <app-recommended-actions-container></app-recommended-actions-container>
   </div>
   <div *ngIf="thereAreZones || thereAreModules" class="column">
     <app-chart-losses-by-zone *ngIf="thereAreZones"></app-chart-losses-by-zone>
