@@ -1,0 +1,9 @@
+<button mat-menu-item [matMenuTriggerFor]="viewsMenu">
+  {{ 'Vista inicial informes' }}: <b>{{ viewsLabels[viewSelected] }}</b>
+</button>
+
+<mat-menu #viewsMenu="matMenu">
+  <button mat-menu-item *ngFor="let view of views" (click)="changeView(view)">
+    {{ viewsLabels[view] }}
+  </button>
+</mat-menu>
