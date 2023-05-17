@@ -88,32 +88,34 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
       this.moduleService.checkModule(anom.modulo)
     );
 
-    this.themeService.themeSelected$
-      .pipe(
-        take(1),
-        switchMap((theme) => {
-          this.theme = theme;
+    this.subscriptions.add(
+      this.themeService.themeSelected$
+        .pipe(
+          take(1),
+          switchMap((theme) => {
+            this.theme = theme;
 
-          return this.reportControlService.selectedInformeId$;
+            return this.reportControlService.selectedInformeId$;
+          })
+        )
+        .subscribe((informeId) => {
+          this.selectedInforme = this.reportControlService.informes.find((informe) => informe.id === informeId);
+
+          this.chartData = [];
+
+          const anomaliasInforme = this.anomalias.filter((anom) => anom.informeId === informeId);
+
+          const fixableAnoms = anomaliasInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+          this.chartData.push(this.calculateChartData(fixableAnoms));
+
+          const unfixableAnoms = anomaliasInforme.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipo));
+          this.chartData.push(this.calculateChartData(unfixableAnoms));
+
+          this.sortChartData();
+
+          this.initChart(this.theme.split('-')[0]);
         })
-      )
-      .subscribe((informeId) => {
-        this.selectedInforme = this.reportControlService.informes.find((informe) => informe.id === informeId);
-
-        this.chartData = [];
-
-        const anomaliasInforme = this.anomalias.filter((anom) => anom.informeId === informeId);
-
-        const fixableAnoms = anomaliasInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
-        this.chartData.push(this.calculateChartData(fixableAnoms));
-
-        const unfixableAnoms = anomaliasInforme.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipo));
-        this.chartData.push(this.calculateChartData(unfixableAnoms));
-
-        this.sortChartData();
-
-        this.initChart(this.theme.split('-')[0]);
-      });
+    );
 
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
