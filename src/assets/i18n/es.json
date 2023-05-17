@@ -285,5 +285,10 @@
   "MAE que solo tiene en cuenta las anomalías que son reparables": "MAE que solo tiene en cuenta las anomalías que son reparables",
   "Leve": "Leve",
   "MAE por ": "MAE por ",
-  "MAE por fabricante de módulo": "MAE por fabricante de módulo"
+  "MAE por fabricante de módulo": "MAE por fabricante de módulo",
+  "Acciones recomendadas": "Acciones recomendadas",
+  "Anomalías reparables": "Anomalías reparables",
+  "Anomalías no reparables": "Anomalías no reparables",
+  "Ver seleccionadas en el mapa": "Ver seleccionadas en el mapa",
+  "Compartir informe seleccionadas": "Compartir informe seleccionadas"
 }

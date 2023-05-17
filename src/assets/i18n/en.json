@@ -285,5 +285,10 @@
   "MAE que solo tiene en cuenta las anomalías que son reparables": "ESM that only takes into account the abnormalities that are fixable",
   "Leve": "Mild",
   "MAE por ": "ESM by ",
-  "MAE por fabricante de módulo": "ESM by module manufacturer"
+  "MAE por fabricante de módulo": "ESM by module manufacturer",
+  "Acciones recomendadas": "Recommended actions",
+  "Anomalías reparables": "Fixable abnormalities",
+  "Anomalías no reparables": "Unfixable abnormalities",
+  "Ver seleccionadas en el mapa": "See selected on the map",
+  "Compartir informe seleccionadas": "Share selected report"
 }

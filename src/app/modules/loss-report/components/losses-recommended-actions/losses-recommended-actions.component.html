@@ -1,10 +1,12 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Acciones recomendadas</mat-card-title>
+    <mat-card-title>{{ 'Acciones recomendadas' | translate }}</mat-card-title>
     <mat-card-subtitle>
       <p>
-        El <b>{{ 90 }}%</b> del MAE está compuesto por anomalías que son reparables. El otro <b>{{ 10 }}%</b> requieren
-        sustituir el módulo pudiendo ser reclamadas a garantía del fabricante si aun están en periodo.
+        El <b>{{ fixableLossesPercentage * 100 | number : '1.0-2' }}% de las pérdidas</b> está compuesto por anomalías
+        que son <b>reparables</b>. El otro
+        <b>{{ (1 - fixableLossesPercentage) * 100 | number : '1.0-2' }}%</b> requieren sustituir el módulo pudiendo
+        <b>reclamar garantía del fabricante</b> de ser posible.
       </p>
       <p>Selecciona las que quieras y elige si verlas en el mapa o compartirlas para su revisión en planta.</p>
     </mat-card-subtitle>
@@ -13,37 +15,43 @@
     <mat-accordion>
       <mat-expansion-panel expanded="true">
         <mat-expansion-panel-header>
-          <mat-panel-title> Anomalías reparables </mat-panel-title>
+          <mat-panel-title> {{ 'Anomalías reparables' | translate }} </mat-panel-title>
           <mat-panel-description>{{ 38 }}</mat-panel-description>
         </mat-expansion-panel-header>
         <app-recommended-actions
           [recomendedActions]="fixableFilter(recomendedActions)"
-          (changeRecommendedActions)="changeRecommendedActions.emit($event)"
+          (changeRecommendedActions)="changeCheckbox($event, 'fixable')"
         ></app-recommended-actions>
       </mat-expansion-panel>
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title> Anomalías no reparables </mat-panel-title>
+          <mat-panel-title> {{ 'Anomalías no reparables' | translate }} </mat-panel-title>
           <mat-panel-description>{{ 207 }}</mat-panel-description>
         </mat-expansion-panel-header>
         <div class="panel-content">
           <app-recommended-actions
-            [recomendedActions]="notFixableFilter(recomendedActions)"
-            (changeRecommendedActions)="changeRecommendedActions.emit($event)"
+            [recomendedActions]="unfixableFilter(recomendedActions)"
+            (changeRecommendedActions)="changeCheckbox($event, 'unfixable')"
           ></app-recommended-actions>
         </div>
       </mat-expansion-panel>
     </mat-accordion>
-    <button class="btn" mat-flat-button color="primary" (click)="navigateToMapFiltered()">
+    <button
+      class="btn"
+      mat-flat-button
+      color="primary"
+      (click)="navigateToMapFiltered()"
+      [disabled]="!anyCheckboxSelected"
+    >
       <div class="btn-content">
         <mat-icon>map</mat-icon>
-        <span>Ver seleccionadas en el mapa</span>
+        <span>{{ 'Ver seleccionadas en el mapa' | translate }}</span>
       </div>
     </button>
-    <button class="btn" mat-flat-button color="primary" (click)="openDialog()">
+    <button class="btn" mat-flat-button color="primary" (click)="openDialog()" [disabled]="!anyCheckboxSelected">
       <div class="btn-content">
         <mat-icon>share</mat-icon>
-        <span>Compartir informe seleccionadas</span>
+        <span>{{ 'Compartir informe seleccionadas' | translate }}</span>
       </div>
     </button>
   </mat-card-content>

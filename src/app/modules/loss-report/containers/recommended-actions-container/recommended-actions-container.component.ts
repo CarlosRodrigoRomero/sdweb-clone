@@ -23,6 +23,7 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
   recomendedActions: RecomendedAction[] = [];
   tipos: number[];
   private selectedReport: InformeInterface;
+  fixableLossesPercentage = 0;
 
   private subcriptions = new Subscription();
 
@@ -53,6 +54,9 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
           }
 
           this.recomendedActions = this.calculateRecomendedActions(anomalias).sort((a, b) => b.mae - a.mae);
+
+          // calculamos el porcentaje de pérdidas que se pueden arreglar
+          this.calculateFixableLosses();
         })
     );
   }
@@ -122,6 +126,18 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
         this.tipos[index] = null;
       }
     });
+  }
+
+  private calculateFixableLosses() {
+    let fixableLosses = 0;
+    this.recomendedActions.forEach((action) => {
+      if (action.fixable) {
+        fixableLosses += action.mae;
+      }
+    });
+    const totalLosses = this.recomendedActions.reduce((acc, action) => acc + action.mae, 0);
+
+    this.fixableLossesPercentage = fixableLosses / totalLosses;
   }
 
   ngOnDestroy() {

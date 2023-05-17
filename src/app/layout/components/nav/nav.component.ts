@@ -23,7 +23,7 @@ export class NavComponent implements OnInit {
   id: string;
   isPortfolio = false;
   isShared = false;
-  showPrediction = true;
+  showPrediction = false;
   itemSelected = 'list';
   itemColor = COLOR.light_orange;
 
@@ -56,11 +56,11 @@ export class NavComponent implements OnInit {
         }
 
         // SOLO PARA CLIENTE INTERNACIONAL
-        // if (this.router.url.split('/').includes('eyeSNsK6pKzfNLuacWdn')) {
-        //   this.showPrediction = true;
-        // } else {
-        //   this.showPrediction = false;
-        // }
+        if (this.router.url.split('/').includes('eyeSNsK6pKzfNLuacWdn')) {
+          this.showPrediction = true;
+        } else {
+          this.showPrediction = false;
+        }
       }
     });
   }
