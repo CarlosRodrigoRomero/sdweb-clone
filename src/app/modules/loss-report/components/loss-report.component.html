@@ -3,8 +3,8 @@
     <app-total-loss-container></app-total-loss-container>
     <app-recommended-actions-container></app-recommended-actions-container>
   </div>
-  <div class="column">
-    <app-chart-losses-by-zone></app-chart-losses-by-zone>
-    <div class="empty"></div>
+  <div *ngIf="thereAreZones || thereAreModules" class="column">
+    <app-chart-losses-by-zone *ngIf="thereAreZones"></app-chart-losses-by-zone>
+    <app-chart-losses-by-modules *ngIf="thereAreModules"></app-chart-losses-by-modules>
   </div>
 </div>

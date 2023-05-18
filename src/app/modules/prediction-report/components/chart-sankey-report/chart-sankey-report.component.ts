@@ -29,8 +29,8 @@ export class ChartSankeyReportComponent implements OnInit {
   colors_nodes = [];
   colors = {
     'Módulo en CA (string)': 'red',
-    '2x Substring CA': 'yellow',
-    'Substring en CA': 'orange',
+    '2x diodo en CA': 'yellow',
+    '1x diodo en CA': 'orange',
     'Módulo en CC': 'blue',
     'PID regular': 'black',
   };
@@ -52,7 +52,7 @@ export class ChartSankeyReportComponent implements OnInit {
         //   // stroke: 'black', // Color of the link border.
         //   // strokeWidth: 1, // Thickness of the link border (default 0).
         // },
-        colors: [COLOR.neutralGrey],
+        colors: [COLOR.dark_neutral],
         colorMode: 'gradient',
       },
     },
@@ -159,12 +159,12 @@ export class ChartSankeyReportComponent implements OnInit {
     const data = [
       ['PID fase temprana', 'PID fase temprana.', 1399],
       ['Módulo en CA (string)', 'Módulo en CA (string).', 140],
-      ['2x Substring CA', '2x Substring CA.', 2],
-      ['Substring en CA', 'Substring en CA.', 62],
+      ['2x diodo en CA', '2x diodo en CA.', 2],
+      ['1x diodo en CA', '1x diodo en CA.', 62],
       ['Módulo en CC', 'Módulo en CC.', 1],
       ['Caja conexiones', 'Caja conexiones.', 6],
       ['Sombras', 'Sombras.', 37],
-      ['Nuevas', 'Substring en CA.', 7],
+      ['Nuevas', '1x diodo en CA.', 7],
       ['Nuevas', 'Caja conexiones.', 2],
       ['Nuevas', 'Módulo en CA (string).', 10],
       ['Nuevas', 'PID fase temprana.', 50],

@@ -21,7 +21,12 @@ import { GLOBAL } from '@data/constants/global';
 export class LossesRecommendedActionsComponent {
   @Input() recomendedActions: RecomendedAction[];
   @Input() tipos: number[];
+  @Input() numFixableAnoms: number;
+  @Input() numUnfixableAnoms: number;
+  @Input() fixableLossesPercentage: number;
   @Output() changeRecommendedActions = new EventEmitter<RecomendedAction[]>();
+  @Output() modifiedType = new EventEmitter<string>();
+  anyCheckboxSelected = false;
 
   constructor(
     public dialog: MatDialog,
@@ -34,8 +39,22 @@ export class LossesRecommendedActionsComponent {
     return actions.filter((action) => action.fixable);
   }
 
-  notFixableFilter(actions: RecomendedAction[]): RecomendedAction[] {
+  unfixableFilter(actions: RecomendedAction[]): RecomendedAction[] {
     return actions.filter((action) => !action.fixable);
+  }
+
+  changeCheckbox(event: any, type: string) {
+    let newRecomendedActions: RecomendedAction[] = [];
+    if (type === 'fixable') {
+      newRecomendedActions = this.unfixableFilter(this.recomendedActions);
+    } else {
+      newRecomendedActions = this.fixableFilter(this.recomendedActions);
+    }
+
+    this.changeRecommendedActions.emit([...event, ...newRecomendedActions]);
+
+    // Actualiza anyCheckboxSelected según si hay algún checkbox seleccionado.
+    this.anyCheckboxSelected = this.recomendedActions.some((action) => action.active);
   }
 
   openDialog() {

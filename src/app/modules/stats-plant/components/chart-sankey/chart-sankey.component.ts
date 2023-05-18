@@ -26,7 +26,7 @@ export class ChartSankeyComponent implements AfterViewInit {
       ['Célula caliente', 'Varias células calientes.', 2],
       ['Célula caliente', 'String', 2],
       ['Varias células calientes', 'Varias células calientes.', 28],
-      ['Varias células calientes', 'Substring en CA.', 1],
+      ['Varias células calientes', '1x diodo en CA.', 1],
       ['Substring en CA', 'Substring en CA.', 9],
       ['Substring en CA', '2x Substring en CA.', 2],
       ['Nuevas', 'Célula caliente.', 10],

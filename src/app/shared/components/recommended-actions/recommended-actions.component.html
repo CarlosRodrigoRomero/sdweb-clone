@@ -3,8 +3,9 @@
     *ngFor="let action of recomendedActions"
     [title]="action.title"
     [cantidad]="action.quantity"
-    [perdidas]="action.loss"
+    [perdidas]="action.mae"
     [porcentajeBarra]="action.barPercentage"
+    [fixable]="action.fixable"
     (changeState)="action.active = $event; emitChangedActions()"
   ></app-recommended-action>
 </div>

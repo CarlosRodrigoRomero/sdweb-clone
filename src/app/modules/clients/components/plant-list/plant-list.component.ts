@@ -192,15 +192,27 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   }
 
   navegateNewReport(row: any) {
+    let initialLocalView = 'map';
+    initialLocalView = this.checkLocalInitialView();
+
     // provisional - no abre ningun informe de fijas anterior al 1/05/2021 salvo DEMO
     if (row.tipo === 'seguidores') {
-      this.router.navigate(['clients/tracker/' + row.plantaId]);
+      this.router.navigate(['clients/tracker/' + row.plantaId + '/' + initialLocalView]);
     } else {
       if (row.ultimaInspeccion > GLOBAL.newReportsDate || row.plantaId === 'egF0cbpXnnBnjcrusoeR') {
-        this.router.navigate(['clients/fixed/' + row.plantaId]);
+        this.router.navigate(['clients/fixed/' + row.plantaId + '/' + initialLocalView]);
       } else {
         this.openSnackBar();
       }
+    }
+  }
+
+  private checkLocalInitialView(): string {
+    const initialLocalView = localStorage.getItem('initialViewReports');
+    if (initialLocalView) {
+      return initialLocalView;
+    } else {
+      return 'map';
     }
   }
 

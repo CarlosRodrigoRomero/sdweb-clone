@@ -398,6 +398,21 @@ export class ReportControlService {
     return mae;
   }
 
+  setMae(anomalias: Anomalia[], informe: InformeInterface, maeType?: string) {
+    const mae = this.getMae(anomalias, informe.numeroModulos);
+
+    let maeField = 'mae';
+    if (maeType) {
+      maeField = maeType;
+    }
+
+    this.informeService.updateInformeField(informe.id, maeField, mae);
+  }
+
+  getMae(anomalias: Anomalia[], numModules: number): number {
+    return anomalias.map((anom) => GLOBAL.pcPerdidas[anom.tipo]).reduce((a, b) => a + b, 0) / numModules;
+  }
+
   private checkFixedPowerLossInformes(): void {
     if (this.allAnomalias.length > 0) {
       this.informes.forEach((informe) => {
@@ -475,6 +490,17 @@ export class ReportControlService {
     if (anomaliasInforme.length > 0) {
       // tslint:disable-next-line: triple-equals
       const celCals = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
+      cc = celCals.length / informe.numeroModulos;
+    }
+
+    this.informeService.updateInformeField(informe.id, 'cc', cc);
+  }
+
+  setCC(anomalias: Anomalia[], informe: InformeInterface) {
+    let cc = 0;
+    if (anomalias.length > 0) {
+      const celCals = anomalias.filter((anom) => anom.tipo === 8 || anom.tipo === 9);
 
       cc = celCals.length / informe.numeroModulos;
     }
@@ -629,19 +655,23 @@ export class ReportControlService {
     }
   }
 
-  sortLocAreas(locAreas: LocationAreaInterface[]) {
+  sortLocAreas(locAreas: LocationAreaInterface[], index?: number): LocationAreaInterface[] {
+    if (index === undefined) {
+      index = 0;
+    }
+
     // comprobamos si el nombre de las zonas es un numero
-    if (!isNaN(parseFloat(locAreas[0].globalCoords[0]))) {
-      locAreas = locAreas.sort((a, b) => parseFloat(a.globalCoords[0]) - parseFloat(b.globalCoords[0]));
-    } else if (locAreas[0].globalCoords[0].match(/\d+/g) !== null) {
+    if (!isNaN(parseFloat(locAreas[0].globalCoords[index]))) {
+      locAreas = locAreas.sort((a, b) => parseFloat(a.globalCoords[index]) - parseFloat(b.globalCoords[0]));
+    } else if (locAreas[0].globalCoords[index].match(/\d+/g) !== null) {
       // si no es un numero buscamos si tiene alguno incluido para ordenarlo
       locAreas.sort((a, b) => {
         let numsA = '';
-        a.globalCoords[0].match(/\d+/g).forEach((element) => {
+        a.globalCoords[index].match(/\d+/g).forEach((element) => {
           numsA += element;
         });
         let numsB = '';
-        b.globalCoords[0].match(/\d+/g).forEach((element) => {
+        b.globalCoords[index].match(/\d+/g).forEach((element) => {
           numsB += element;
         });
 

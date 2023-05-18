@@ -28,6 +28,8 @@ export class ZonesService {
   thereAreZones$ = new BehaviorSubject<boolean>(this._thereAreZones);
   private _thereAreLargestZones = false;
   thereAreLargestZones$ = new BehaviorSubject<boolean>(this._thereAreLargestZones);
+  private _thereAreModules = false;
+  thereAreModules$ = new BehaviorSubject<boolean>(this._thereAreModules);
 
   constructor(private plantaService: PlantaService, private olMapService: OlMapService) {}
 
@@ -50,6 +52,10 @@ export class ZonesService {
             this.zones = this.zonesBySize.flat();
           }
 
+          // comprobamos si hay más de un modelo de módulos
+          if (locAreas.filter((locArea) => locArea.modulo !== undefined && locArea.modulo !== null).length > 0) {
+            this.thereAreModules = true;
+          }
           initService(true);
         });
     });
@@ -246,6 +252,17 @@ export class ZonesService {
     }
   }
 
+  getUniqueIndexZones(locAreas: LocationAreaInterface[], indexSelected: number): LocationAreaInterface[] {
+    if (indexSelected === undefined || indexSelected === null) {
+      indexSelected = 0;
+    }
+
+    return locAreas.filter(
+      (locA, index, locAs) =>
+        locAs.map((loc) => loc.globalCoords[indexSelected]).indexOf(locA.globalCoords[indexSelected]) === index
+    );
+  }
+
   isZoneInsideLargestZone(zone: LocationAreaInterface, largestZone: LocationAreaInterface): boolean {
     const coordsLargestZone = this.olMapService.pathToCoordinate(largestZone.path);
     const polygonLargestZone = new Polygon([coordsLargestZone]);
@@ -303,5 +320,14 @@ export class ZonesService {
   set thereAreLargestZones(value: boolean) {
     this._thereAreLargestZones = value;
     this.thereAreLargestZones$.next(value);
+  }
+
+  get thereAreModules(): boolean {
+    return this._thereAreModules;
+  }
+
+  set thereAreModules(value: boolean) {
+    this._thereAreModules = value;
+    this.thereAreModules$.next(value);
   }
 }

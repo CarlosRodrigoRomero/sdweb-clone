@@ -136,7 +136,7 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
               ? Math.max(...maeTotalData) * 1.1
               : Math.max(...maeTotalData) + 1.1,
         },
-        colors: ['transparent', COLOR.dark_orange, COLOR.neutralGrey],
+        colors: ['transparent', COLOR.dark_orange, COLOR.dark_neutral],
         legend: {
           show: true,
           position: 'top',
@@ -145,7 +145,7 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
         //   type: 'gradient',
         //   gradient: {
         //     shade: 'dark',
-        //     gradientToColors: [COLOR.neutralGrey, COLOR.lightOrange],
+        //     gradientToColors: [COLOR.light_neutral, COLOR.light_orange],
         //     shadeIntensity: 1,
         //     type: 'horizontal',
         //     opacityFrom: 1,
@@ -190,11 +190,14 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          let color = COLOR.dark_orange;
+          let highlightColor = COLOR.dark_orange;
+          let neutralColor = COLOR.dark_neutral;
           if (theme === 'dark-theme') {
-            color = COLOR.dark_orange;
+            highlightColor = COLOR.dark_orange;
+            neutralColor = COLOR.dark_neutral;
           } else {
-            color = COLOR.light_orange;
+            highlightColor = COLOR.light_orange;
+            neutralColor = COLOR.light_neutral;
           }
 
           this.chartOptions = {
@@ -217,7 +220,7 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
                 foreColor: this.themeService.textColor,
               },
             },
-            colors: ['transparent', color, COLOR.neutralGrey],
+            colors: ['transparent', highlightColor, neutralColor],
           };
         }
       })

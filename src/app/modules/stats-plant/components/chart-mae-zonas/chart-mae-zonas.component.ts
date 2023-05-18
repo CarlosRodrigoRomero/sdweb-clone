@@ -107,6 +107,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
 
             return this.informeService.getDateLabelsInformes(this.informesIdList);
           }),
+          take(1),
           switchMap((dateLabels) => {
             this.dateLabels = dateLabels;
 

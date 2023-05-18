@@ -54,14 +54,14 @@ export let GLOBAL = {
     '0',
     'PC',
     'VPV',
-    'Substring en CA', // 3
+    '1x diodo en CA', // 3
     'String',
     'Módulo en CA', // 5
-    'Substring en CC', // 6
+    'Diodo en CC', // 6
     'Módulo en CC', // 7
     'Célula', // 8
     'Varias células', // 9
-    '2x Substring CA', // 10
+    '2x diodo en CA', // 10
     'Suciedad', // 11
     'Vidrio roto', // 12
     'Resist. anómala',
@@ -74,20 +74,20 @@ export let GLOBAL = {
     'PID regular', // 20
     'PID irregular', // 21
   ],
-  fixableTypes: [3, 5, 10, 11, 14, 15, 17],
+  fixableTypes: [6, 11, 14, 15, 17, 18, 19, 20, 21],
   labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [
     '0', // Para que coincida el indice con el tipo de anomalia
     'Punto caliente', // 1 - Nos
     'Varios puntos calientes', // 2
-    'Substring en circuito abierto', // 3
+    '1x diodo en circuito abierto', // 3
     'String', // 4
     'Módulo en circuito abierto', // 5
-    'Substring en cortocircuito', // 6
+    'Diodo en cortocircuito', // 6
     'Módulo en cortocircuito', // 7
     'Célula caliente', // 8
     'Varias células calientes', // 9
-    '2x substrings en circuito abierto', // 10
+    '2x diodo en circuito abierto', // 10
     'Células calientes debido a suciedad', // 11
     'Vidrio roto', // 12
     'Resistencia anómala', // 13
@@ -152,20 +152,20 @@ export let GLOBAL = {
     0, // Para que coincida el indice con el tipo de anomalia
     0, // "Punto caliente", // 1
     0, // "Varios puntos calientes", // 2
-    0.33, // "Substring en CA", // 3
+    0.33, // "1x diodo en CA", // 3
     0, // "String", // 4
     1, // "Módulo en CA", // 5
-    0.33, // "Substring en CC", // 6
+    0.33, // "Diodo en CC", // 6
     0.85, // "Módulo en CC", // 7
     0.02, // "Célula caliente", // 8
     0.03, // "Varias células calientes", // 9
-    0.66, // "2X substring en CA", // 10
+    0.66, // "2X diodo en CA", // 10
     0.02, // "Células calientes debido a suciedad", // 11
     0.85, // "Vidrio roto", // 12
     0, // "Transfer resistance", // 13
     0, // "Caja de conexiones caliente", // 14
     0.02, // "Módulo afectado por sombras" // 15
-    0, // Yellowing //16
+    0, // Yellowing // 16
     1, // "String en CA", // 17
     0.15, // "PID fase temprana" // 18
     0, // Falta modulo // 19
@@ -179,10 +179,10 @@ export let GLOBAL = {
     17, // 'Módulo en CA (string)'
     4, // 'String'
     5, // 'Módulo en CA'
-    10, // '2x Substring CA'
-    3, // 'Substring en CA'
+    10, // '2x diodo CA'
+    3, // '1x Diodo en CA'
     7, // 'Módulo en CC'
-    6, // 'Substring en CC'
+    6, // 'Diodo en CC'
     12, // 'Vidrio roto'
     13, // 'Resist. anómala'
     14, // 'Caja conexiones'

@@ -176,7 +176,7 @@ export class DemoService {
     const warnings: string[] = [];
     if (plantsData.nombre === 'Planta 1') {
       warnings.push('3476 módulos en circuito abierto (string)');
-      warnings.push('446 módulos con substring en circuito abierto');
+      warnings.push('446 módulos con 1x diodo en circuito abierto');
       warnings.push('63% de anomalías en la fila 1 (más alejada del suelo)');
 
       plantsData.warnings = warnings;
@@ -188,14 +188,14 @@ export class DemoService {
     }
     if (plantsData.nombre === 'Planta 3') {
       warnings.push('573 módulos en circuito abierto (string)');
-      warnings.push('147 módulos con substring en circuito abierto');
+      warnings.push('147 módulos con 1x diodo en circuito abierto');
       warnings.push('6 módulos con células calientes con gradiente mayor de 40ºC');
 
       plantsData.warnings = warnings;
     }
     if (plantsData.nombre === 'Demo') {
       warnings.push('17 módulos en circuito abierto (string)');
-      warnings.push('2 módulos con substring en circuito abierto');
+      warnings.push('2 módulos con 1x diodo en circuito abierto');
       warnings.push('4 módulos con células calientes con gradiente mayor de 40ºC');
 
       plantsData.warnings = warnings;
