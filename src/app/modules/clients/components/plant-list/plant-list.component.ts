@@ -49,7 +49,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   public dataSource = new MatTableDataSource<PlantsData>();
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
-  sortedColumn = 'mae';
+  sortedColumn = 'fixablePower';
   theme: string;
   private screenWidth: number;
 

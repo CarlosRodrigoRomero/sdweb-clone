@@ -5,9 +5,9 @@
   align-items: center;
 }
 
-.grid {
+.content {
   display: grid;
-  grid-template-columns: 100%;
+  grid-template-columns: 2fr 1fr;
   padding: 0 2rem;
   gap: 1rem;
 }
@@ -57,10 +57,16 @@
   .barra-titulo {
     display: none;
   }
+
+  .content {
+    display: flex;
+    gap: unset;
+    grid-template-columns: none;
+  }
 }
 
 @media (max-width: 1000px) {
-  .grid {
+  .content {
     display: grid;
     padding: 0 1rem 1rem;
   }
