@@ -14,9 +14,9 @@
   padding-bottom: 6px;
 }
 
-:host ::ng-deep td.mat-cell:first-of-type {
+/* :host ::ng-deep td.mat-cell:first-of-type {
   padding-left: 0px;
-}
+} */
 
 /* ocultamos la barra vertical overscrool */
 ::-webkit-scrollbar {
@@ -87,7 +87,7 @@ h4 {
   }
 
   .tabla-container {
-    max-height: calc(100vh - 56px - 16px - 32px - 36px - 62px);
+    max-height: calc(100vh - 56px - 16px - 32px - 36px - 64px);
   }
 
   .mat-column-color {
@@ -104,13 +104,5 @@ h4 {
 
   .mat-column-inspeccionesAntiguas {
     display: none;
-  }
-
-  .mobile-left-header {
-    margin-left: 16px;
-  }
-
-  .mobile-left-cell {
-    margin-left: 16px;
   }
 }

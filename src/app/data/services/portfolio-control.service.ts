@@ -171,11 +171,17 @@ export class PortfolioControlService {
               }
             });
 
+            let lastReportDate = 0;
             this.listaPlantas.forEach((planta) => {
               const informesPlanta = this.listaInformes.filter((inf) => inf.plantaId === planta.id);
               const informeReciente = informesPlanta.reduce((prev, current) =>
                 prev.fecha > current.fecha ? prev : current
               );
+
+              // obtenemos la fecha del informe mas reciente
+              if (new Date(informeReciente.fecha) > new Date(lastReportDate)) {
+                lastReportDate = informeReciente.fecha;
+              }
 
               // añadimos el mae del informe mas reciente de cada planta
               // los antiguos de fijas los devidimos por 100

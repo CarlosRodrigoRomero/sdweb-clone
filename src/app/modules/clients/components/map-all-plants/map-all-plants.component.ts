@@ -141,7 +141,8 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
         informeReciente,
       });
 
-      const iconSrc = this.getMaeIcon(informeReciente.mae);
+      const iconSrc = 'assets/icons/location-pin-dark-unhover.png';
+      // const iconSrc = this.getMaeIcon(informeReciente.mae);
 
       feature.setStyle(
         new Style({
@@ -309,7 +310,8 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
     if (hovered) {
       return (feature: Feature) => {
         if (feature !== undefined) {
-          const iconSrc = 'assets/icons/location-pin-hovered.png';
+          const iconSrc = 'assets/icons/location-pin-dark-hover.png';
+          // const iconSrc = 'assets/icons/location-pin-hovered.png';
 
           return new Style({
             image: new Icon({
@@ -323,7 +325,8 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
     } else {
       return (feature: Feature) => {
         if (feature !== undefined) {
-          const iconSrc = this.getMaeIcon(feature.getProperties().informeReciente.mae);
+          const iconSrc = 'assets/icons/location-pin-dark-unhover.png';
+          // const iconSrc = this.getMaeIcon(feature.getProperties().informeReciente.mae);
 
           return new Style({
             image: new Icon({
