@@ -3,7 +3,7 @@ export interface RecomendedAction {
   type: number;
   title: string;
   quantity: number;
-  loss: number;
+  mae: number;
   barPercentage: string;
   active: boolean;
 }

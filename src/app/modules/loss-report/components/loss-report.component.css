@@ -4,13 +4,7 @@
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 1rem;
-}
-
-.empty {
-  width: 100%;
-  height: fit-content;
-  min-height: 500px;
-  background-color: red;
+  padding-bottom: 1rem;
 }
 
 .column {

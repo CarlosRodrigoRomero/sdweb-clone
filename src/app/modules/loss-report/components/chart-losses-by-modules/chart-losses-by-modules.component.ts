@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { switchMap, take } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 import {
   ApexAxisChartSeries,
@@ -9,69 +9,65 @@ import {
   ChartComponent,
   ApexDataLabels,
   ApexPlotOptions,
-  ApexResponsive,
-  ApexXAxis,
+  ApexYAxis,
   ApexLegend,
+  ApexStroke,
+  ApexXAxis,
   ApexFill,
   ApexTooltip,
-  ApexStroke,
-  ApexYAxis,
+  ApexTitleSubtitle,
 } from 'ng-apexcharts';
 
-import { TranslateService } from '@ngx-translate/core';
-
-import { ThemeService } from '@data/services/theme.service';
+import { ModuleService } from '@data/services/module.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { PlantaService } from '@data/services/planta.service';
+import { ThemeService } from '@data/services/theme.service';
+import { ZonesService } from '@data/services/zones.service';
 
-import { LocationAreaInterface } from '@core/models/location';
 import { Anomalia } from '@core/models/anomalia';
-import { InformeInterface } from '@core/models/informe';
-
-import { COLOR } from '@data/constants/color';
 import { GLOBAL } from '@data/constants/global';
+import { COLOR } from '@data/constants/color';
+import { Subscription } from 'rxjs';
+import { InformeInterface } from '@core/models/informe';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
   dataLabels: ApexDataLabels;
-  responsive: ApexResponsive[];
-  xaxis: ApexXAxis;
-  yaxis: ApexYAxis;
-  legend: ApexLegend;
-  fill: ApexFill;
-  stroke: ApexStroke;
-  tooltip: ApexTooltip;
-  colors: string[];
   plotOptions: ApexPlotOptions;
+  yaxis: ApexYAxis;
+  xaxis: ApexXAxis;
+  fill: ApexFill;
+  tooltip: ApexTooltip;
+  stroke: ApexStroke;
+  legend: ApexLegend;
+  title: ApexTitleSubtitle;
+  colors: string[];
 };
 
 @Component({
-  selector: 'app-chart-losses-by-zone',
-  templateUrl: './chart-losses-by-zone.component.html',
-  styleUrls: ['./chart-losses-by-zone.component.css'],
+  selector: 'app-chart-losses-by-modules',
+  templateUrl: './chart-losses-by-modules.component.html',
+  styleUrls: ['./chart-losses-by-modules.component.css'],
 })
-export class ChartLossesByZoneComponent implements OnInit {
+export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
   @ViewChild('chart') chart: ChartComponent;
-  chartOptions: Partial<ChartOptions>;
-  chartData: number[][];
-  zones: LocationAreaInterface[];
-  allAnomalias: Anomalia[] = [];
-  theme: string;
+  public chartOptions: Partial<ChartOptions>;
+  modulesLabel: string[];
   private seriesLabels = ['Reparable', 'No reparable'];
+  chartData: number[][];
   chartLoaded = false;
-  private maeLabel: string;
-  private indexLargestZones = 0;
-  private zonesLabels: string[];
+  private anomalias: Anomalia[];
+  private theme: string;
   private selectedInforme: InformeInterface;
-  titleZone = 'Zona';
+  private maeLabel: string;
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
-    private themeService: ThemeService,
+    private zonesService: ZonesService,
+    private moduleService: ModuleService,
     private reportControlService: ReportControlService,
-    private plantaService: PlantaService,
+    private themeService: ThemeService,
     private translate: TranslateService
   ) {}
 
@@ -83,30 +79,18 @@ export class ChartLossesByZoneComponent implements OnInit {
         this.maeLabel = res + ' (%)';
       });
 
+    const locAreasWithModules = this.zonesService.locAreas.filter(
+      (locArea) => locArea.modulo !== null && locArea.modulo !== undefined
+    );
+    this.modulesLabel = this.moduleService.getModuleBrandLabels(locAreasWithModules);
+
+    this.anomalias = this.reportControlService.allAnomalias.filter((anom) =>
+      this.moduleService.checkModule(anom.modulo)
+    );
+
     this.subscriptions.add(
-      this.plantaService
-        .getLocationsArea(this.reportControlService.plantaId)
+      this.themeService.themeSelected$
         .pipe(
-          take(1),
-          switchMap((locAreas) => {
-            // obtenemos las zonas mayores
-            if (this.reportControlService.planta.sizeZonesClusters !== undefined) {
-              this.indexLargestZones = this.reportControlService.planta.sizeZonesClusters;
-            }
-
-            this.zones = locAreas.filter(
-              (locArea) =>
-                locArea.globalCoords[this.indexLargestZones] !== undefined &&
-                locArea.globalCoords[this.indexLargestZones] !== null &&
-                locArea.globalCoords[this.indexLargestZones] !== ''
-            );
-
-            this.zonesLabels = this.zones.map((zone) => zone.globalCoords[this.indexLargestZones]);
-
-            this.allAnomalias = this.reportControlService.allAnomalias;
-
-            return this.themeService.themeSelected$;
-          }),
           take(1),
           switchMap((theme) => {
             this.theme = theme;
@@ -119,11 +103,13 @@ export class ChartLossesByZoneComponent implements OnInit {
 
           this.chartData = [];
 
-          const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
+          const anomaliasInforme = this.anomalias.filter((anom) => anom.informeId === informeId);
 
-          // añadimos las anomalias reaprables y las no reparables
-          this.chartData.push(this.calculateChartData(anomaliasInforme, true));
-          this.chartData.push(this.calculateChartData(anomaliasInforme));
+          const fixableAnoms = anomaliasInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+          this.chartData.push(this.calculateChartData(fixableAnoms));
+
+          const unfixableAnoms = anomaliasInforme.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipo));
+          this.chartData.push(this.calculateChartData(unfixableAnoms));
 
           this.sortChartData();
 
@@ -171,20 +157,12 @@ export class ChartLossesByZoneComponent implements OnInit {
     );
   }
 
-  private calculateChartData(anomalias: Anomalia[], fixables = false): number[] {
+  private calculateChartData(anomalias: Anomalia[]): number[] {
     const result = Array<number>();
-    this.zones.forEach((zone) => {
-      // tslint:disable-next-line: triple-equals
-      const anomsZone = anomalias.filter(
-        (anom) => anom.globalCoords[this.indexLargestZones] == zone.globalCoords[this.indexLargestZones]
-      );
+    this.modulesLabel.forEach((label) => {
+      const labelAnoms = anomalias.filter((anom) => this.moduleService.getModuleBrandLabel(anom.modulo) === label);
 
-      let filtered: Anomalia[] = anomsZone.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipo));
-      if (fixables) {
-        filtered = anomsZone.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
-      }
-
-      result.push(this.getMAE(filtered));
+      result.push(this.getMAE(labelAnoms));
     });
 
     return result;
@@ -209,22 +187,21 @@ export class ChartLossesByZoneComponent implements OnInit {
     this.chartData = [indices.map((i) => this.chartData[0][i]), indices.map((i) => this.chartData[1][i])];
 
     // ordenamos tambien los labels
-    this.zonesLabels = indices.map((i) => this.zonesLabels[i]);
+    this.modulesLabel = indices.map((i) => this.modulesLabel[i]);
   }
 
   private initChart(theme: string): void {
-    const series = this.seriesLabels.map((label, index) => {
-      return { name: label, data: this.chartData[index] };
+    const series = this.seriesLabels.map((dateLabel, index) => {
+      return { name: dateLabel, data: this.chartData[index] };
     });
 
-    if (this.reportControlService.nombreGlobalCoords.length > 0) {
-      this.translate
-        .get(this.reportControlService.nombreGlobalCoords[this.indexLargestZones])
-        .pipe(take(1))
-        .subscribe((res: string) => {
-          this.titleZone = res;
-        });
-    }
+    let titleXAxis = 'Marca módulo';
+    this.translate
+      .get(titleXAxis)
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        titleXAxis = res;
+      });
 
     // espera a que el dataPlot tenga datos
     if (this.chartData[0] !== undefined) {
@@ -260,20 +237,20 @@ export class ChartLossesByZoneComponent implements OnInit {
           // colors,
         },
         // stroke: {
-        //   show: false,
+        //   show: true,
         //   width: 2,
         //   colors: ['transparent'],
         // },
         xaxis: {
-          categories: this.zonesLabels,
+          categories: this.modulesLabel,
           title: {
-            text: this.titleZone,
+            text: titleXAxis,
           },
         },
         colors: [COLOR.dark_orange, COLOR.dark_neutral],
         yaxis: {
           decimalsInFloat: 2,
-          forceNiceScale: true,
+          // forceNiceScale: true,
           title: {
             text: this.maeLabel,
           },
@@ -283,7 +260,7 @@ export class ChartLossesByZoneComponent implements OnInit {
           x: {
             show: true,
             formatter: (v) => {
-              return this.titleZone + ' ' + v;
+              return titleXAxis + ' ' + v;
             },
           },
           y: {

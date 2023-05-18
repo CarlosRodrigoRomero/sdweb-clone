@@ -141,7 +141,7 @@ export class HotkeysClassificationComponent implements OnInit {
             return false; // Prevent bubbling
           },
           undefined,
-          'ctrl+3: 2x substring en circuito abierto'
+          'ctrl+3: 2x diodo en circuito abierto'
         )
       );
       this.hotkeysService.add(
@@ -160,7 +160,7 @@ export class HotkeysClassificationComponent implements OnInit {
             return false; // Prevent bubbling
           },
           undefined,
-          'shift+3: Substring en cortocircuito'
+          'shift+3: Diodo en cortocircuito'
         )
       );
       this.hotkeysService.add(

@@ -7,6 +7,7 @@
 
 .row {
   display: flex;
+  flex-wrap: nowrap;
   width: 100%;
   justify-content: space-around;
 }
@@ -19,7 +20,7 @@
 }
 
 .data-title {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 300;
 }
 
@@ -28,6 +29,5 @@
 }
 
 .data-secondary-value {
-  font-size: 1.5rem;
-  font-weight: 300;
+  font-size: 1.6rem;
 }

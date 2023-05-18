@@ -26,8 +26,8 @@ export class ChartSankeyPowerReportComponent implements OnInit {
   colors_nodes = [];
   colors = {
     'Módulo en CA (string)': 'red',
-    '2x Substring CA': 'yellow',
-    'Substring en CA': 'orange',
+    '2x diodo en CA': 'yellow',
+    '1x diodo en CA': 'orange',
     'Módulo en CC': 'blue',
     'PID regular': 'black',
   };
@@ -49,7 +49,7 @@ export class ChartSankeyPowerReportComponent implements OnInit {
         //   // stroke: 'black', // Color of the link border.
         //   // strokeWidth: 1, // Thickness of the link border (default 0).
         // },
-        colors: [COLOR.neutralGrey],
+        colors: [COLOR.dark_neutral],
         colorMode: 'gradient',
       },
     },

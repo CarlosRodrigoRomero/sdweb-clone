@@ -1,44 +1,43 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+import { Subscription } from 'rxjs';
 
 import { ReportControlService } from '@data/services/report-control.service';
-import { FilterService } from '@data/services/filter.service';
-import { Anomalia } from '@core/models/anomalia';
-import { Seguidor } from '@core/models/seguidor';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-total-loss-container',
   templateUrl: './total-loss-container.component.html',
   styleUrls: ['./total-loss-container.component.css'],
 })
-export class TotalLossContainerComponent implements OnInit {
-  totalLossPercentage: number;
-  totalLoss: number;
-  totalFixedLossPercentage: number;
-  totalFixedLoss: number;
-  totalNotFixedLossPercentage: number;
-  totalNotFixedLoss: number;
+export class TotalLossContainerComponent implements OnInit, OnDestroy {
+  totalMae: number;
+  fixableMae: number;
+  numTotalAnoms: number;
+  numFixableAnoms: number;
 
-  constructor(private filterService: FilterService, private reportControlService: ReportControlService) {}
+  private subscriptions: Subscription = new Subscription();
+
+  constructor(private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    this.filterService.filteredElements$.subscribe((elems) => {
-      const selectedReport = this.reportControlService.informes.find(
-        (informe) => informe.id === this.reportControlService.selectedInformeId
-      );
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+        const selectedReport = this.reportControlService.informes.find((informe) => informe.id === informeId);
 
-      let anomalias: Anomalia[] = [];
-      if (this.reportControlService.plantaFija) {
-        anomalias = elems as Anomalia[];
-      } else {
-        anomalias = (elems as Seguidor[]).map((seguidor) => seguidor.anomaliasCliente).flat();
-      }
+        const anomaliasInforme = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId);
+        this.numTotalAnoms = anomaliasInforme.length;
+        const fixableAnoms = anomaliasInforme.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo));
+        this.numFixableAnoms = fixableAnoms.length;
 
-      this.totalLossPercentage = this.reportControlService.getLossReport(anomalias, selectedReport);
-      this.totalLoss = this.totalLossPercentage * this.reportControlService.planta.potencia;
-      this.totalFixedLossPercentage = this.reportControlService.getFixedLossReport(anomalias, selectedReport);
-      this.totalFixedLoss = this.totalFixedLossPercentage * this.reportControlService.planta.potencia;
-      this.totalNotFixedLossPercentage = this.totalLossPercentage - this.totalFixedLossPercentage;
-      this.totalNotFixedLoss = this.totalNotFixedLossPercentage * this.reportControlService.planta.potencia;
-    });
+        this.totalMae = this.reportControlService.getMae(anomaliasInforme, selectedReport.numeroModulos);
+        this.fixableMae = this.reportControlService.getMae(fixableAnoms, selectedReport.numeroModulos);
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

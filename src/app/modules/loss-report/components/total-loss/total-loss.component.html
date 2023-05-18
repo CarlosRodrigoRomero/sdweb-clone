@@ -1,23 +1,33 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Pérdidas totales</mat-card-title>
+    <mat-card-title>Estado general</mat-card-title>
+    <mat-card-subtitle
+      ><p>MAE y número de anomalías totales y su parte reparable.</p>
+      <p>
+        MAE significa Módulos Apagados Equivalentes y ofrece una estimación de pérdidas. El MAE reparable solo tiene en
+        cuanta la anomalías que son reparables.
+      </p>
+    </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content class="card-content">
-    <div class="data">
-      <span class="data-title">Totales</span>
-      <span class="data-value">{{ totalLoss | number : '1.0-2' }} MW</span>
-      <span class="data-secondary-value">{{ totalLossPercentage * 100 | number : '1.0-2' }}%</span>
+    <div class="row">
+      <div class="data">
+        <span class="data-title">MAE total</span>
+        <span class="data-value">{{ totalMae * 100 | number : '1.0-2' }}%</span>
+      </div>
+      <div class="data">
+        <span class="data-title">MAE reparable</span>
+        <span class="data-value highlight-color">{{ fixableMae * 100 | number : '1.0-2' }}%</span>
+      </div>
     </div>
     <div class="row">
       <div class="data">
-        <span class="data-title">Reparables</span>
-        <span class="data-value">{{ totalFixedLoss | number : '1.0-2' }} MW</span>
-        <span class="data-secondary-value">{{ totalFixedLossPercentage * 100 | number : '1.0-2' }}%</span>
+        <span class="data-title">Nº total anomalías</span>
+        <span class="data-secondary-value">{{ numTotalAnoms }}</span>
       </div>
       <div class="data">
-        <span class="data-title">No reparables</span>
-        <span class="data-value">{{ totalNotFixedLoss | number : '1.0-2' }} MW</span>
-        <span class="data-secondary-value">{{ totalNotFixedLossPercentage * 100 | number : '1.0-2' }}%</span>
+        <span class="data-title">Nº anomalías reparables</span>
+        <span class="data-secondary-value highlight-color">{{ numFixableAnoms }}</span>
       </div>
     </div>
   </mat-card-content>

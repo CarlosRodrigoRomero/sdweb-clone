@@ -23,6 +23,9 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
   recomendedActions: RecomendedAction[] = [];
   tipos: number[];
   private selectedReport: InformeInterface;
+  fixableLossesPercentage = 0;
+  numFixableAnoms = 0;
+  numUnfixableAnoms = 0;
 
   private subcriptions = new Subscription();
 
@@ -34,26 +37,22 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subcriptions.add(
-      this.reportControlService.selectedInformeId$
-        .pipe(
-          switchMap((id) => {
-            this.selectedReport = this.reportControlService.informes.find((informe) => informe.id === id);
+      this.reportControlService.selectedInformeId$.subscribe((id) => {
+        this.selectedReport = this.reportControlService.informes.find((informe) => informe.id === id);
 
-            return this.filterService.filteredElements$;
-          })
-        )
-        .subscribe((elems) => {
-          let anomalias: Anomalia[] = [];
-          if (this.reportControlService.plantaFija) {
-            anomalias = elems as Anomalia[];
-          } else {
-            elems.forEach((elem) => {
-              anomalias = anomalias.concat((elem as Seguidor).anomaliasCliente);
-            });
-          }
+        const anomalias = this.reportControlService.allAnomalias;
 
-          this.recomendedActions = this.calculateRecomendedActions(anomalias).sort((a, b) => b.loss - a.loss);
-        })
+        // obtenemos el numero de anomalias reparables
+        this.numFixableAnoms = this.getNumFixableAnoms(anomalias);
+        this.numUnfixableAnoms = anomalias.length - this.numFixableAnoms;
+
+        this.recomendedActions = this.calculateRecomendedActions(anomalias).sort((a, b) => b.mae - a.mae);
+
+        // calculamos el porcentaje de pérdidas que se pueden arreglar
+        this.calculateFixableLosses();
+
+        return this.filterService.filteredElements$;
+      })
     );
   }
 
@@ -62,7 +61,7 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
     let types: number[] = [];
     let titles: string[] = [];
     let quantities: number[] = [];
-    let losses: number[] = [];
+    let maes: number[] = [];
 
     GLOBAL.pcDescripcion.forEach((label, index) => {
       if (!GLOBAL.tipos_no_utilizados.includes(index)) {
@@ -72,11 +71,11 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
         types.push(index);
         titles.push(label);
         quantities.push(quantity);
-        losses.push(Number(this.getTypeLosses(quantity, index).toFixed(2)));
+        maes.push(Number(this.getTypeLosses(quantity, index)));
       }
     });
 
-    const maxLoss = Math.max(...losses);
+    const maxLoss = Math.max(...maes);
 
     const recomendedActions: RecomendedAction[] = [];
     fixables.forEach((fixable, index) => {
@@ -85,8 +84,8 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
         type: types[index],
         title: titles[index],
         quantity: quantities[index],
-        loss: losses[index],
-        barPercentage: `${(losses[index] / maxLoss) * 100}%`,
+        mae: maes[index],
+        barPercentage: `${(maes[index] / maxLoss) * 100}%`,
         active: false,
       };
       recomendedActions.push(recomendedAction);
@@ -95,12 +94,18 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
     return recomendedActions;
   }
 
+  private getNumFixableAnoms(anomalias: Anomalia[]): number {
+    const fixableAnoms = anomalias.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo));
+
+    return fixableAnoms.length;
+  }
+
   private getTypeLosses(quantity: number, index: number): number {
     const totalLoss = quantity * GLOBAL.pcPerdidas[index];
 
     const lossPercentage = totalLoss / this.selectedReport.numeroModulos;
 
-    return lossPercentage * this.reportControlService.planta.potencia;
+    return lossPercentage;
   }
 
   changeActions(event: any) {
@@ -122,6 +127,18 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
         this.tipos[index] = null;
       }
     });
+  }
+
+  private calculateFixableLosses() {
+    let fixableLosses = 0;
+    this.recomendedActions.forEach((action) => {
+      if (action.fixable) {
+        fixableLosses += action.mae;
+      }
+    });
+    const totalLosses = this.recomendedActions.reduce((acc, action) => acc + action.mae, 0);
+
+    this.fixableLossesPercentage = fixableLosses / totalLosses;
   }
 
   ngOnDestroy() {
