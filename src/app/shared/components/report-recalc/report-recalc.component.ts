@@ -14,6 +14,7 @@ import { ZonesService } from '@data/services/zones.service';
 import { InformeInterface } from '@core/models/informe';
 import { Seguidor } from '@core/models/seguidor';
 import { Anomalia } from '@core/models/anomalia';
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-report-recalc',
@@ -44,19 +45,15 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
   }
 
   recalMAEyCC() {
-    if (this.reportControlService.plantaFija) {
-      const anomaliasInforme = this.reportControlService.allAnomalias.filter(
-        (anom) => anom.informeId === this.selectedInforme.id
-      );
-      this.reportControlService.setMaeInformeFija(anomaliasInforme, this.selectedInforme);
-      this.reportControlService.setCCInformeFija(anomaliasInforme, this.selectedInforme);
-    } else {
-      const allSeguidores = this.reportControlService.allFilterableElements as Seguidor[];
-      const seguidoresInforme = allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
+    const anomaliasInforme = this.reportControlService.allAnomalias.filter(
+      (anom) => anom.informeId === this.selectedInforme.id
+    );
+    this.reportControlService.setMae(anomaliasInforme, this.selectedInforme);
 
-      this.reportControlService.setMaeInformeSeguidores(seguidoresInforme, this.selectedInforme);
-      this.reportControlService.setCCInformeSeguidores(seguidoresInforme, this.selectedInforme);
-    }
+    const fixableAnoms = anomaliasInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+    this.reportControlService.setMae(fixableAnoms, this.selectedInforme, 'fixablePower');
+
+    this.reportControlService.setCC(anomaliasInforme, this.selectedInforme);
   }
 
   setTipoNextYear() {

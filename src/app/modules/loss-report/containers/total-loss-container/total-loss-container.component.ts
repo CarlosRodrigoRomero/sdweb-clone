@@ -22,16 +22,16 @@ export class TotalLossContainerComponent implements OnInit, OnDestroy {
   constructor(private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    const anomalias = this.reportControlService.allAnomalias;
-    this.numTotalAnoms = anomalias.length;
-    const fixableAnoms = anomalias.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo));
-    this.numFixableAnoms = fixableAnoms.length;
-
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
         const selectedReport = this.reportControlService.informes.find((informe) => informe.id === informeId);
 
-        this.totalMae = this.reportControlService.getMae(anomalias, selectedReport.numeroModulos);
+        const anomaliasInforme = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId);
+        this.numTotalAnoms = anomaliasInforme.length;
+        const fixableAnoms = anomaliasInforme.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo));
+        this.numFixableAnoms = fixableAnoms.length;
+
+        this.totalMae = this.reportControlService.getMae(anomaliasInforme, selectedReport.numeroModulos);
         this.fixableMae = this.reportControlService.getMae(fixableAnoms, selectedReport.numeroModulos);
       })
     );

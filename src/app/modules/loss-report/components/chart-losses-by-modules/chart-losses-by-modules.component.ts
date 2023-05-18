@@ -53,7 +53,7 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
   modulesLabel: string[];
-  private seriesLabels = ['Reparables', 'No reparables'];
+  private seriesLabels = ['Reparable', 'No reparable'];
   chartData: number[][];
   chartLoaded = false;
   private anomalias: Anomalia[];
@@ -223,7 +223,7 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
         plotOptions: {
           bar: {
             horizontal: false,
-            borderRadius: 8,
+            borderRadius: 4,
             distributed: false,
             dataLabels: {
               position: 'center', // top, center, bottom

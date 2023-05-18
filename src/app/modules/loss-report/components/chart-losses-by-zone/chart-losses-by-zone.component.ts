@@ -58,7 +58,7 @@ export class ChartLossesByZoneComponent implements OnInit {
   zones: LocationAreaInterface[];
   allAnomalias: Anomalia[] = [];
   theme: string;
-  private seriesLabels = ['Reparables', 'No reparables'];
+  private seriesLabels = ['Reparable', 'No reparable'];
   chartLoaded = false;
   private maeLabel: string;
   private indexLargestZones = 0;
@@ -246,7 +246,7 @@ export class ChartLossesByZoneComponent implements OnInit {
         plotOptions: {
           bar: {
             horizontal: false,
-            borderRadius: 8,
+            borderRadius: 4,
             distributed: false,
             dataLabels: {
               position: 'center', // top, center, bottom

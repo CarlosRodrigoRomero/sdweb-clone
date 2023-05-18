@@ -53,11 +53,7 @@ export class ZonesService {
           }
 
           // comprobamos si hay más de un modelo de módulos
-          if (
-            locAreas.filter(
-              (locArea) => locArea.modulo !== undefined && locArea.modulo !== null && locArea.modulo !== null
-            ).length > 1
-          ) {
+          if (locAreas.filter((locArea) => locArea.modulo !== undefined && locArea.modulo !== null).length > 0) {
             this.thereAreModules = true;
           }
           initService(true);

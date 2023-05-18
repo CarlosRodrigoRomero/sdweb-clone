@@ -209,6 +209,7 @@ export class PcService {
             .map((doc) => {
               let data = doc.payload.doc.data() as PcInterface;
               data.id = doc.payload.doc.id;
+              data.tipo = Number(data.tipo);
               data = this.globalCoordsToClasic(data);
               return data;
             })

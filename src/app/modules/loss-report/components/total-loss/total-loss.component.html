@@ -13,11 +13,11 @@
     <div class="row">
       <div class="data">
         <span class="data-title">MAE total</span>
-        <span class="data-value">{{ totalMae | number : '1.0-2' }}%</span>
+        <span class="data-value">{{ totalMae * 100 | number : '1.0-2' }}%</span>
       </div>
       <div class="data">
         <span class="data-title">MAE reparable</span>
-        <span class="data-value highlight-color">{{ fixableMae | number : '1.0-2' }}%</span>
+        <span class="data-value highlight-color">{{ fixableMae * 100 | number : '1.0-2' }}%</span>
       </div>
     </div>
     <div class="row">

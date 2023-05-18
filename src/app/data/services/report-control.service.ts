@@ -398,8 +398,19 @@ export class ReportControlService {
     return mae;
   }
 
+  setMae(anomalias: Anomalia[], informe: InformeInterface, maeType?: string) {
+    const mae = this.getMae(anomalias, informe.numeroModulos);
+
+    let maeField = 'mae';
+    if (maeType) {
+      maeField = maeType;
+    }
+
+    this.informeService.updateInformeField(informe.id, maeField, mae);
+  }
+
   getMae(anomalias: Anomalia[], numModules: number): number {
-    return (anomalias.map((anom) => GLOBAL.pcPerdidas[anom.tipo]).reduce((a, b) => a + b, 0) / numModules) * 100;
+    return anomalias.map((anom) => GLOBAL.pcPerdidas[anom.tipo]).reduce((a, b) => a + b, 0) / numModules;
   }
 
   private checkFixedPowerLossInformes(): void {
@@ -479,6 +490,17 @@ export class ReportControlService {
     if (anomaliasInforme.length > 0) {
       // tslint:disable-next-line: triple-equals
       const celCals = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+
+      cc = celCals.length / informe.numeroModulos;
+    }
+
+    this.informeService.updateInformeField(informe.id, 'cc', cc);
+  }
+
+  setCC(anomalias: Anomalia[], informe: InformeInterface) {
+    let cc = 0;
+    if (anomalias.length > 0) {
+      const celCals = anomalias.filter((anom) => anom.tipo === 8 || anom.tipo === 9);
 
       cc = celCals.length / informe.numeroModulos;
     }
