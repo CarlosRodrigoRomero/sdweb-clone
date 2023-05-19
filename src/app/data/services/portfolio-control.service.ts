@@ -38,6 +38,9 @@ export class PortfolioControlService {
   maeMedio$ = new BehaviorSubject<number>(this._maeMedio);
   private _maeSigma: number = undefined;
   maeSigma$ = new BehaviorSubject<number>(this._maeSigma);
+  private fixableMaePlantas: number[] = [];
+  private _fixableMaeMedio: number = undefined;
+  fixableMaeMedio$ = new BehaviorSubject<number>(this._fixableMaeMedio);
   numPlantas = 0;
   potenciaTotal = 0;
   listaPlantas: PlantaInterface[] = [];
@@ -194,6 +197,7 @@ export class PortfolioControlService {
               } else {
                 // el resto añadimos normal
                 this.maePlantas.push(informeReciente.mae);
+                this.fixableMaePlantas.push(informeReciente.fixablePower);
               }
             });
 
@@ -202,6 +206,11 @@ export class PortfolioControlService {
               this.listaPlantas.map((planta) => planta.potencia)
             );
             this.maeSigma = MathOperations.DAM(this.maePlantas, this.maeMedio);
+
+            this.fixableMaeMedio = MathOperations.weightedAverage(
+              this.fixableMaePlantas,
+              this.listaPlantas.map((planta) => planta.potencia)
+            );
 
             this.initialized = true;
 
@@ -433,6 +442,15 @@ export class PortfolioControlService {
   set maeSigma(value: number) {
     this._maeSigma = value;
     this.maeSigma$.next(value);
+  }
+
+  get fixableMaeMedio() {
+    return this._fixableMaeMedio;
+  }
+
+  set fixableMaeMedio(value: number) {
+    this._fixableMaeMedio = value;
+    this.fixableMaeMedio$.next(value);
   }
 
   get initialized() {

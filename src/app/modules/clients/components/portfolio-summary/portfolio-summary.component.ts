@@ -11,6 +11,7 @@ export class PortfolioSummaryComponent implements OnInit {
   numPlantas = 0;
   potenciaTotal = 0;
   maeMedio = 0;
+  fixableMaeMedio = 0;
 
   constructor(private portfolioControlService: PortfolioControlService) {}
 
@@ -18,5 +19,6 @@ export class PortfolioSummaryComponent implements OnInit {
     this.numPlantas = this.portfolioControlService.numPlantas;
     this.potenciaTotal = this.portfolioControlService.potenciaTotal;
     this.maeMedio = this.portfolioControlService.maeMedio;
+    this.fixableMaeMedio = this.portfolioControlService.fixableMaeMedio;
   }
 }

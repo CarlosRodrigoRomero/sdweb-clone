@@ -1,32 +1,34 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>Estado general</mat-card-title>
+    <mat-card-title>{{ 'Estado general' | translate }}</mat-card-title>
     <mat-card-subtitle
-      ><p>MAE y número de anomalías totales y su parte reparable.</p>
+      ><p>{{ 'MAE y número de anomalías totales y su parte reparable.' | translate }}</p>
       <p>
-        MAE significa Módulos Apagados Equivalentes y ofrece una estimación de pérdidas. El MAE reparable solo tiene en
-        cuanta la anomalías que son reparables.
+        {{
+          'MAE significa Módulos Apagados Equivalentes y ofrece una estimación de pérdidas. El MAE reparable solo tiene en cuanta la anomalías que son reparables.'
+            | translate
+        }}
       </p>
     </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content class="card-content">
     <div class="row">
       <div class="data">
-        <span class="data-title">MAE total</span>
+        <span class="data-title">{{ 'MAE total' | translate }}</span>
         <span class="data-value">{{ totalMae * 100 | number : '1.0-2' }}%</span>
       </div>
       <div class="data">
-        <span class="data-title">MAE reparable</span>
+        <span class="data-title">{{ 'MAE reparable' | translate }}</span>
         <span class="data-value highlight-color">{{ fixableMae * 100 | number : '1.0-2' }}%</span>
       </div>
     </div>
     <div class="row">
       <div class="data">
-        <span class="data-title">Nº total anomalías</span>
+        <span class="data-title">{{ 'Nº total anomalías' | translate }}</span>
         <span class="data-secondary-value">{{ numTotalAnoms }}</span>
       </div>
       <div class="data">
-        <span class="data-title">Nº anomalías reparables</span>
+        <span class="data-title">{{ 'Nº anomalías reparables' | translate }}</span>
         <span class="data-secondary-value highlight-color">{{ numFixableAnoms }}</span>
       </div>
     </div>

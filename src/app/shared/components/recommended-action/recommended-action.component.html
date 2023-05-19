@@ -2,11 +2,11 @@
   <mat-checkbox (change)="changeState.emit($event.checked)">
     <div class="check-content">
       <div class="content-row">
-        <span class="row-title">{{ title }}</span>
+        <span class="row-title">{{ title | translate }}</span>
         <span class="cantidad">{{ cantidad }}</span>
       </div>
       <div class="content-row">
-        <span class="row-subtitle">MAE</span>
+        <span class="row-subtitle">{{ 'MAE' | translate }}</span>
         <span class="perdidas">{{ perdidas * 100 | number : '1.0-2' }}%</span>
       </div>
       <div *ngIf="fixable" class="bar-row highlight-background" [style.width]="porcentajeBarra"></div>

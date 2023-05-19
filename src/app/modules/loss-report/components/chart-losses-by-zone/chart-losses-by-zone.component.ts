@@ -76,12 +76,8 @@ export class ChartLossesByZoneComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.translate
-      .get('MAE')
-      .pipe(take(1))
-      .subscribe((res: string) => {
-        this.maeLabel = res + ' (%)';
-      });
+    // checkeamos las traducciones
+    this.checkTranslate();
 
     this.subscriptions.add(
       this.plantaService
@@ -212,19 +208,43 @@ export class ChartLossesByZoneComponent implements OnInit {
     this.zonesLabels = indices.map((i) => this.zonesLabels[i]);
   }
 
+  private checkTranslate(): void {
+    this.translate
+      .get(this.seriesLabels[0])
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.seriesLabels[0] = res;
+      });
+
+    this.translate
+      .get(this.seriesLabels[1])
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.seriesLabels[1] = res;
+      });
+
+    this.translate
+      .get('MAE')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.maeLabel = res + ' (%)';
+      });
+
+    if (this.reportControlService.nombreGlobalCoords.length > 0) {
+      this.titleZone = this.reportControlService.nombreGlobalCoords[this.indexLargestZones];
+    }
+    this.translate
+      .get(this.titleZone)
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.titleZone = res;
+      });
+  }
+
   private initChart(theme: string): void {
     const series = this.seriesLabels.map((label, index) => {
       return { name: label, data: this.chartData[index] };
     });
-
-    if (this.reportControlService.nombreGlobalCoords.length > 0) {
-      this.translate
-        .get(this.reportControlService.nombreGlobalCoords[this.indexLargestZones])
-        .pipe(take(1))
-        .subscribe((res: string) => {
-          this.titleZone = res;
-        });
-    }
 
     // espera a que el dataPlot tenga datos
     if (this.chartData[0] !== undefined) {
