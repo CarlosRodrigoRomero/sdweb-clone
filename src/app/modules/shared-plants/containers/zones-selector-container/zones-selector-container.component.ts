@@ -151,10 +151,10 @@ export class ZonesSelectorContainerComponent implements OnInit, OnDestroy {
   }
 
   setVisibilityAllLayers(completed: boolean) {
-    if (this.task.subtasks.every((t) => t.completed === true)) {
-      this.globalCoordAreasVectorLayers.forEach((layer) => layer.setVisible(false));
-    } else {
+    if (completed) {
       this.globalCoordAreasVectorLayers.forEach((layer) => layer.setVisible(true));
+    } else {
+      this.globalCoordAreasVectorLayers.forEach((layer) => layer.setVisible(false));
     }
 
     this.setAll(completed);
