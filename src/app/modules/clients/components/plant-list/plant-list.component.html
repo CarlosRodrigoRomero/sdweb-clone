@@ -154,7 +154,7 @@
               [ngClass]="{ 'highlight-color': sortedColumn === 'tipo' }"
             >
               <div class="cell-centered">
-                {{ row.tipo | translate }}
+                {{ row.tipo | translate | titlecase }}
               </div>
             </td>
           </ng-container>
