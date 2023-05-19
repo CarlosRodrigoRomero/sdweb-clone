@@ -34,7 +34,7 @@
         </a>
         <a *ngIf="isPortfolio" mat-list-item>
           <div *ngIf="itemSelected === 'list'" class="item-content" [ngStyle]="{ color: itemColor }">
-            <mat-icon>list</mat-icon>
+            <mat-icon>view_list</mat-icon>
             <span>{{ 'listado' | translate | titlecase }}</span>
           </div>
           <div *ngIf="itemSelected !== 'list'" class="item-content">
