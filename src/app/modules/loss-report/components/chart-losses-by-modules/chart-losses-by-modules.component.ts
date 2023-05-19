@@ -72,12 +72,7 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.translate
-      .get('MAE')
-      .pipe(take(1))
-      .subscribe((res: string) => {
-        this.maeLabel = res + ' (%)';
-      });
+    this.checkTranslate();
 
     const locAreasWithModules = this.zonesService.locAreas.filter(
       (locArea) => locArea.modulo !== null && locArea.modulo !== undefined
@@ -190,12 +185,35 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
     this.modulesLabel = indices.map((i) => this.modulesLabel[i]);
   }
 
+  private checkTranslate(): void {
+    this.translate
+      .get(this.seriesLabels[0])
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.seriesLabels[0] = res;
+      });
+
+    this.translate
+      .get(this.seriesLabels[1])
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.seriesLabels[1] = res;
+      });
+
+    this.translate
+      .get('MAE')
+      .pipe(take(1))
+      .subscribe((res: string) => {
+        this.maeLabel = res + ' (%)';
+      });
+  }
+
   private initChart(theme: string): void {
     const series = this.seriesLabels.map((dateLabel, index) => {
       return { name: dateLabel, data: this.chartData[index] };
     });
 
-    let titleXAxis = 'Marca módulo';
+    let titleXAxis = 'Fabricante';
     this.translate
       .get(titleXAxis)
       .pipe(take(1))

@@ -4,8 +4,9 @@
     <!-- <mat-card-subtitle>{{ 'Para visualizar dónde están los problemas de rendimiento' | translate }}</mat-card-subtitle> -->
     <mat-card-subtitle>
       <p>
-        Distribución de <b>MAE por {{ titleZone | translate | lowercase }}</b> especificando que porcentaje son
-        anomalías reparables y que porcentaje no lo son.
+        {{ 'Distribución de' | translate }}
+        <b>{{ 'MAE por' | translate }} {{ titleZone | translate | lowercase }}</b>
+        {{ 'especificando que porcentaje son anomalías reparables y que porcentaje no lo son.' | translate }}
       </p>
       <!-- <p>
         Pulsa la {{ titleZone | translate | lowercase }} que quieras para ir a ver sus anomalías filtradas en el mapa.

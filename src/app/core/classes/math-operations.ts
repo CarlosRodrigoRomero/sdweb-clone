@@ -13,6 +13,10 @@ export class MathOperations {
   static weightedAverage(values: number[], weights: number[]): number {
     const result = values
       .map((value, i) => {
+        if (value === undefined) {
+          return [0, 0];
+        }
+
         const weight = weights[i];
         const sum = value * weight;
 

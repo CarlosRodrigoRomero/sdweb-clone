@@ -6,24 +6,25 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subscription } from 'rxjs';
 
 import 'ol/ol.css';
-import Circle from 'ol/geom/Circle';
 import { defaults as defaultControls } from 'ol/control.js';
 import Feature from 'ol/Feature';
 import Map from 'ol/Map';
 import View from 'ol/View';
-import { Fill, Icon, Stroke, Style } from 'ol/style';
-import { OSM, Vector as VectorSource, XYZ } from 'ol/source';
+import { Icon, Style } from 'ol/style';
+import { Vector as VectorSource, XYZ } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
 import { Overlay } from 'ol';
 import Point from 'ol/geom/Point';
 
 import { PortfolioControlService } from '@data/services/portfolio-control.service';
-import { GLOBAL } from '@data/constants/global';
 import { OlMapService } from '@data/services/ol-map.service';
+import { ThemeService } from '@data/services/theme.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-map-all-plants',
@@ -52,7 +53,8 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
     private portfolioControlService: PortfolioControlService,
     private router: Router,
     private _snackBar: MatSnackBar,
-    private olMapService: OlMapService
+    private olMapService: OlMapService,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -87,6 +89,26 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
               this.setPlantaStyle(this.prevPlantaHovered.id, false);
             }
           }
+        }
+      })
+    );
+
+    // cuando cambiamos de tema, cambiamos el estilo de las plantas
+    this.subscriptions.add(
+      this.themeService.themeSelected$.subscribe((theme) => {
+        if (this.map !== undefined) {
+          this.map.getLayers().forEach((layer) => {
+            if (layer.get('name') === 'plantas') {
+              (layer as VectorLayer)
+                .getSource()
+                .getFeatures()
+                .forEach((feature) => {
+                  feature.setStyle(this.getStyleOnHover(false, theme));
+                });
+
+              (layer as VectorLayer).setStyle(this.getStyleOnHover(false, theme));
+            }
+          });
         }
       })
     );
@@ -141,7 +163,12 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
         informeReciente,
       });
 
-      const iconSrc = this.getMaeIcon(informeReciente.mae);
+      let iconSrc: string;
+      if (this.themeService.themeSelected === 'light-theme') {
+        iconSrc = 'assets/icons/location-pin-light-unhover.png';
+      } else {
+        iconSrc = 'assets/icons/location-pin-dark-unhover.png';
+      }
 
       feature.setStyle(
         new Style({
@@ -160,7 +187,11 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
 
     const plantasLayer = new VectorLayer({
       source: this.plantasSource,
-      style: this.getStyleOnHover(false),
+      style: this.getStyleOnHover(false, this.themeService.themeSelected),
+    });
+
+    plantasLayer.setProperties({
+      name: 'plantas',
     });
 
     this.map.addLayer(plantasLayer);
@@ -302,15 +333,19 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
   private setPlantaStyle(plantaId: string, hovered: boolean) {
     const feature = this.plantasSource.getFeatureById(plantaId);
 
-    feature.setStyle(this.getStyleOnHover(hovered));
+    feature.setStyle(this.getStyleOnHover(hovered, this.themeService.themeSelected));
   }
 
-  private getStyleOnHover(hovered: boolean) {
+  private getStyleOnHover(hovered: boolean, theme: string) {
+    let iconSrc: string;
     if (hovered) {
+      if (theme === 'light-theme') {
+        iconSrc = 'assets/icons/location-pin-light-hover.png';
+      } else {
+        iconSrc = 'assets/icons/location-pin-dark-hover.png';
+      }
       return (feature: Feature) => {
         if (feature !== undefined) {
-          const iconSrc = 'assets/icons/location-pin-hovered.png';
-
           return new Style({
             image: new Icon({
               crossOrigin: 'anonymous',
@@ -321,10 +356,13 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
         }
       };
     } else {
+      if (theme === 'light-theme') {
+        iconSrc = 'assets/icons/location-pin-light-unhover.png';
+      } else {
+        iconSrc = 'assets/icons/location-pin-dark-unhover.png';
+      }
       return (feature: Feature) => {
         if (feature !== undefined) {
-          const iconSrc = this.getMaeIcon(feature.getProperties().informeReciente.mae);
-
           return new Style({
             image: new Icon({
               crossOrigin: 'anonymous',

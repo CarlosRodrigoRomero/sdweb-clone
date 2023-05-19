@@ -34,7 +34,7 @@
         </a>
         <a *ngIf="isPortfolio" mat-list-item>
           <div *ngIf="itemSelected === 'list'" class="item-content" [ngStyle]="{ color: itemColor }">
-            <mat-icon>list</mat-icon>
+            <mat-icon>view_list</mat-icon>
             <span>{{ 'listado' | translate | titlecase }}</span>
           </div>
           <div *ngIf="itemSelected !== 'list'" class="item-content">
@@ -42,8 +42,12 @@
             <span>{{ 'listado' | translate | titlecase }}</span>
           </div>
         </a>
-        <!-- <a mat-list-item>
-          <div class="item-content">
+        <!-- <a *ngIf="isPortfolio" mat-list-item (click)="navigateTo('charts')">
+          <div *ngIf="itemSelected === 'charts'" class="item-content" [ngStyle]="{ color: itemColor }">
+            <mat-icon>insights</mat-icon>
+            <span>{{ 'graficos' | translate | titlecase }}</span>
+          </div>
+          <div *ngIf="itemSelected !== 'charts'" class="item-content">
             <mat-icon>insights</mat-icon>
             <span>{{ 'graficos' | translate | titlecase }}</span>
           </div>
