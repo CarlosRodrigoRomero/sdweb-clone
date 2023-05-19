@@ -83,7 +83,7 @@ export class SeguidorService {
             let anomaliasSeguidor: Anomalia[] = [];
             if (sortedAnoms !== null) {
               const anomsLargestLocArea = sortedAnoms[0].find(
-                (array) => (array[0] as Anomalia).globalCoords[0] === areaSeg.globalCoords[0]
+                (array) => (array[0] as Anomalia).globalCoords[0] == areaSeg.globalCoords[0]
               );
 
               if (anomsLargestLocArea !== undefined) {
@@ -199,7 +199,7 @@ export class SeguidorService {
     if (largestLocAreas.length > 0) {
       const sortAnoms = [[]];
       largestLocAreas.forEach((locArea) => {
-        const anomsLocArea = anoms.filter((anom) => anom.globalCoords[0] === locArea.globalCoords[0]);
+        const anomsLocArea = anoms.filter((anom) => anom.globalCoords[0] == locArea.globalCoords[0]);
 
         if (anomsLocArea.length > 0) {
           sortAnoms[0].push(anomsLocArea);
