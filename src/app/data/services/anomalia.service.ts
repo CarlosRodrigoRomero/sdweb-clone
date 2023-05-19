@@ -39,7 +39,7 @@ export class AnomaliaService {
   public criterioCriticidad: CritCriticidad;
   private _hasCriticidad = false;
   public hasCriticidad$ = new BehaviorSubject<boolean>(this._hasCriticidad);
-  private planta: PlantaInterface;
+  planta: PlantaInterface;
   private locAreasTipoSeguidor: LocationAreaInterface[] = [];
 
   private subscriptions: Subscription = new Subscription();

@@ -15,8 +15,11 @@
     <!-- MENU ALERTAS INFORME TERMINADO ANTES DE ENTREGAR -->
     <app-warnings-menu *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-warnings-menu>
 
-    <!-- MENU RECALCULAR MAE Y CC -->
+    <!-- MENU RECALCULAR DATOS EN INFORMES -->
     <app-report-recalc *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-report-recalc>
+
+    <!-- MENU RECALCULAR DATOS EN PORTFOLIO -->
+    <app-portfolio-recalc *ngIf="isAdmin && !isReport && !isDemo"></app-portfolio-recalc>
 
     <!-- BOTON NOTIFICACIONES PROVISIONAL -->
     <button class="btn-notif" *ngIf="hasNotifications" mat-icon-button [matMenuTriggerFor]="notifMenu">
