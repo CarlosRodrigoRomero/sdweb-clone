@@ -28,7 +28,7 @@ interface PlantsData {
   informesAntiguos: InformeInterface[];
   plantaId: string;
   tipo: string;
-  color: string;
+  // color: string;
 }
 
 @Component({
@@ -38,7 +38,7 @@ interface PlantsData {
 })
 export class PlantListComponent implements OnInit, AfterViewInit {
   public displayedColumns: string[] = [
-    'color',
+    // 'color',
     'nombre',
     'potencia',
     'mae',
@@ -49,7 +49,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   public dataSource = new MatTableDataSource<PlantsData>();
   private plantas: PlantaInterface[];
   private informes: InformeInterface[];
-  sortedColumn = 'mae';
+  sortedColumn = 'fixablePower';
   theme: string;
   private screenWidth: number;
 
@@ -95,7 +95,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
         plantaId: planta.id,
         tipo: planta.tipo,
         informeReciente,
-        color: this.portfolioControlService.getColorMae(informeReciente.mae),
+        // color: this.portfolioControlService.getColorMae(informeReciente.mae),
       });
     });
 

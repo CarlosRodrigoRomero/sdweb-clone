@@ -3,12 +3,19 @@
     <mat-card-title>{{ 'Acciones recomendadas' | translate }}</mat-card-title>
     <mat-card-subtitle>
       <p>
-        El <b>{{ fixableLossesPercentage * 100 | number : '1.0-2' }}% de las pérdidas</b> está compuesto por anomalías
-        que son <b>reparables</b>. El otro
-        <b>{{ (1 - fixableLossesPercentage) * 100 | number : '1.0-2' }}%</b> requieren sustituir el módulo pudiendo
-        <b>reclamar garantía del fabricante</b> de ser posible.
+        {{ 'El ' | translate
+        }}<b>{{ fixableLossesPercentage * 100 | number : '1.0-2' }}% {{ 'de las pérdidas' | translate }}</b>
+        {{ 'está compuesto por anomalías que son' | translate }} <b>{{ 'reparables' | translate }}</b
+        >. {{ 'El otro' | translate }} <b>{{ (1 - fixableLossesPercentage) * 100 | number : '1.0-2' }}%</b>
+        {{ 'requieren sustituir el módulo pudiendo' | translate }}
+        <b>{{ 'reclamar garantía del fabricante' | translate }}</b> {{ 'de ser posible' | translate }}.
       </p>
-      <p>Selecciona las que quieras y elige si verlas en el mapa o compartirlas para su revisión en planta.</p>
+      <p>
+        {{
+          'Selecciona las que quieras y elige si verlas en el mapa o compartirlas para su revisión en planta.'
+            | translate
+        }}
+      </p>
     </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content class="card-content">
