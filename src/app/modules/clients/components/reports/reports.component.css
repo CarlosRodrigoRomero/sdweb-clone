@@ -60,6 +60,7 @@
 
   .content {
     display: flex;
+    position: fixed;
     gap: unset;
     grid-template-columns: none;
   }
