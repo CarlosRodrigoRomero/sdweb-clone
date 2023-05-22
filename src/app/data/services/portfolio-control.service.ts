@@ -197,8 +197,10 @@ export class PortfolioControlService {
               } else {
                 // el resto añadimos normal
                 this.maePlantas.push(informeReciente.mae);
-                this.fixableMaePlantas.push(informeReciente.fixablePower);
               }
+
+              // añadimos el mae reparables del informe mas reciente de cada planta
+              this.fixableMaePlantas.push(informeReciente.fixablePower);
             });
 
             this.maeMedio = MathOperations.weightedAverage(
