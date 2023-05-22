@@ -101,6 +101,7 @@ export class ReportEditComponent implements OnInit {
       disponible: [false],
       vientoVelocidad: [],
       vientoDireccion: [, [Validators.min(0), Validators.max(360)]],
+      numeroModulos: [],
       camara: [],
       camaraSN: [],
       servidorCapas: [, [Validators.required]],
@@ -142,6 +143,9 @@ export class ReportEditComponent implements OnInit {
       }
       if (this.form.get('vientoDireccion').value !== null) {
         this.informe.vientoDireccion = this.form.get('vientoDireccion').value;
+      }
+      if (this.form.get('numeroModulos').value !== null) {
+        this.informe.numeroModulos = this.form.get('numeroModulos').value;
       }
       if (this.form.get('camara').value !== null) {
         this.informe.camara = this.form.get('camara').value;

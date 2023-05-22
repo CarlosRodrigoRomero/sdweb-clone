@@ -63,7 +63,7 @@
               *matCellDef="let row"
               [ngClass]="{ 'highlight-color': sortedColumn === 'potencia' }"
             >
-              <div class="cell-centered">
+              <div>
                 {{ row.potencia | number : '1.2-2' }}
               </div>
             </td>
@@ -86,7 +86,7 @@
               *matCellDef="let row"
               [ngClass]="{ 'highlight-color': sortedColumn === 'mae' }"
             >
-              <div class="cell-centered">
+              <div>
                 {{ row.mae * 100 | number : '1.2-2' }}
               </div>
             </td>
@@ -130,7 +130,7 @@
               *matCellDef="let row"
               [ngClass]="{ 'highlight-color': sortedColumn === 'fixablePower' }"
             >
-              <div class="cell-centered">
+              <div>
                 {{ row.fixablePower * 100 | number : '1.2-2' }}
               </div>
             </td>
@@ -153,7 +153,7 @@
               *matCellDef="let row"
               [ngClass]="{ 'highlight-color': sortedColumn === 'tipo' }"
             >
-              <div class="cell-centered">
+              <div>
                 {{ row.tipo | translate | titlecase }}
               </div>
             </td>
