@@ -19,7 +19,7 @@
     <app-report-recalc *ngIf="isAdmin && isReport && loadContent && !isDemo"></app-report-recalc>
 
     <!-- MENU RECALCULAR DATOS EN PORTFOLIO -->
-    <app-portfolio-recalc *ngIf="isAdmin && !isReport && !isDemo"></app-portfolio-recalc>
+    <!-- <app-portfolio-recalc *ngIf="isAdmin && !isReport && !isDemo"></app-portfolio-recalc> -->
 
     <!-- BOTON NOTIFICACIONES PROVISIONAL -->
     <button class="btn-notif" *ngIf="hasNotifications" mat-icon-button [matMenuTriggerFor]="notifMenu">
