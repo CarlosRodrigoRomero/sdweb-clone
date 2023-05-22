@@ -76,11 +76,6 @@ h4 {
   hyphens: auto;
 }
 
-.cell-centered {
-  display: flex;
-  justify-content: center;
-}
-
 @media (max-width: 600px) {
   mat-card {
     height: auto;

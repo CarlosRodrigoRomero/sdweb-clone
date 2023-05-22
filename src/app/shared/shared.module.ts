@@ -33,6 +33,7 @@ import { SdCompleteLogoComponent } from './components/sd-complete-logo/sd-comple
 import { RecommendedActionComponent } from './components/recommended-action/recommended-action.component';
 import { RecommendedActionsComponent } from './components/recommended-actions/recommended-actions.component';
 import { SelectLanguageComponent } from './components/select-language/select-language.component';
+import { PortfolioRecalcComponent } from './components/portfolio-recalc/portfolio-recalc.component';
 
 const components = [
   SpinnerComponent,
@@ -51,6 +52,7 @@ const components = [
   RecommendedActionComponent,
   RecommendedActionsComponent,
   SelectLanguageComponent,
+  PortfolioRecalcComponent,
 ];
 
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
