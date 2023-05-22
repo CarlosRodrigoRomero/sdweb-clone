@@ -45,11 +45,13 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
   }
 
   recalMAEyCC() {
+    // calculamos MAE
     const anomaliasInforme = this.reportControlService.allAnomalias.filter(
       (anom) => anom.informeId === this.selectedInforme.id
     );
     this.reportControlService.setMae(anomaliasInforme, this.selectedInforme);
 
+    // calculamos MAE reparable
     const fixableAnoms = anomaliasInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
     this.reportControlService.setMae(fixableAnoms, this.selectedInforme, 'fixablePower');
 
