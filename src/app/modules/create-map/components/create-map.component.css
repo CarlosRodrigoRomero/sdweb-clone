@@ -4,3 +4,7 @@
   position: relative;
   overflow: hidden;
 }
+
+mat-drawer {
+  min-width: 300px;
+}

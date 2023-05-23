@@ -31,8 +31,10 @@ import { PlantaInterface } from '@core/models/planta';
 export class MapCreateMapComponent implements OnInit {
   private planta: PlantaInterface;
   private divisionLayer: VectorLayer;
+  private divisionSource: VectorSource;
   map: Map;
   private draw: Draw;
+  private divisions: MapDivision[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -47,6 +49,7 @@ export class MapCreateMapComponent implements OnInit {
 
     this.initMap();
     this.createDivisionLayer();
+    this.addDivisions();
 
     this.subscriptions.add(
       this.createMapService.createMode$.subscribe((mode) => {
@@ -93,8 +96,10 @@ export class MapCreateMapComponent implements OnInit {
   private createDivisionLayer() {
     // si no existe previamente la creamos
     if (this.divisionLayer === undefined) {
+      this.divisionSource = new VectorSource({ wrapX: false });
+
       this.divisionLayer = new VectorLayer({
-        source: new VectorSource({ wrapX: false }),
+        source: this.divisionSource,
         style: new Style({
           stroke: new Stroke({
             width: 2,
@@ -117,7 +122,7 @@ export class MapCreateMapComponent implements OnInit {
 
   drawDivisions() {
     this.draw = new Draw({
-      source: this.divisionLayer.getSource(),
+      source: this.divisionSource,
       type: GeometryType.POLYGON,
     });
     this.olMapService.draw = this.draw;
@@ -145,16 +150,8 @@ export class MapCreateMapComponent implements OnInit {
   }
 
   private addDivisionFeature(division: MapDivision) {
-    let divisionLayer;
-    this.map.getLayers().forEach((layer) => {
-      if (layer.getProperties().id === 'divisionLayer') {
-        divisionLayer = layer;
-      }
-    });
-
     const coords = Object.values(division.coords); // lo convertimos en un array
 
-    const divisionSource = divisionLayer.getSource();
     const feature = new Feature({
       geometry: new Polygon([coords]),
       properties: {
@@ -162,7 +159,30 @@ export class MapCreateMapComponent implements OnInit {
       },
     });
 
-    divisionSource.addFeature(feature);
+    this.divisionSource.addFeature(feature);
+  }
+
+  private addDivisions() {
+    this.subscriptions.add(
+      this.mapDivisionsService.getMapDivisions().subscribe((divisions) => {
+        this.divisionSource.clear();
+
+        this.divisions = divisions;
+
+        this.divisions.forEach((division) => this.addDivision(division));
+      })
+    );
+  }
+
+  private addDivision(division: MapDivision) {
+    const feature = new Feature({
+      geometry: new Polygon([division.coords]),
+      properties: {
+        id: division.id,
+      },
+    });
+
+    this.divisionSource.addFeature(feature);
   }
 
   ngOnDestroy(): void {

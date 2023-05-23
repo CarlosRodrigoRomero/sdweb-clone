@@ -24,6 +24,10 @@ export class MapDivisionsService {
         actions.map((a) => {
           const data = a.payload.doc.data() as MapDivision;
           const id = a.payload.doc.id;
+
+          // Convertimos el objeto en un array
+          data.coords = Object.values(data.coords);
+
           return { id, ...data };
         })
       )
