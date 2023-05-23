@@ -49,8 +49,8 @@ export class MapDivisionsService {
     return this.mapDivisionsCollection.doc(id).set(mapDivision);
   }
 
-  updateMapDivision(id: string, mapDivision: MapDivision): Promise<void> {
-    return this.mapDivisionsCollection.doc<MapDivision>(id).update(mapDivision);
+  updateMapDivision(mapDivision: MapDivision): Promise<void> {
+    return this.mapDivisionsCollection.doc<MapDivision>(mapDivision.id).update(mapDivision);
   }
 
   deleteMapDivision(id: string): Promise<void> {

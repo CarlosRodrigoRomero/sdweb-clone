@@ -9,7 +9,7 @@ import { XYZ } from 'ol/source';
 import TileLayer from 'ol/layer/Tile';
 import { defaults } from 'ol/control.js';
 import Map from 'ol/Map';
-import { Draw } from 'ol/interaction';
+import { Draw, Modify } from 'ol/interaction';
 import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
@@ -22,6 +22,8 @@ import { CreateMapService } from '@data/services/create-map.service';
 import { OlMapService } from '@data/services/ol-map.service';
 
 import { PlantaInterface } from '@core/models/planta';
+import { Coordinate } from 'ol/coordinate';
+import { never } from 'ol/events/condition';
 
 @Component({
   selector: 'app-map-create-map',
@@ -50,6 +52,7 @@ export class MapCreateMapComponent implements OnInit {
     this.initMap();
     this.createDivisionLayer();
     this.addDivisions();
+    this.addModifyDivisionsInteraction();
 
     this.subscriptions.add(
       this.createMapService.createMode$.subscribe((mode) => {
@@ -183,6 +186,33 @@ export class MapCreateMapComponent implements OnInit {
     });
 
     this.divisionSource.addFeature(feature);
+  }
+
+  private addModifyDivisionsInteraction() {
+    const modify = new Modify({ source: this.divisionSource, insertVertexCondition: never });
+
+    modify.on('modifyend', (e) => {
+      if (e.features.getArray().length > 0) {
+        const divisionId = e.features.getArray()[0].getProperties().properties.id;
+        const division = this.divisions.find((d) => d.id === divisionId);
+        const coords = this.getCoords(e.features.getArray()[0]);
+
+        if (coords !== null) {
+          division.coords = { ...coords };
+
+          this.mapDivisionsService.updateMapDivision(division);
+        }
+      }
+    });
+
+    this.map.addInteraction(modify);
+  }
+
+  getCoords(feature: Feature): Coordinate[] {
+    const polygon = feature.getGeometry() as Polygon;
+    const coords = polygon.getCoordinates()[0];
+
+    return coords;
   }
 
   ngOnDestroy(): void {
