@@ -15,7 +15,7 @@ export class MapDivisionsService {
 
   constructor(private afs: AngularFirestore, private router: Router) {
     const informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
-    this.mapDivisionsCollection = this.afs.collection<MapDivision>('informes/' + informeId + '/map-divisions');
+    this.mapDivisionsCollection = this.afs.collection<MapDivision>('informes/' + informeId + '/mapDivisions');
   }
 
   getMapDivisions(): Observable<MapDivision[]> {
