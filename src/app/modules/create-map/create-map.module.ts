@@ -6,9 +6,11 @@ import { SharedModule } from '@shared/shared.module';
 
 import { CreateMapComponent } from './components/create-map.component';
 import { MapCreateMapComponent } from './components/map-create-map/map-create-map.component';
+import { ListCreateMapComponent } from './components/list-create-map/list-create-map.component';
+import { ListCreateMapContainerComponent } from './containers/list-create-map-container/list-create-map-container.component';
 
 @NgModule({
-  declarations: [CreateMapComponent, MapCreateMapComponent],
+  declarations: [CreateMapComponent, MapCreateMapComponent, ListCreateMapComponent, ListCreateMapContainerComponent],
   imports: [CommonModule, CreateMapRoutingModule, SharedModule],
 })
 export class CreateMapModule {}
