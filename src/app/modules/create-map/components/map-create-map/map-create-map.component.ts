@@ -11,7 +11,7 @@ import { defaults } from 'ol/control.js';
 import Map from 'ol/Map';
 import { Draw, Modify } from 'ol/interaction';
 import VectorSource from 'ol/source/Vector';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style, Text } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 import { MapDivisionsService } from '@data/services/map-divisions.service';
 import { MapDivision } from '@core/models/mapDivision';
@@ -57,11 +57,11 @@ export class MapCreateMapComponent implements OnInit {
     this.planta = this.createMapService.planta;
 
     this.initMap();
+    this.createImagePointsLayer();
+    this.addImagePoints();
     this.createDivisionLayer();
     this.addDivisions();
     this.addModifyDivisionsInteraction();
-    this.createImagePointsLayer();
-    this.addImagePoints();
 
     this.subscriptions.add(
       this.createMapService.createMode$.subscribe((mode) => {
@@ -112,12 +112,7 @@ export class MapCreateMapComponent implements OnInit {
 
       this.divisionLayer = new VectorLayer({
         source: this.divisionSource,
-        style: new Style({
-          stroke: new Stroke({
-            width: 2,
-            color: 'white',
-          }),
-        }),
+        style: this.getDivisionStyle(),
       });
 
       this.divisionLayer.setProperties({
@@ -144,7 +139,7 @@ export class MapCreateMapComponent implements OnInit {
       // const centroid = this.olMapService.getCentroid(coords[0]);
 
       const division: MapDivision = {
-        coords: coords[0],
+        coords: Object.values(coords[0]),
         status: 0,
         precise: false,
       };
@@ -153,21 +148,8 @@ export class MapCreateMapComponent implements OnInit {
       this.mapDivisionsService.addMapDivision(division);
 
       // añadimos el nuevo modulo como feature
-      this.addDivisionFeature(division);
+      this.addDivision(division);
     });
-  }
-
-  private addDivisionFeature(division: MapDivision) {
-    const coords = Object.values(division.coords); // lo convertimos en un array
-
-    const feature = new Feature({
-      geometry: new Polygon([coords]),
-      properties: {
-        id: division.id,
-      },
-    });
-
-    this.divisionSource.addFeature(feature);
   }
 
   private addDivisions() {
@@ -177,16 +159,22 @@ export class MapCreateMapComponent implements OnInit {
 
         this.divisions = divisions;
 
-        this.divisions.forEach((division) => this.addDivision(division));
+        this.divisions.forEach((division) => {
+          this.addDivision(division);
+        });
       })
     );
   }
 
   private addDivision(division: MapDivision) {
+    // calculamos el numero de imagenes que hay dentro de la division
+    division = this.getImagesInsideDivision(division);
+
     const feature = new Feature({
       geometry: new Polygon([division.coords]),
       properties: {
         id: division.id,
+        numImages: division.imagesIds.length.toString(),
       },
     });
 
@@ -261,6 +249,47 @@ export class MapCreateMapComponent implements OnInit {
     });
 
     this.imagePointSource.addFeature(feature);
+  }
+
+  private getImagesInsideDivision(division: MapDivision): MapDivision {
+    const imagesIds: string[] = [];
+    this.mapImagesService.mapImages.forEach((image) => {
+      if (this.isInsideDivision(image.coords, division.coords)) {
+        imagesIds.push(image.id);
+      }
+    });
+    division.imagesIds = imagesIds;
+
+    return division;
+  }
+
+  private isInsideDivision(imageCoords: Coordinate, divisionCoords: Coordinate[]): boolean {
+    const divisionPolygon = new Polygon([divisionCoords]);
+
+    // comprobamos si esta dentro de la zone
+    return divisionPolygon.intersectsCoordinate(fromLonLat(imageCoords));
+  }
+
+  private getDivisionStyle() {
+    return (feature: Feature) => {
+      return new Style({
+        stroke: new Stroke({
+          width: 2,
+          color: 'white',
+        }),
+        text: new Text({
+          text: feature.getProperties().properties.numImages,
+          font: 'bold 16px Roboto',
+          fill: new Fill({
+            color: 'black',
+          }),
+          stroke: new Stroke({
+            color: 'white',
+            width: 4,
+          }),
+        }),
+      });
+    };
   }
 
   switchCreateMode() {

@@ -7,4 +7,5 @@ export interface MapDivision {
   precise: boolean;
   notPreciseId?: string;
   mapId?: string;
+  imagesIds?: string[];
 }

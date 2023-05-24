@@ -38,7 +38,8 @@ export class CreateMapComponent implements OnInit {
       const mapImage: MapImage = {
         id: index.toString(),
         coords: randomPoint,
-        archivo: 'archivo',
+        path: 'archivo',
+        fecha: 123456789,
       };
       randomMapImages.push(mapImage);
     }
