@@ -9,7 +9,7 @@ import { XYZ } from 'ol/source';
 import TileLayer from 'ol/layer/Tile';
 import { defaults } from 'ol/control.js';
 import Map from 'ol/Map';
-import { Draw, Modify } from 'ol/interaction';
+import { DoubleClickZoom, Draw, Modify } from 'ol/interaction';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
@@ -133,22 +133,30 @@ export class MapCreateMapComponent implements OnInit {
     this.map.addInteraction(this.draw);
 
     this.draw.on('drawend', (evt) => {
+      // desactivamos el dobleclick para que no interfiera al cerrar poligono
+      this.map.getInteractions().forEach((interaction) => {
+        if (interaction instanceof DoubleClickZoom) {
+          this.map.removeInteraction(interaction);
+        }
+      });
+
       const polygon = evt.feature.getGeometry() as Polygon;
       const coords = polygon.getCoordinates();
       coords[0].pop(); // quitamos el ultimo punto que es igual al primero
-      // const centroid = this.olMapService.getCentroid(coords[0]);
 
-      const division: MapDivision = {
+      let division: MapDivision = {
         coords: Object.values(coords[0]),
         status: 0,
         precise: false,
       };
 
+      // calculamos el numero de imagenes que hay dentro de la division
+      const imagesIds = this.getImagesInsideDivision(coords[0]);
+      division.imagesIds = imagesIds;
+      division.numImages = imagesIds.length;
+
       // añadimos la división a la DB
       this.mapDivisionsService.addMapDivision(division);
-
-      // añadimos el nuevo modulo como feature
-      this.addDivision(division);
     });
   }
 
@@ -159,22 +167,22 @@ export class MapCreateMapComponent implements OnInit {
 
         this.divisions = divisions;
 
-        this.divisions.forEach((division) => {
-          this.addDivision(division);
-        });
+        this.divisions.forEach((division) => this.addDivision(division));
       })
     );
   }
 
   private addDivision(division: MapDivision) {
-    // calculamos el numero de imagenes que hay dentro de la division
-    division = this.getImagesInsideDivision(division);
+    let numImages = '0';
+    if (division.numImages !== undefined) {
+      numImages = division.numImages.toString();
+    }
 
     const feature = new Feature({
       geometry: new Polygon([division.coords]),
       properties: {
         id: division.id,
-        numImages: division.imagesIds.length.toString(),
+        numImages,
       },
     });
 
@@ -187,10 +195,14 @@ export class MapCreateMapComponent implements OnInit {
     modify.on('modifyend', (e) => {
       if (e.features.getArray().length > 0) {
         const divisionId = e.features.getArray()[0].getProperties().properties.id;
-        const division = this.divisions.find((d) => d.id === divisionId);
+        let division = this.divisions.find((d) => d.id === divisionId);
         const coords = this.getCoords(e.features.getArray()[0]);
 
         if (coords !== null) {
+          // calculamos el numero de imagenes que hay dentro de la division
+          division.imagesIds = this.getImagesInsideDivision(division.coords);
+
+          // adaptamos las coords a la DB
           division.coords = { ...coords };
 
           this.mapDivisionsService.updateMapDivision(division);
@@ -251,16 +263,15 @@ export class MapCreateMapComponent implements OnInit {
     this.imagePointSource.addFeature(feature);
   }
 
-  private getImagesInsideDivision(division: MapDivision): MapDivision {
+  private getImagesInsideDivision(divisionCoords: Coordinate[]): string[] {
     const imagesIds: string[] = [];
     this.mapImagesService.mapImages.forEach((image) => {
-      if (this.isInsideDivision(image.coords, division.coords)) {
+      if (this.isInsideDivision(image.coords, divisionCoords)) {
         imagesIds.push(image.id);
       }
     });
-    division.imagesIds = imagesIds;
 
-    return division;
+    return imagesIds;
   }
 
   private isInsideDivision(imageCoords: Coordinate, divisionCoords: Coordinate[]): boolean {
@@ -272,13 +283,17 @@ export class MapCreateMapComponent implements OnInit {
 
   private getDivisionStyle() {
     return (feature: Feature) => {
+      let text = '0';
+      if (feature.getProperties().properties !== undefined) {
+        text = feature.getProperties().properties.numImages;
+      }
       return new Style({
         stroke: new Stroke({
           width: 2,
           color: 'white',
         }),
         text: new Text({
-          text: feature.getProperties().properties.numImages,
+          text,
           font: 'bold 16px Roboto',
           fill: new Fill({
             color: 'black',

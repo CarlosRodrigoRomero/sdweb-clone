@@ -21,12 +21,20 @@ export class MapDivisionsService {
   getMapDivisions(): Observable<MapDivision[]> {
     return this.mapDivisionsCollection.snapshotChanges().pipe(
       map((actions) =>
-        actions.map((a) => {
+        actions.map((a, index) => {
           const data = a.payload.doc.data() as MapDivision;
           const id = a.payload.doc.id;
 
+          data.numDivision = index + 1;
+
           // Convertimos el objeto en un array
           data.coords = Object.values(data.coords);
+
+          if (data.hasOwnProperty('imagesIds')) {
+            data.numImages = data.imagesIds.length;
+          } else {
+            data.numImages = 0;
+          }
 
           return { id, ...data };
         })
