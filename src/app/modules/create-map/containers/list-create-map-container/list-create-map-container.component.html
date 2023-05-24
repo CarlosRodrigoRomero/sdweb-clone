@@ -1,1 +1,5 @@
-<app-list-create-map [dataSource]="dataSource" [displayedColumns]="displayedColumns"></app-list-create-map>
+<app-list-create-map
+  [dataSource]="dataSource"
+  [displayedColumns]="displayedColumns"
+  (rowSelected)="selectDivision($event)"
+></app-list-create-map>

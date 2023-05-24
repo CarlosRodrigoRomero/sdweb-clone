@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
@@ -10,8 +10,14 @@ import { MatTableDataSource } from '@angular/material/table';
 export class ListCreateMapComponent implements OnInit {
   @Input() displayedColumns: string;
   @Input() dataSource: MatTableDataSource<any>;
+  @Output() rowSelected = new EventEmitter<any>();
 
   constructor() {}
 
   ngOnInit(): void {}
+
+  selectRow(row: any, zoom: boolean) {
+    row.zoom = zoom;
+    this.rowSelected.emit(row);
+  }
 }
