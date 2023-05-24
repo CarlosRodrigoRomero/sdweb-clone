@@ -11,19 +11,22 @@ import { defaults } from 'ol/control.js';
 import Map from 'ol/Map';
 import { Draw, Modify } from 'ol/interaction';
 import VectorSource from 'ol/source/Vector';
-import { Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
 import { MapDivisionsService } from '@data/services/map-divisions.service';
 import { MapDivision } from '@core/models/mapDivision';
 import GeometryType from 'ol/geom/GeometryType';
 import VectorLayer from 'ol/layer/Vector';
+import { Coordinate } from 'ol/coordinate';
+import { never } from 'ol/events/condition';
 
 import { CreateMapService } from '@data/services/create-map.service';
 import { OlMapService } from '@data/services/ol-map.service';
+import { MapImagesService } from '@data/services/map-images.service';
 
 import { PlantaInterface } from '@core/models/planta';
-import { Coordinate } from 'ol/coordinate';
-import { never } from 'ol/events/condition';
+import { MapImage } from '@core/models/mapImages';
+import Circle from 'ol/geom/Circle';
 
 @Component({
   selector: 'app-map-create-map',
@@ -34,16 +37,20 @@ export class MapCreateMapComponent implements OnInit {
   private planta: PlantaInterface;
   private divisionLayer: VectorLayer;
   private divisionSource: VectorSource;
+  private imagePointLayer: VectorLayer;
+  private imagePointSource: VectorSource;
   map: Map;
   private draw: Draw;
   private divisions: MapDivision[] = [];
+  private images: MapImage[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private createMapService: CreateMapService,
     private olMapService: OlMapService,
-    private mapDivisionsService: MapDivisionsService
+    private mapDivisionsService: MapDivisionsService,
+    private mapImagesService: MapImagesService
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +60,8 @@ export class MapCreateMapComponent implements OnInit {
     this.createDivisionLayer();
     this.addDivisions();
     this.addModifyDivisionsInteraction();
+    this.createImagePointsLayer();
+    this.addImagePoints();
 
     this.subscriptions.add(
       this.createMapService.createMode$.subscribe((mode) => {
@@ -117,10 +126,6 @@ export class MapCreateMapComponent implements OnInit {
 
       this.map.addLayer(this.divisionLayer);
     }
-  }
-
-  switchCreateMode() {
-    this.createMapService.createMode = !this.createMapService.createMode;
   }
 
   drawDivisions() {
@@ -206,6 +211,60 @@ export class MapCreateMapComponent implements OnInit {
     });
 
     this.map.addInteraction(modify);
+  }
+
+  private createImagePointsLayer() {
+    // si no existe previamente la creamos
+    if (this.imagePointLayer === undefined) {
+      this.imagePointSource = new VectorSource({ wrapX: false });
+
+      this.imagePointLayer = new VectorLayer({
+        source: this.imagePointSource,
+        style: new Style({
+          fill: new Fill({
+            color: 'black',
+          }),
+        }),
+      });
+
+      this.imagePointLayer.setProperties({
+        id: 'imagePointLayer',
+      });
+
+      this.map.addLayer(this.imagePointLayer);
+    }
+  }
+
+  private addImagePoints() {
+    // this.subscriptions.add(
+    //   this.mapImagesService.getMapImages().subscribe((images) => {
+    //     this.imagePointSource.clear();
+
+    //     this.images = images;
+
+    //     this.images.forEach((image) => this.addImagePoint(image));
+    //   })
+    // );
+
+    // TEMPORAL, HASTA QUE ESTÉN LAS IMAGENES EN LA DB
+    this.images = this.mapImagesService.mapImages;
+
+    this.images.forEach((image) => this.addImagePoint(image));
+  }
+
+  private addImagePoint(image: MapImage) {
+    const feature = new Feature({
+      geometry: new Circle(fromLonLat(image.coords), 2),
+      properties: {
+        id: image.id,
+      },
+    });
+
+    this.imagePointSource.addFeature(feature);
+  }
+
+  switchCreateMode() {
+    this.createMapService.createMode = !this.createMapService.createMode;
   }
 
   getCoords(feature: Feature): Coordinate[] {
