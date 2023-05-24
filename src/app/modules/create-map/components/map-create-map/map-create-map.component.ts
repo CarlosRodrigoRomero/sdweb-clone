@@ -9,7 +9,7 @@ import { XYZ } from 'ol/source';
 import TileLayer from 'ol/layer/Tile';
 import { defaults } from 'ol/control.js';
 import Map from 'ol/Map';
-import { DoubleClickZoom, Draw, Modify } from 'ol/interaction';
+import { DoubleClickZoom, Draw, Modify, Select } from 'ol/interaction';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
@@ -18,15 +18,16 @@ import { MapDivision } from '@core/models/mapDivision';
 import GeometryType from 'ol/geom/GeometryType';
 import VectorLayer from 'ol/layer/Vector';
 import { Coordinate } from 'ol/coordinate';
-import { never } from 'ol/events/condition';
+import { click, never } from 'ol/events/condition';
+import Circle from 'ol/geom/Circle';
 
 import { CreateMapService } from '@data/services/create-map.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { MapImagesService } from '@data/services/map-images.service';
+import { MapDivisionControlService } from '@data/services/map-division-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { MapImage } from '@core/models/mapImages';
-import Circle from 'ol/geom/Circle';
 
 @Component({
   selector: 'app-map-create-map',
@@ -50,7 +51,8 @@ export class MapCreateMapComponent implements OnInit {
     private createMapService: CreateMapService,
     private olMapService: OlMapService,
     private mapDivisionsService: MapDivisionsService,
-    private mapImagesService: MapImagesService
+    private mapImagesService: MapImagesService,
+    private mapDivisionControlService: MapDivisionControlService
   ) {}
 
   ngOnInit(): void {
@@ -62,6 +64,7 @@ export class MapCreateMapComponent implements OnInit {
     this.createDivisionLayer();
     this.addDivisions();
     this.addModifyDivisionsInteraction();
+    this.addSelectDivisionsInteraction();
 
     this.subscriptions.add(
       this.createMapService.createMode$.subscribe((mode) => {
@@ -182,6 +185,7 @@ export class MapCreateMapComponent implements OnInit {
       geometry: new Polygon([division.coords]),
       properties: {
         id: division.id,
+        name: 'division',
         numImages,
       },
     });
@@ -288,6 +292,9 @@ export class MapCreateMapComponent implements OnInit {
         text = feature.getProperties().properties.numImages;
       }
       return new Style({
+        fill: new Fill({
+          color: 'rgba(255, 255, 255, 0.2)',
+        }),
         stroke: new Stroke({
           width: 2,
           color: 'white',
@@ -307,6 +314,34 @@ export class MapCreateMapComponent implements OnInit {
     };
   }
 
+  private addSelectDivisionsInteraction() {
+    const select = new Select({
+      style: this.getDivisionStyle(),
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().id === 'divisionLayer') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    this.map.addInteraction(select);
+
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        const feature = e.selected[0];
+        if (feature.getProperties().properties.name === 'division') {
+          const divisionId = feature.getProperties().properties.id;
+          const division = this.divisions.find((d) => d.id === divisionId);
+
+          this.mapDivisionControlService.mapDivisionSelected = division;
+        }
+      }
+    });
+  }
+
   switchCreateMode() {
     this.createMapService.createMode = !this.createMapService.createMode;
   }
@@ -316,6 +351,38 @@ export class MapCreateMapComponent implements OnInit {
     const coords = polygon.getCoordinates()[0];
 
     return coords;
+  }
+
+  private getStyleDivision(hovered: boolean) {
+    if (hovered) {
+      return (feature: Feature) => {
+        if (feature !== undefined) {
+          return new Style({
+            stroke: new Stroke({
+              width: 4,
+              color: 'white',
+            }),
+            fill: new Fill({
+              color: 'rgba(255, 255, 255, 0.2)',
+            }),
+          });
+        }
+      };
+    } else {
+      return (feature: Feature) => {
+        if (feature !== undefined) {
+          return new Style({
+            stroke: new Stroke({
+              width: 2,
+              color: 'white',
+            }),
+            fill: new Fill({
+              color: 'rgba(255, 255, 255, 0)',
+            }),
+          });
+        }
+      };
+    }
   }
 
   ngOnDestroy(): void {

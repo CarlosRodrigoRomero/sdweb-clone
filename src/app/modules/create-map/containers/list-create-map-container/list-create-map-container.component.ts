@@ -21,6 +21,7 @@ export class ListCreateMapContainerComponent implements OnInit, OnDestroy {
   dataSource: MatTableDataSource<MapDivision>;
   private mapDivisions: MapDivision[];
   private map: Map;
+  mapDivisionSelected: MapDivision;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -39,6 +40,10 @@ export class ListCreateMapContainerComponent implements OnInit, OnDestroy {
 
         this.dataSource = new MatTableDataSource(mapDivisions);
       })
+    );
+
+    this.subscriptions.add(
+      this.mapDivisionControlService.mapDivisionSelected$.subscribe((division) => (this.mapDivisionSelected = division))
     );
   }
 
