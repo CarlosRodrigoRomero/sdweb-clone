@@ -28,6 +28,8 @@ import { MapDivisionControlService } from '@data/services/map-division-control.s
 
 import { PlantaInterface } from '@core/models/planta';
 import { MapImage } from '@core/models/mapImages';
+import { MapClippingService } from '@data/services/map-clipping.service';
+import { MapClipping } from '@core/models/mapClipping';
 
 @Component({
   selector: 'app-map-create-map',
@@ -40,10 +42,13 @@ export class MapCreateMapComponent implements OnInit {
   private divisionSource: VectorSource;
   private imagePointLayer: VectorLayer;
   private imagePointSource: VectorSource;
+  private clippingLayer: VectorLayer;
+  private clippingSource: VectorSource;
   map: Map;
   private draw: Draw;
   private divisions: MapDivision[] = [];
   private images: MapImage[] = [];
+  private clippings: MapClipping[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -52,19 +57,26 @@ export class MapCreateMapComponent implements OnInit {
     private olMapService: OlMapService,
     private mapDivisionsService: MapDivisionsService,
     private mapImagesService: MapImagesService,
-    private mapDivisionControlService: MapDivisionControlService
+    private mapDivisionControlService: MapDivisionControlService,
+    private mapClippingService: MapClippingService
   ) {}
 
   ngOnInit(): void {
     this.planta = this.createMapService.planta;
 
     this.initMap();
+
     this.createImagePointsLayer();
     this.addImagePoints();
+
     this.createDivisionLayer();
     this.addDivisions();
     this.addModifyDivisionsInteraction();
     this.addSelectDivisionsInteraction();
+
+    this.createClippingLayer();
+    this.addClippings();
+    this.addModifyClippingsInteraction();
 
     this.subscriptions.add(
       this.createMapService.createMode$.subscribe((mode) => {
@@ -149,8 +161,6 @@ export class MapCreateMapComponent implements OnInit {
 
       let division: MapDivision = {
         coords: Object.values(coords[0]),
-        status: 0,
-        precise: false,
       };
 
       // calculamos el numero de imagenes que hay dentro de la division
@@ -342,6 +352,83 @@ export class MapCreateMapComponent implements OnInit {
     });
   }
 
+  private addClippings() {
+    this.subscriptions.add(
+      this.mapClippingService.getMapClippings().subscribe((clippings) => {
+        this.clippingSource.clear();
+
+        this.clippings = clippings;
+
+        this.clippings.forEach((clipping) => this.addClipping(clipping));
+      })
+    );
+  }
+
+  private addClipping(clipping: MapClipping) {
+    const feature = new Feature({
+      geometry: new Polygon([clipping.coords]),
+      properties: {
+        id: clipping.id,
+        name: 'clipping',
+      },
+    });
+
+    this.clippingSource.addFeature(feature);
+  }
+
+  private createClippingLayer() {
+    // si no existe previamente la creamos
+    if (this.clippingLayer === undefined) {
+      this.clippingSource = new VectorSource({ wrapX: false });
+
+      this.clippingLayer = new VectorLayer({
+        source: this.clippingSource,
+        style: this.getClippingStyle(),
+      });
+
+      this.clippingLayer.setProperties({
+        id: 'clippingLayer',
+      });
+
+      this.map.addLayer(this.clippingLayer);
+    }
+  }
+
+  private getClippingStyle() {
+    return (feature: Feature) => {
+      return new Style({
+        fill: new Fill({
+          color: 'rgba(0, 0, 255, 0.2)',
+        }),
+        stroke: new Stroke({
+          width: 2,
+          color: 'blue',
+        }),
+      });
+    };
+  }
+
+  private addModifyClippingsInteraction() {
+    const modify = new Modify({ source: this.clippingSource, insertVertexCondition: never });
+
+    modify.on('modifyend', (e) => {
+      if (e.features.getArray().length > 0) {
+        const clippingId = e.features.getArray()[0].getProperties().properties.id;
+        let clipping = this.clippings.find((d) => d.id === clippingId);
+        const coords = this.getCoords(e.features.getArray()[0]);
+
+        if (coords !== null) {
+          // adaptamos las coords a la DB
+          clipping.coords = { ...coords };
+
+          this.mapClippingService.updateMapClipping(clipping);
+        }
+      }
+    });
+
+    this.map.addInteraction(modify);
+  }
+
   switchCreateMode() {
     this.createMapService.createMode = !this.createMapService.createMode;
   }
@@ -351,38 +438,6 @@ export class MapCreateMapComponent implements OnInit {
     const coords = polygon.getCoordinates()[0];
 
     return coords;
-  }
-
-  private getStyleDivision(hovered: boolean) {
-    if (hovered) {
-      return (feature: Feature) => {
-        if (feature !== undefined) {
-          return new Style({
-            stroke: new Stroke({
-              width: 4,
-              color: 'white',
-            }),
-            fill: new Fill({
-              color: 'rgba(255, 255, 255, 0.2)',
-            }),
-          });
-        }
-      };
-    } else {
-      return (feature: Feature) => {
-        if (feature !== undefined) {
-          return new Style({
-            stroke: new Stroke({
-              width: 2,
-              color: 'white',
-            }),
-            fill: new Fill({
-              color: 'rgba(255, 255, 255, 0)',
-            }),
-          });
-        }
-      };
-    }
   }
 
   ngOnDestroy(): void {

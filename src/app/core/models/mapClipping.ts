@@ -1,10 +1,8 @@
 import { Coordinate } from 'ol/coordinate';
 
-export interface MapDivision {
+export interface MapClipping {
   id?: string;
   numDivision?: number;
   coords: Coordinate[];
-  imagesIds?: string[];
-  numImages?: number;
   // mapId?: string;
 }
