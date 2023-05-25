@@ -33,10 +33,10 @@ export class CreateMapComponent implements OnInit {
     const bottomRight = [coordsPlanta[0] + 0.004, coordsPlanta[1] - 0.002] as Coordinate;
 
     const randomMapImages: MapImage[] = [];
-    for (let index = 0; index < 1000; index++) {
+    for (let index = 0; index < 3; index++) {
       const randomPoint = this.randomGpsPoint(topLeft, bottomRight);
       const mapImage: MapImage = {
-        id: index.toString(),
+        id: (index + 1).toString(),
         coords: randomPoint,
         path: 'archivo',
         fecha: 123456789,

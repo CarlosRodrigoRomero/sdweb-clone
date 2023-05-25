@@ -8,3 +8,8 @@
   top: 10px;
   left: 100px;
 }
+
+.ol-popup {
+  position: absolute;
+  transform: translate(-50%, -105%);
+}

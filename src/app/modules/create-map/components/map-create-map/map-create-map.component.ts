@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
-import { Feature, View } from 'ol';
+import { Feature, Overlay, View } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import { XYZ } from 'ol/source';
 import TileLayer from 'ol/layer/Tile';
@@ -49,6 +49,8 @@ export class MapCreateMapComponent implements OnInit {
   private divisions: MapDivision[] = [];
   private images: MapImage[] = [];
   private clippings: MapClipping[] = [];
+  private popup: Overlay;
+  urlImageThumbnail: string;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -66,8 +68,12 @@ export class MapCreateMapComponent implements OnInit {
 
     this.initMap();
 
+    this.addPointerOnHover();
+
     this.createImagePointsLayer();
     this.addImagePoints();
+    this.addPopupOverlay();
+    this.addOnHoverImageAction();
 
     this.createDivisionLayer();
     this.addDivisions();
@@ -90,7 +96,11 @@ export class MapCreateMapComponent implements OnInit {
         }
       })
     );
+
+    this.mapImagesService.urlImageThumbnail$.subscribe((url) => (this.urlImageThumbnail = url));
   }
+
+  /* MAPA */
 
   initMap() {
     const baseSource = new XYZ({
@@ -120,6 +130,27 @@ export class MapCreateMapComponent implements OnInit {
       });
   }
 
+  private addPointerOnHover() {
+    this.map.on('pointermove', (event) => {
+      if (this.map.hasFeatureAtPixel(event.pixel)) {
+        const features = this.map.getFeaturesAtPixel(event.pixel);
+
+        if (features.length > 0) {
+          // cambia el puntero por el de seleccionar
+          this.map.getViewport().style.cursor = 'pointer';
+        } else {
+          // vuelve a poner el puntero normal
+          this.map.getViewport().style.cursor = 'inherit';
+        }
+      } else {
+        // vuelve a poner el puntero normal
+        this.map.getViewport().style.cursor = 'inherit';
+      }
+    });
+  }
+
+  /* DIVISIONES */
+
   private createDivisionLayer() {
     // si no existe previamente la creamos
     if (this.divisionLayer === undefined) {
@@ -127,7 +158,7 @@ export class MapCreateMapComponent implements OnInit {
 
       this.divisionLayer = new VectorLayer({
         source: this.divisionSource,
-        style: this.getDivisionStyle(),
+        style: this.getStyleDivision(),
       });
 
       this.divisionLayer.setProperties({
@@ -227,6 +258,83 @@ export class MapCreateMapComponent implements OnInit {
     this.map.addInteraction(modify);
   }
 
+  private addSelectDivisionsInteraction() {
+    const select = new Select({
+      style: this.getStyleDivision(),
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().id === 'divisionLayer') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    this.map.addInteraction(select);
+
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        const feature = e.selected[0];
+        if (feature.getProperties().properties.name === 'division') {
+          const divisionId = feature.getProperties().properties.id;
+          const division = this.divisions.find((d) => d.id === divisionId);
+
+          this.mapDivisionControlService.mapDivisionSelected = division;
+        }
+      }
+    });
+  }
+
+  private getStyleDivision() {
+    return (feature: Feature) => {
+      let text = '0';
+      if (feature.getProperties().properties !== undefined) {
+        text = feature.getProperties().properties.numImages;
+      }
+      return new Style({
+        fill: new Fill({
+          color: 'rgba(255, 255, 255, 0.2)',
+        }),
+        stroke: new Stroke({
+          width: 2,
+          color: 'white',
+        }),
+        text: new Text({
+          text,
+          font: 'bold 16px Roboto',
+          fill: new Fill({
+            color: 'black',
+          }),
+          stroke: new Stroke({
+            color: 'white',
+            width: 4,
+          }),
+        }),
+      });
+    };
+  }
+
+  private getImagesInsideDivision(divisionCoords: Coordinate[]): string[] {
+    const imagesIds: string[] = [];
+    this.mapImagesService.mapImages.forEach((image) => {
+      if (this.isInsideDivision(image.coords, divisionCoords)) {
+        imagesIds.push(image.id);
+      }
+    });
+
+    return imagesIds;
+  }
+
+  private isInsideDivision(imageCoords: Coordinate, divisionCoords: Coordinate[]): boolean {
+    const divisionPolygon = new Polygon([divisionCoords]);
+
+    // comprobamos si esta dentro de la zone
+    return divisionPolygon.intersectsCoordinate(fromLonLat(imageCoords));
+  }
+
+  /* IMÁGENES */
+
   private createImagePointsLayer() {
     // si no existe previamente la creamos
     if (this.imagePointLayer === undefined) {
@@ -234,11 +342,7 @@ export class MapCreateMapComponent implements OnInit {
 
       this.imagePointLayer = new VectorLayer({
         source: this.imagePointSource,
-        style: new Style({
-          fill: new Fill({
-            color: 'black',
-          }),
-        }),
+        style: this.getStyleImagePoint(false),
       });
 
       this.imagePointLayer.setProperties({
@@ -268,89 +372,97 @@ export class MapCreateMapComponent implements OnInit {
 
   private addImagePoint(image: MapImage) {
     const feature = new Feature({
-      geometry: new Circle(fromLonLat(image.coords), 2),
+      geometry: new Circle(fromLonLat(image.coords), 4),
       properties: {
         id: image.id,
+        name: 'imagePoint',
       },
     });
 
     this.imagePointSource.addFeature(feature);
   }
 
-  private getImagesInsideDivision(divisionCoords: Coordinate[]): string[] {
-    const imagesIds: string[] = [];
-    this.mapImagesService.mapImages.forEach((image) => {
-      if (this.isInsideDivision(image.coords, divisionCoords)) {
-        imagesIds.push(image.id);
-      }
+  private addPopupOverlay() {
+    const container = document.getElementById('popup');
+
+    this.popup = new Overlay({
+      id: 'popup',
+      element: container,
+      position: undefined,
     });
 
-    return imagesIds;
+    this.map.addOverlay(this.popup);
   }
 
-  private isInsideDivision(imageCoords: Coordinate, divisionCoords: Coordinate[]): boolean {
-    const divisionPolygon = new Polygon([divisionCoords]);
+  private addOnHoverImageAction() {
+    let currentFeatureHover: Feature;
+    this.map.on('pointermove', (event) => {
+      let featureExistsUnderCursor = false; // Controla si hay una feature debajo del cursor
 
-    // comprobamos si esta dentro de la zone
-    return divisionPolygon.intersectsCoordinate(fromLonLat(imageCoords));
-  }
+      this.map.forEachFeatureAtPixel(event.pixel, (f) => {
+        const feature = f as Feature;
+        if (
+          feature.getProperties().hasOwnProperty('properties') &&
+          feature.getProperties().properties.hasOwnProperty('name') &&
+          feature.getProperties().properties.name === 'imagePoint'
+        ) {
+          featureExistsUnderCursor = true;
 
-  private getDivisionStyle() {
-    return (feature: Feature) => {
-      let text = '0';
-      if (feature.getProperties().properties !== undefined) {
-        text = feature.getProperties().properties.numImages;
+          if (currentFeatureHover !== undefined) {
+            currentFeatureHover.setStyle(this.getStyleImagePoint(false));
+          }
+
+          currentFeatureHover = feature;
+          currentFeatureHover.setStyle(this.getStyleImagePoint(true));
+
+          const imagePointId = feature.getProperties().properties.id;
+          const image = this.images.find((img) => img.id === imagePointId);
+
+          // cargamos la miniatura asociada a este punto
+          this.mapImagesService.getImageThumbnail(image.id);
+
+          // mostramos el popup
+          this.map.getOverlayById('popup').setPosition(fromLonLat(image.coords));
+        }
+      });
+
+      // Si no hay ninguna feature debajo del cursor, ocultamos el popup y reseteamos el estilo de la feature anterior
+      if (!featureExistsUnderCursor && currentFeatureHover !== undefined) {
+        currentFeatureHover.setStyle(this.getStyleImagePoint(false));
+        currentFeatureHover = undefined;
+
+        this.urlImageThumbnail = undefined;
+
+        this.map.getOverlayById('popup').setPosition(undefined);
       }
-      return new Style({
-        fill: new Fill({
-          color: 'rgba(255, 255, 255, 0.2)',
-        }),
-        stroke: new Stroke({
-          width: 2,
-          color: 'white',
-        }),
-        text: new Text({
-          text,
-          font: 'bold 16px Roboto',
+    });
+  }
+
+  private getStyleImagePoint(focused: boolean) {
+    if (focused) {
+      return (feature: Feature) => {
+        return new Style({
+          fill: new Fill({
+            color: 'white',
+          }),
+          stroke: new Stroke({
+            width: 4,
+            color: 'white',
+          }),
+        });
+      };
+    } else {
+      return (feature: Feature) => {
+        return new Style({
           fill: new Fill({
             color: 'black',
           }),
-          stroke: new Stroke({
-            color: 'white',
-            width: 4,
-          }),
-        }),
-      });
-    };
+        });
+      };
+    }
   }
 
-  private addSelectDivisionsInteraction() {
-    const select = new Select({
-      style: this.getDivisionStyle(),
-      condition: click,
-      layers: (l) => {
-        if (l.getProperties().id === 'divisionLayer') {
-          return true;
-        } else {
-          return false;
-        }
-      },
-    });
-
-    this.map.addInteraction(select);
-
-    select.on('select', (e) => {
-      if (e.selected.length > 0) {
-        const feature = e.selected[0];
-        if (feature.getProperties().properties.name === 'division') {
-          const divisionId = feature.getProperties().properties.id;
-          const division = this.divisions.find((d) => d.id === divisionId);
-
-          this.mapDivisionControlService.mapDivisionSelected = division;
-        }
-      }
-    });
-  }
+  /* RECORTES */
 
   private addClippings() {
     this.subscriptions.add(
@@ -428,6 +540,8 @@ export class MapCreateMapComponent implements OnInit {
 
     this.map.addInteraction(modify);
   }
+
+  /* OTROS */
 
   switchCreateMode() {
     this.createMapService.createMode = !this.createMapService.createMode;
