@@ -1,6 +1,8 @@
 <app-list-create-map
+  [planta]="planta"
   [dataSource]="dataSource"
   [displayedColumns]="displayedColumns"
+  [mapDivisionHovered]="mapDivisionHovered"
   [mapDivisionSelected]="mapDivisionSelected"
   (rowHovered)="hoverDivision($event)"
   (rowSelected)="selectDivision($event)"

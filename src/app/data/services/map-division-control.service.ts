@@ -6,10 +6,21 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class MapDivisionControlService {
+  private _mapDivisionHovered: MapDivision = undefined;
+  mapDivisionHovered$ = new BehaviorSubject<MapDivision>(this._mapDivisionHovered);
   private _mapDivisionSelected: MapDivision = undefined;
   mapDivisionSelected$ = new BehaviorSubject<MapDivision>(this._mapDivisionSelected);
 
   constructor() {}
+
+  get mapDivisionHovered() {
+    return this._mapDivisionHovered;
+  }
+
+  set mapDivisionHovered(value: MapDivision) {
+    this._mapDivisionHovered = value;
+    this.mapDivisionHovered$.next(value);
+  }
 
   get mapDivisionSelected() {
     return this._mapDivisionSelected;

@@ -1,8 +1,10 @@
 import { Coordinate } from 'ol/coordinate';
+import { MapElement } from './mapElement';
 
-export interface MapClipping {
+export class MapClipping implements MapElement {
   id?: string;
-  numDivision?: number;
   coords: Coordinate[];
+  type: string;
+  numDivision?: number;
   // mapId?: string;
 }

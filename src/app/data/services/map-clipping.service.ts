@@ -25,6 +25,8 @@ export class MapClippingService {
           const data = a.payload.doc.data() as MapClipping;
           const id = a.payload.doc.id;
 
+          data.type = 'recorte';
+
           // Convertimos el objeto en un array
           data.coords = Object.values(data.coords);
 

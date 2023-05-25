@@ -25,7 +25,8 @@ export class MapDivisionsService {
           const data = a.payload.doc.data() as MapDivision;
           const id = a.payload.doc.id;
 
-          data.numDivision = index + 1;
+          data.type = 'division';
+          // data.numDivision = index + 1;
 
           // Convertimos el objeto en un array
           data.coords = Object.values(data.coords);

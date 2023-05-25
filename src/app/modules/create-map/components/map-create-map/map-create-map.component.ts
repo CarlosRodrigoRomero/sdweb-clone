@@ -51,6 +51,8 @@ export class MapCreateMapComponent implements OnInit {
   private clippings: MapClipping[] = [];
   private popup: Overlay;
   urlImageThumbnail: string;
+  private divisionHovered: MapDivision;
+  private divisionSelected: MapDivision;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -77,6 +79,7 @@ export class MapCreateMapComponent implements OnInit {
 
     this.createDivisionLayer();
     this.addDivisions();
+    this.addOnHoverDivisionsInteraction();
     this.addModifyDivisionsInteraction();
     this.addSelectDivisionsInteraction();
 
@@ -84,10 +87,10 @@ export class MapCreateMapComponent implements OnInit {
     this.addClippings();
     this.addModifyClippingsInteraction();
 
+    this.addClickOutFeatures();
+
     this.subscriptions.add(
       this.createMapService.createMode$.subscribe((mode) => {
-        // this.createMode = mode;
-
         if (mode) {
           this.drawDivisions();
         } else if (this.draw !== undefined) {
@@ -97,7 +100,39 @@ export class MapCreateMapComponent implements OnInit {
       })
     );
 
-    this.mapImagesService.urlImageThumbnail$.subscribe((url) => (this.urlImageThumbnail = url));
+    this.subscriptions.add(this.mapImagesService.urlImageThumbnail$.subscribe((url) => (this.urlImageThumbnail = url)));
+
+    this.subscriptions.add(
+      this.mapDivisionControlService.mapDivisionSelected$.subscribe((division) => {
+        if (this.divisionSelected) {
+          // quitamos el estilo a la anterior hovered
+          this.setExternalDivisionStyle(this.divisionSelected.id, false);
+        }
+
+        if (division !== undefined) {
+          this.setExternalDivisionStyle(division.id, true);
+        }
+
+        this.divisionSelected = division;
+      })
+    );
+
+    this.subscriptions.add(
+      this.mapDivisionControlService.mapDivisionHovered$.subscribe((division) => {
+        if (this.divisionSelected === undefined) {
+          if (this.divisionHovered) {
+            // quitamos el estilo a la anterior hovered
+            this.setExternalDivisionStyle(this.divisionHovered.id, false);
+          }
+
+          if (division !== undefined) {
+            this.setExternalDivisionStyle(division.id, true);
+          }
+
+          this.divisionHovered = division;
+        }
+      })
+    );
   }
 
   /* MAPA */
@@ -105,7 +140,6 @@ export class MapCreateMapComponent implements OnInit {
   initMap() {
     const baseSource = new XYZ({
       url: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}', // hidrido
-      // url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', // satelite
       crossOrigin: '',
     });
     const baseLayer = new TileLayer({
@@ -158,7 +192,7 @@ export class MapCreateMapComponent implements OnInit {
 
       this.divisionLayer = new VectorLayer({
         source: this.divisionSource,
-        style: this.getStyleDivision(),
+        style: this.getStyleDivision(false),
       });
 
       this.divisionLayer.setProperties({
@@ -192,6 +226,7 @@ export class MapCreateMapComponent implements OnInit {
 
       let division: MapDivision = {
         coords: Object.values(coords[0]),
+        type: 'division',
       };
 
       // calculamos el numero de imagenes que hay dentro de la division
@@ -234,6 +269,44 @@ export class MapCreateMapComponent implements OnInit {
     this.divisionSource.addFeature(feature);
   }
 
+  private addOnHoverDivisionsInteraction() {
+    let currentFeatureHover: Feature;
+    this.map.on('pointermove', (event) => {
+      let featureExistsUnderCursor = false; // Controla si hay una feature debajo del cursor
+
+      this.map.forEachFeatureAtPixel(event.pixel, (f) => {
+        const feature = f as Feature;
+        if (
+          feature.getProperties().hasOwnProperty('properties') &&
+          feature.getProperties().properties.hasOwnProperty('name') &&
+          feature.getProperties().properties.name === 'division'
+        ) {
+          featureExistsUnderCursor = true;
+
+          if (currentFeatureHover !== undefined) {
+            currentFeatureHover.setStyle(this.getStyleDivision(false));
+          }
+
+          currentFeatureHover = feature;
+          currentFeatureHover.setStyle(this.getStyleDivision(true));
+
+          const divisionId = feature.getProperties().properties.id;
+          const division = this.divisions.find((img) => img.id === divisionId);
+
+          this.mapDivisionControlService.mapDivisionHovered = division;
+        }
+      });
+
+      // Si no hay ninguna feature debajo del cursor, reseteamos el estilo de la feature anterior
+      if (!featureExistsUnderCursor && currentFeatureHover !== undefined) {
+        currentFeatureHover.setStyle(this.getStyleDivision(false));
+        currentFeatureHover = undefined;
+
+        this.mapDivisionControlService.mapDivisionHovered = undefined;
+      }
+    });
+  }
+
   private addModifyDivisionsInteraction() {
     const modify = new Modify({ source: this.divisionSource, insertVertexCondition: never });
 
@@ -260,7 +333,7 @@ export class MapCreateMapComponent implements OnInit {
 
   private addSelectDivisionsInteraction() {
     const select = new Select({
-      style: this.getStyleDivision(),
+      style: this.getStyleDivision(false),
       condition: click,
       layers: (l) => {
         if (l.getProperties().id === 'divisionLayer') {
@@ -286,33 +359,74 @@ export class MapCreateMapComponent implements OnInit {
     });
   }
 
-  private getStyleDivision() {
-    return (feature: Feature) => {
-      let text = '0';
-      if (feature.getProperties().properties !== undefined) {
-        text = feature.getProperties().properties.numImages;
-      }
-      return new Style({
-        fill: new Fill({
-          color: 'rgba(255, 255, 255, 0.2)',
-        }),
-        stroke: new Stroke({
-          width: 2,
-          color: 'white',
-        }),
-        text: new Text({
-          text,
-          font: 'bold 16px Roboto',
+  private getStyleDivision(focused: boolean) {
+    if (focused) {
+      return (feature: Feature) => {
+        let text = '0';
+        if (feature.getProperties().properties !== undefined) {
+          text = feature.getProperties().properties.numImages;
+        }
+        return new Style({
           fill: new Fill({
-            color: 'black',
+            color: 'rgba(255, 255, 255, 0.2)',
           }),
           stroke: new Stroke({
+            width: 2,
             color: 'white',
-            width: 4,
           }),
-        }),
-      });
-    };
+          text: new Text({
+            text,
+            font: 'bold 16px Roboto',
+            fill: new Fill({
+              color: 'black',
+            }),
+            stroke: new Stroke({
+              color: 'white',
+              width: 4,
+            }),
+          }),
+        });
+      };
+    } else {
+      return (feature: Feature) => {
+        let text = '0';
+        if (feature.getProperties().properties !== undefined) {
+          text = feature.getProperties().properties.numImages;
+        }
+        return new Style({
+          fill: new Fill({
+            color: 'rgba(0, 0, 255, 0.2)',
+          }),
+          stroke: new Stroke({
+            width: 2,
+            color: 'blue',
+          }),
+          text: new Text({
+            text,
+            font: 'bold 16px Roboto',
+            fill: new Fill({
+              color: 'black',
+            }),
+            stroke: new Stroke({
+              color: 'white',
+              width: 4,
+            }),
+          }),
+        });
+      };
+    }
+  }
+
+  private setExternalDivisionStyle(divisionId: string, focused: boolean) {
+    const features: Feature[] = this.divisionLayer.getSource().getFeatures();
+
+    const feature = features.find((f) => f.getProperties().properties.id === divisionId);
+
+    if (focused) {
+      feature.setStyle(this.getStyleDivision(true));
+    } else {
+      feature.setStyle(this.getStyleDivision(false));
+    }
   }
 
   private getImagesInsideDivision(divisionCoords: Coordinate[]): string[] {
@@ -495,7 +609,7 @@ export class MapCreateMapComponent implements OnInit {
 
       this.clippingLayer = new VectorLayer({
         source: this.clippingSource,
-        style: this.getClippingStyle(),
+        style: this.getStyleClipping(false),
       });
 
       this.clippingLayer.setProperties({
@@ -506,18 +620,32 @@ export class MapCreateMapComponent implements OnInit {
     }
   }
 
-  private getClippingStyle() {
-    return (feature: Feature) => {
-      return new Style({
-        fill: new Fill({
-          color: 'rgba(0, 0, 255, 0.2)',
-        }),
-        stroke: new Stroke({
-          width: 2,
-          color: 'blue',
-        }),
-      });
-    };
+  private getStyleClipping(focused: boolean) {
+    if (focused) {
+      return (feature: Feature) => {
+        return new Style({
+          fill: new Fill({
+            color: 'rgba(255, 255, 255, 0.2)',
+          }),
+          stroke: new Stroke({
+            width: 2,
+            color: 'white',
+          }),
+        });
+      };
+    } else {
+      return (feature: Feature) => {
+        return new Style({
+          fill: new Fill({
+            color: 'rgba(0, 255, 0, 0.2)',
+          }),
+          stroke: new Stroke({
+            width: 2,
+            color: 'green',
+          }),
+        });
+      };
+    }
   }
 
   private addModifyClippingsInteraction() {
@@ -542,6 +670,21 @@ export class MapCreateMapComponent implements OnInit {
   }
 
   /* OTROS */
+
+  private addClickOutFeatures() {
+    this.map.on('click', (event) => {
+      const feature = this.map
+        .getFeaturesAtPixel(event.pixel)
+        .filter((item) => item.getProperties().properties !== undefined);
+      if (feature.length === 0) {
+        if (this.divisionSelected !== undefined) {
+          this.setExternalDivisionStyle(this.divisionSelected.id, false);
+
+          this.divisionSelected = undefined;
+        }
+      }
+    });
+  }
 
   switchCreateMode() {
     this.createMapService.createMode = !this.createMapService.createMode;

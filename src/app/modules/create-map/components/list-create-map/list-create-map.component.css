@@ -1,4 +1,14 @@
+.tabla-container {
+  position: relative;
+  height: calc(100vh - 194px);
+  overflow: auto;
+}
+
 table {
+  width: 100%;
+}
+
+.buscar-input {
   width: 100%;
 }
 

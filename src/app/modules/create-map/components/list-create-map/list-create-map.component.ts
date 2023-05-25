@@ -6,10 +6,14 @@ import {
   OnChanges,
   Output,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { MapDivision } from '@core/models/mapDivision';
+import { PlantaInterface } from '@core/models/planta';
 
 @Component({
   selector: 'app-list-create-map',
@@ -18,20 +22,28 @@ import { MapDivision } from '@core/models/mapDivision';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListCreateMapComponent implements OnChanges {
+  @Input() planta: PlantaInterface;
   @Input() displayedColumns: string;
   @Input() dataSource: MatTableDataSource<any>;
-  @Input() mapDivisionSelected: MapDivision;
   @Input() mapDivisionHovered: MapDivision;
+  @Input() mapDivisionSelected: MapDivision;
   @Output() rowSelected = new EventEmitter<any>();
   @Output() rowHovered = new EventEmitter<any>();
   @Output() mapDivisionDelete = new EventEmitter<any>();
+  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor() {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.mapDivisionSelected && this.mapDivisionSelected) {
-      this.scrollToRow(this.mapDivisionSelected);
-    }
+    // if (changes.mapDivisionSelected && this.mapDivisionSelected) {
+    //   this.scrollToRow(this.mapDivisionSelected);
+    // }
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   scrollToRow(mapDivision: MapDivision) {

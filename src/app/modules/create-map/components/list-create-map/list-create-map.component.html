@@ -1,49 +1,53 @@
-<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
-  <!-- NÚMERO -->
-  <ng-container matColumnDef="num">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
-    <td mat-cell *matCellDef="let element">{{ element.numDivision }}</td>
-  </ng-container>
+<div class="lista">
+  <h3>{{ planta.nombre }}</h3>
+  <mat-form-field class="buscar-input" appearance="outline">
+    <mat-label>Buscar</mat-label>
+    <input matInput (keyup)="applyFilter($event)" #input autocomplete="off" />
+  </mat-form-field>
 
-  <!-- TIPO -->
-  <ng-container matColumnDef="precise">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>TIPO</th>
-    <td mat-cell *matCellDef="let element">{{ element.precise ? 'Recorte' : 'Subdivisión' }}</td>
-  </ng-container>
+  <div class="tabla-container mat-elevation-z4">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+      <!-- ID -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+      </ng-container>
 
-  <!-- ESTADO -->
-  <!-- <ng-container matColumnDef="status">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>ESTADO</th>
-    <td mat-cell *matCellDef="let element">{{ element.status }}</td>
-  </ng-container> -->
+      <!-- TIPO -->
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>TIPO</th>
+        <td mat-cell *matCellDef="let element">{{ element.type | titlecase }}</td>
+      </ng-container>
 
-  <!-- NÚMERO DE IMÁGENES -->
-  <ng-container matColumnDef="numImages">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>IMÁGENES</th>
-    <td mat-cell *matCellDef="let element">{{ element.numImages }}</td>
-  </ng-container>
+      <!-- NÚMERO DE IMÁGENES -->
+      <ng-container matColumnDef="numImages">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>IMÁGENES</th>
+        <td mat-cell *matCellDef="let element">{{ element.numImages }}</td>
+      </ng-container>
 
-  <!-- ACCIONES -->
-  <ng-container matColumnDef="actions">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
-    <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-      <button (click)="mapDivisionDelete.emit(element.id)" mat-icon-button>
-        <mat-icon>delete</mat-icon>
-      </button>
-    </td>
-  </ng-container>
+      <!-- ACCIONES -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+          <button *ngIf="element.type === 'division'" (click)="mapDivisionDelete.emit(element.id)" mat-icon-button>
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr
-    mat-row
-    [attr.id]="'row-' + row.id"
-    (mouseover)="hoverRow(row, true)"
-    (mouseleave)="hoverRow(row, false)"
-    (click)="selectRow(row, false)"
-    [ngClass]="{
-      selected: mapDivisionSelected && row.id === mapDivisionSelected.id,
-      hovered: mapDivisionHovered && row.id === mapDivisionHovered.id
-    }"
-    *matRowDef="let row; columns: displayedColumns"
-  ></tr>
-</table>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr
+        mat-row
+        [attr.id]="'row-' + row.id"
+        (mouseover)="hoverRow(row, true)"
+        (mouseleave)="hoverRow(row, false)"
+        (click)="selectRow(row, false)"
+        [ngClass]="{
+          selected: mapDivisionSelected && row.id === mapDivisionSelected.id,
+          hovered: mapDivisionHovered && row.id === mapDivisionHovered.id
+        }"
+        *matRowDef="let row; columns: displayedColumns"
+      ></tr>
+    </table>
+  </div>
+</div>

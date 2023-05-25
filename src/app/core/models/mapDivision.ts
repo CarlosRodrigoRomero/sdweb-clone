@@ -1,9 +1,11 @@
 import { Coordinate } from 'ol/coordinate';
+import { MapElement } from './mapElement';
 
-export interface MapDivision {
+export class MapDivision implements MapElement {
   id?: string;
-  numDivision?: number;
   coords: Coordinate[];
+  type: string;
+  numDivision?: number;
   imagesIds?: string[];
   numImages?: number;
   // mapId?: string;
