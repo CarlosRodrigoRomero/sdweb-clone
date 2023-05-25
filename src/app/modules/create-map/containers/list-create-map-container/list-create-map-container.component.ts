@@ -47,6 +47,17 @@ export class ListCreateMapContainerComponent implements OnInit, OnDestroy {
     );
   }
 
+  hoverDivision(row: any) {
+    // if (this.anomaliasControlService.anomaliaSelect === undefined) {
+    //   if (row.hovered) {
+    //     this.anomaliasControlService.anomaliaHover = row.anomalia;
+    //   } else {
+    //     this.anomaliasControlService.anomaliaHover = undefined;
+    //   }
+    //   this.anomaliasControlService.setExternalStyle(row.id, row.hovered);
+    // }
+  }
+
   selectDivision(row: any) {
     const division = this.mapDivisions.find((division) => division.id === row.id);
 
@@ -64,6 +75,10 @@ export class ListCreateMapContainerComponent implements OnInit, OnDestroy {
 
     // centramos la vista al hacer click
     this.centerView(division);
+  }
+
+  deleteDivision(id: string) {
+    this.mapDivisionsService.deleteMapDivision(id);
   }
 
   private centerView(mapDivision: MapDivision) {

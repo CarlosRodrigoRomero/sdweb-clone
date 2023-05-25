@@ -21,7 +21,10 @@ export class ListCreateMapComponent implements OnChanges {
   @Input() displayedColumns: string;
   @Input() dataSource: MatTableDataSource<any>;
   @Input() mapDivisionSelected: MapDivision;
+  @Input() mapDivisionHovered: MapDivision;
   @Output() rowSelected = new EventEmitter<any>();
+  @Output() rowHovered = new EventEmitter<any>();
+  @Output() mapDivisionDelete = new EventEmitter<any>();
 
   constructor() {}
 
@@ -37,6 +40,11 @@ export class ListCreateMapComponent implements OnChanges {
     if (rowElement) {
       rowElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  }
+
+  hoverRow(row: any, zoom: boolean) {
+    row.zoom = zoom;
+    this.rowHovered.emit(row);
   }
 
   selectRow(row: any, zoom: boolean) {

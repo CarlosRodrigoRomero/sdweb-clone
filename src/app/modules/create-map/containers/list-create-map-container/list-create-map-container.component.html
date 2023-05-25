@@ -2,5 +2,7 @@
   [dataSource]="dataSource"
   [displayedColumns]="displayedColumns"
   [mapDivisionSelected]="mapDivisionSelected"
+  (rowHovered)="hoverDivision($event)"
   (rowSelected)="selectDivision($event)"
+  (mapDivisionDelete)="deleteDivision($event)"
 ></app-list-create-map>

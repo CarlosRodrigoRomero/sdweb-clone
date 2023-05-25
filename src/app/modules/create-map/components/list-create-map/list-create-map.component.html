@@ -8,7 +8,7 @@
   <!-- TIPO -->
   <ng-container matColumnDef="precise">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>TIPO</th>
-    <td mat-cell *matCellDef="let element">{{ element.precise ? 'Precisa' : 'Normal' }}</td>
+    <td mat-cell *matCellDef="let element">{{ element.precise ? 'Recorte' : 'Subdivisión' }}</td>
   </ng-container>
 
   <!-- ESTADO -->
@@ -26,10 +26,9 @@
   <!-- ACCIONES -->
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
-    <td mat-cell *matCellDef="let element">
-      <button *ngIf="!element.precise" mat-raised-button>
-        <mat-icon>add</mat-icon>
-        <span>Crear división precisa</span>
+    <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+      <button (click)="mapDivisionDelete.emit(element.id)" mat-icon-button>
+        <mat-icon>delete</mat-icon>
       </button>
     </td>
   </ng-container>
@@ -37,8 +36,14 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr
     mat-row
-    (click)="selectRow(row, false)"
     [attr.id]="'row-' + row.id"
+    (mouseover)="hoverRow(row, true)"
+    (mouseleave)="hoverRow(row, false)"
+    (click)="selectRow(row, false)"
+    [ngClass]="{
+      selected: mapDivisionSelected && row.id === mapDivisionSelected.id,
+      hovered: mapDivisionHovered && row.id === mapDivisionHovered.id
+    }"
     *matRowDef="let row; columns: displayedColumns"
   ></tr>
 </table>
