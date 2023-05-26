@@ -40,10 +40,10 @@ import { COLOR } from '@data/constants/color';
 })
 export class MapClustersComponent implements OnInit, OnDestroy {
   private planta: PlantaInterface;
-  private satelliteLayer: TileLayer;
+  private satelliteLayer: TileLayer<any>;
   private map: Map;
   private coordsPuntosTrayectoria: Coordinate[] = [];
-  private prevFeatureHover: Feature;
+  private prevFeatureHover: Feature<any>;
   private puntosTrayectoria: PuntoTrayectoria[] = [];
   private prevPuntoTrayectoriaSelected: PuntoTrayectoria;
   private puntoTrayectoriaSelected: PuntoTrayectoria;
@@ -54,8 +54,8 @@ export class MapClustersComponent implements OnInit, OnDestroy {
   private deleteMode = false;
   private joinActive = false;
   private createClusterActive = false;
-  private mesasLayer: VectorLayer;
-  private mesasSource: VectorSource;
+  private mesasLayer: VectorLayer<any>;
+  private mesasSource: VectorSource<any>;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -242,7 +242,7 @@ export class MapClustersComponent implements OnInit, OnDestroy {
   }
 
   private addPuntosTrayectoria() {
-    const features: Feature[] = [];
+    const features: Feature<any>[] = [];
 
     this.puntosTrayectoria.forEach((punto) => {
       const feature = new Feature({
@@ -290,7 +290,7 @@ export class MapClustersComponent implements OnInit, OnDestroy {
           const clustersLayer = this.map
             .getLayers()
             .getArray()
-            .find((layer) => layer.getProperties().id === 'clustersLayer') as VectorLayer;
+            .find((layer) => layer.getProperties().id === 'clustersLayer') as VectorLayer<any>;
 
           const clustersSource = clustersLayer.getSource();
           clustersSource.clear();
@@ -398,14 +398,14 @@ export class MapClustersComponent implements OnInit, OnDestroy {
   }
 
   private addOnHoverPointAction() {
-    let currentFeatureHover: Feature;
+    let currentFeatureHover: Feature<any>;
     this.map.on('pointermove', (event) => {
       if (this.puntoTrayectoriaSelected === undefined) {
         if (this.map.hasFeatureAtPixel(event.pixel)) {
           const feature = this.map
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
-            .filter((item) => item.getProperties().properties.name === 'puntoTrayectoria')[0] as Feature;
+            .filter((item) => item.getProperties().properties.name === 'puntoTrayectoria')[0] as Feature<any>;
 
           if (feature !== undefined && this.puntoClusterHovered === undefined) {
             // cuando pasamos de un punto a otro directamente sin pasar por vacio
@@ -463,12 +463,12 @@ export class MapClustersComponent implements OnInit, OnDestroy {
 
             this.clustersService.getImageThumbnail(puntoEquivalente.thumbnail);
 
-            (feature[0] as Feature).setStyle(this.getStyleCluster(true));
+            (feature[0] as Feature<any>).setStyle(this.getStyleCluster(true));
           }
         } else {
           this.puntoClusterHovered = undefined;
           if (currentFeatureHover !== undefined) {
-            (currentFeatureHover[0] as Feature).setStyle(this.getStyleCluster(false));
+            (currentFeatureHover[0] as Feature<any>).setStyle(this.getStyleCluster(false));
             currentFeatureHover = undefined;
           }
         }
@@ -605,7 +605,7 @@ export class MapClustersComponent implements OnInit, OnDestroy {
 
   private getStylePuntos(focused: boolean) {
     if (focused) {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             fill: new Fill({
@@ -619,7 +619,7 @@ export class MapClustersComponent implements OnInit, OnDestroy {
         }
       };
     } else {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             fill: new Fill({
@@ -635,11 +635,11 @@ export class MapClustersComponent implements OnInit, OnDestroy {
     const trayectoriaLayer = this.map
       .getLayers()
       .getArray()
-      .find((layer) => layer.getProperties().id === 'puntosTrayectoriaLayer') as VectorLayer;
+      .find((layer) => layer.getProperties().id === 'puntosTrayectoriaLayer') as VectorLayer<any>;
 
     const features = trayectoriaLayer.getSource().getFeatures();
 
-    const feature: Feature = features.find((f) => f.getProperties().properties.id === puntoId);
+    const feature: Feature<any> = features.find((f) => f.getProperties().properties.id === puntoId);
 
     const focusedStyle = new Style({
       fill: new Fill({
@@ -666,7 +666,7 @@ export class MapClustersComponent implements OnInit, OnDestroy {
 
   private getStyleCluster(hovered: boolean) {
     if (hovered) {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             fill: new Fill({
@@ -683,7 +683,7 @@ export class MapClustersComponent implements OnInit, OnDestroy {
         }
       };
     } else {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           if (feature.getProperties().properties.isJoined) {
             return new Style({
@@ -725,11 +725,11 @@ export class MapClustersComponent implements OnInit, OnDestroy {
     const clustersLayer = this.map
       .getLayers()
       .getArray()
-      .find((layer) => layer.getProperties().id === 'clustersLayer') as VectorLayer;
+      .find((layer) => layer.getProperties().id === 'clustersLayer') as VectorLayer<any>;
 
     const features = clustersLayer.getSource().getFeatures();
 
-    let feature: Feature;
+    let feature: Feature<any>;
     if (this.isClusterA) {
       feature = features.find(
         (f) => f.getProperties().properties.id === clusterId && f.getProperties().properties.name === 'puntoClusterA'

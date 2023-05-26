@@ -4,7 +4,6 @@ import Map from 'ol/Map';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
-import XYZ from 'ol/source/XYZ';
 import { OSM } from 'ol/source';
 import * as Proj from 'ol/proj.js';
 import { defaults as defaultControls, Control } from 'ol/control.js';
@@ -63,7 +62,7 @@ export class OlMapComponent implements OnInit, AfterViewInit {
     }
   }
 
-  public setMarker(vector: VectorLayer) {
+  public setMarker(vector: VectorLayer<any>) {
     this.map.addLayer(vector);
   }
 

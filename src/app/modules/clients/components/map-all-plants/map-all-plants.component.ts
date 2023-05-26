@@ -44,7 +44,7 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
   private prevFeatureHover: any;
   private popup: Overlay;
   labelPlanta: string;
-  private plantasSource: VectorSource;
+  private plantasSource: VectorSource<any>;
   private prevPlantaHovered: PlantaInterface;
 
   private subscriptions: Subscription = new Subscription();
@@ -99,14 +99,14 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
         if (this.map !== undefined) {
           this.map.getLayers().forEach((layer) => {
             if (layer.get('name') === 'plantas') {
-              (layer as VectorLayer)
+              (layer as VectorLayer<any>)
                 .getSource()
                 .getFeatures()
                 .forEach((feature) => {
                   feature.setStyle(this.getStyleOnHover(false, theme));
                 });
 
-              (layer as VectorLayer).setStyle(this.getStyleOnHover(false, theme));
+              (layer as VectorLayer<any>).setStyle(this.getStyleOnHover(false, theme));
             }
           });
         }
@@ -220,10 +220,10 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
     let currentFeatureHover;
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const features = this.map.getFeaturesAtPixel(event.pixel) as Feature[];
+        const features = this.map.getFeaturesAtPixel(event.pixel) as Feature<any>[];
 
         if (features.length > 0) {
-          const feature = features[0] as Feature;
+          const feature = features[0] as Feature<any>;
           const planta = feature.getProperties().planta;
 
           this.portfolioControlService.plantaHovered = planta;
@@ -239,7 +239,7 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
       const features = this.map.getFeaturesAtPixel(event.pixel);
 
       if (features.length > 0) {
-        const feature = features[0] as Feature;
+        const feature = features[0] as Feature<any>;
         const planta: PlantaInterface = feature.getProperties().planta;
         const informeReciente = feature.getProperties().informeReciente;
 
@@ -344,7 +344,7 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
       } else {
         iconSrc = 'assets/icons/location-pin-dark-hover.png';
       }
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             image: new Icon({
@@ -361,7 +361,7 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
       } else {
         iconSrc = 'assets/icons/location-pin-dark-unhover.png';
       }
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             image: new Icon({

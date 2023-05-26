@@ -41,7 +41,7 @@ export class AnomaliasControlService {
   private prevFeatureHover: any;
   public prevAnomaliaSelect: Anomalia;
   public listaAnomalias: Anomalia[];
-  private anomaliaLayers: VectorImageLayer[];
+  private anomaliaLayers: VectorImageLayer<any>[];
   private sharedReportNoFilters = false;
   private toggleViewSelected: string;
   private _coordsPointer: Coordinate = undefined;
@@ -102,8 +102,8 @@ export class AnomaliasControlService {
     });
   }
 
-  createAnomaliaLayers(informeId: string): VectorImageLayer[] {
-    const anomaliasLayers: VectorImageLayer[] = [];
+  createAnomaliaLayers(informeId: string): VectorImageLayer<any>[] {
+    const anomaliasLayers: VectorImageLayer<any>[] = [];
 
     const perdidasLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
@@ -189,7 +189,7 @@ export class AnomaliasControlService {
         anomaliasInforme = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
       }
 
-      const source = l.getSource() as VectorSource;
+      const source = l.getSource() as VectorSource<any>;
       source.clear();
       anomaliasInforme.forEach((anom) => {
         const feature = new Feature({
@@ -267,7 +267,7 @@ export class AnomaliasControlService {
               .filter((item) => item.getProperties().properties !== undefined)
               .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
               .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)
-              .filter((item) => item.getProperties().properties.type === 'anomalia')[0] as Feature;
+              .filter((item) => item.getProperties().properties.type === 'anomalia')[0] as Feature<any>;
 
             if (feature !== undefined) {
               // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
@@ -400,7 +400,7 @@ export class AnomaliasControlService {
 
   public permitirCrearAnomalias(plantaId: string) {
     const draw = new Draw({
-      source: this.anomaliaLayers[0].getSource() as VectorSource,
+      source: this.anomaliaLayers[0].getSource() as VectorSource<any>,
       type: GeometryType.CIRCLE,
       geometryFunction: createBox(),
     });
@@ -411,7 +411,7 @@ export class AnomaliasControlService {
     });
   }
 
-  private addAnomaliaToDb(feature: Feature, plantaId: string) {
+  private addAnomaliaToDb(feature: Feature<any>, plantaId: string) {
     const geometry = feature.getGeometry() as SimpleGeometry;
 
     const anomalia = new Anomalia(
@@ -460,7 +460,7 @@ export class AnomaliasControlService {
     };
   }
 
-  private getColorMae(feature: Feature, opacity: number): string {
+  private getColorMae(feature: Feature<any>, opacity: number): string {
     const perdidas = feature.getProperties().properties.perdidas as number;
 
     return Colors.getColor(perdidas, [0.3, 0.5], opacity);
@@ -483,7 +483,7 @@ export class AnomaliasControlService {
     };
   }
 
-  private getColorCelsCalientes(feature: Feature, opacity: number): string {
+  private getColorCelsCalientes(feature: Feature<any>, opacity: number): string {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
     return Colors.getColor(gradNormMax, [10, 40], opacity);
@@ -506,7 +506,7 @@ export class AnomaliasControlService {
     };
   }
 
-  private getColorGradienteNormMax(feature: Feature, opacity: number) {
+  private getColorGradienteNormMax(feature: Feature<any>, opacity: number) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
     return Colors.getColor(gradNormMax, [10, 40], opacity);
@@ -529,7 +529,7 @@ export class AnomaliasControlService {
     };
   }
 
-  private getColorTipo(feature: Feature) {
+  private getColorTipo(feature: Feature<any>) {
     if (feature !== undefined) {
       const tipo = Number(feature.getProperties().properties.tipo);
 
@@ -544,8 +544,8 @@ export class AnomaliasControlService {
 
     const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
 
-    const features: Feature[] = [];
-    layersView.forEach((layer) => features.push(...(layer.getSource() as VectorSource).getFeatures()));
+    const features: Feature<any>[] = [];
+    layersView.forEach((layer) => features.push(...(layer.getSource() as VectorSource<any>).getFeatures()));
 
     const feature = features.find((f) => f.getProperties().properties.anomaliaId === anomaliaId);
 

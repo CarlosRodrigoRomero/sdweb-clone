@@ -30,8 +30,8 @@ export interface Task {
 export class ZonesSelectorContainerComponent implements OnInit, OnDestroy {
   planta: PlantaInterface;
   private zones: LocationAreaInterface[][] = [];
-  globalCoordAreasVectorSources: VectorSource[] = [];
-  globalCoordAreasVectorLayers: VectorLayer[] = [];
+  globalCoordAreasVectorSources: VectorSource<any>[] = [];
+  globalCoordAreasVectorLayers: VectorLayer<any>[] = [];
   private nombreGlobalCoords: string[] = [];
   map: Map;
   numAreas: number;
@@ -130,7 +130,7 @@ export class ZonesSelectorContainerComponent implements OnInit, OnDestroy {
     };
   }
 
-  private getLabelStyle(feature: Feature) {
+  private getLabelStyle(feature: Feature<any>) {
     return new Text({
       text: feature.getProperties().properties.id,
       font: 'bold 16px Roboto',

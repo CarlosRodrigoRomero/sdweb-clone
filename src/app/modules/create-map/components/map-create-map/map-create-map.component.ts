@@ -5,8 +5,9 @@ import { Subscription } from 'rxjs';
 
 import { Feature, Overlay, View } from 'ol';
 import { fromLonLat } from 'ol/proj';
-import { XYZ } from 'ol/source';
+import { XYZ, GeoTIFF } from 'ol/source';
 import TileLayer from 'ol/layer/Tile';
+import WebGLTileLayer from 'ol/layer/WebGLTile';
 import { defaults } from 'ol/control.js';
 import Map from 'ol/Map';
 import { DoubleClickZoom, Draw, Modify, Select } from 'ol/interaction';
@@ -38,12 +39,12 @@ import { MapClipping } from '@core/models/mapClipping';
 })
 export class MapCreateMapComponent implements OnInit {
   private planta: PlantaInterface;
-  private divisionLayer: VectorLayer;
-  private divisionSource: VectorSource;
-  private imagePointLayer: VectorLayer;
-  private imagePointSource: VectorSource;
-  private clippingLayer: VectorLayer;
-  private clippingSource: VectorSource;
+  private divisionLayer: VectorLayer<any>;
+  private divisionSource: VectorSource<any>;
+  private imagePointLayer: VectorLayer<any>;
+  private imagePointSource: VectorSource<any>;
+  private clippingLayer: VectorLayer<any>;
+  private clippingSource: VectorSource<any>;
   map: Map;
   private draw: Draw;
   private divisions: MapDivision[] = [];
@@ -69,6 +70,10 @@ export class MapCreateMapComponent implements OnInit {
     this.planta = this.createMapService.planta;
 
     this.initMap();
+
+    // this.loadThermalLayers();
+
+    // this.addGeoTiffs();
 
     this.addPointerOnHover();
 
@@ -183,14 +188,33 @@ export class MapCreateMapComponent implements OnInit {
     });
   }
 
+  private async addGeoTiffs() {
+    // const url = 'https://storage.googleapis.com/mapas-cog/test_coded_cog.tif';
+    const url = 'https://storage.googleapis.com/mapas-cog/test_cog.tif';
+
+    const source = new GeoTIFF({
+      sources: [
+        {
+          url,
+          min: 31.7997,
+          max: 70.2184,
+        },
+      ],
+    });
+
+    const layer = new WebGLTileLayer({ source });
+
+    this.map.addLayer(layer);
+  }
+
   /* DIVISIONES */
 
   private createDivisionLayer() {
     // si no existe previamente la creamos
     if (this.divisionLayer === undefined) {
-      this.divisionSource = new VectorSource({ wrapX: false });
+      this.divisionSource = new VectorSource<any>({ wrapX: false });
 
-      this.divisionLayer = new VectorLayer({
+      this.divisionLayer = new VectorLayer<any>({
         source: this.divisionSource,
         style: this.getStyleDivision(false),
       });
@@ -270,12 +294,12 @@ export class MapCreateMapComponent implements OnInit {
   }
 
   private addOnHoverDivisionsInteraction() {
-    let currentFeatureHover: Feature;
+    let currentFeatureHover: Feature<any>;
     this.map.on('pointermove', (event) => {
       let featureExistsUnderCursor = false; // Controla si hay una feature debajo del cursor
 
       this.map.forEachFeatureAtPixel(event.pixel, (f) => {
-        const feature = f as Feature;
+        const feature = f as Feature<any>;
         if (
           feature.getProperties().hasOwnProperty('properties') &&
           feature.getProperties().properties.hasOwnProperty('name') &&
@@ -314,7 +338,7 @@ export class MapCreateMapComponent implements OnInit {
       if (e.features.getArray().length > 0) {
         const divisionId = e.features.getArray()[0].getProperties().properties.id;
         let division = this.divisions.find((d) => d.id === divisionId);
-        const coords = this.getCoords(e.features.getArray()[0]);
+        const coords = this.getCoords(e.features.getArray()[0] as Feature<Polygon>);
 
         if (coords !== null) {
           // calculamos el numero de imagenes que hay dentro de la division
@@ -361,7 +385,7 @@ export class MapCreateMapComponent implements OnInit {
 
   private getStyleDivision(focused: boolean) {
     if (focused) {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         let text = '0';
         if (feature.getProperties().properties !== undefined) {
           text = feature.getProperties().properties.numImages;
@@ -388,7 +412,7 @@ export class MapCreateMapComponent implements OnInit {
         });
       };
     } else {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         let text = '0';
         if (feature.getProperties().properties !== undefined) {
           text = feature.getProperties().properties.numImages;
@@ -418,7 +442,7 @@ export class MapCreateMapComponent implements OnInit {
   }
 
   private setExternalDivisionStyle(divisionId: string, focused: boolean) {
-    const features: Feature[] = this.divisionLayer.getSource().getFeatures();
+    const features: Feature<any>[] = this.divisionLayer.getSource().getFeatures();
 
     const feature = features.find((f) => f.getProperties().properties.id === divisionId);
 
@@ -452,9 +476,9 @@ export class MapCreateMapComponent implements OnInit {
   private createImagePointsLayer() {
     // si no existe previamente la creamos
     if (this.imagePointLayer === undefined) {
-      this.imagePointSource = new VectorSource({ wrapX: false });
+      this.imagePointSource = new VectorSource<any>({ wrapX: false });
 
-      this.imagePointLayer = new VectorLayer({
+      this.imagePointLayer = new VectorLayer<any>({
         source: this.imagePointSource,
         style: this.getStyleImagePoint(false),
       });
@@ -509,12 +533,12 @@ export class MapCreateMapComponent implements OnInit {
   }
 
   private addOnHoverImageAction() {
-    let currentFeatureHover: Feature;
+    let currentFeatureHover: Feature<any>;
     this.map.on('pointermove', (event) => {
       let featureExistsUnderCursor = false; // Controla si hay una feature debajo del cursor
 
       this.map.forEachFeatureAtPixel(event.pixel, (f) => {
-        const feature = f as Feature;
+        const feature = f as Feature<any>;
         if (
           feature.getProperties().hasOwnProperty('properties') &&
           feature.getProperties().properties.hasOwnProperty('name') &&
@@ -554,7 +578,7 @@ export class MapCreateMapComponent implements OnInit {
 
   private getStyleImagePoint(focused: boolean) {
     if (focused) {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         return new Style({
           fill: new Fill({
             color: 'white',
@@ -566,7 +590,7 @@ export class MapCreateMapComponent implements OnInit {
         });
       };
     } else {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         return new Style({
           fill: new Fill({
             color: 'black',
@@ -605,9 +629,9 @@ export class MapCreateMapComponent implements OnInit {
   private createClippingLayer() {
     // si no existe previamente la creamos
     if (this.clippingLayer === undefined) {
-      this.clippingSource = new VectorSource({ wrapX: false });
+      this.clippingSource = new VectorSource<any>({ wrapX: false });
 
-      this.clippingLayer = new VectorLayer({
+      this.clippingLayer = new VectorLayer<any>({
         source: this.clippingSource,
         style: this.getStyleClipping(false),
       });
@@ -622,7 +646,7 @@ export class MapCreateMapComponent implements OnInit {
 
   private getStyleClipping(focused: boolean) {
     if (focused) {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         return new Style({
           fill: new Fill({
             color: 'rgba(255, 255, 255, 0.2)',
@@ -634,7 +658,7 @@ export class MapCreateMapComponent implements OnInit {
         });
       };
     } else {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         return new Style({
           fill: new Fill({
             color: 'rgba(0, 255, 0, 0.2)',
@@ -655,7 +679,7 @@ export class MapCreateMapComponent implements OnInit {
       if (e.features.getArray().length > 0) {
         const clippingId = e.features.getArray()[0].getProperties().properties.id;
         let clipping = this.clippings.find((d) => d.id === clippingId);
-        const coords = this.getCoords(e.features.getArray()[0]);
+        const coords = this.getCoords(e.features.getArray()[0] as Feature<Polygon>);
 
         if (coords !== null) {
           // adaptamos las coords a la DB
@@ -690,7 +714,7 @@ export class MapCreateMapComponent implements OnInit {
     this.createMapService.createMode = !this.createMapService.createMode;
   }
 
-  getCoords(feature: Feature): Coordinate[] {
+  getCoords(feature: Feature<any>): Coordinate[] {
     const polygon = feature.getGeometry() as Polygon;
     const coords = polygon.getCoordinates()[0];
 

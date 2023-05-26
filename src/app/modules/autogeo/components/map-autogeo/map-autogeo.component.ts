@@ -35,12 +35,12 @@ import { InformeInterface } from '@core/models/informe';
 })
 export class MapAutogeoComponent implements OnInit, OnDestroy {
   private map: Map;
-  private aerialLayers: TileLayer[];
+  private aerialLayers: TileLayer<any>[];
   private informeId: string;
   private informe: InformeInterface;
   planta: PlantaInterface;
-  private mesasLayer: VectorLayer;
-  private mesasSource: VectorSource;
+  private mesasLayer: VectorLayer<any>;
+  private mesasSource: VectorSource<any>;
   private mesas: Mesa[] = [];
   private draw: Draw;
   deleteMode = false;
@@ -244,7 +244,7 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
   }
 
   private addOnHoverMesaAction() {
-    let currentFeatureHover: Feature;
+    let currentFeatureHover: Feature<any>;
     this.map.on('pointermove', (event) => {
       if (currentFeatureHover !== undefined) {
         currentFeatureHover.setStyle(this.getStyleMesa(false));
@@ -252,7 +252,7 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
       }
 
       this.map.forEachFeatureAtPixel(event.pixel, (feature) => {
-        const f = feature as Feature;
+        const f = feature as Feature<any>;
         if (f.getProperties().name === 'mesa') {
           currentFeatureHover = f;
           currentFeatureHover.setStyle(this.getStyleMesa(true));
@@ -297,7 +297,9 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
       if (e.features.getArray().length > 0) {
         const mesaId = e.features.getArray()[0].getProperties().properties.id;
         const mesa = this.mesas.find((m) => m.id === mesaId);
-        const coords = this.olMapService.fourSidePolygonCoordToObject(this.getCoords(e.features.getArray()[0]));
+        const coords = this.olMapService.fourSidePolygonCoordToObject(
+          this.getCoords(e.features.getArray()[0] as Feature<any>)
+        );
 
         if (coords !== null) {
           mesa.coords = coords;
@@ -310,7 +312,7 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
     this.map.addInteraction(modify);
   }
 
-  getCoords(feature: Feature): Coordinate[] {
+  getCoords(feature: Feature<any>): Coordinate[] {
     const polygon = feature.getGeometry() as Polygon;
     const coords = polygon.getCoordinates()[0];
 
@@ -319,7 +321,7 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
 
   private getStyleMesa(hovered: boolean) {
     if (hovered) {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             stroke: new Stroke({
@@ -333,7 +335,7 @@ export class MapAutogeoComponent implements OnInit, OnDestroy {
         }
       };
     } else {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             stroke: new Stroke({

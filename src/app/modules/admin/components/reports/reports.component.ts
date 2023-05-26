@@ -2,9 +2,8 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } fr
 
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatInput } from '@angular/material/input';
 
-import { switchMap, take } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
 import { InformeService } from '@data/services/informe.service';

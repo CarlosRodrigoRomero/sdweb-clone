@@ -17,7 +17,7 @@ import { switchMap, take } from 'rxjs/operators';
   styleUrls: ['./slider-opacity.component.scss'],
 })
 export class SliderOpacityComponent implements OnInit, OnDestroy {
-  private thermalLayers: TileLayer[];
+  private thermalLayers: TileLayer<any>[];
   private selectedInformeId: string;
 
   private subscriptions: Subscription = new Subscription();

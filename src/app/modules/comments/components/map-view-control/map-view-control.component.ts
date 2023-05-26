@@ -17,10 +17,10 @@ import { ZonesService } from '@data/services/zones.service';
   styleUrls: ['./map-view-control.component.css'],
 })
 export class MapViewControlComponent implements OnInit, OnDestroy {
-  private anomaliaLayer: VectorImageLayer;
-  private seguidorLayers: VectorImageLayer[];
-  private zonesLayers: VectorImageLayer[];
-  private thermalLayer: TileLayer;
+  private anomaliaLayer: VectorImageLayer<any>;
+  private seguidorLayers: VectorImageLayer<any>[];
+  private zonesLayers: VectorImageLayer<any>[];
+  private thermalLayer: TileLayer<any>;
   private currentZoom: number;
 
   private subscriptions: Subscription = new Subscription();

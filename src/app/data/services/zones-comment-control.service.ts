@@ -65,7 +65,7 @@ export class ZonesCommentControlService {
     });
   }
 
-  createSmallZonesLayer(informeId: string): VectorImageLayer {
+  createSmallZonesLayer(informeId: string): VectorImageLayer<any> {
     const layer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getSmallZonesStyle(),
@@ -79,7 +79,7 @@ export class ZonesCommentControlService {
     return layer;
   }
 
-  mostrarSmallZones(zonas: LocationAreaInterface[], layers: VectorImageLayer[]) {
+  mostrarSmallZones(zonas: LocationAreaInterface[], layers: VectorImageLayer<any>[]) {
     if (this.reportControlService.plantaFija) {
       this.subscriptions.add(
         this.comentariosControlService.anomalias$.subscribe((anoms) => this.addSmallZones(zonas, layers, anoms))
@@ -91,10 +91,10 @@ export class ZonesCommentControlService {
     }
   }
 
-  private addSmallZones(zonas: LocationAreaInterface[], layers: VectorImageLayer[], elems: FilterableElement[]) {
+  private addSmallZones(zonas: LocationAreaInterface[], layers: VectorImageLayer<any>[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
-      const source = l.getSource() as VectorSource;
+      const source = l.getSource() as VectorSource<any>;
       source.clear();
       zonas.forEach((zona) => {
         const elemsZona = this.zonesControlService.getElemsZona(zona, elems);
@@ -232,14 +232,14 @@ export class ZonesCommentControlService {
     };
   }
 
-  private getColor(feature: Feature, opacity: number) {
+  private getColor(feature: Feature<any>, opacity: number) {
     const numChecked = feature.getProperties().properties.numChecked;
     const numElems = feature.getProperties().properties.numElems;
 
     return Colors.getColorComentarios(numChecked >= numElems, opacity);
   }
 
-  getLabelSmallZonesStyle(feature: Feature) {
+  getLabelSmallZonesStyle(feature: Feature<any>) {
     return new Text({
       text: feature.getProperties().properties.label,
       font: 'bold 14px Roboto',
@@ -269,7 +269,7 @@ export class ZonesCommentControlService {
     };
   }
 
-  private getLabelBigZonesStyle(feature: Feature) {
+  private getLabelBigZonesStyle(feature: Feature<any>) {
     return new Text({
       text: feature.getProperties().properties.id,
       font: 'bold 16px Roboto',

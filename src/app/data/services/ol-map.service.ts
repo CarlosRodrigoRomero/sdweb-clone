@@ -43,19 +43,19 @@ export class OlMapService {
   currentZoom$ = new BehaviorSubject<number>(this._currentZoom);
   private _draw: Draw = undefined;
   public draw$ = new BehaviorSubject<Draw>(this._draw);
-  private drawLayers: VectorLayer[] = [];
-  private thermalLayers: TileLayer[] = [];
-  private thermalLayers$ = new BehaviorSubject<TileLayer[]>(this.thermalLayers);
-  private anomaliaLayers: VectorImageLayer[] = [];
-  private anomaliaLayers$ = new BehaviorSubject<VectorImageLayer[]>(this.anomaliaLayers);
-  private seguidorLayers: VectorImageLayer[] = [];
-  private seguidorLayers$ = new BehaviorSubject<VectorImageLayer[]>(this.seguidorLayers);
-  private _zonasLayers: VectorImageLayer[] = [];
-  zonasLayers$ = new BehaviorSubject<VectorImageLayer[]>(this._zonasLayers);
-  private incrementoLayers: VectorLayer[] = [];
-  private incrementoLayers$ = new BehaviorSubject<VectorLayer[]>(this.incrementoLayers);
-  private _aerialLayers: TileLayer[] = [];
-  aerialLayers$ = new BehaviorSubject<TileLayer[]>(this._aerialLayers);
+  private drawLayers: VectorLayer<any>[] = [];
+  private thermalLayers: TileLayer<any>[] = [];
+  private thermalLayers$ = new BehaviorSubject<TileLayer<any>[]>(this.thermalLayers);
+  private anomaliaLayers: VectorImageLayer<any>[] = [];
+  private anomaliaLayers$ = new BehaviorSubject<VectorImageLayer<any>[]>(this.anomaliaLayers);
+  private seguidorLayers: VectorImageLayer<any>[] = [];
+  private seguidorLayers$ = new BehaviorSubject<VectorImageLayer<any>[]>(this.seguidorLayers);
+  private _zonasLayers: VectorImageLayer<any>[] = [];
+  zonasLayers$ = new BehaviorSubject<VectorImageLayer<any>[]>(this._zonasLayers);
+  private incrementoLayers: VectorLayer<any>[] = [];
+  private incrementoLayers$ = new BehaviorSubject<VectorLayer<any>[]>(this.incrementoLayers);
+  private _aerialLayers: TileLayer<any>[] = [];
+  aerialLayers$ = new BehaviorSubject<TileLayer<any>[]>(this._aerialLayers);
   mapMoving = false;
 
   constructor(
@@ -88,14 +88,14 @@ export class OlMapService {
     this.map.on('movestart', () => (this.mapMoving = true));
   }
 
-  createVectorLayer(source: VectorSource): VectorLayer {
+  createVectorLayer(source: VectorSource<any>): VectorLayer<any> {
     const layer = new VectorLayer({ source });
     this.drawLayers.push(layer);
 
     return layer;
   }
 
-  addThermalLayer(layer: TileLayer) {
+  addThermalLayer(layer: TileLayer<any>) {
     this.thermalLayers.push(layer);
     this.thermalLayers$.next(this.thermalLayers);
   }
@@ -104,7 +104,7 @@ export class OlMapService {
     return this.thermalLayers$.asObservable();
   }
 
-  addAnomaliaLayer(layer: VectorImageLayer) {
+  addAnomaliaLayer(layer: VectorImageLayer<any>) {
     this.anomaliaLayers.push(layer);
     this.anomaliaLayers$.next(this.anomaliaLayers);
   }
@@ -117,12 +117,12 @@ export class OlMapService {
     this.drawLayers.forEach((layer) => (this._map as Map).removeLayer(layer));
   }
 
-  addSeguidorLayer(layer: VectorImageLayer) {
+  addSeguidorLayer(layer: VectorImageLayer<any>) {
     this.seguidorLayers.push(layer);
     this.seguidorLayers$.next(this.seguidorLayers);
   }
 
-  addZoneLayer(layer: VectorImageLayer) {
+  addZoneLayer(layer: VectorImageLayer<any>) {
     this._zonasLayers.push(layer);
     this.zonasLayers$.next(this._zonasLayers);
   }
@@ -131,7 +131,7 @@ export class OlMapService {
     return this.seguidorLayers$.asObservable();
   }
 
-  addIncrementoLayer(layer: VectorLayer) {
+  addIncrementoLayer(layer: VectorLayer<any>) {
     this.incrementoLayers.push(layer);
     this.incrementoLayers$.next(this.incrementoLayers);
   }
@@ -150,7 +150,7 @@ export class OlMapService {
         .pipe(
           take(1),
           catchError((error) => {
-            let aerialLayer: TileLayer;
+            let aerialLayer: TileLayer<any>;
 
             // no recibimos respuesta del servidor porque no existe
             if (error.status === 0 || error.status === 504) {
@@ -189,7 +189,7 @@ export class OlMapService {
     });
   }
 
-  createThermalLayer(thermalLayer: ThermalLayerInterface, informe: InformeInterface, index: number): TileLayer {
+  createThermalLayer(thermalLayer: ThermalLayerInterface, informe: InformeInterface, index: number): TileLayer<any> {
     // Iniciar mapa térmico
     let url: string;
     if (informe.hasOwnProperty('servidorCapas')) {
@@ -217,6 +217,30 @@ export class OlMapService {
         url,
         crossOrigin: 'anonymous',
         tileClass,
+        tileLoadFunction: (imageTile, src) => {
+          imageTile.rangeTempMax = thermalLayer.rangeTempMax;
+          imageTile.rangeTempMin = thermalLayer.rangeTempMin;
+          imageTile.thermalService = this.thermalService;
+          imageTile.getImage().src = src;
+          imageTile.thermalLayer = thermalLayer;
+          imageTile.index = index;
+        },
+      }),
+      preload: Infinity,
+    });
+
+    return tl;
+  }
+
+  createThermalLayerClippings(thermalLayer: ThermalLayerInterface, index: number): TileLayer<any> {
+    // Iniciar mapa térmico
+    const url = GEO.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
+
+    const tl = new TileLayer({
+      source: new XYZ_mod({
+        url,
+        crossOrigin: 'anonymous',
+        ImageTileMod,
         tileLoadFunction: (imageTile, src) => {
           imageTile.rangeTempMax = thermalLayer.rangeTempMax;
           imageTile.rangeTempMin = thermalLayer.rangeTempMin;
@@ -339,7 +363,7 @@ export class OlMapService {
         .getArray()
         .forEach((layer) => {
           if (layer.getProperties().informeId === informeId && layer.getProperties().view === view) {
-            (layer as VectorImageLayer).getSource().changed();
+            (layer as VectorImageLayer<any>).getSource().changed();
           }
         });
     }
@@ -387,20 +411,20 @@ export class OlMapService {
     this.currentZoom$.next(value);
   }
 
-  get zonasLayers(): VectorImageLayer[] {
+  get zonasLayers(): VectorImageLayer<any>[] {
     return this._zonasLayers;
   }
 
-  set zonasLayers(value: VectorImageLayer[]) {
+  set zonasLayers(value: VectorImageLayer<any>[]) {
     this._zonasLayers = value;
     this.zonasLayers$.next(value);
   }
 
-  get aerialLayers(): TileLayer[] {
+  get aerialLayers(): TileLayer<any>[] {
     return this._aerialLayers;
   }
 
-  set aerialLayers(value: TileLayer[]) {
+  set aerialLayers(value: TileLayer<any>[]) {
     this._aerialLayers = value;
     this.aerialLayers$.next(value);
   }

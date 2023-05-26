@@ -35,8 +35,8 @@ export class ImagesTilesService {
   private tileResolution = 256;
   private _imagesPlantaCompleta = {};
   imagesPlantaCompleta$ = new BehaviorSubject<{}>(this._imagesPlantaCompleta);
-  private _layerInformeSelected: TileLayer = undefined;
-  layerInformeSelected$ = new BehaviorSubject<TileLayer>(this._layerInformeSelected);
+  private _layerInformeSelected: TileLayer<any> = undefined;
+  layerInformeSelected$ = new BehaviorSubject<TileLayer<any>>(this._layerInformeSelected);
 
   private _imagesPlantaLoaded = 0;
   imagesPlantaLoaded$ = new BehaviorSubject<number>(this._imagesPlantaLoaded);
@@ -229,7 +229,7 @@ export class ImagesTilesService {
     // obtenemos los tileCoords de cada coordenada
     let tilesCoord: TileCoord[] = [];
 
-    this.layerInformeSelected = map.getLayers().getArray()[0] as TileLayer;
+    this.layerInformeSelected = map.getLayers().getArray()[0] as TileLayer<any>;
 
     const source = this.layerInformeSelected.getSource();
     const tileGrid = source.getTileGrid();
@@ -494,7 +494,7 @@ export class ImagesTilesService {
     return this._layerInformeSelected;
   }
 
-  set layerInformeSelected(value: TileLayer) {
+  set layerInformeSelected(value: TileLayer<any>) {
     this._layerInformeSelected = value;
     this.layerInformeSelected$.next(value);
   }
