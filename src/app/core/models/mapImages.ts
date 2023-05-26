@@ -5,4 +5,5 @@ export interface MapImage {
   coords: Coordinate;
   path: string;
   fecha: number;
+  tipo: string;
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { take } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest } from 'rxjs';
 
 import { Feature, Overlay, View } from 'ol';
 import { fromLonLat } from 'ol/proj';
@@ -26,11 +26,13 @@ import { CreateMapService } from '@data/services/create-map.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { MapImagesService } from '@data/services/map-images.service';
 import { MapDivisionControlService } from '@data/services/map-division-control.service';
+import { ThermalService } from '@data/services/thermal.service';
+import { MapClippingService } from '@data/services/map-clipping.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { MapImage } from '@core/models/mapImages';
-import { MapClippingService } from '@data/services/map-clipping.service';
 import { MapClipping } from '@core/models/mapClipping';
+import { InformeInterface } from '@core/models/informe';
 
 @Component({
   selector: 'app-map-create-map',
@@ -39,6 +41,7 @@ import { MapClipping } from '@core/models/mapClipping';
 })
 export class MapCreateMapComponent implements OnInit {
   private planta: PlantaInterface;
+  private informe: InformeInterface;
   private divisionLayer: VectorLayer<any>;
   private divisionSource: VectorSource<any>;
   private imagePointLayer: VectorLayer<any>;
@@ -68,10 +71,9 @@ export class MapCreateMapComponent implements OnInit {
 
   ngOnInit(): void {
     this.planta = this.createMapService.planta;
+    this.informe = this.createMapService.informe;
 
     this.initMap();
-
-    // this.loadThermalLayers();
 
     // this.addGeoTiffs();
 
@@ -83,14 +85,14 @@ export class MapCreateMapComponent implements OnInit {
     this.addOnHoverImageAction();
 
     this.createDivisionLayer();
-    this.addDivisions();
-    this.addOnHoverDivisionsInteraction();
+    // this.addOnHoverDivisionsInteraction();
     this.addModifyDivisionsInteraction();
     this.addSelectDivisionsInteraction();
 
     this.createClippingLayer();
-    this.addClippings();
     this.addModifyClippingsInteraction();
+
+    this.addElems();
 
     this.addClickOutFeatures();
 
@@ -263,16 +265,26 @@ export class MapCreateMapComponent implements OnInit {
     });
   }
 
-  private addDivisions() {
+  private addElems() {
     this.subscriptions.add(
-      this.mapDivisionsService.getMapDivisions().subscribe((divisions) => {
-        this.divisionSource.clear();
+      combineLatest([this.mapDivisionsService.getMapDivisions(), this.mapClippingService.getMapClippings()]).subscribe(
+        ([divisions, clippings]) => {
+          // solo mostramos las divisiones que no tienen recorte
+          const rightDivisions = divisions.filter((division) => !clippings.map((c) => c.id).includes(division.id));
 
-        this.divisions = divisions;
-
-        this.divisions.forEach((division) => this.addDivision(division));
-      })
+          this.addDivisions(rightDivisions);
+          this.addClippings(clippings);
+        }
+      )
     );
+  }
+
+  private addDivisions(divisions: MapDivision[]) {
+    this.divisionSource.clear();
+
+    this.divisions = divisions;
+
+    divisions.forEach((division) => this.addDivision(division));
   }
 
   private addDivision(division: MapDivision) {
@@ -602,16 +614,12 @@ export class MapCreateMapComponent implements OnInit {
 
   /* RECORTES */
 
-  private addClippings() {
-    this.subscriptions.add(
-      this.mapClippingService.getMapClippings().subscribe((clippings) => {
-        this.clippingSource.clear();
+  private addClippings(clippings: MapClipping[]) {
+    this.clippingSource.clear();
 
-        this.clippings = clippings;
+    this.clippings = clippings;
 
-        this.clippings.forEach((clipping) => this.addClipping(clipping));
-      })
-    );
+    this.clippings.forEach((clipping) => this.addClipping(clipping));
   }
 
   private addClipping(clipping: MapClipping) {

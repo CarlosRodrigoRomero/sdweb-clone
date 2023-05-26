@@ -40,6 +40,7 @@ export class CreateMapComponent implements OnInit {
         coords: randomPoint,
         path: 'archivo',
         fecha: 123456789,
+        tipo: 'RGB',
       };
       randomMapImages.push(mapImage);
     }
