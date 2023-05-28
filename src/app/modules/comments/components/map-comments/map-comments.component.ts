@@ -37,10 +37,10 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
   private map: Map;
   private planta: PlantaInterface;
   private informe: InformeInterface;
-  private thermalLayer: TileLayer;
-  private anomaliaLayer: VectorImageLayer;
-  private aerialLayer: TileLayer;
-  private prevFeatureSelected: Feature;
+  private thermalLayer: TileLayer<any>;
+  private anomaliaLayer: VectorImageLayer<any>;
+  private aerialLayer: TileLayer<any>;
+  private prevFeatureSelected: Feature<any>;
   thermalVisible = false;
 
   private subscriptions: Subscription = new Subscription();
@@ -108,7 +108,7 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
 
         if (anom !== undefined) {
           if (this.anomaliaLayer !== undefined) {
-            const anomaliaFeature = (this.anomaliaLayer.getSource() as VectorSource)
+            const anomaliaFeature = (this.anomaliaLayer.getSource() as VectorSource<any>)
               .getFeatures()
               .find((feature) => feature.getProperties().properties.anomaliaId === anom.id);
 
@@ -219,9 +219,9 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
     const geoLocLayer = this.map
       .getLayers()
       .getArray()
-      .find((layer) => layer.getProperties().type === 'geoLoc') as VectorLayer;
+      .find((layer) => layer.getProperties().type === 'geoLoc') as VectorLayer<any>;
 
-    const geoLocSource = geoLocLayer.getSource() as VectorSource;
+    const geoLocSource = geoLocLayer.getSource() as VectorSource<any>;
 
     navigator.geolocation.watchPosition(
       (pos) => {
@@ -244,7 +244,7 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
     this.addCenterControl(geoLocSource);
   }
 
-  private addCenterControl(source: VectorSource) {
+  private addCenterControl(source: VectorSource<any>) {
     const centerControl = document.getElementById('center-btn');
 
     centerControl.className = 'ol-control ol-unselectable locate';
@@ -273,7 +273,7 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
         .getArray()
         .forEach((layer) => {
           if (layer.getProperties().type === 'smallZones' || layer.getProperties().type === 'anomalias') {
-            (layer as VectorLayer).getSource().changed();
+            (layer as VectorLayer<any>).getSource().changed();
           }
         });
     });

@@ -114,7 +114,7 @@ export class ClassificationService {
       .subscribe((anoms) => (this.listaAnomalias = anoms));
   }
 
-  createAnomaliaFromNormModule(feature: Feature, date: number) {
+  createAnomaliaFromNormModule(feature: Feature<any>, date: number) {
     const id = feature.getProperties().properties.id;
     const normModule: NormalizedModule = feature.getProperties().properties.normMod;
     const geometry = feature.getGeometry() as SimpleGeometry;

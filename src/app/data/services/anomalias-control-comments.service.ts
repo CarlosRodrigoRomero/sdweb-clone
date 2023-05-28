@@ -21,7 +21,7 @@ import { Colors } from '@core/classes/colors';
 export class AnomaliasControlCommentsService {
   private currentZoom: number;
   public listaAnomalias: Anomalia[];
-  private anomaliaLayer: VectorImageLayer;
+  private anomaliaLayer: VectorImageLayer<any>;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -43,11 +43,11 @@ export class AnomaliasControlCommentsService {
     });
   }
 
-  createCommentsAnomaliaLayers(): VectorImageLayer {
+  createCommentsAnomaliaLayers(): VectorImageLayer<any> {
     const layer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleAnoms(false),
-      visible: false,
+      // visible: false,
     });
     layer.setProperties({
       type: 'anomalias',
@@ -68,7 +68,7 @@ export class AnomaliasControlCommentsService {
   }
 
   private dibujarAnomalias(anomalias: Anomalia[]) {
-    const source = this.anomaliaLayer.getSource() as VectorSource;
+    const source = this.anomaliaLayer.getSource() as VectorSource<any>;
     source.clear();
     anomalias.forEach((anom) => {
       const feature = new Feature({
@@ -114,7 +114,7 @@ export class AnomaliasControlCommentsService {
     };
   }
 
-  private getColor(feature: Feature, opacity: number): string {
+  private getColor(feature: Feature<any>, opacity: number): string {
     return Colors.getColorComentarios(feature.getProperties().properties.checked, opacity);
   }
 
@@ -123,7 +123,7 @@ export class AnomaliasControlCommentsService {
     return Colors.getColorComentarios(anomChecked, opacity);
   }
 
-  private getLabeAnomStyle(feature: Feature) {
+  private getLabeAnomStyle(feature: Feature<any>) {
     return new Text({
       text: feature.getProperties().properties.label,
       font: 'bold 14px Roboto',

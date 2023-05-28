@@ -32,14 +32,14 @@ import { click } from 'ol/events/condition';
 })
 export class RawModulesComponent implements OnInit, OnDestroy {
   private map: Map;
-  private vectorRawModule: VectorLayer;
+  private vectorRawModule: VectorLayer<any>;
   private draw: Draw;
   deleteMode = false;
   createMode = false;
   private rawModDeletedIds: string[] = [];
-  private rawModLayer: VectorLayer;
+  private rawModLayer: VectorLayer<any>;
   private rawMods: RawModule[];
-  private prevFeatureHover: Feature;
+  private prevFeatureHover: Feature<any>;
 
   private subscriptions: Subscription = new Subscription();
   private rawModsSubscriptions: Subscription = new Subscription();
@@ -229,14 +229,14 @@ export class RawModulesComponent implements OnInit, OnDestroy {
   }
 
   private addOnHoverRawModuleAction() {
-    let currentFeatureHover: Feature;
+    let currentFeatureHover: Feature<any>;
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
         if (this.deleteMode) {
-          const feature: Feature = this.map
+          const feature: Feature<any> = this.map
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
-            .filter((item) => item.getProperties().properties.name === 'rawMod')[0] as Feature;
+            .filter((item) => item.getProperties().properties.name === 'rawMod')[0] as Feature<any>;
 
           if (feature !== undefined) {
             // cuando pasamos de un modulo a otro directamente sin pasar por vacio
@@ -257,10 +257,10 @@ export class RawModulesComponent implements OnInit, OnDestroy {
             this.prevFeatureHover = feature;
           }
         } else {
-          const feature: Feature = this.map
+          const feature: Feature<any> = this.map
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
-            .filter((item) => item.getProperties().properties.name === 'rawMod')[0] as Feature;
+            .filter((item) => item.getProperties().properties.name === 'rawMod')[0] as Feature<any>;
 
           if (feature !== undefined) {
             this.structuresControlService.rawModHovered = this.rawMods.find(
@@ -329,7 +329,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
 
   private getStyleRawMod(hovered: boolean) {
     if (hovered) {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined && feature.getProperties().properties.visible === true) {
           return new Style({
             stroke: new Stroke({
@@ -340,7 +340,7 @@ export class RawModulesComponent implements OnInit, OnDestroy {
         }
       };
     } else {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined && feature.getProperties().properties.visible === true) {
           return new Style({
             stroke: new Stroke({

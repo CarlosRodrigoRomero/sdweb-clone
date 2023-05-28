@@ -18,11 +18,11 @@ import { ZonesService } from '@data/services/zones.service';
   styleUrls: ['./view-control.component.css'],
 })
 export class ViewControlComponent implements OnInit, OnDestroy {
-  private aerialLayers: TileLayer[];
-  private thermalLayers: TileLayer[];
-  private anomaliaLayers: VectorImageLayer[];
-  private seguidorLayers: VectorImageLayer[];
-  private zonesLayers: VectorImageLayer[];
+  private aerialLayers: TileLayer<any>[];
+  private thermalLayers: TileLayer<any>[];
+  private anomaliaLayers: VectorImageLayer<any>[];
+  private seguidorLayers: VectorImageLayer<any>[];
+  private zonesLayers: VectorImageLayer<any>[];
   public selectedInformeId: string;
   private reportViewSelected: string;
   private currentZoom: number;

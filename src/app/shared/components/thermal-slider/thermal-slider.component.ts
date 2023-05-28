@@ -24,7 +24,7 @@ import { Patches } from '@core/classes/patches';
   styleUrls: ['./thermal-slider.component.scss'],
 })
 export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
-  private thermalLayers: TileLayer[] = [];
+  private thermalLayers: TileLayer<any>[] = [];
   private thermalLayersDB: ThermalLayerInterface[] = [];
   private indexSelected: number;
   private thermalLayersLoaded = false;

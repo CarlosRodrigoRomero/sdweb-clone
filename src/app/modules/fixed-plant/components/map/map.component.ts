@@ -40,12 +40,12 @@ export class MapComponent implements OnInit, OnDestroy {
   public anomaliaSelect: Anomalia;
   public anomaliaHover: Anomalia;
   public sliderYear: number;
-  public aerialLayers: TileLayer[];
+  public aerialLayers: TileLayer<any>[];
   private extent1: any;
   public thermalSource;
   private thermalLayersDB: ThermalLayerInterface[];
-  private thermalLayers: TileLayer[];
-  private anomaliaLayers: VectorImageLayer[];
+  private thermalLayers: TileLayer<any>[];
+  private anomaliaLayers: VectorImageLayer<any>[];
   public leftOpened: boolean;
   public rightOpened: boolean;
   public statsOpened: boolean;

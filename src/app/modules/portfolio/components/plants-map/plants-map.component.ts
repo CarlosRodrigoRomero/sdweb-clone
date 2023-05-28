@@ -40,7 +40,7 @@ export class PlantsMapComponent implements OnInit, AfterViewInit, OnDestroy {
   plantaHovered: PlantaInterface;
   private popup: Overlay;
   labelPlanta: string;
-  private plantasSource: VectorSource;
+  private plantasSource: VectorSource<any>;
   private prevPlantaHovered: PlantaInterface;
 
   private subscriptions: Subscription = new Subscription();
@@ -187,10 +187,10 @@ export class PlantsMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private addOnHoverAction() {
     this.map.on('pointermove', (event) => {
       if (this.map.hasFeatureAtPixel(event.pixel)) {
-        const features = this.map.getFeaturesAtPixel(event.pixel) as Feature[];
+        const features = this.map.getFeaturesAtPixel(event.pixel) as Feature<any>[];
 
         if (features.length > 0) {
-          const feature = features[0] as Feature;
+          const feature = features[0] as Feature<any>;
           const planta = feature.getProperties().planta;
 
           this.portfolioControlService.plantaHovered = planta;
@@ -206,7 +206,7 @@ export class PlantsMapComponent implements OnInit, AfterViewInit, OnDestroy {
       const features = this.map.getFeaturesAtPixel(event.pixel);
 
       if (features.length > 0) {
-        const feature = features[0] as Feature;
+        const feature = features[0] as Feature<any>;
         const planta: PlantaInterface = feature.getProperties().planta;
         const informeReciente = feature.getProperties().informeReciente;
 
@@ -277,7 +277,7 @@ export class PlantsMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getStyleOnHover(hovered: boolean) {
     if (hovered) {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             image: new Icon({
@@ -290,7 +290,7 @@ export class PlantsMapComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       };
     } else {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             image: new Icon({

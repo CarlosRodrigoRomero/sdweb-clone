@@ -91,6 +91,12 @@ export const routes: Routes = [
     loadChildren: () => import('@modules/autogeo/autogeo.module').then((m) => m.AutogeoModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'create-map',
+    component: NavComponent,
+    loadChildren: () => import('@modules/create-map/create-map.module').then((m) => m.CreateMapModule),
+    canActivate: [AuthGuard],
+  },
   { path: '**', redirectTo: 'clients', pathMatch: 'full' },
 ];
 

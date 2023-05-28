@@ -39,16 +39,16 @@
 
       <!-- Localización -->
       <ng-container matColumnDef="localizacion">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="location-col">
           <div *ngIf="plantaFija" class="loc-header">
             <span>{{ 'Localización' | translate }}</span>
-            <span>{{ headerLocLabel }}</span>
+            <span class="loc-header-label"> {{ headerLocLabel }}</span>
           </div>
           <div *ngIf="!plantaFija" class="loc-header">
             <span>{{ 'Seguidor' | translate }}</span>
           </div>
         </th>
-        <td mat-cell (click)="selectElems(row)" *matCellDef="let row">
+        <td mat-cell (click)="selectElems(row)" *matCellDef="let row" class="location-col">
           <div class="row-data">
             <span>{{ row.localizacion }}</span>
             <span class="small-data">{{ row.posicion }}</span>

@@ -19,7 +19,7 @@ import { LocationAreaInterface } from '@core/models/location';
 })
 export class ZonesComponent implements OnInit, OnDestroy {
   private zones: LocationAreaInterface[][] = [];
-  private zonesLayers: VectorImageLayer[];
+  private zonesLayers: VectorImageLayer<any>[];
   private map: Map;
   public selectedInformeId: string;
 

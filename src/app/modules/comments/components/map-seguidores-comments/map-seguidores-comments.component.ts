@@ -35,9 +35,9 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
   private map: Map;
   private planta: PlantaInterface;
   private informe: InformeInterface;
-  private aerialLayer: TileLayer;
-  private seguidoresLayer: VectorImageLayer;
-  private prevFeatureSelected: Feature;
+  private aerialLayer: TileLayer<any>;
+  private seguidoresLayer: VectorImageLayer<any>;
+  private prevFeatureSelected: Feature<any>;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -75,7 +75,7 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
 
         if (seg !== undefined) {
           if (this.seguidoresLayer !== undefined) {
-            const seguidorFeature = (this.seguidoresLayer.getSource() as VectorSource)
+            const seguidorFeature = (this.seguidoresLayer.getSource() as VectorSource<any>)
               .getFeatures()
               .find((feature) => feature.getProperties().properties.seguidorId === seg.id);
 
@@ -176,9 +176,9 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
     const geoLocLayer = this.map
       .getLayers()
       .getArray()
-      .find((layer) => layer.getProperties().type === 'geoLoc') as VectorLayer;
+      .find((layer) => layer.getProperties().type === 'geoLoc') as VectorLayer<any>;
 
-    const geoLocSource = geoLocLayer.getSource() as VectorSource;
+    const geoLocSource = geoLocLayer.getSource() as VectorSource<any>;
 
     navigator.geolocation.watchPosition(
       (pos) => {
@@ -215,7 +215,7 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private addCenterControl(source: VectorSource) {
+  private addCenterControl(source: VectorSource<any>) {
     const centerControl = document.getElementById('center-btn');
 
     centerControl.className = 'ol-control ol-unselectable locate';
@@ -244,7 +244,7 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
         .getArray()
         .forEach((layer) => {
           if (layer.getProperties().type === 'smallZones' || layer.getProperties().type === 'seguidores') {
-            (layer as VectorLayer).getSource().changed();
+            (layer as VectorLayer<any>).getSource().changed();
           }
         });
     });

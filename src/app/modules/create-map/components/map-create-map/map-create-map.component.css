@@ -1,0 +1,15 @@
+.map {
+  height: calc(100vh - 64px);
+  width: 100%;
+}
+
+.add-btn {
+  position: absolute;
+  top: 10px;
+  left: 100px;
+}
+
+.ol-popup {
+  position: absolute;
+  transform: translate(-50%, -105%);
+}

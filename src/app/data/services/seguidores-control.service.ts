@@ -42,8 +42,8 @@ export class SeguidoresControlService {
   private listaAllSeguidores: Seguidor[];
   public prevSeguidorSelected: Seguidor;
   private sharedReportNoFilters = false;
-  private seguidorLayers: VectorImageLayer[];
-  private prevFeatureHover: Feature;
+  private seguidorLayers: VectorImageLayer<any>[];
+  private prevFeatureHover: Feature<any>;
   private toggleViewSelected: string;
   private _seguidorViewOpened = false;
   public seguidorViewOpened$ = new BehaviorSubject<boolean>(this._seguidorViewOpened);
@@ -119,8 +119,8 @@ export class SeguidoresControlService {
     });
   }
 
-  createSeguidorLayers(informeId: string): VectorImageLayer[] {
-    const seguidoresLayers: VectorImageLayer[] = [];
+  createSeguidorLayers(informeId: string): VectorImageLayer<any>[] {
+    const seguidoresLayers: VectorImageLayer<any>[] = [];
 
     const maeLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
@@ -188,7 +188,7 @@ export class SeguidoresControlService {
       // filtra los seguidores correspondientes al informe
       const seguidoresInforme = seguidores.filter((seguidor) => seguidor.informeId === l.getProperties().informeId);
 
-      const source = l.getSource() as VectorSource;
+      const source = l.getSource() as VectorSource<any>;
       source.clear();
       seguidoresInforme.forEach((seguidor) => {
         // crea poligono seguidor
@@ -254,7 +254,7 @@ export class SeguidoresControlService {
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
             .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-            .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)[0] as Feature;
+            .filter((item) => item.getProperties().properties.view === this.toggleViewSelected)[0] as Feature<any>;
 
           if (feature !== undefined) {
             // cuando pasamos de un seguidor a otro directamente sin pasar por vacio
@@ -517,7 +517,7 @@ export class SeguidoresControlService {
     };
   }
 
-  private getNoAnomsStyle(feature: Feature, focused: boolean) {
+  private getNoAnomsStyle(feature: Feature<any>, focused: boolean) {
     return new Style({
       stroke: new Stroke({
         color:
@@ -538,7 +538,7 @@ export class SeguidoresControlService {
     });
   }
 
-  private getColorFeatureMae(feature: Feature, opacity: number) {
+  private getColorFeatureMae(feature: Feature<any>, opacity: number) {
     const mae = feature.getProperties().properties.mae as number;
 
     return this.getColorSeguidorMae(mae, opacity);
@@ -580,7 +580,7 @@ export class SeguidoresControlService {
     };
   }
 
-  private getColorSeguidorCelsCalientes(feature: Feature, opacity: number) {
+  private getColorSeguidorCelsCalientes(feature: Feature<any>, opacity: number) {
     const celsCalientes = feature.getProperties().properties.celsCalientes;
 
     return Colors.getColor(celsCalientes, [0.02, 0.1], opacity);
@@ -618,7 +618,7 @@ export class SeguidoresControlService {
     };
   }
 
-  private getColorFeatureGradienteNormMax(feature: Feature, opacity: number) {
+  private getColorFeatureGradienteNormMax(feature: Feature<any>, opacity: number) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
     return this.getColorSeguidorGradienteNormMax(gradNormMax, opacity);
@@ -628,7 +628,7 @@ export class SeguidoresControlService {
     return Colors.getColor(gradNormMax, [10, 40], opacity);
   }
 
-  getLabelStyle(feature: Feature) {
+  getLabelStyle(feature: Feature<any>) {
     return new Text({
       text: feature.getProperties().properties.name,
       font: 'bold 14px Roboto',
@@ -649,8 +649,8 @@ export class SeguidoresControlService {
 
     const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
 
-    const features: Feature[] = [];
-    layersView.forEach((layer) => features.push(...(layer.getSource() as VectorSource).getFeatures()));
+    const features: Feature<any>[] = [];
+    layersView.forEach((layer) => features.push(...(layer.getSource() as VectorSource<any>).getFeatures()));
 
     const feature = features.find((f) => f.getProperties().properties.seguidorId === seguidorId);
 

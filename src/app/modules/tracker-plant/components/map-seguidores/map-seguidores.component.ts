@@ -38,13 +38,13 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public palleteJSON: string;
   public selectedInformeId: string;
   public seguidorHovered: Seguidor;
-  public locAreasVectorSource: VectorSource;
+  public locAreasVectorSource: VectorSource<any>;
   public listaSeguidores: Seguidor[];
   public sliderYear: number;
-  public aerialLayers: TileLayer[];
+  public aerialLayers: TileLayer<any>[];
   public thermalSource;
-  private seguidorLayers: VectorImageLayer[];
-  private incrementoLayers: VectorLayer[];
+  private seguidorLayers: VectorImageLayer<any>[];
+  private incrementoLayers: VectorLayer<any>[];
   public leftOpened: boolean;
   public rightOpened: boolean;
   public statsOpened: boolean;

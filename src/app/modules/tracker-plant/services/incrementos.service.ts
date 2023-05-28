@@ -14,13 +14,12 @@ import { MapSeguidoresService } from './map-seguidores.service';
 import { FilterService } from '@data/services/filter.service';
 
 import { Seguidor } from '@core/models/seguidor';
-import { LatLngLiteral } from '@agm/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class IncrementosService {
-  private incrementoLayers: VectorLayer[];
+  private incrementoLayers: VectorLayer<any>[];
   public informeIdList: string[] = [];
   private listaSeguidores: Seguidor[];
   private _initialized = false;
@@ -36,7 +35,7 @@ export class IncrementosService {
     this.olMapService.getIncrementoLayers().subscribe((layers) => (this.incrementoLayers = layers));
   }
 
-  createIncrementoLayers(informeId: string): VectorLayer[] {
+  createIncrementoLayers(informeId: string): VectorLayer<any>[] {
     const incMaeLayer = new VectorLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleIncrementos('mae'),
@@ -112,7 +111,7 @@ export class IncrementosService {
       }),
     });
 
-    return (feature: Feature) => {
+    return (feature: Feature<any>) => {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         switch (view) {
           case 'mae': {
@@ -144,7 +143,7 @@ export class IncrementosService {
     };
   }
 
-  private getIncrementoMae(feature: Feature): number {
+  private getIncrementoMae(feature: Feature<any>): number {
     let informeIdActual: string;
     let informeIdPrevio: string;
 
@@ -179,7 +178,7 @@ export class IncrementosService {
     return maeActual;
   }
 
-  private getIncrementoCC(feature: Feature): number {
+  private getIncrementoCC(feature: Feature<any>): number {
     let informeIdActual: string;
     let informeIdPrevio: string;
 
@@ -216,7 +215,7 @@ export class IncrementosService {
     return porcentajeCCActual;
   }
 
-  private getIncrementoGradiente(feature: Feature): number {
+  private getIncrementoGradiente(feature: Feature<any>): number {
     let informeIdActual: string;
     let informeIdPrevio: string;
 
