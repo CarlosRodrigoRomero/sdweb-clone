@@ -47,7 +47,7 @@ export class AnomaliasControlCommentsService {
     const layer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleAnoms(false),
-      visible: false,
+      // visible: false,
     });
     layer.setProperties({
       type: 'anomalias',

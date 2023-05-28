@@ -137,7 +137,7 @@ export class ZonesCommentControlService {
   }
 
   private getSmallGlobal(globalCoords: string[]): string {
-    const notNullGlobals = globalCoords.filter((gC) => gC !== null);
+    const notNullGlobals = globalCoords.filter((gC) => gC !== null && gC !== undefined && gC !== '');
     const indexGlobal = notNullGlobals.length - 1;
 
     let nombreGlobal = '';

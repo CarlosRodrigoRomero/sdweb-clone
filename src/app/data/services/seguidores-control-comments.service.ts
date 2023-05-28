@@ -47,7 +47,6 @@ export class SeguidoresControlCommentsService {
     const layer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleSegs(false),
-      visible: false,
     });
     layer.setProperties({
       type: 'seguidores',
