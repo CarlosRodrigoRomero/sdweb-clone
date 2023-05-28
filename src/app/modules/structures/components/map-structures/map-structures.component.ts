@@ -31,12 +31,12 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
   private informe: InformeInterface;
   private map: Map;
   public thermalSource;
-  private thermalLayer: TileLayer;
+  private thermalLayer: TileLayer<any>;
   private thermalLayerDB: ThermalLayerInterface;
   public layerVisibility = true;
   endFilterSubscription = false;
   rawModHovered: RawModule;
-  private aerialLayer: TileLayer;
+  private aerialLayer: TileLayer<any>;
 
   private subscriptionFilters: Subscription = new Subscription();
   private subscriptions: Subscription = new Subscription();

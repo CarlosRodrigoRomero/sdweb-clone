@@ -42,7 +42,7 @@ export class FilterService {
     this.allFiltrableElements = elems;
     this.filteredElements = elems;
 
-    return new Promise((response, reject) => {
+    return new Promise(async (response, reject) => {
       if (shared) {
         this.subscriptions.add(
           this.shareReportService.getParams().subscribe((params) => this.filterControlService.setInitParams(params))
@@ -50,15 +50,13 @@ export class FilterService {
 
         // obtenemos lo filtros guardados en al DB y los añadimos
         this.subscriptions.add(
-          this.shareReportService.getFiltersByParams(sharedId).subscribe((filters) => {
+          await this.shareReportService.getFiltersByParams(sharedId).then((filters) => {
             if (filters.length > 0) {
               this.addFilters(filters);
-
-              response(true);
             }
+            response(true);
           })
         );
-        response(true);
       } else {
         response(true);
       }

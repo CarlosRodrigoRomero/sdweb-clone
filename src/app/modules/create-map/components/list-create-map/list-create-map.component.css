@@ -1,0 +1,29 @@
+.tabla-container {
+  position: relative;
+  height: calc(100vh - 194px);
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.buscar-input {
+  width: 100%;
+}
+
+.mat-row {
+  cursor: pointer;
+}
+
+.mat-row:hover {
+  background-color: grey;
+}
+
+.mat-row.hovered {
+  background-color: grey;
+}
+
+.mat-row.selected {
+  background-color: gray;
+}

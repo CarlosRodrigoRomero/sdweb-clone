@@ -45,7 +45,7 @@ export class PortfolioControlService {
   potenciaTotal = 0;
   listaPlantas: PlantaInterface[] = [];
   listaInformes: InformeInterface[] = [];
-  allFeatures: Feature[] = [];
+  allFeatures: Feature<any>[] = [];
   user: UserInterface;
   criterioCriticidad: CritCriticidad;
   usersFakePlants = ['xsx8U7BrLRU20pj9Oa35ZbJIggx2', 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2', 'I3VzW9HJ5UdIuJH0pbuX69TndDn2'];

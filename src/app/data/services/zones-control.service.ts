@@ -36,8 +36,8 @@ export class ZonesControlService {
   zoomChangeView = 18;
   private selectedInformeId: string;
   private toggleViewSelected: string;
-  private featureHovered: Feature;
-  private prevFeatureHovered: Feature;
+  private featureHovered: Feature<any>;
+  private prevFeatureHovered: Feature<any>;
   private currentZoom: number;
 
   private subscriptions: Subscription = new Subscription();
@@ -83,7 +83,7 @@ export class ZonesControlService {
     });
   }
 
-  createZonasLayers(informeId: string): VectorImageLayer[] {
+  createZonasLayers(informeId: string): VectorImageLayer<any>[] {
     const maeLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleMae(false),
@@ -145,7 +145,7 @@ export class ZonesControlService {
     return zones;
   }
 
-  mostrarZonas(zones: ZoneInterface[], layers: VectorImageLayer[]) {
+  mostrarZonas(zones: ZoneInterface[], layers: VectorImageLayer<any>[]) {
     this.subscriptions.add(
       this.filterService.filteredElements$.subscribe((elems) => {
         this.addZonas(zones, layers, elems);
@@ -153,12 +153,12 @@ export class ZonesControlService {
     );
   }
 
-  private addZonas(zonas: ZoneInterface[], layers: VectorImageLayer[], elems: FilterableElement[]) {
+  private addZonas(zonas: ZoneInterface[], layers: VectorImageLayer<any>[], elems: FilterableElement[]) {
     // Para cada vector maeLayer (que corresponde a un informe)
     layers.forEach((l) => {
       const view = l.getProperties().view;
       const informeId = l.getProperties().informeId;
-      const source = l.getSource() as VectorSource;
+      const source = l.getSource() as VectorSource<any>;
       source.clear();
       const zonasInforme = zonas.filter((z) => z.informeId === informeId);
       zonasInforme.forEach((zona) => {
@@ -332,7 +332,7 @@ export class ZonesControlService {
           .getFeaturesAtPixel(event.pixel)
           .filter((item) => item.getProperties().properties !== undefined)
           .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId)
-          .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature;
+          .filter((item) => item.getProperties().properties.type === 'zone')[0] as Feature<any>;
 
         if (feature !== undefined && this.currentZoom < this.zoomChangeView) {
           // cuando pasamos de una zona a otra directamente sin pasar por vacio
@@ -418,7 +418,7 @@ export class ZonesControlService {
   }
 
   // ESTILO SIN ANOMALIAS
-  private getNoAnomsStyle(feature: Feature, focused: boolean) {
+  private getNoAnomsStyle(feature: Feature<any>, focused: boolean) {
     return new Style({
       stroke: new Stroke({
         color:
@@ -465,7 +465,7 @@ export class ZonesControlService {
     };
   }
 
-  private getColorMae(feature: Feature, opacity: number) {
+  private getColorMae(feature: Feature<any>, opacity: number) {
     const mae = feature.getProperties().properties.mae as number;
 
     if (mae < 0.01) {
@@ -507,7 +507,7 @@ export class ZonesControlService {
     };
   }
 
-  private getColorCelsCalientes(feature: Feature, opacity: number) {
+  private getColorCelsCalientes(feature: Feature<any>, opacity: number) {
     const celsCalientes = feature.getProperties().properties.celsCalientes;
 
     if (celsCalientes < 0.02) {
@@ -549,7 +549,7 @@ export class ZonesControlService {
     };
   }
 
-  private getColorGradienteNormMax(feature: Feature, opacity: number) {
+  private getColorGradienteNormMax(feature: Feature<any>, opacity: number) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
     if (gradNormMax < 10) {
@@ -561,7 +561,7 @@ export class ZonesControlService {
     }
   }
 
-  getLabelStyle(feature: Feature) {
+  getLabelStyle(feature: Feature<any>) {
     return new Text({
       text: feature.getProperties().properties.name,
       font: 'bold 14px Roboto',

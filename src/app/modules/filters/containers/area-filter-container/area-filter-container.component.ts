@@ -33,8 +33,8 @@ export class AreaFilterContainerComponent implements OnInit {
   private draw: Draw;
 
   areaFilter: AreaFilter;
-  vectorArea: VectorLayer;
-  deleteButton: VectorLayer;
+  vectorArea: VectorLayer<any>;
+  deleteButton: VectorLayer<any>;
 
   private subscriptions: Subscription = new Subscription();
 

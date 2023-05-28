@@ -182,7 +182,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
 
   private getNormModStyle(focused: boolean) {
     if (focused) {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             stroke: new Stroke({
@@ -193,7 +193,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
         }
       };
     } else {
-      return (feature: Feature) => {
+      return (feature: Feature<any>) => {
         if (feature !== undefined) {
           return new Style({
             stroke: new Stroke({
@@ -236,7 +236,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
       }),
     });
 
-    const vectorNormModule: VectorLayer = this.olMapService.createVectorLayer(sourceNormModule);
+    const vectorNormModule: VectorLayer<any> = this.olMapService.createVectorLayer(sourceNormModule);
     vectorNormModule.setStyle(style);
 
     this.map.addLayer(vectorNormModule);

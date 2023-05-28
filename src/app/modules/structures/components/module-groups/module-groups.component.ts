@@ -29,10 +29,10 @@ import { ModuleGroup } from '@core/models/moduleGroup';
   styleUrls: ['./module-groups.component.css'],
 })
 export class ModuleGroupsComponent implements OnInit, OnDestroy {
-  private vectorGroup: VectorLayer;
+  private vectorGroup: VectorLayer<any>;
   private map: Map;
   private draw: Draw;
-  private mGLayer: VectorLayer;
+  private mGLayer: VectorLayer<any>;
   modGroupSelectedId: string;
   drawActive = false;
 

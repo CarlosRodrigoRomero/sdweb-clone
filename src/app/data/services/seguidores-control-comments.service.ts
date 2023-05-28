@@ -20,7 +20,7 @@ import { Seguidor } from '@core/models/seguidor';
 })
 export class SeguidoresControlCommentsService {
   private currentZoom: number;
-  private seguidoresLayer: VectorImageLayer;
+  private seguidoresLayer: VectorImageLayer<any>;
   private listaSeguidores: Seguidor[];
 
   private subscriptions: Subscription = new Subscription();
@@ -43,11 +43,10 @@ export class SeguidoresControlCommentsService {
     });
   }
 
-  createCommentsSeguidoresLayers(): VectorImageLayer {
+  createCommentsSeguidoresLayers(): VectorImageLayer<any> {
     const layer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleSegs(false),
-      visible: false,
     });
     layer.setProperties({
       type: 'seguidores',
@@ -68,7 +67,7 @@ export class SeguidoresControlCommentsService {
   }
 
   private dibujarSeguidores(seguidores: Seguidor[]) {
-    const source = this.seguidoresLayer.getSource() as VectorSource;
+    const source = this.seguidoresLayer.getSource() as VectorSource<any>;
     source.clear();
     seguidores.forEach((seg) => {
       // solo añadimos los que tienen anomalías
@@ -120,11 +119,11 @@ export class SeguidoresControlCommentsService {
     };
   }
 
-  private getColor(feature: Feature, opacity: number): string {
+  private getColor(feature: Feature<any>, opacity: number): string {
     return Colors.getColorComentarios(feature.getProperties().properties.checked, opacity);
   }
 
-  private getLabelSegStyle(feature: Feature) {
+  private getLabelSegStyle(feature: Feature<any>) {
     return new Text({
       text: feature.getProperties().properties.label,
       font: 'bold 14px Roboto',

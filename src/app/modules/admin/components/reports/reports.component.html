@@ -98,6 +98,7 @@
             [routerLink]="['../../classification', element.informeId]"
             >Clasificación</a
           >
+          <a mat-button [routerLink]="['../../create-map', element.informeId]">Crear mapas</a>
           <a
             mat-button
             *ngIf="element.tipo === 'seguidores' && element.fecha < newS2EReportsData"

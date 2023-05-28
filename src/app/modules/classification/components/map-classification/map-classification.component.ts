@@ -50,17 +50,17 @@ export class MapClassificationComponent implements OnInit {
   private informe: InformeInterface;
   private map: Map;
   private thermalLayerDB: ThermalLayerInterface;
-  private thermalLayers: TileLayer[];
+  private thermalLayers: TileLayer<any>[];
   private normModules: NormalizedModule[];
   private listaAnomalias: Anomalia[] = [];
-  private normModLayer: VectorLayer = undefined;
-  private prevFeatureHover: Feature;
+  private normModLayer: VectorLayer<any> = undefined;
+  private prevFeatureHover: Feature<any>;
   thermalLayerVisibility = true;
   private palette = PALETTE.ironPalette;
   normModSelected: NormalizedModule;
   anomaliaSelected: Anomalia;
   public showAnomOk = false;
-  private aerialLayer: TileLayer;
+  private aerialLayer: TileLayer<any>;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -235,15 +235,15 @@ export class MapClassificationComponent implements OnInit {
   }
 
   private addOnHoverAction() {
-    let currentFeatureHover: Feature;
+    let currentFeatureHover: Feature<any>;
     this.map.on('pointermove', (event) => {
       // impedimos hover cuando estamos moviendo una anomalia
       if (this.classificationService.normModAnomaliaSelected === undefined) {
         if (this.map.hasFeatureAtPixel(event.pixel)) {
-          const feature: Feature = this.map
+          const feature: Feature<any> = this.map
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
-            .filter((item) => item.getProperties().properties.name === 'normMod')[0] as Feature;
+            .filter((item) => item.getProperties().properties.name === 'normMod')[0] as Feature<any>;
 
           if (feature !== undefined) {
             // cuando pasamos de un modulo a otro directamente sin pasar por vacio
@@ -278,7 +278,7 @@ export class MapClassificationComponent implements OnInit {
 
   private addOnDoubleClickInteraction() {
     this.map.on('dblclick', (event) => {
-      const feature = this.map.getFeaturesAtPixel(event.pixel)[0] as Feature;
+      const feature = this.map.getFeaturesAtPixel(event.pixel)[0] as Feature<any>;
       if (feature) {
         const normMod: NormalizedModule = feature.getProperties().properties.normMod;
 
@@ -458,7 +458,7 @@ export class MapClassificationComponent implements OnInit {
       .forEach((layer) => {
         const thermalLayerDB: ThermalLayerInterface = layer.getProperties().layerDB;
 
-        ((layer as TileLayer).getSource() as XYZ_mod).setTileLoadFunction((imageTile, src) => {
+        ((layer as TileLayer<any>).getSource() as XYZ_mod).setTileLoadFunction((imageTile, src) => {
           imageTile.rangeTempMax = thermalLayerDB.rangeTempMax;
           imageTile.rangeTempMin = thermalLayerDB.rangeTempMin;
           imageTile.palette = this.palette;

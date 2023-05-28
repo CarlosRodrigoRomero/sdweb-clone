@@ -9,7 +9,6 @@ export class ViewCommentsService {
   zoomShowAnoms = 18;
   zoomChangeAnomsView = 22;
   zoomChangeSegsView = 20;
-  zoomShowSmallZones = 16;
   private _thermalLayerVisible = false;
   thermalLayerVisible$ = new BehaviorSubject<boolean>(this._thermalLayerVisible);
 
@@ -19,7 +18,6 @@ export class ViewCommentsService {
     this.zoomShowAnoms = 18;
     this.zoomChangeAnomsView = 22;
     this.zoomChangeSegsView = 20;
-    this.zoomShowSmallZones = 16;
     this.thermalLayerVisible = false;
   }
 

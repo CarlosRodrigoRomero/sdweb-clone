@@ -23,12 +23,12 @@ import { InformeInterface } from '@core/models/informe';
 export class ZonesCommentsComponent implements OnInit, OnDestroy {
   private smallZones: LocationAreaInterface[] = [];
   private bigZones: LocationAreaInterface[][] = [];
-  private zonesLayers: VectorImageLayer[];
+  private zonesLayers: VectorImageLayer<any>[];
   private map: Map;
   public selectedInformeId: string;
   private informe: InformeInterface;
-  public globalCoordAreasVectorSources: VectorSource[] = [];
-  public globalCoordAreasVectorLayers: VectorLayer[] = [];
+  public globalCoordAreasVectorSources: VectorSource<any>[] = [];
+  public globalCoordAreasVectorLayers: VectorLayer<any>[] = [];
 
   private subscriptions: Subscription = new Subscription();
 

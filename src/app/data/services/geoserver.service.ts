@@ -44,6 +44,10 @@ export class GeoserverService {
     return url;
   }
 
+  getCOGTiff() {
+    
+  }
+
   getTileCoords(checkType: boolean, tileCoord: TileCoord): string {
     if (checkType) {
       return '1/1/1';
