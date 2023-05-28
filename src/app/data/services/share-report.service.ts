@@ -250,100 +250,104 @@ export class ShareReportService {
     return this.params$.asObservable();
   }
 
-  getFiltersByParams(id: string) {
+  async getFiltersByParams(id: string): Promise<FilterInterface[]> {
     const filters: FilterInterface[] = [];
-    const filters$ = new BehaviorSubject<FilterInterface[]>(filters);
 
-    this.subscriptions.add(
-      this.afs
-        .collection('share')
-        .doc(id)
-        .get()
-        .subscribe((params) => {
-          this.params = params.data();
+    try {
+      const docRef = this.afs.collection('share').doc(id);
+      const doc = await docRef.get().toPromise();
 
-          if (Object.keys(this.params).includes('minGradient')) {
-            if (this.params.minGradient !== null) {
-              const gradientFilter = new GradientFilter('gradient', this.params.minGradient, this.params.maxGradient);
-              filters.push(gradientFilter);
-            }
-          }
-          if (Object.keys(this.params).includes('minPerdidas')) {
-            if (this.params.minPerdidas !== null) {
-              const perdidasFilter = new PerdidasFilter('perdidas', this.params.minPerdidas, this.params.maxPerdidas);
-              filters.push(perdidasFilter);
-            }
-          }
-          if (Object.keys(this.params).includes('minTempMax')) {
-            if (this.params.minTempMax !== null) {
-              const tempMaxFilter = new TempMaxFilter('tempMax', this.params.minTempMax, this.params.maxTempMax);
-              filters.push(tempMaxFilter);
-            }
-          }
-          if (Object.keys(this.params).includes('area')) {
-            if (this.params.area !== null) {
-              const coordinates = [];
-              this.params.area.forEach((num, index) => {
-                if (!(index % 2)) {
-                  const c = [num, this.params.area[index + 1]];
-                  coordinates.push(c);
-                }
-              });
-              const areaFilter = new AreaFilter('area', [coordinates]);
-              filters.push(areaFilter);
-            }
-          }
-          if (Object.keys(this.params).includes('clase')) {
-            if (this.params.clase !== null) {
-              this.params.clase.forEach((clase, index) => {
-                if (clase) {
-                  const claseFilter = new ClaseFilter('CoA_' + (index + 1), 'clase', index + 1);
-                  filters.push(claseFilter);
-                }
-              });
-            }
-          }
-          if (Object.keys(this.params).includes('criticidad')) {
-            if (this.params.criticidad !== null) {
-              this.params.criticidad.forEach((crit, index) => {
-                if (crit) {
-                  const criticidadFilter = new CriticidadFilter(index.toString(), 'criticidad', index);
-                  filters.push(criticidadFilter);
-                }
-              });
-            }
-          }
-          if (Object.keys(this.params).includes('modulo')) {
-            if (this.params.modulo !== null) {
-              const moduloFilter = new ModuloPcFilter('', 'modulo', this.params.modulo);
-              filters.push(moduloFilter);
-            }
-          }
-          if (Object.keys(this.params).includes('tipo')) {
-            if (this.params.tipo !== null) {
-              let tiposSelected = this.filterControlService.tiposSelected;
-              this.params.tipo.forEach((tipo, index, tipos) => {
-                if (tipo !== undefined && tipo !== null) {
-                  const tipoFilter = new TipoElemFilter(`tipo_${tipo}`, 'tipo', tipo, tipos.length, index);
-                  filters.push(tipoFilter);
+      if (doc.exists) {
+        this.params = doc.data();
 
-                  tiposSelected[tipo] = true;
-                }
-              });
+        if (Object.keys(this.params).includes('minGradient')) {
+          if (this.params.minGradient !== null) {
+            const gradientFilter = new GradientFilter('gradient', this.params.minGradient, this.params.maxGradient);
+            filters.push(gradientFilter);
+          }
+        }
+        if (Object.keys(this.params).includes('minPerdidas')) {
+          if (this.params.minPerdidas !== null) {
+            const perdidasFilter = new PerdidasFilter('perdidas', this.params.minPerdidas, this.params.maxPerdidas);
+            filters.push(perdidasFilter);
+          }
+        }
+        if (Object.keys(this.params).includes('minTempMax')) {
+          if (this.params.minTempMax !== null) {
+            const tempMaxFilter = new TempMaxFilter('tempMax', this.params.minTempMax, this.params.maxTempMax);
+            filters.push(tempMaxFilter);
+          }
+        }
+        if (Object.keys(this.params).includes('area')) {
+          if (this.params.area !== null) {
+            const coordinates = [];
+            this.params.area.forEach((num, index) => {
+              if (!(index % 2)) {
+                const c = [num, this.params.area[index + 1]];
+                coordinates.push(c);
+              }
+            });
+            const areaFilter = new AreaFilter('area', [coordinates]);
+            filters.push(areaFilter);
+          }
+        }
+        if (Object.keys(this.params).includes('clase')) {
+          if (this.params.clase !== null) {
+            this.params.clase.forEach((clase, index) => {
+              if (clase) {
+                const claseFilter = new ClaseFilter('CoA_' + (index + 1), 'clase', index + 1);
+                filters.push(claseFilter);
+              }
+            });
+          }
+        }
+        if (Object.keys(this.params).includes('criticidad')) {
+          if (this.params.criticidad !== null) {
+            this.params.criticidad.forEach((crit, index) => {
+              if (crit) {
+                const criticidadFilter = new CriticidadFilter(index.toString(), 'criticidad', index);
+                filters.push(criticidadFilter);
+              }
+            });
+          }
+        }
+        if (Object.keys(this.params).includes('modulo')) {
+          if (this.params.modulo !== null) {
+            const moduloFilter = new ModuloPcFilter('', 'modulo', this.params.modulo);
+            filters.push(moduloFilter);
+          }
+        }
+        if (Object.keys(this.params).includes('tipo')) {
+          if (this.params.tipo !== null) {
+            let tiposSelected = this.filterControlService.tiposSelected;
+            this.params.tipo.forEach((tipo, index, tipos) => {
+              if (tipo !== undefined && tipo !== null) {
+                const tipoFilter = new TipoElemFilter(`tipo_${tipo}`, 'tipo', tipo, tipos.length, index);
+                filters.push(tipoFilter);
 
-              this.filterControlService.tiposSelected = tiposSelected;
-            }
+                tiposSelected[tipo] = true;
+              }
+            });
+
+            this.filterControlService.tiposSelected = tiposSelected;
           }
-          if (Object.keys(this.params).includes('zona')) {
-            if (this.params.zona !== null) {
-              const zonaFilter = new ZonaFilter('', 'zona', this.params.zona);
-              filters.push(zonaFilter);
-            }
+        }
+        if (Object.keys(this.params).includes('zona')) {
+          if (this.params.zona !== null) {
+            const zonaFilter = new ZonaFilter('', 'zona', this.params.zona);
+            filters.push(zonaFilter);
           }
-          filters$.next(filters);
-        })
-    );
-    return filters$.asObservable();
+        }
+
+        filters;
+      } else {
+        console.log('No such document!');
+      }
+    } catch (err) {
+      console.error('Error getting document:', err);
+    }
+
+    return filters;
   }
 
   getSharedReports(): Observable<ParamsFilterShare[]> {

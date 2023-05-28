@@ -38,9 +38,17 @@
   overflow-y: auto;
 }
 
+.location-col {
+  max-width: 100px;
+}
+
 .loc-header {
   display: flex;
   flex-direction: column;
+}
+
+.loc-header-label {
+  font-size: 10px;
 }
 
 .mat-row.selected {
