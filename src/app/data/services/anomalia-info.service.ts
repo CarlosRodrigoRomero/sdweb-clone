@@ -195,7 +195,7 @@ export class AnomaliaInfoService {
 
     globals.forEach((coord, index) => {
       if (coord !== undefined && coord !== null && coord !== '') {
-        if (planta.hasOwnProperty('nombreGlobalCoords')) {
+        if (planta.hasOwnProperty('nombreGlobalCoords') && planta.nombreGlobalCoords.length > index) {
           this.subscriptions.add(
             this.translate.get(planta.nombreGlobalCoords[index]).subscribe((res: string) => {
               label += `${res}: ${coord} / `;
