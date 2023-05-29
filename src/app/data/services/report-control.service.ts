@@ -62,6 +62,7 @@ export class ReportControlService {
   public allFilterableElements$ = new BehaviorSubject<FilterableElement[]>(this._allFilterableElements);
   private _allAnomalias: Anomalia[] = [];
   allAnomalias$ = new BehaviorSubject<Anomalia[]>(this._allAnomalias);
+  dirtyAnoms: Anomalia[] = [];
   public plantaFija = undefined;
   private _nombreGlobalCoords: string[] = [];
   private _numFixedGlobalCoords: number = 3;
@@ -162,6 +163,10 @@ export class ReportControlService {
               take(1),
               switchMap((elems) => {
                 if (this.plantaFija) {
+                  // guardamos las anomalía de suciedad aparte
+                  this.dirtyAnoms = (elems as Anomalia[]).filter((anom) => anom.tipo === 11);
+
+                  // filtramos las anomalías reales
                   this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
 
                   if (this.allFilterableElements.length === 0) {
