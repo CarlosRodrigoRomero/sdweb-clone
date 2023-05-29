@@ -33,6 +33,16 @@
   font-weight: 500;
 }
 
+.ol-popup {
+  position: absolute;
+  transform: translate(-50%, -105%);
+}
+
+.popup-label {
+  white-space: nowrap;
+  max-width: 200px;
+}
+
 @media (max-width: 1050px) {
   #popup {
     top: 50px;

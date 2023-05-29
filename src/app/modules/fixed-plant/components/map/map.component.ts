@@ -23,6 +23,12 @@ import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { InformeInterface } from '@core/models/informe';
+import VectorSource from 'ol/source/Vector';
+import { Feature, Overlay } from 'ol';
+import Polygon from 'ol/geom/Polygon';
+import VectorLayer from 'ol/layer/Vector';
+import { Fill, Stroke, Style } from 'ol/style';
+import { DirtyAnomsService } from '@data/services/dirty-anoms.service';
 
 @Component({
   selector: 'app-map',
@@ -54,6 +60,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public sharedReport = false;
   noAnomsReport = false;
   public coordsPointer;
+  private popupDirtyAnoms: Overlay;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -63,7 +70,8 @@ export class MapComponent implements OnInit, OnDestroy {
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
     private anomaliasControlService: AnomaliasControlService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private dirtyAnomsService: DirtyAnomsService
   ) {}
 
   ngOnInit(): void {
@@ -112,6 +120,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
           if (index === this.informes.length - 1) {
             this.initMap();
+
+            this.addPopupOverlay();
+
+            // añadimos las anomalías de suciedad por separado
+            this.dirtyAnomsService.initService();
           }
         });
       });
@@ -222,6 +235,31 @@ export class MapComponent implements OnInit, OnDestroy {
         );
       }
     });
+
+    // inicializamos el servicio que controla el comportamiento de las anomalías de suciedad
+    this.dirtyAnomsService.initService().then((value) => {
+      if (value) {
+        this.informes.forEach((informe) => {
+          // creamos la capa de suciedad para los diferentes informes
+          this.dirtyAnomsService.createDirtyAnomsLayer(informe.id);
+
+          // añadimos las anomalías de suciedad por separado
+          this.dirtyAnomsService.addDirtyAnoms(informe.id);
+        });
+      }
+    });
+  }
+
+  private addPopupOverlay() {
+    const container = document.getElementById('popup-dirty');
+
+    this.popupDirtyAnoms = new Overlay({
+      id: 'popup-dirty',
+      element: container,
+      position: undefined,
+    });
+
+    this.map.addOverlay(this.popupDirtyAnoms);
   }
 
   private transform(extent) {
