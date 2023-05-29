@@ -103,13 +103,9 @@
             mat-button
             *ngIf="element.tipo === 'seguidores' && element.fecha < newS2EReportsData"
             [routerLink]="['../../clientes/informe-edit', element.informeId]"
-            >Clasificación</a
+            >Clasificación S2E</a
           >
-          <a
-            mat-button
-            *ngIf="element.tipo !== 'seguidores' && element.thermalLayerPending"
-            [routerLink]="['../thermalLayer', element.informeId]"
-          >
+          <a mat-button *ngIf="element.thermalLayerPending" [routerLink]="['../thermalLayer', element.informeId]">
             <mat-icon>add</mat-icon>
             <span>Thermal</span>
           </a>

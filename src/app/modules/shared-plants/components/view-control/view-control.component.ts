@@ -11,6 +11,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { ViewReportService } from '@data/services/view-report.service';
 import { ZonesControlService } from '@data/services/zones-control.service';
 import { ZonesService } from '@data/services/zones.service';
+import { DirtyAnomsService } from '@data/services/dirty-anoms.service';
 
 @Component({
   selector: 'app-view-control',
@@ -21,6 +22,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private aerialLayers: TileLayer<any>[];
   private thermalLayers: TileLayer<any>[];
   private anomaliaLayers: VectorImageLayer<any>[];
+  private dirtyAnomsLayers: VectorImageLayer<any>[];
   private seguidorLayers: VectorImageLayer<any>[];
   private zonesLayers: VectorImageLayer<any>[];
   public selectedInformeId: string;
@@ -35,7 +37,8 @@ export class ViewControlComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private viewReportService: ViewReportService,
     private zonesControlService: ZonesControlService,
-    private zonesService: ZonesService
+    private zonesService: ZonesService,
+    private dirtyAnomsService: DirtyAnomsService
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +52,10 @@ export class ViewControlComponent implements OnInit, OnDestroy {
 
       this.subscriptions.add(
         this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers))
+      );
+
+      this.subscriptions.add(
+        this.dirtyAnomsService.dirtyAnomsLayers$.subscribe((layers) => (this.dirtyAnomsLayers = layers))
       );
     } else {
       this.subscriptions.add(
@@ -114,10 +121,27 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       if (this.reportControlService.plantaFija) {
         this.setThermalLayersVisibility(informeId);
         this.setAnomaliaLayersVisibility(informeId);
+        this.setDirtyAnomsLayersVisibility(informeId);
       } else {
         this.setSeguidorLayersVisibility(informeId);
       }
     }
+  }
+
+  private setDirtyAnomsLayersVisibility(informeId: string) {
+    this.dirtyAnomsLayers.forEach((layer) => {
+      if (layer !== null) {
+        if (layer.getProperties().informeId === informeId) {
+          if (this.currentZoom >= this.dirtyAnomsService.zoomChangeView) {
+            layer.setVisible(true);
+          } else {
+            layer.setVisible(false);
+          }
+        } else {
+          layer.setVisible(false);
+        }
+      }
+    });
   }
 
   private setAerialLayersVisibility(informeId: string) {
