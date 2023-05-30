@@ -213,7 +213,8 @@ export class MapCreateMapComponent implements OnInit {
   private async addGeoTiffs(min: number, max: number) {
     // const url = 'https://storage.googleapis.com/mapas-cog/test_coded_cog.tif';
     // const url = 'https://storage.googleapis.com/mapas-cog/test_cog.tif';
-    const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineosX20.tif';
+    // const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineosX20.tif';
+    const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineos.tif';
 
     this.geoTiffSource = new GeoTIFF({
       sources: [
