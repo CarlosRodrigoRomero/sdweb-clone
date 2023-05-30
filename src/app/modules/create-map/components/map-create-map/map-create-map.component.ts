@@ -47,6 +47,8 @@ export class MapCreateMapComponent implements OnInit {
   private imagePointSource: VectorSource<any>;
   private clippingLayer: VectorImageLayer<any>;
   private clippingSource: VectorSource<any>;
+  private geoTiffSource: GeoTIFF;
+  private geoTiffLayer: WebGLTileLayer;
   map: Map;
   private draw: Draw;
   private divisions: MapDivision[] = [];
@@ -56,6 +58,8 @@ export class MapCreateMapComponent implements OnInit {
   urlImageThumbnail: string;
   private divisionHovered: MapDivision;
   private divisionSelected: MapDivision;
+  private sliderMin: number;
+  private sliderMax: number;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -73,8 +77,6 @@ export class MapCreateMapComponent implements OnInit {
     this.informe = this.createMapService.informe;
 
     this.initMap();
-
-    // this.addGeoTiffs();
 
     this.addPointerOnHover();
 
@@ -94,6 +96,22 @@ export class MapCreateMapComponent implements OnInit {
     this.addElems();
 
     this.addClickOutFeatures();
+
+    this.subscriptions.add(
+      this.createMapService.sliderMin$.subscribe((min) => {
+        this.sliderMin = min;
+
+        this.updateGeoTiffs(this.sliderMin, this.sliderMax);
+      })
+    );
+
+    this.subscriptions.add(
+      this.createMapService.sliderMax$.subscribe((max) => {
+        this.sliderMax = max;
+
+        this.updateGeoTiffs(this.sliderMin, this.sliderMax);
+      })
+    );
 
     this.subscriptions.add(
       this.createMapService.createMode$.subscribe((mode) => {
@@ -189,23 +207,31 @@ export class MapCreateMapComponent implements OnInit {
     });
   }
 
-  private async addGeoTiffs() {
+  private async addGeoTiffs(min: number, max: number) {
     // const url = 'https://storage.googleapis.com/mapas-cog/test_coded_cog.tif';
     const url = 'https://storage.googleapis.com/mapas-cog/test_cog.tif';
 
-    const source = new GeoTIFF({
+    this.geoTiffSource = new GeoTIFF({
       sources: [
         {
           url,
-          min: 31.7997,
-          max: 70.2184,
+          min,
+          max,
         },
       ],
     });
 
-    const layer = new WebGLTileLayer({ source });
+    this.geoTiffLayer = new WebGLTileLayer({ source: this.geoTiffSource });
 
-    this.map.addLayer(layer);
+    this.map.addLayer(this.geoTiffLayer);
+  }
+
+  private updateGeoTiffs(min: number, max: number) {
+    /// Eliminamos la capa antigua
+    this.map.removeLayer(this.geoTiffLayer);
+
+    // Añadimos una nueva capa con los nuevos valores
+    this.addGeoTiffs(min, max);
   }
 
   /* DIVISIONES */
@@ -531,8 +557,6 @@ export class MapCreateMapComponent implements OnInit {
   private addImagePoints() {
     this.subscriptions.add(
       this.mapImagesService.getMapImages().subscribe((images) => {
-        console.log(images.length);
-        console.log(images.filter((i) => i.tipo === 'RGB').length);
         this.imagePointSource.clear();
 
         this.images = images;
