@@ -10,7 +10,7 @@ import TileLayer from 'ol/layer/Tile';
 import WebGLTileLayer from 'ol/layer/WebGLTile';
 import { defaults } from 'ol/control.js';
 import Map from 'ol/Map';
-import { DoubleClickZoom, Draw, Modify, Select } from 'ol/interaction';
+import { DoubleClickZoom, DragBox, Draw, Modify, Select } from 'ol/interaction';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
@@ -21,6 +21,7 @@ import { Coordinate } from 'ol/coordinate';
 import { click, never } from 'ol/events/condition';
 import Circle from 'ol/geom/Circle';
 import VectorImageLayer from 'ol/layer/VectorImage';
+import { platformModifierKeyOnly } from 'ol/events/condition.js';
 
 import { CreateMapService } from '@data/services/create-map.service';
 import { OlMapService } from '@data/services/ol-map.service';
@@ -92,6 +93,8 @@ export class MapCreateMapComponent implements OnInit {
 
     this.createClippingLayer();
     this.addModifyClippingsInteraction();
+
+    this.addDragboxInteraction();
 
     this.addElems();
 
@@ -209,7 +212,8 @@ export class MapCreateMapComponent implements OnInit {
 
   private async addGeoTiffs(min: number, max: number) {
     // const url = 'https://storage.googleapis.com/mapas-cog/test_coded_cog.tif';
-    const url = 'https://storage.googleapis.com/mapas-cog/test_cog.tif';
+    // const url = 'https://storage.googleapis.com/mapas-cog/test_cog.tif';
+    const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineosX20.tif';
 
     this.geoTiffSource = new GeoTIFF({
       sources: [
@@ -745,6 +749,83 @@ export class MapCreateMapComponent implements OnInit {
     });
 
     this.map.addInteraction(modify);
+  }
+
+  private addDragboxInteraction() {
+    const selectedStyle = new Style({
+      fill: new Fill({
+        color: 'rgba(255, 255, 255, 0.6)',
+      }),
+      stroke: new Stroke({
+        color: 'rgba(255, 255, 255, 0.7)',
+        width: 2,
+      }),
+    });
+
+    // a normal select interaction to handle click
+    const select = new Select({
+      style: function (feature) {
+        const color = feature.get('COLOR_BIO') || '#eeeeee';
+        selectedStyle.getFill().setColor(color);
+        return selectedStyle;
+      },
+    });
+    this.map.addInteraction(select);
+
+    const selectedFeatures = select.getFeatures();
+
+    // a DragBox interaction used to select features by drawing boxes
+    const dragBox = new DragBox({
+      condition: platformModifierKeyOnly,
+    });
+
+    this.map.addInteraction(dragBox);
+
+    dragBox.on('boxend', function () {
+      const extent = dragBox.getGeometry().getExtent();
+      const boxFeatures = this.clippingSource
+        .getFeaturesInExtent(extent)
+        .filter((feature) => feature.getGeometry().intersectsExtent(extent));
+
+      // features that intersect the box geometry are added to the
+      // collection of selected features
+
+      // if the view is not obliquely rotated the box geometry and
+      // its extent are equalivalent so intersecting features can
+      // be added directly to the collection
+      const rotation = this.map.getView().getRotation();
+      const oblique = rotation % (Math.PI / 2) !== 0;
+
+      // when the view is obliquely rotated the box extent will
+      // exceed its geometry so both the box and the candidate
+      // feature geometries are rotated around a common anchor
+      // to confirm that, with the box geometry aligned with its
+      // extent, the geometries intersect
+      if (oblique) {
+        const anchor = [0, 0];
+        const geometry = dragBox.getGeometry().clone();
+        geometry.rotate(-rotation, anchor);
+        const extent = geometry.getExtent();
+        boxFeatures.forEach(function (feature) {
+          const geometry = feature.getGeometry().clone();
+          geometry.rotate(-rotation, anchor);
+          if (geometry.intersectsExtent(extent)) {
+            selectedFeatures.push(feature);
+          }
+        });
+      } else {
+        selectedFeatures.extend(boxFeatures);
+      }
+    });
+
+    // clear selection when drawing a new box and when clicking on the map
+    dragBox.on('boxstart', () => {
+      selectedFeatures.clear();
+    });
+
+    selectedFeatures.on(['add', 'remove'], () => {
+      console.log(selectedFeatures.getArray().length);
+    });
   }
 
   /* OTROS */
