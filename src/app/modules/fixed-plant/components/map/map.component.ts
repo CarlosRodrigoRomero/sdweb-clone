@@ -11,6 +11,7 @@ import TileLayer from 'ol/layer/Tile';
 import { defaults as defaultControls } from 'ol/control.js';
 import XYZ from 'ol/source/XYZ';
 import VectorImageLayer from 'ol/layer/VectorImage';
+import { Overlay } from 'ol';
 
 import { PlantaService } from '@data/services/planta.service';
 import { MapControlService } from '../../services/map-control.service';
@@ -18,17 +19,12 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { DirtyAnomsService } from '@data/services/dirty-anoms.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { InformeInterface } from '@core/models/informe';
-import VectorSource from 'ol/source/Vector';
-import { Feature, Overlay } from 'ol';
-import Polygon from 'ol/geom/Polygon';
-import VectorLayer from 'ol/layer/Vector';
-import { Fill, Stroke, Style } from 'ol/style';
-import { DirtyAnomsService } from '@data/services/dirty-anoms.service';
 
 @Component({
   selector: 'app-map',
