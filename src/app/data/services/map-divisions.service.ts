@@ -30,10 +30,16 @@ export class MapDivisionsService {
           // Convertimos el objeto en un array
           data.coords = Object.values(data.coords);
 
-          if (data.hasOwnProperty('imagesIds')) {
-            data.numImages = data.imagesIds.length;
+          if (data.hasOwnProperty('imagesRgbIds')) {
+            data.numImagesRgb = data.imagesRgbIds.length;
           } else {
-            data.numImages = 0;
+            data.numImagesRgb = 0;
+          }
+
+          if (data.hasOwnProperty('imagesThermalIds')) {
+            data.numImagesThermal = data.imagesThermalIds.length;
+          } else {
+            data.numImagesThermal = 0;
           }
 
           return { id, ...data };

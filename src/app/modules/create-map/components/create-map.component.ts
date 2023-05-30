@@ -22,7 +22,7 @@ export class CreateMapComponent implements OnInit {
     this.createMapService.initService().then((initService) => {
       this.dataLoaded = initService;
 
-      this.generateRandomMapImages();
+      // this.generateRandomMapImages();
     });
   }
 

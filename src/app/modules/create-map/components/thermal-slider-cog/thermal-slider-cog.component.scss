@@ -1,0 +1,38 @@
+mat-card {
+  border-color: transparent;
+  box-shadow: none !important;
+  padding-top: 10px;
+  padding-bottom: 0;
+  min-width: 250px;
+}
+
+:host ::ng-deep {
+  .temperature-slider .ngx-slider .ngx-slider-selection {
+    z-index: 2 !important;
+    background: linear-gradient(90deg, #010106, #481461, #b02f4c, #f36d18, #f9fb93) !important;
+    border-radius: 2px !important;
+  }
+
+  .temperature-slider .ngx-slider .ngx-slider-pointer:after {
+    display: none !important;
+  }
+
+  .temperature-slider .ngx-slider .ngx-slider-bubble {
+    bottom: 14px !important;
+    color: unset;
+  }
+
+  .temperature-slider .ngx-slider .ngx-slider-pointer {
+    width: 8px !important;
+    height: 16px !important;
+    top: auto !important; /* to remove the default positioning */
+    bottom: 0 !important;
+    background-color: #333 !important;
+    border-top-left-radius: 3px !important;
+    border-top-right-radius: 3px !important;
+  }
+
+  .temperature-slider .ngx-slider .ngx-slider-limit {
+    display: none;
+  }
+}

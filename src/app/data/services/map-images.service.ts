@@ -20,7 +20,7 @@ export class MapImagesService {
 
   constructor(private afs: AngularFirestore, private router: Router, private storage: AngularFireStorage) {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
-    this.mapImagesCollection = this.afs.collection<MapImage>('informes/' + this.informeId + '/mapImages');
+    this.mapImagesCollection = this.afs.collection<MapImage>('informes/' + this.informeId + '/imagesMap');
   }
 
   getMapImages(): Observable<MapImage[]> {
