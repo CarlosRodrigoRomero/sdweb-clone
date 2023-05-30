@@ -17,16 +17,15 @@ import Polygon from 'ol/geom/Polygon';
 import { MapDivisionsService } from '@data/services/map-divisions.service';
 import { MapDivision } from '@core/models/mapDivision';
 import GeometryType from 'ol/geom/GeometryType';
-import VectorLayer from 'ol/layer/Vector';
 import { Coordinate } from 'ol/coordinate';
 import { click, never } from 'ol/events/condition';
 import Circle from 'ol/geom/Circle';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import { CreateMapService } from '@data/services/create-map.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { MapImagesService } from '@data/services/map-images.service';
 import { MapDivisionControlService } from '@data/services/map-division-control.service';
-import { ThermalService } from '@data/services/thermal.service';
 import { MapClippingService } from '@data/services/map-clipping.service';
 
 import { PlantaInterface } from '@core/models/planta';
@@ -42,11 +41,11 @@ import { InformeInterface } from '@core/models/informe';
 export class MapCreateMapComponent implements OnInit {
   private planta: PlantaInterface;
   private informe: InformeInterface;
-  private divisionLayer: VectorLayer<any>;
+  private divisionLayer: VectorImageLayer<any>;
   private divisionSource: VectorSource<any>;
-  private imagePointLayer: VectorLayer<any>;
+  private imagePointLayer: VectorImageLayer<any>;
   private imagePointSource: VectorSource<any>;
-  private clippingLayer: VectorLayer<any>;
+  private clippingLayer: VectorImageLayer<any>;
   private clippingSource: VectorSource<any>;
   map: Map;
   private draw: Draw;
@@ -216,7 +215,7 @@ export class MapCreateMapComponent implements OnInit {
     if (this.divisionLayer === undefined) {
       this.divisionSource = new VectorSource<any>({ wrapX: false });
 
-      this.divisionLayer = new VectorLayer<any>({
+      this.divisionLayer = new VectorImageLayer<any>({
         source: this.divisionSource,
         style: this.getStyleDivision(false),
       });
@@ -256,9 +255,11 @@ export class MapCreateMapComponent implements OnInit {
       };
 
       // calculamos el numero de imagenes que hay dentro de la division
-      const imagesIds = this.getImagesInsideDivision(coords[0]);
-      division.imagesIds = imagesIds;
-      division.numImages = imagesIds.length;
+      const [imagesRgbIds, imagesThermalIds] = this.getImagesInsideDivision(coords[0]);
+      division.imagesRgbIds = imagesRgbIds;
+      division.numImagesRgb = imagesRgbIds.length;
+      division.imagesThermalIds = imagesThermalIds;
+      division.numImagesThermal = imagesThermalIds.length;
 
       // añadimos la división a la DB
       this.mapDivisionsService.addMapDivision(division);
@@ -288,9 +289,11 @@ export class MapCreateMapComponent implements OnInit {
   }
 
   private addDivision(division: MapDivision) {
-    let numImages = '0';
-    if (division.numImages !== undefined) {
-      numImages = division.numImages.toString();
+    let numImagesRgb = '0';
+    let numImagesThermal = '0';
+    if (division.numImagesRgb !== undefined) {
+      numImagesRgb = division.numImagesRgb.toString();
+      numImagesThermal = division.numImagesThermal.toString();
     }
 
     const feature = new Feature({
@@ -298,7 +301,8 @@ export class MapCreateMapComponent implements OnInit {
       properties: {
         id: division.id,
         name: 'division',
-        numImages,
+        numImagesRgb,
+        numImagesThermal,
       },
     });
 
@@ -354,7 +358,9 @@ export class MapCreateMapComponent implements OnInit {
 
         if (coords !== null) {
           // calculamos el numero de imagenes que hay dentro de la division
-          division.imagesIds = this.getImagesInsideDivision(division.coords);
+          const [imagesRgbIds, imagesThermalIds] = this.getImagesInsideDivision(coords);
+          division.imagesRgbIds = imagesRgbIds;
+          division.imagesThermalIds = imagesThermalIds;
 
           // adaptamos las coords a la DB
           division.coords = { ...coords };
@@ -398,10 +404,15 @@ export class MapCreateMapComponent implements OnInit {
   private getStyleDivision(focused: boolean) {
     if (focused) {
       return (feature: Feature<any>) => {
-        let text = '0';
+        let textRgb = '0';
+        let textThermal = '0';
         if (feature.getProperties().properties !== undefined) {
-          text = feature.getProperties().properties.numImages;
+          textRgb = feature.getProperties().properties.numImagesRgb;
+          textThermal = feature.getProperties().properties.numImagesThermal;
         }
+
+        const label = `${textRgb} RGB\n${textThermal} THERMAL`;
+
         return new Style({
           fill: new Fill({
             color: 'rgba(255, 255, 255, 0.2)',
@@ -411,7 +422,7 @@ export class MapCreateMapComponent implements OnInit {
             color: 'white',
           }),
           text: new Text({
-            text,
+            text: label,
             font: 'bold 16px Roboto',
             fill: new Fill({
               color: 'black',
@@ -425,10 +436,15 @@ export class MapCreateMapComponent implements OnInit {
       };
     } else {
       return (feature: Feature<any>) => {
-        let text = '0';
+        let textRgb = '0';
+        let textThermal = '0';
         if (feature.getProperties().properties !== undefined) {
-          text = feature.getProperties().properties.numImages;
+          textRgb = feature.getProperties().properties.numImagesRgb;
+          textThermal = feature.getProperties().properties.numImagesThermal;
         }
+
+        const label = `${textRgb} RGB\n${textThermal} THERMAL`;
+
         return new Style({
           fill: new Fill({
             color: 'rgba(0, 0, 255, 0.2)',
@@ -438,7 +454,7 @@ export class MapCreateMapComponent implements OnInit {
             color: 'blue',
           }),
           text: new Text({
-            text,
+            text: label,
             font: 'bold 16px Roboto',
             fill: new Fill({
               color: 'black',
@@ -465,15 +481,24 @@ export class MapCreateMapComponent implements OnInit {
     }
   }
 
-  private getImagesInsideDivision(divisionCoords: Coordinate[]): string[] {
-    const imagesIds: string[] = [];
-    this.mapImagesService.mapImages.forEach((image) => {
+  private getImagesInsideDivision(divisionCoords: Coordinate[]): string[][] {
+    const imagesRgb = this.images.filter((image) => image.tipo === 'RGB');
+    const imagesRgbIds: string[] = [];
+    imagesRgb.forEach((image) => {
       if (this.isInsideDivision(image.coords, divisionCoords)) {
-        imagesIds.push(image.id);
+        imagesRgbIds.push(image.id);
       }
     });
 
-    return imagesIds;
+    const imagesThermal = this.images.filter((image) => image.tipo !== 'RGB');
+    const imagesThermalIds: string[] = [];
+    imagesThermal.forEach((image) => {
+      if (this.isInsideDivision(image.coords, divisionCoords)) {
+        imagesThermalIds.push(image.id);
+      }
+    });
+
+    return [imagesRgbIds, imagesThermalIds];
   }
 
   private isInsideDivision(imageCoords: Coordinate, divisionCoords: Coordinate[]): boolean {
@@ -490,7 +515,7 @@ export class MapCreateMapComponent implements OnInit {
     if (this.imagePointLayer === undefined) {
       this.imagePointSource = new VectorSource<any>({ wrapX: false });
 
-      this.imagePointLayer = new VectorLayer<any>({
+      this.imagePointLayer = new VectorImageLayer<any>({
         source: this.imagePointSource,
         style: this.getStyleImagePoint(false),
       });
@@ -504,25 +529,22 @@ export class MapCreateMapComponent implements OnInit {
   }
 
   private addImagePoints() {
-    // this.subscriptions.add(
-    //   this.mapImagesService.getMapImages().subscribe((images) => {
-    //     this.imagePointSource.clear();
+    this.subscriptions.add(
+      this.mapImagesService.getMapImages().subscribe((images) => {
+        console.log(images.length);
+        console.log(images.filter((i) => i.tipo === 'RGB').length);
+        this.imagePointSource.clear();
 
-    //     this.images = images;
+        this.images = images;
 
-    //     this.images.forEach((image) => this.addImagePoint(image));
-    //   })
-    // );
-
-    // TEMPORAL, HASTA QUE ESTÉN LAS IMAGENES EN LA DB
-    this.images = this.mapImagesService.mapImages;
-
-    this.images.forEach((image) => this.addImagePoint(image));
+        this.images.forEach((image) => this.addImagePoint(image));
+      })
+    );
   }
 
   private addImagePoint(image: MapImage) {
     const feature = new Feature({
-      geometry: new Circle(fromLonLat(image.coords), 4),
+      geometry: new Circle(fromLonLat(image.coords), 1),
       properties: {
         id: image.id,
         name: 'imagePoint',
@@ -596,7 +618,7 @@ export class MapCreateMapComponent implements OnInit {
             color: 'white',
           }),
           stroke: new Stroke({
-            width: 4,
+            width: 2,
             color: 'white',
           }),
         });
@@ -639,7 +661,7 @@ export class MapCreateMapComponent implements OnInit {
     if (this.clippingLayer === undefined) {
       this.clippingSource = new VectorSource<any>({ wrapX: false });
 
-      this.clippingLayer = new VectorLayer<any>({
+      this.clippingLayer = new VectorImageLayer<any>({
         source: this.clippingSource,
         style: this.getStyleClipping(false),
       });

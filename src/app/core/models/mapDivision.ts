@@ -5,7 +5,9 @@ export class MapDivision implements MapElement {
   id?: string;
   coords: Coordinate[];
   type: string;
-  imagesIds?: string[];
-  numImages?: number;
+  imagesRgbIds?: string[];
+  imagesThermalIds?: string[];
+  numImagesRgb?: number;
+  numImagesThermal?: number;
   // mapId?: string;
 }
