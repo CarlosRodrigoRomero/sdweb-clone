@@ -92,7 +92,7 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
 
           this.tiposElem = [];
           // obtenermos los labels de todas las anomalias
-          this._getAllCategorias(anomalias);
+          this._getAllCategorias(this.allAnomalias);
           this.labelsCategoria.forEach((label, i) => {
             this.tiposElem.push({ tipo: GLOBAL.labels_tipos.indexOf(label), label, color: this.coloresCategoria[i] });
 
