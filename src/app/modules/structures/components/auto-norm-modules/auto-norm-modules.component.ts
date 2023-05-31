@@ -1,9 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { combineLatest, Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
 
 import { StructuresService } from '@data/services/structures.service';
 
@@ -18,16 +16,11 @@ import { ModuleGroup } from '@core/models/moduleGroup';
 export class AutoNormModulesComponent implements OnInit, OnDestroy {
   private moduleGroups: any[];
   private normModules: NormalizedModule[];
-  form: FormGroup;
   groupsWithoutNormMod: ModuleGroup[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(
-    private http: HttpClient,
-    private formBuilder: FormBuilder,
-    private structuresService: StructuresService
-  ) {}
+  constructor(private http: HttpClient, private structuresService: StructuresService) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -47,19 +40,9 @@ export class AutoNormModulesComponent implements OnInit, OnDestroy {
         }
       )
     );
-
-    this.buildForm();
   }
 
-  private buildForm() {
-    this.form = this.formBuilder.group({
-      filas: [1, [Validators.required, Validators.min(1)]],
-      columnas: [1, [Validators.required, Validators.min(1)]],
-      ventana: [7, [Validators.required, Validators.min(3), Validators.max(10)]],
-    });
-  }
-
-  onSubmit(select: string) {
+  autoNorm(select: string) {
     if (select === 'all') {
       this.autoNormModules(this.moduleGroups);
     } else {
@@ -68,32 +51,21 @@ export class AutoNormModulesComponent implements OnInit, OnDestroy {
   }
 
   autoNormModules(moduleGroups: ModuleGroup[]) {
-    const url = `https://europe-west1-sdweb-d33ce.cloudfunctions.net/estructura`;
+    const url = `https://modulosbruto-to-modulosnormalizados-rcpywurt6q-ew.a.run.app/`;
 
-    if (this.form.valid) {
-      const filas = this.form.get('filas').value;
-      const columnas = this.form.get('columnas').value;
-      const ventana = this.form.get('ventana').value;
+    moduleGroups.forEach((group) => {
+      const params = new HttpParams().set('informeId', this.structuresService.informeId).set('agrupacionId', group.id);
 
-      moduleGroups.forEach((group) => {
-        const params = new HttpParams()
-          .set('informeId', this.structuresService.informeId)
-          .set('agrupacionId', group.id)
-          .set('filas', filas.toString())
-          .set('columnas', columnas.toString())
-          .set('ventana', ventana.toString());
-
-        return this.http
-          .get(url, { responseType: 'text', params })
-          .toPromise()
-          .then((res) => {
-            console.log(res);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      });
-    }
+      return this.http
+        .get(url, { responseType: 'text', params })
+        .toPromise()
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
   }
 
   ngOnDestroy(): void {
