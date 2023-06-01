@@ -39,13 +39,12 @@ export class MapImagesService {
     );
   }
 
-  getImageThumbnail(thumbnailId: string) {
-    if (thumbnailId !== undefined) {
+  getImageThumbnail(thumbnailPath: string) {
+    if (thumbnailPath !== undefined) {
       // Creamos una referencia a la imagen
       const storageRef = this.storage.ref('');
 
-      let imageExt = '.png';
-      let imageRef = storageRef.child('vuelos/' + this.informeId + '/thumbnails/' + thumbnailId + imageExt);
+      let imageRef = storageRef.child('vuelos/' + this.informeId + '/thumbnails/' + thumbnailPath);
 
       // Obtenemos la URL y descargamos el archivo capturando los posibles errores
       imageRef
