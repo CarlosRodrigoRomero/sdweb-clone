@@ -1,6 +1,13 @@
 <div id="map" class="map"></div>
 
-<button mat-raised-button class="add-btn" (click)="switchCreateMode()">Crear divisiones</button>
+<div class="actions-btns">
+  <button mat-raised-button (click)="switchCreateMode()">
+    <span *ngIf="!createDivisionMode">Activar dibujo devisiones</span>
+    <span *ngIf="createDivisionMode">Parar dibujo divisiones</span>
+  </button>
+
+  <button *ngIf="clippingSelected !== undefined" mat-raised-button (click)="cutMap()">Cortar mapa seleccionado</button>
+</div>
 
 <mat-card id="popup" class="ol-popup">
   <img src="{{ urlImageThumbnail }}" alt="" height="200px" />
