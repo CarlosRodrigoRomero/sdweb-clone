@@ -49,8 +49,7 @@ export class MapCreateMapComponent implements OnInit {
   private imagePointSource: VectorSource<any>;
   private clippingLayer: VectorImageLayer<any>;
   private clippingSource: VectorSource<any>;
-  private geoTiffSource: GeoTIFF;
-  private geoTiffLayer: WebGLTileLayer;
+  private geoTiffLayers: WebGLTileLayer[] = [];
   map: Map;
   private draw: Draw;
   private divisions: MapDivision[] = [];
@@ -236,13 +235,11 @@ export class MapCreateMapComponent implements OnInit {
     });
   }
 
-  private async addGeoTiffs(min: number, max: number) {
-    // const url = 'https://storage.googleapis.com/mapas-cog/test_coded_cog.tif';
-    // const url = 'https://storage.googleapis.com/mapas-cog/test_cog.tif';
+  private async addGeoTiffs(url: string, min: number, max: number) {
     // const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineosX20.tif';
-    const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineos.tif';
+    // const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineos.tif';
 
-    this.geoTiffSource = new GeoTIFF({
+    const source = new GeoTIFF({
       sources: [
         {
           url,
@@ -252,17 +249,27 @@ export class MapCreateMapComponent implements OnInit {
       ],
     });
 
-    this.geoTiffLayer = new WebGLTileLayer({ source: this.geoTiffSource });
+    const layer = new WebGLTileLayer({ source });
 
-    this.map.addLayer(this.geoTiffLayer);
+    this.geoTiffLayers.push(layer);
+
+    this.map.addLayer(layer);
   }
 
   private updateGeoTiffs(min: number, max: number) {
-    /// Eliminamos la capa antigua
-    this.map.removeLayer(this.geoTiffLayer);
+    /// Eliminamos las capas antiguas
+    if (this.geoTiffLayers.length > 0) {
+      this.geoTiffLayers.forEach((layer) => this.map.removeLayer(layer));
+    }
 
-    // Añadimos una nueva capa con los nuevos valores
-    this.addGeoTiffs(min, max);
+    const urls = [
+      'https://storage.googleapis.com/mapas-cog/parte1.tif',
+      'https://storage.googleapis.com/mapas-cog/parte2.tif',
+      'https://storage.googleapis.com/mapas-cog/parte3.tif',
+    ];
+
+    // Añadimos nuevas capas con los nuevos valores
+    urls.forEach((url) => this.addGeoTiffs(url, min, max));
   }
 
   /* DIVISIONES */
