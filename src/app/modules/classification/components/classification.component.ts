@@ -51,6 +51,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   private locAreas: LocationAreaInterface[] = [];
   private realAnoms: Anomalia[] = [];
   informeId: string;
+  private urlCalcAnomData = 'https://datos-anomalia-rcpywurt6q-ew.a.run.app';
 
   private subscriptions: Subscription = new Subscription();
 
@@ -118,8 +119,6 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   }
 
   private updateAnomalias() {
-    const url = `https://europe-west1-sdweb-d33ce.cloudfunctions.net/datos_anomalia`;
-
     this.processing = true;
 
     let count = 0;
@@ -129,7 +128,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       const params = new HttpParams().set('anomaliaId', anom.id);
 
       return this.http
-        .get(url, { responseType: 'text', params })
+        .get(this.urlCalcAnomData, { responseType: 'text', params })
         .toPromise()
         .then((res) => {
           console.log(res);
@@ -157,8 +156,6 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   }
 
   updateAnomaliasNoData() {
-    const url = `https://europe-west1-sdweb-d33ce.cloudfunctions.net/datos_anomalia`;
-
     this.processing = true;
 
     let count = 0;
@@ -168,7 +165,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       const params = new HttpParams().set('anomaliaId', anom.id);
 
       return this.http
-        .get(url, { responseType: 'text', params })
+        .get(this.urlCalcAnomData, { responseType: 'text', params })
         .toPromise()
         .then((res) => {
           console.log(res);
