@@ -561,12 +561,14 @@ export class MapCreateMapComponent implements OnInit {
 
   private addImagePoints() {
     this.subscriptions.add(
-      this.mapImagesService.getMapImages().subscribe((images) => {
+      this.mapImagesService.getMapImages().pipe(take(1)).subscribe((images) => {
         this.imagePointSource.clear();
 
         this.images = images;
 
-        this.images.forEach((image) => this.addImagePoint(image));
+        const imagesRgb = this.images.filter((image) => image.tipo === 'RGB');
+
+        imagesRgb.forEach((image) => this.addImagePoint(image));
       })
     );
   }
@@ -620,7 +622,7 @@ export class MapCreateMapComponent implements OnInit {
           const image = this.images.find((img) => img.id === imagePointId);
 
           // cargamos la miniatura asociada a este punto
-          this.mapImagesService.getImageThumbnail(image.id);
+          this.mapImagesService.getImageThumbnail(image.path);
 
           // mostramos el popup
           this.map.getOverlayById('popup').setPosition(fromLonLat(image.coords));
