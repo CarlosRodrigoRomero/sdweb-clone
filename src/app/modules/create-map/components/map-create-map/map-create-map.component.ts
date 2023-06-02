@@ -28,6 +28,7 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { MapImagesService } from '@data/services/map-images.service';
 import { MapDivisionControlService } from '@data/services/map-division-control.service';
 import { MapClippingService } from '@data/services/map-clipping.service';
+import { MapClippingControlService } from '@data/services/map-clipping-control.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { MapImage } from '@core/models/mapImages';
@@ -48,8 +49,7 @@ export class MapCreateMapComponent implements OnInit {
   private imagePointSource: VectorSource<any>;
   private clippingLayer: VectorImageLayer<any>;
   private clippingSource: VectorSource<any>;
-  private geoTiffSource: GeoTIFF;
-  private geoTiffLayer: WebGLTileLayer;
+  private geoTiffLayers: WebGLTileLayer[] = [];
   map: Map;
   private draw: Draw;
   private divisions: MapDivision[] = [];
@@ -59,8 +59,10 @@ export class MapCreateMapComponent implements OnInit {
   urlImageThumbnail: string;
   private divisionHovered: MapDivision;
   private divisionSelected: MapDivision;
+  clippingSelected: MapClipping;
   private sliderMin: number;
   private sliderMax: number;
+  createDivisionMode: boolean;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -70,7 +72,8 @@ export class MapCreateMapComponent implements OnInit {
     private mapDivisionsService: MapDivisionsService,
     private mapImagesService: MapImagesService,
     private mapDivisionControlService: MapDivisionControlService,
-    private mapClippingService: MapClippingService
+    private mapClippingService: MapClippingService,
+    private mapClippingControlService: MapClippingControlService
   ) {}
 
   ngOnInit(): void {
@@ -93,6 +96,7 @@ export class MapCreateMapComponent implements OnInit {
 
     this.createClippingLayer();
     this.addModifyClippingsInteraction();
+    this.addSelectClippingsInteraction();
 
     this.addDragboxInteraction();
 
@@ -118,6 +122,8 @@ export class MapCreateMapComponent implements OnInit {
 
     this.subscriptions.add(
       this.createMapService.createMode$.subscribe((mode) => {
+        this.createDivisionMode = mode;
+
         if (mode) {
           this.drawDivisions();
         } else if (this.draw !== undefined) {
@@ -132,11 +138,13 @@ export class MapCreateMapComponent implements OnInit {
     this.subscriptions.add(
       this.mapDivisionControlService.mapDivisionSelected$.subscribe((division) => {
         if (this.divisionSelected) {
-          // quitamos el estilo a la anterior hovered
+          // quitamos el estilo a la subdivision anterior seleccionada
           this.setExternalDivisionStyle(this.divisionSelected.id, false);
         }
 
-        if (division !== undefined) {
+        if (division) {
+          this.clippingSelected = undefined;
+
           this.setExternalDivisionStyle(division.id, true);
         }
 
@@ -146,18 +154,35 @@ export class MapCreateMapComponent implements OnInit {
 
     this.subscriptions.add(
       this.mapDivisionControlService.mapDivisionHovered$.subscribe((division) => {
-        if (this.divisionSelected === undefined) {
+        if (this.divisionSelected) {
           if (this.divisionHovered) {
             // quitamos el estilo a la anterior hovered
             this.setExternalDivisionStyle(this.divisionHovered.id, false);
           }
 
-          if (division !== undefined) {
+          if (division) {
             this.setExternalDivisionStyle(division.id, true);
           }
 
           this.divisionHovered = division;
         }
+      })
+    );
+
+    this.subscriptions.add(
+      this.mapClippingControlService.mapClippingSelected$.subscribe((clipping) => {
+        if (this.clippingSelected) {
+          // quitamos el estilo al recorte anterior seleccionado
+          this.setExternalClippingStyle(this.clippingSelected.id, false);
+        }
+
+        if (clipping) {
+          this.divisionSelected = undefined;
+
+          this.setExternalClippingStyle(clipping.id, true);
+        }
+
+        this.clippingSelected = clipping;
       })
     );
   }
@@ -210,13 +235,11 @@ export class MapCreateMapComponent implements OnInit {
     });
   }
 
-  private async addGeoTiffs(min: number, max: number) {
-    // const url = 'https://storage.googleapis.com/mapas-cog/test_coded_cog.tif';
-    // const url = 'https://storage.googleapis.com/mapas-cog/test_cog.tif';
+  private async addGeoTiffs(url: string, min: number, max: number) {
     // const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineosX20.tif';
-    const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineos.tif';
+    // const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineos.tif';
 
-    this.geoTiffSource = new GeoTIFF({
+    const source = new GeoTIFF({
       sources: [
         {
           url,
@@ -226,17 +249,27 @@ export class MapCreateMapComponent implements OnInit {
       ],
     });
 
-    this.geoTiffLayer = new WebGLTileLayer({ source: this.geoTiffSource });
+    const layer = new WebGLTileLayer({ source });
 
-    this.map.addLayer(this.geoTiffLayer);
+    this.geoTiffLayers.push(layer);
+
+    this.map.addLayer(layer);
   }
 
   private updateGeoTiffs(min: number, max: number) {
-    /// Eliminamos la capa antigua
-    this.map.removeLayer(this.geoTiffLayer);
+    /// Eliminamos las capas antiguas
+    if (this.geoTiffLayers.length > 0) {
+      this.geoTiffLayers.forEach((layer) => this.map.removeLayer(layer));
+    }
 
-    // Añadimos una nueva capa con los nuevos valores
-    this.addGeoTiffs(min, max);
+    const urls = [
+      'https://storage.googleapis.com/mapas-cog/parte1.tif',
+      'https://storage.googleapis.com/mapas-cog/parte2.tif',
+      'https://storage.googleapis.com/mapas-cog/parte3.tif',
+    ];
+
+    // Añadimos nuevas capas con los nuevos valores
+    urls.forEach((url) => this.addGeoTiffs(url, min, max));
   }
 
   /* DIVISIONES */
@@ -561,15 +594,18 @@ export class MapCreateMapComponent implements OnInit {
 
   private addImagePoints() {
     this.subscriptions.add(
-      this.mapImagesService.getMapImages().pipe(take(1)).subscribe((images) => {
-        this.imagePointSource.clear();
+      this.mapImagesService
+        .getMapImages()
+        .pipe(take(1))
+        .subscribe((images) => {
+          this.imagePointSource.clear();
 
-        this.images = images;
+          this.images = images;
 
-        const imagesRgb = this.images.filter((image) => image.tipo === 'RGB');
+          const imagesRgb = this.images.filter((image) => image.tipo === 'RGB');
 
-        imagesRgb.forEach((image) => this.addImagePoint(image));
-      })
+          imagesRgb.forEach((image) => this.addImagePoint(image));
+        })
     );
   }
 
@@ -690,6 +726,7 @@ export class MapCreateMapComponent implements OnInit {
   private createClippingLayer() {
     // si no existe previamente la creamos
     if (this.clippingLayer === undefined) {
+      console.log('ok');
       this.clippingSource = new VectorSource<any>({ wrapX: false });
 
       this.clippingLayer = new VectorImageLayer<any>({
@@ -702,34 +739,6 @@ export class MapCreateMapComponent implements OnInit {
       });
 
       this.map.addLayer(this.clippingLayer);
-    }
-  }
-
-  private getStyleClipping(focused: boolean) {
-    if (focused) {
-      return (feature: Feature<any>) => {
-        return new Style({
-          fill: new Fill({
-            color: 'rgba(255, 255, 255, 0.2)',
-          }),
-          stroke: new Stroke({
-            width: 2,
-            color: 'white',
-          }),
-        });
-      };
-    } else {
-      return (feature: Feature<any>) => {
-        return new Style({
-          fill: new Fill({
-            color: 'rgba(0, 255, 0, 0.2)',
-          }),
-          stroke: new Stroke({
-            width: 2,
-            color: 'green',
-          }),
-        });
-      };
     }
   }
 
@@ -752,6 +761,34 @@ export class MapCreateMapComponent implements OnInit {
     });
 
     this.map.addInteraction(modify);
+  }
+
+  private addSelectClippingsInteraction() {
+    const select = new Select({
+      style: this.getStyleClipping(false),
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().id === 'clippingLayer') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    this.map.addInteraction(select);
+
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        const feature = e.selected[0];
+        if (feature.getProperties().properties.name === 'clipping') {
+          const clippingId = feature.getProperties().properties.id;
+          const clipping = this.clippings.find((c) => c.id === clippingId);
+
+          this.mapClippingControlService.mapClippingSelected = clipping;
+        }
+      }
+    });
   }
 
   private addDragboxInteraction() {
@@ -785,6 +822,7 @@ export class MapCreateMapComponent implements OnInit {
     this.map.addInteraction(dragBox);
 
     dragBox.on('boxend', function () {
+      console.log(this.clippingSource);
       const extent = dragBox.getGeometry().getExtent();
       const boxFeatures = this.clippingSource
         .getFeaturesInExtent(extent)
@@ -827,8 +865,52 @@ export class MapCreateMapComponent implements OnInit {
     });
 
     selectedFeatures.on(['add', 'remove'], () => {
-      console.log(selectedFeatures.getArray().length);
+      // console.log(selectedFeatures.getArray().length);
     });
+  }
+
+  private getStyleClipping(focused: boolean) {
+    if (focused) {
+      return (feature: Feature<any>) => {
+        return new Style({
+          fill: new Fill({
+            color: 'rgba(255, 255, 255, 0.2)',
+          }),
+          stroke: new Stroke({
+            width: 2,
+            color: 'white',
+          }),
+        });
+      };
+    } else {
+      return (feature: Feature<any>) => {
+        return new Style({
+          fill: new Fill({
+            color: 'rgba(0, 255, 0, 0.2)',
+          }),
+          stroke: new Stroke({
+            width: 2,
+            color: 'green',
+          }),
+        });
+      };
+    }
+  }
+
+  private setExternalClippingStyle(clippingId: string, focused: boolean) {
+    const features: Feature<any>[] = this.clippingLayer.getSource().getFeatures();
+
+    const feature = features.find((f) => f.getProperties().properties.id === clippingId);
+
+    if (focused) {
+      feature.setStyle(this.getStyleClipping(true));
+    } else {
+      feature.setStyle(this.getStyleClipping(false));
+    }
+  }
+
+  cutMap() {
+    console.log('cutMap');
   }
 
   /* OTROS */
@@ -840,9 +922,15 @@ export class MapCreateMapComponent implements OnInit {
         .filter((item) => item.getProperties().properties !== undefined);
       if (feature.length === 0) {
         if (this.divisionSelected !== undefined) {
-          this.setExternalDivisionStyle(this.divisionSelected.id, false);
+          // this.setExternalDivisionStyle(this.divisionSelected.id, false);
 
-          this.divisionSelected = undefined;
+          this.mapDivisionControlService.mapDivisionSelected = undefined;
+        }
+
+        if (this.clippingSelected !== undefined) {
+          // this.setExternalDivisionStyle(this.divisionSelected.id, false);
+
+          this.mapClippingControlService.mapClippingSelected = undefined;
         }
       }
     });
