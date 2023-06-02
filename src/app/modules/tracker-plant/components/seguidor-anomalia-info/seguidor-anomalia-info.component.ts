@@ -9,7 +9,6 @@ import { AuthService } from '@data/services/auth.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
-
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
 
@@ -50,6 +49,8 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
         )
         .subscribe((anom) => {
           this.anomaliaSelected = anom;
+
+          console.log('anomaliaSelected', this.anomaliaSelected);
 
           if (this.anomaliaSelected !== undefined) {
             let numComentarios = null;

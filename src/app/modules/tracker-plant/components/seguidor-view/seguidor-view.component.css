@@ -100,11 +100,8 @@ app-seguidor-anomalia-info {
   position: absolute;
   z-index: 8;
   right: 77px;
-  top: 450px;
+  top: 426px;
   width: 500px;
-  background: white;
-  padding: 0.5rem 0 0;
-  border-radius: 4px;
 }
 
 .left-content {
