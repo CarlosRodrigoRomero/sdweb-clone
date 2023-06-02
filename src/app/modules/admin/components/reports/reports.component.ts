@@ -30,6 +30,8 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
     'actions',
   ];
   dataSource = new MatTableDataSource<any>();
+  newS2EReportsData = 1682899200; // 1/05/23
+
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild(MatSort) sort: MatSort;
