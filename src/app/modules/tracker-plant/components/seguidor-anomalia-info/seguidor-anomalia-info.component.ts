@@ -50,8 +50,6 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
         .subscribe((anom) => {
           this.anomaliaSelected = anom;
 
-          console.log('anomaliaSelected', this.anomaliaSelected);
-
           if (this.anomaliaSelected !== undefined) {
             let numComentarios = null;
             if (this.anomaliaSelected.hasOwnProperty('comentarios') && this.anomaliaSelected.comentarios.length > 0) {
