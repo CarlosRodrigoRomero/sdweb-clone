@@ -224,4 +224,17 @@
     />
     <span class="hotkeys">(Shift+8)</span>
   </div>
+  <div class="legend__element">
+    <div class="element__title">
+      <span>0</span>
+      <mat-icon [ngStyle]="{ color: anomaliaColors[0] }">crop_16_9</mat-icon>
+    </div>
+    <img
+      class="icon"
+      matTooltip="Sin anomalías"
+      (click)="updateAnomalia(0)"
+      src="../../../assets/images/tipo_0.png"
+    />
+    <span class="hotkeys">(Shift+1)</span>
+  </div>
 </div>
