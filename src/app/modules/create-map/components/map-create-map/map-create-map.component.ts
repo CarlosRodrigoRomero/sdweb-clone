@@ -98,7 +98,7 @@ export class MapCreateMapComponent implements OnInit {
     this.addModifyClippingsInteraction();
     this.addSelectClippingsInteraction();
 
-    // this.addDragboxInteraction();
+    this.addDragboxInteraction();
 
     this.addElems();
 
@@ -726,6 +726,7 @@ export class MapCreateMapComponent implements OnInit {
   private createClippingLayer() {
     // si no existe previamente la creamos
     if (this.clippingLayer === undefined) {
+      console.log('ok');
       this.clippingSource = new VectorSource<any>({ wrapX: false });
 
       this.clippingLayer = new VectorImageLayer<any>({
@@ -821,6 +822,7 @@ export class MapCreateMapComponent implements OnInit {
     this.map.addInteraction(dragBox);
 
     dragBox.on('boxend', function () {
+      console.log(this.clippingSource);
       const extent = dragBox.getGeometry().getExtent();
       const boxFeatures = this.clippingSource
         .getFeaturesInExtent(extent)

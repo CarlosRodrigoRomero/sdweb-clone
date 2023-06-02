@@ -29,6 +29,7 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.subscriptions.add(
       this.seguidoresControlService.seguidorSelected$.subscribe((seguidor) => {
+        console.log(seguidor);
         this.seguidorSelected = seguidor;
 
         if (this.seguidorSelected !== undefined && this.seguidorSelected !== null) {

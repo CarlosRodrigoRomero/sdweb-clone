@@ -2,8 +2,8 @@
 
 <div class="actions-btns">
   <button mat-raised-button (click)="switchCreateMode()">
-    <span *ngIf="!createDivisionMode">Activar dibujo devisiones</span>
-    <span *ngIf="createDivisionMode">Parar dibujo divisiones</span>
+    <span *ngIf="!createDivisionMode">Activar crear devisiones</span>
+    <span *ngIf="createDivisionMode">Parar crear divisiones</span>
   </button>
 
   <button *ngIf="clippingSelected !== undefined" mat-raised-button (click)="cutMap()">Cortar mapa seleccionado</button>

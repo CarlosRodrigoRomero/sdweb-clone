@@ -49,7 +49,10 @@ export class SeguidorService {
     informes.forEach((informe) => {
       // traemos ambos tipos de anomalias por si hay pcs antiguos
       anomaliaObsList.push(this.getSeguidores$(informe.id, planta.id, 'pcs'));
-      anomaliaObsList.push(this.getSeguidores$(informe.id, planta.id, 'anomalias'));
+      // solo para Carbonero no traemos anomalias
+      if (planta.id !== 'NJjVdM0e94vhHVfveaPh') {
+        anomaliaObsList.push(this.getSeguidores$(informe.id, planta.id, 'anomalias'));
+      }
     });
     return combineLatest(anomaliaObsList).pipe(
       map((arr) => {
