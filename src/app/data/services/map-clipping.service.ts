@@ -52,10 +52,17 @@ export class MapClippingService {
   }
 
   updateMapClipping(mapClipping: MapClipping): Promise<void> {
+    // adaptamos las coords a la DB
+    mapClipping.coords = { ...mapClipping.coords };
+
     return this.mapClippingCollection.doc<MapClipping>(mapClipping.id).update(mapClipping);
   }
 
   deleteMapClipping(id: string): Promise<void> {
     return this.mapClippingCollection.doc(id).delete();
+  }
+
+  resetService() {
+    this.mapClippingCollection = undefined;
   }
 }

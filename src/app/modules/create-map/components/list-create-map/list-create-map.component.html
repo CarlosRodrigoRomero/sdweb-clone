@@ -32,6 +32,10 @@
           <button *ngIf="element.type === 'division'" (click)="mapDivisionDelete.emit(element.id)" mat-icon-button>
             <mat-icon>delete</mat-icon>
           </button>
+          <button *ngIf="element.type === 'recorte'" (click)="mapClippingHide.emit(element.id)" mat-icon-button>
+            <mat-icon *ngIf="element.visible">visibility</mat-icon>
+            <mat-icon *ngIf="!element.visible">visibility_off</mat-icon>
+          </button>
         </td>
       </ng-container>
 

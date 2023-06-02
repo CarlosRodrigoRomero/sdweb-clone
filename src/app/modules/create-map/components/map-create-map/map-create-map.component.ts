@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { Subscription, combineLatest } from 'rxjs';
 
 import { Feature, Overlay, View } from 'ol';
@@ -60,8 +60,6 @@ export class MapCreateMapComponent implements OnInit {
   private divisionHovered: MapDivision;
   private divisionSelected: MapDivision;
   clippingSelected: MapClipping;
-  private sliderMin: number;
-  private sliderMax: number;
   createDivisionMode: boolean;
   clippingsToMerge: MapClipping[] = [];
 
@@ -102,25 +100,44 @@ export class MapCreateMapComponent implements OnInit {
 
     // this.addDragboxInteraction();
 
-    this.addElems();
+    // this.addElems();
 
     this.addClickOutFeatures();
 
     this.subscriptions.add(
-      this.createMapService.sliderMin$.subscribe((min) => {
-        this.sliderMin = min;
+      combineLatest([this.mapDivisionsService.getMapDivisions(), this.mapClippingService.getMapClippings()])
+        .pipe(
+          switchMap(([divisions, clippings]) => {
+            // solo mostramos las divisiones que no tienen recorte
+            this.divisions = divisions.filter((division) => !clippings.map((c) => c.id).includes(division.id));
+            this.clippings = clippings;
 
-        this.updateGeoTiffs(this.sliderMin, this.sliderMax);
-      })
+            this.addDivisions();
+            this.addClippings();
+
+            return combineLatest([this.createMapService.sliderMin$, this.createMapService.sliderMax$]);
+          })
+        )
+        .subscribe(([min, max]) => {
+          this.updateGeoTiffs(min, max);
+        })
     );
 
-    this.subscriptions.add(
-      this.createMapService.sliderMax$.subscribe((max) => {
-        this.sliderMax = max;
+    // this.subscriptions.add(
+    //   this.createMapService.sliderMin$.subscribe((min) => {
+    //     this.sliderMin = min;
 
-        this.updateGeoTiffs(this.sliderMin, this.sliderMax);
-      })
-    );
+    //     this.updateGeoTiffs(this.sliderMin, this.sliderMax);
+    //   })
+    // );
+
+    // this.subscriptions.add(
+    //   this.createMapService.sliderMax$.subscribe((max) => {
+    //     this.sliderMax = max;
+
+    //     this.updateGeoTiffs(this.sliderMin, this.sliderMax);
+    //   })
+    // );
 
     this.subscriptions.add(
       this.createMapService.createMode$.subscribe((mode) => {
@@ -261,9 +278,8 @@ export class MapCreateMapComponent implements OnInit {
     });
   }
 
-  private async addGeoTiffs(url: string, min: number, max: number) {
-    // const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineosX20.tif';
-    // const url = 'https://storage.googleapis.com/mapas-cog/prueba-pirineos.tif';
+  private async addGeoTiffs(clipping: MapClipping, min: number, max: number) {
+    const url = `https://storage.googleapis.com/mapas-cog/${clipping.id}.tif`;
 
     const source = new GeoTIFF({
       sources: [
@@ -277,6 +293,8 @@ export class MapCreateMapComponent implements OnInit {
 
     const layer = new WebGLTileLayer({ source });
 
+    layer.setVisible(clipping.visible);
+
     this.geoTiffLayers.push(layer);
 
     this.map.addLayer(layer);
@@ -285,17 +303,16 @@ export class MapCreateMapComponent implements OnInit {
   private updateGeoTiffs(min: number, max: number) {
     /// Eliminamos las capas antiguas
     if (this.geoTiffLayers.length > 0) {
-      this.geoTiffLayers.forEach((layer) => this.map.removeLayer(layer));
+      this.geoTiffLayers.forEach((layer, index) => {
+        layer.setZIndex(index);
+
+        this.map.removeLayer(layer);
+      });
     }
 
-    const urls = [
-      'https://storage.googleapis.com/mapas-cog/parte1.tif',
-      'https://storage.googleapis.com/mapas-cog/parte2.tif',
-      'https://storage.googleapis.com/mapas-cog/parte3.tif',
-    ];
-
-    // Añadimos nuevas capas con los nuevos valores
-    urls.forEach((url) => this.addGeoTiffs(url, min, max));
+    this.clippings.forEach((clipping) => {
+      this.addGeoTiffs(clipping, min, max);
+    });
   }
 
   /* DIVISIONES */
@@ -313,6 +330,9 @@ export class MapCreateMapComponent implements OnInit {
       this.divisionLayer.setProperties({
         id: 'divisionLayer',
       });
+
+      // le asignamos un numero alto para que queda siempre por encima de los mapas
+      this.divisionLayer.setZIndex(1000);
 
       this.map.addLayer(this.divisionLayer);
     }
@@ -361,21 +381,20 @@ export class MapCreateMapComponent implements OnInit {
       combineLatest([this.mapDivisionsService.getMapDivisions(), this.mapClippingService.getMapClippings()]).subscribe(
         ([divisions, clippings]) => {
           // solo mostramos las divisiones que no tienen recorte
-          const rightDivisions = divisions.filter((division) => !clippings.map((c) => c.id).includes(division.id));
+          this.divisions = divisions.filter((division) => !clippings.map((c) => c.id).includes(division.id));
+          this.clippings = clippings;
 
-          this.addDivisions(rightDivisions);
-          this.addClippings(clippings);
+          this.addDivisions();
+          this.addClippings();
         }
       )
     );
   }
 
-  private addDivisions(divisions: MapDivision[]) {
+  private addDivisions() {
     this.divisionSource.clear();
 
-    this.divisions = divisions;
-
-    divisions.forEach((division) => this.addDivision(division));
+    this.divisions.forEach((division) => this.addDivision(division));
   }
 
   private addDivision(division: MapDivision) {
@@ -614,6 +633,9 @@ export class MapCreateMapComponent implements OnInit {
         id: 'imagePointLayer',
       });
 
+      // le asignamos un numero alto para que queda siempre por encima de los mapas
+      this.imagePointLayer.setZIndex(1001);
+
       this.map.addLayer(this.imagePointLayer);
     }
   }
@@ -729,10 +751,8 @@ export class MapCreateMapComponent implements OnInit {
 
   /* RECORTES */
 
-  private addClippings(clippings: MapClipping[]) {
+  private addClippings() {
     this.clippingSource.clear();
-
-    this.clippings = clippings;
 
     this.clippings.forEach((clipping) => this.addClipping(clipping));
   }
@@ -763,6 +783,9 @@ export class MapCreateMapComponent implements OnInit {
         id: 'clippingLayer',
       });
 
+      // le asignamos un numero alto para que queda siempre por encima de los mapas
+      this.clippingLayer.setZIndex(1000);
+
       this.map.addLayer(this.clippingLayer);
     }
   }
@@ -777,9 +800,6 @@ export class MapCreateMapComponent implements OnInit {
         const coords = this.getCoords(e.features.getArray()[0] as Feature<Polygon>);
 
         if (coords !== null) {
-          // adaptamos las coords a la DB
-          clipping.coords = { ...coords };
-
           this.mapClippingService.updateMapClipping(clipping);
         }
       }

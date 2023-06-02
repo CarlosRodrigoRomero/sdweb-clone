@@ -13,6 +13,13 @@ export class MapDivisionControlService {
 
   constructor() {}
 
+  resetService() {
+    this.mapDivisionHovered = undefined;
+    this.mapDivisionSelected = undefined;
+  }
+
+  ////////////////////////////////////////////////////////////
+
   get mapDivisionHovered() {
     return this._mapDivisionHovered;
   }

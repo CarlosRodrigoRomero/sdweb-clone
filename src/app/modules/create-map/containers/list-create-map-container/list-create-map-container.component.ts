@@ -109,6 +109,12 @@ export class ListCreateMapContainerComponent implements OnInit, OnDestroy {
     // this.centerView(clipping);
   }
 
+  hideClipping(id: string) {
+    const clipping = this.mapClippings.find((clipping) => clipping.id === id);
+    clipping.visible = !clipping.visible;
+    this.mapClippingService.updateMapClipping(clipping);
+  }
+
   private centerView(mapElem: MapElement) {
     this.map.getView().setCenter(mapElem.coords[0]);
   }

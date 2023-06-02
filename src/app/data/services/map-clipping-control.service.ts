@@ -15,6 +15,13 @@ export class MapClippingControlService {
 
   constructor() {}
 
+  resetService() {
+    this.mapClippingSelected = undefined;
+    this.mapClippingToMerge = [];
+  }
+
+  ////////////////////////////////////////////////////////////
+
   get mapClippingSelected() {
     return this._mapClippingSelected;
   }
