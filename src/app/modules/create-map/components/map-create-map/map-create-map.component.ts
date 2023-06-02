@@ -63,7 +63,7 @@ export class MapCreateMapComponent implements OnInit {
   private sliderMin: number;
   private sliderMax: number;
   createDivisionMode: boolean;
-  private clippingsToMerge: MapClipping[];
+  clippingsToMerge: MapClipping[] = [];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -97,7 +97,7 @@ export class MapCreateMapComponent implements OnInit {
 
     this.createClippingLayer();
     this.addModifyClippingsInteraction();
-    // this.addSelectClippingsInteraction();
+    this.addSelectClippingsInteraction();
     this.addMultiSelectClippingsInteraction();
 
     // this.addDragboxInteraction();
@@ -202,6 +202,10 @@ export class MapCreateMapComponent implements OnInit {
         if (clippings.length > 0) {
           this.divisionSelected = undefined;
           this.clippingSelected = undefined;
+
+          this.setExternalClippingToMergeStyle(clippings, true);
+        } else if (this.clippingsToMerge.length > 0) {
+          this.setExternalClippingToMergeStyle(this.clippingsToMerge, false);
         }
 
         this.clippingsToMerge = clippings;
@@ -787,7 +791,9 @@ export class MapCreateMapComponent implements OnInit {
   private addSelectClippingsInteraction() {
     const select = new Select({
       style: this.getStyleClipping(false),
-      condition: click,
+      condition: (mapBrowserEvent) => {
+        return click(mapBrowserEvent) && !platformModifierKeyOnly(mapBrowserEvent);
+      },
       layers: (l) => {
         if (l.getProperties().id === 'clippingLayer') {
           return true;
@@ -814,8 +820,10 @@ export class MapCreateMapComponent implements OnInit {
 
   private addMultiSelectClippingsInteraction() {
     const select = new Select({
-      style: this.getStyleClippingToMerge(true),
-      condition: platformModifierKeyOnly,
+      style: this.getStyleClippingToMerge(false),
+      condition: (mapBrowserEvent) => {
+        return click(mapBrowserEvent) && platformModifierKeyOnly(mapBrowserEvent);
+      },
       layers: (l) => {
         if (l.getProperties().id === 'clippingLayer') {
           return true;
@@ -842,84 +850,6 @@ export class MapCreateMapComponent implements OnInit {
           }
         });
       }
-    });
-  }
-
-  private addDragboxInteraction() {
-    const selectedStyle = new Style({
-      fill: new Fill({
-        color: 'rgba(255, 255, 255, 0.6)',
-      }),
-      stroke: new Stroke({
-        color: 'rgba(255, 255, 255, 0.7)',
-        width: 2,
-      }),
-    });
-
-    // a normal select interaction to handle click
-    const select = new Select({
-      style: function (feature) {
-        const color = feature.get('COLOR_BIO') || '#eeeeee';
-        selectedStyle.getFill().setColor(color);
-        return selectedStyle;
-      },
-    });
-    this.map.addInteraction(select);
-
-    const selectedFeatures = select.getFeatures();
-
-    // a DragBox interaction used to select features by drawing boxes
-    const dragBox = new DragBox({
-      condition: platformModifierKeyOnly,
-    });
-
-    this.map.addInteraction(dragBox);
-
-    dragBox.on('boxend', function () {
-      console.log(this.clippingSource);
-      const extent = dragBox.getGeometry().getExtent();
-      const boxFeatures = this.clippingSource
-        .getFeaturesInExtent(extent)
-        .filter((feature) => feature.getGeometry().intersectsExtent(extent));
-
-      // features that intersect the box geometry are added to the
-      // collection of selected features
-
-      // if the view is not obliquely rotated the box geometry and
-      // its extent are equalivalent so intersecting features can
-      // be added directly to the collection
-      const rotation = this.map.getView().getRotation();
-      const oblique = rotation % (Math.PI / 2) !== 0;
-
-      // when the view is obliquely rotated the box extent will
-      // exceed its geometry so both the box and the candidate
-      // feature geometries are rotated around a common anchor
-      // to confirm that, with the box geometry aligned with its
-      // extent, the geometries intersect
-      if (oblique) {
-        const anchor = [0, 0];
-        const geometry = dragBox.getGeometry().clone();
-        geometry.rotate(-rotation, anchor);
-        const extent = geometry.getExtent();
-        boxFeatures.forEach(function (feature) {
-          const geometry = feature.getGeometry().clone();
-          geometry.rotate(-rotation, anchor);
-          if (geometry.intersectsExtent(extent)) {
-            selectedFeatures.push(feature);
-          }
-        });
-      } else {
-        selectedFeatures.extend(boxFeatures);
-      }
-    });
-
-    // clear selection when drawing a new box and when clicking on the map
-    dragBox.on('boxstart', () => {
-      selectedFeatures.clear();
-    });
-
-    selectedFeatures.on(['add', 'remove'], () => {
-      // console.log(selectedFeatures.getArray().length);
     });
   }
 
@@ -991,8 +921,26 @@ export class MapCreateMapComponent implements OnInit {
     }
   }
 
+  private setExternalClippingToMergeStyle(clippings: MapClipping[], focused: boolean) {
+    const features: Feature<any>[] = this.clippingLayer.getSource().getFeatures();
+
+    clippings.forEach((clipping) => {
+      const feature = features.find((f) => f.getProperties().properties.id === clipping.id);
+
+      if (focused) {
+        feature.setStyle(this.getStyleClippingToMerge(true));
+      } else {
+        feature.setStyle(this.getStyleClippingToMerge(false));
+      }
+    });
+  }
+
   cutMap() {
-    console.log('cutMap');
+    console.log('Mapa seleccionado: ', this.clippingSelected);
+  }
+
+  mergeMaps() {
+    console.log('Mapas seleccionados: ', this.clippingsToMerge);
   }
 
   /* OTROS */
@@ -1004,15 +952,15 @@ export class MapCreateMapComponent implements OnInit {
         .filter((item) => item.getProperties().properties !== undefined);
       if (feature.length === 0) {
         if (this.divisionSelected !== undefined) {
-          // this.setExternalDivisionStyle(this.divisionSelected.id, false);
-
           this.mapDivisionControlService.mapDivisionSelected = undefined;
         }
 
         if (this.clippingSelected !== undefined) {
-          // this.setExternalDivisionStyle(this.divisionSelected.id, false);
-
           this.mapClippingControlService.mapClippingSelected = undefined;
+        }
+
+        if (this.clippingsToMerge.length > 0) {
+          this.mapClippingControlService.mapClippingToMerge = [];
         }
       }
     });
