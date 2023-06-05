@@ -17,6 +17,7 @@ import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import VectorImageLayer from 'ol/layer/VectorImage';
+import Geolocation from 'ol/Geolocation';
 
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
@@ -27,6 +28,8 @@ import { AnomaliasControlCommentsService } from '@data/services/anomalias-contro
 
 import { PlantaInterface } from '@core/models/planta';
 import { InformeInterface } from '@core/models/informe';
+import { Fill, Stroke, Style } from 'ol/style';
+import CircleStyle from 'ol/style/Circle';
 
 @Component({
   selector: 'app-map-comments',
@@ -223,23 +226,69 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
 
     const geoLocSource = geoLocLayer.getSource() as VectorSource<any>;
 
-    navigator.geolocation.watchPosition(
-      (pos) => {
-        const coords = [pos.coords.longitude, pos.coords.latitude];
-        const accuracy = circular(coords, pos.coords.accuracy);
-        geoLocSource.clear(true);
-        geoLocSource.addFeatures([
-          new Feature(accuracy.transform('EPSG:4326', this.map.getView().getProjection())),
-          new Feature(new Point(fromLonLat(coords))),
-        ]);
-      },
-      (error) => {
-        alert(`ERROR: ${error.message}`);
-      },
-      {
+    // navigator.geolocation.watchPosition(
+    //   (pos) => {
+    //     const coords = [pos.coords.longitude, pos.coords.latitude];
+    //     const accuracy = circular(coords, pos.coords.accuracy);
+    //     geoLocSource.clear(true);
+    //     geoLocSource.addFeatures([
+    //       new Feature(accuracy.transform('EPSG:4326', this.map.getView().getProjection())),
+    //       new Feature(new Point(fromLonLat(coords))),
+    //     ]);
+    //   },
+    //   (error) => {
+    //     alert(`ERROR: ${error.message}`);
+    //   },
+    //   {
+    //     enableHighAccuracy: true,
+    //   }
+    // );
+
+    // Añade la geolocalización
+    const geolocation = new Geolocation({
+      // Habilita la opción de proyección en el constructor de geolocalización.
+      projection: this.map.getView().getProjection(),
+      tracking: true, // Habilita el rastreo
+      trackingOptions: {
         enableHighAccuracy: true,
-      }
+      },
+    });
+
+    function el(id) {
+      return document.getElementById(id);
+    }
+
+    // update the HTML page when the position changes.
+    geolocation.on('change', function () {
+      el('accuracy').innerText = geolocation.getAccuracy() + ' [m]';
+      el('altitude').innerText = geolocation.getAltitude() + ' [m]';
+      el('altitudeAccuracy').innerText = geolocation.getAltitudeAccuracy() + ' [m]';
+      el('heading').innerText = geolocation.getHeading() + ' [rad]';
+      el('speed').innerText = geolocation.getSpeed() + ' [m/s]';
+    });
+
+    const positionFeature = new Feature();
+    positionFeature.setStyle(
+      new Style({
+        image: new CircleStyle({
+          radius: 6,
+          fill: new Fill({
+            color: '#3399CC',
+          }),
+          stroke: new Stroke({
+            color: '#fff',
+            width: 2,
+          }),
+        }),
+      })
     );
+
+    geoLocSource.addFeature(positionFeature);
+
+    geolocation.on('change:position', function () {
+      const coordinates = geolocation.getPosition();
+      positionFeature.setGeometry(coordinates ? new Point(coordinates) : null);
+    });
 
     this.addCenterControl(geoLocSource);
   }

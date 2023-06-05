@@ -1,7 +1,7 @@
 <div *ngIf="anomaliaSelected" class="content">
-  <h5 class="title">
+  <span class="title">
     {{ 'Anomalía' | translate }} {{ anomaliaInfo.numAnom }} <b>({{ anomaliaInfo.tipo | translate }})</b>
-  </h5>
+  </span>
 
   <div *ngIf="plantaFija" class="elem-info">
     <span class="titulo">{{ 'Localización' | translate }}</span>
@@ -9,7 +9,7 @@
   </div>
 
   <div class="elem-info">
-    <span>{{ 'Nº de serie' | translate }}</span>
+    <span class="elem-info-label">{{ 'Nº de serie' | translate }}</span>
     <div *ngIf="!editInput" class="read-input">
       <span>{{
         anomaliaSelected.hasOwnProperty('numeroSerie') ? anomaliaSelected.numeroSerie : ('Desconocido' | translate)
@@ -29,7 +29,7 @@
     </form>
   </div>
 
-  <div id="pos-map" class="elem-info">
+  <div *ngIf="plantaFija" id="pos-map" class="elem-info">
     <span class="titulo">{{ 'Ir al mapa' | translate }}</span>
     <button mat-icon-button (click)="goToAnomMap()">
       <mat-icon>place</mat-icon>
