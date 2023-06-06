@@ -147,6 +147,13 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
 
     geoLocLayer.setProperties({ type: 'geoLoc' });
 
+    // asignamos diferentes z-index para que quede por encima de las demas capas
+    satelliteLayer.setZIndex(0);
+    this.aerialLayer.setZIndex(1);
+    this.thermalLayer.setZIndex(2);
+    this.anomaliaLayer.setZIndex(3);
+    geoLocLayer.setZIndex(4);
+
     const layers = [satelliteLayer, this.aerialLayer, geoLocLayer, this.thermalLayer];
 
     const view = new View({
@@ -226,24 +233,6 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
 
     const geoLocSource = geoLocLayer.getSource() as VectorSource<any>;
 
-    // navigator.geolocation.watchPosition(
-    //   (pos) => {
-    //     const coords = [pos.coords.longitude, pos.coords.latitude];
-    //     const accuracy = circular(coords, pos.coords.accuracy);
-    //     geoLocSource.clear(true);
-    //     geoLocSource.addFeatures([
-    //       new Feature(accuracy.transform('EPSG:4326', this.map.getView().getProjection())),
-    //       new Feature(new Point(fromLonLat(coords))),
-    //     ]);
-    //   },
-    //   (error) => {
-    //     alert(`ERROR: ${error.message}`);
-    //   },
-    //   {
-    //     enableHighAccuracy: true,
-    //   }
-    // );
-
     // Añade la geolocalización
     const geolocation = new Geolocation({
       // Habilita la opción de proyección en el constructor de geolocalización.
@@ -257,15 +246,6 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
     function el(id) {
       return document.getElementById(id);
     }
-
-    // update the HTML page when the position changes.
-    geolocation.on('change', function () {
-      el('accuracy').innerText = geolocation.getAccuracy() + ' [m]';
-      el('altitude').innerText = geolocation.getAltitude() + ' [m]';
-      el('altitudeAccuracy').innerText = geolocation.getAltitudeAccuracy() + ' [m]';
-      el('heading').innerText = geolocation.getHeading() + ' [rad]';
-      el('speed').innerText = geolocation.getSpeed() + ' [m/s]';
-    });
 
     const positionFeature = new Feature();
     positionFeature.setStyle(
