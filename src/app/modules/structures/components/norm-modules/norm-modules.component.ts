@@ -282,11 +282,14 @@ export class NormModulesComponent implements OnInit, OnDestroy {
       data: 'Se eliminará el módulo de forma permanente. ¿Desea continuar?',
     });
 
-    dialogRef.afterClosed().pipe(take(1)).subscribe((response: boolean) => {
-      if (response) {
-        this.deleteNormModule();
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((response: boolean) => {
+        if (response) {
+          this.deleteNormModule();
+        }
+      });
   }
 
   deleteNormModule() {
@@ -329,7 +332,7 @@ export class NormModulesComponent implements OnInit, OnDestroy {
   autoNormModules(event: Event) {
     event.preventDefault();
 
-    const url = `https://europe-west1-sdweb-d33ce.cloudfunctions.net/estructura`;
+    const url = `https://modulosbruto-to-modulosnormalizados-rcpywurt6q-ew.a.run.app/`;
 
     if (this.form.valid) {
       const filas = this.form.get('filas').value;
