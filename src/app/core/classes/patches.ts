@@ -9,7 +9,11 @@ export class Patches {
   static checkId(id: string): boolean {
     const informesIds: string[] = [
       'cAX7f55nKEQBzx7RcROI', // Casas de Don Pedro 2022
-      'RJh4Kfbg116FECvAMfgx', // Alqueva 2022
+      'RJh4Kfbg116FECvAMfgx', // Alqueva 2022,
+      'X8PNrQOPgGVTMx0ZCXjC', // prueba-pirineos 2023
+      'DrZWBkxkw1QF4aZOBZ5D', // Pizarro 1/06/2023
+      'J6hpthPQHrIqciuf5LYQ', // Pizarro 3/06/2023
+      'ighFmQO3ovf5JPoxLdt4', // Pizarro 4/06/2023
     ];
     const plantasIds: string[] = [
       'AyKgsY6F3TqGQGYNaOUY', // Logrosan
@@ -49,7 +53,7 @@ export class Patches {
         return dateBerenis2;
 
       default:
-        return undefined;
+        return anomalia;
     }
   }
 

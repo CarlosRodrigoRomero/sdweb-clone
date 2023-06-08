@@ -8,6 +8,8 @@ import { PdfService } from '@data/services/pdf.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { FilterService } from '@data/services/filter.service';
 
+import { Patches } from '@core/classes/patches';
+
 export interface DialogData {
   id: string;
   label: string;
@@ -114,6 +116,11 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
             this.noOrtofotos = true;
           }
           this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Imágenes anomalías', completed: false };
+        }
+
+        // aplicamos parches para algunos informes
+        if (Patches.checkId(informe.id)) {
+          this.noOrtofotos = true;
         }
       })
     );
