@@ -295,7 +295,7 @@ export class FilterService {
   }
 
   resetService() {
-    this.multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad'];
+    this.multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'reparable'];
     this.noAmosSegsFilters = ['area'];
     this.otherFilters = ['confianza', 'aspectRatio', 'areaM'];
     this.filters = [];
