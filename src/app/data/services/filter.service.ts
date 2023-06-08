@@ -16,7 +16,7 @@ import { Anomalia } from '@core/models/anomalia';
   providedIn: 'root',
 })
 export class FilterService {
-  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location'];
+  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'reparable'];
   private noAmosSegsFilters = ['area'];
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
@@ -186,7 +186,6 @@ export class FilterService {
 
     // para calcular el numero de anomalias por filtro tipo
     // this.excludeTipoFilters();
-
     return finalElements;
   }
 

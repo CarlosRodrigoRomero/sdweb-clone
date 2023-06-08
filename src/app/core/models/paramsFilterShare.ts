@@ -13,6 +13,7 @@ export interface ParamsFilterShare {
   area?: number[];
   clase?: boolean[];
   criticidad?: boolean[];
+  reparable?: boolean[];
   modulo?: string;
   tipo?: number[];
   zona?: string;

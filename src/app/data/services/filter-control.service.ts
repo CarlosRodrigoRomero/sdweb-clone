@@ -47,6 +47,9 @@ export class FilterControlService {
   private _criticidadSelected: boolean[] = [false, false, false, false, false];
   public criticidadSelected$ = new BehaviorSubject<boolean[]>(this._criticidadSelected);
 
+  private _reparableSelected: boolean[] = [false, false];
+  public reparableSelected$ = new BehaviorSubject<boolean[]>(this._reparableSelected);
+
   private _activeDrawArea: boolean = false;
   public activeDrawArea$ = new BehaviorSubject<boolean>(this._activeDrawArea);
 
@@ -79,6 +82,9 @@ export class FilterControlService {
     }
     if (params.criticidad !== undefined && params.criticidad !== null) {
       this.criticidadSelected = params.criticidad;
+    }
+    if (params.reparable !== undefined && params.reparable !== null) {
+      this.reparableSelected = params.reparable;
     }
     if (params.tipo !== undefined && params.tipo !== null) {
       this.tiposSelected = [];
@@ -121,6 +127,9 @@ export class FilterControlService {
     // CRITICIDAD
     this.criticidadSelected = [false, false, false, false, false];
 
+    // REPARABLE
+    this.reparableSelected = [false, false];
+
     // AREA
     this.activeDrawArea = false;
     this.activeDeleteArea = false;
@@ -146,6 +155,7 @@ export class FilterControlService {
     this.tiposSelected = [];
     this.claseSelected = [false, false, false];
     this.criticidadSelected = [false, false, false, false, false];
+    this.reparableSelected = [false, false];
     this.activeDrawArea = false;
     this.activeDeleteArea = false;
   }
@@ -256,6 +266,16 @@ export class FilterControlService {
   set criticidadSelected(value: boolean[]) {
     this._criticidadSelected = value;
     this.criticidadSelected$.next(value);
+  }
+
+   /* ANOMALÍAS REPARABLES */
+   get reparableSelected() {
+    return this._reparableSelected;
+  }
+
+  set reparableSelected(value: boolean[]) {
+    this._reparableSelected = value;
+    this.reparableSelected$.next(value);
   }
 
   /* AREA */
