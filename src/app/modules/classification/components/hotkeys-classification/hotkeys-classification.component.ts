@@ -211,7 +211,7 @@ export class HotkeysClassificationComponent implements OnInit {
               this.classificationService.anomaliaSelected.tipo = 7;
 
               // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 5);
+              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 7);
 
               // reseteamos lo seleccionado
               this.classificationService.resetElemsSelected();
