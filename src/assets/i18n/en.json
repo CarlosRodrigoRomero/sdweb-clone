@@ -159,7 +159,7 @@
   "Resistencia anómala": "Anomalous resistance",
   "Caja de conexiones caliente": "Heated connection box",
   "Módulo con sombras": "Module with shadows",
-  "Módulo en string con baja producción": "Module in string with low production",
+  "Módulo en string en circuito abierto": "Module in string in open circuit",
   "PID en fase temprana": "PID in early phase",
   "localizacion": "location",
   "Gradiente Temp. Normalizado": "Normalized Temp. Gradient",

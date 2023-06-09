@@ -94,7 +94,7 @@ export let GLOBAL = {
     'Caja de conexiones caliente', // 14
     'Módulo con sombras', // 15
     'Yellowing', // 16
-    'Módulo en string con baja producción', // 17
+    'Módulo en string en circuito abierto', // 17
     'PID en fase temprana', // 18
     'Falta módulo', // 19
     'PID regular', // 20
