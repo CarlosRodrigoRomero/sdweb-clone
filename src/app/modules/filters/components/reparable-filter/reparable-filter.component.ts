@@ -25,6 +25,7 @@ export class ReparableFilterComponent implements OnInit {
   reparableElems: Reparable[] = [];
   allComplete: boolean;
   filtroReparable: ReparableFilter;
+  private labels = ['Reparable', 'No reparable'];
 
   public reparableSelected: boolean[] = undefined;
 
@@ -37,7 +38,7 @@ export class ReparableFilterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    ['Reparable', 'No reparable'].forEach((label) => {
+    this.labels.forEach((label) => {
       this.reparableElems.push({
         label,
         completed: false,
@@ -52,22 +53,19 @@ export class ReparableFilterComponent implements OnInit {
   onChangeReparableFilter(event: MatButtonToggleChange) {
     const indexSelected = Number(event.source.id) - 1;
     const reparableSelected: boolean = indexSelected === 0;
+
     if (event.source.checked) {
       this.filtroReparable = new ReparableFilter(indexSelected.toString(), 'reparable', reparableSelected);
 
       this.filterService.addFilter(this.filtroReparable);
-      console.log(this.filterService);
       this.filterControlService.reparableSelected[indexSelected] = true;
+      // Como es un filtro simple, hacemos uncheck del otro botón
+      this.filterControlService.reparableSelected[Math.abs(indexSelected - 1)] = false;
     } else {
       this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
-        filters
-          .filter((filter) => filter.type === 'reparable')
-          .forEach((filter) => {
-            if (filter.id == indexSelected.toString()) {
-              this.filterService.deleteFilter(filter);
-            }
-          })
-      );
+        this.filterService.deleteFilter(
+          filters.filter((filter) => filter.type === 'reparable')[0]
+        ));
       this.filterControlService.reparableSelected[indexSelected] = false;
     }
   }

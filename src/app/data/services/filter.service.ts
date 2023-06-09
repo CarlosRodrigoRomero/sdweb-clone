@@ -16,7 +16,7 @@ import { Anomalia } from '@core/models/anomalia';
   providedIn: 'root',
 })
 export class FilterService {
-  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'reparable'];
+  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location'];
   private noAmosSegsFilters = ['area'];
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
@@ -66,6 +66,8 @@ export class FilterService {
   addFilter(filter: FilterInterface) {
     // comprobamos que no es de tipo 'multiple'
     if (!this.multipleFilters.includes(filter.type)) {
+      console.log("Previous filters: ", this.filters);
+      console.log("New filter: ", filter);
       // eliminamos, si lo hubiera, el filtro anterior del mismo tipo que el recibido
       this.filters = this.filters.filter((f) => f.type !== filter.type);
       // añadimos el nuevo filtro
@@ -169,6 +171,7 @@ export class FilterService {
     }
 
     // añadimos al array los elementos filtrados de los filtros no 'multiple'
+    console.log("Estos son los filtros activos: ", this.filters);
     this.filters
       .filter((fil) => noMultFilters.includes(fil.type))
       .forEach((fil) => {
@@ -295,7 +298,7 @@ export class FilterService {
   }
 
   resetService() {
-    this.multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'reparable'];
+    this.multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location'];
     this.noAmosSegsFilters = ['area'];
     this.otherFilters = ['confianza', 'aspectRatio', 'areaM'];
     this.filters = [];
