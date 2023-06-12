@@ -16,7 +16,7 @@ import { Anomalia } from '@core/models/anomalia';
   providedIn: 'root',
 })
 export class FilterService {
-  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location'];
+  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'modelo'];
   private noAmosSegsFilters = ['area'];
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
@@ -171,7 +171,6 @@ export class FilterService {
     }
 
     // añadimos al array los elementos filtrados de los filtros no 'multiple'
-    console.log("Estos son los filtros activos: ", this.filters);
     this.filters
       .filter((fil) => noMultFilters.includes(fil.type))
       .forEach((fil) => {
@@ -298,7 +297,7 @@ export class FilterService {
   }
 
   resetService() {
-    this.multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location'];
+    this.multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'modelo'];
     this.noAmosSegsFilters = ['area'];
     this.otherFilters = ['confianza', 'aspectRatio', 'areaM'];
     this.filters = [];

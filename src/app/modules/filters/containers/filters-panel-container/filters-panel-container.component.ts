@@ -4,6 +4,7 @@ import { FilterService } from '@data/services/filter.service';
 import { FilterControlService } from '@data/services/filter-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { Subscription } from 'rxjs';
+import { ReportControlService } from '@data/services/report-control.service';
 
 @Component({
   selector: 'app-filters-panel-container',
@@ -12,6 +13,7 @@ import { Subscription } from 'rxjs';
 })
 export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
   filtrosActivos = false;
+  mostrarFiltroModelo = false;
   hasCriticidad = false;
 
   private subscriptions: Subscription = new Subscription();
@@ -19,16 +21,25 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
   constructor(
     private filterService: FilterService,
     private filterControlService: FilterControlService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
+      this.subscriptions.add(
       this.filterService.filters$.subscribe((filters) => {
         if (filters.length > 0) {
           this.filtrosActivos = true;
         } else {
           this.filtrosActivos = false;
+        }
+        // Comprobamos si hay anomalías en más de un modelo de módulo, y si sólo hay uno no mostramos el filtro
+        const anomalias = this.anomaliaService.getRealAnomalias(this.reportControlService.allAnomalias);
+        const modelos = [...new Set(anomalias.map((anomalia) => `${anomalia.modulo.marca} (${anomalia.modulo.potencia}W)`))];
+        if (modelos.length > 1) {
+          this.mostrarFiltroModelo = true;
+        } else {
+          this.mostrarFiltroModelo = false;
         }
       })
     );

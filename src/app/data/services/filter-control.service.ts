@@ -41,6 +41,15 @@ export class FilterControlService {
   private _tiposSelected: boolean[] = [];
   public tiposSelected$ = new BehaviorSubject<boolean[]>(this._tiposSelected);
 
+  private _labelModeloDefaultStatus = true;
+  public labelModeloDefaultStatus$ = new BehaviorSubject<boolean>(this._labelModeloDefaultStatus);
+  public selectedModeloDefaultLabel = 'Modelo de módulo';
+  private _selectedModeloLabels: string[] = [this.selectedModeloDefaultLabel];
+  public selectedModeloLabels$ = new BehaviorSubject<string[]>(this._selectedModeloLabels);
+  public modelosSelectedDefault: boolean[] = [];
+  private _modelosSelected: boolean[] = [];
+  public modelosSelected$ = new BehaviorSubject<boolean[]>(this._modelosSelected);
+
   private _claseSelected: boolean[] = [false, false, false];
   public claseSelected$ = new BehaviorSubject<boolean[]>(this._claseSelected);
 
@@ -96,6 +105,16 @@ export class FilterControlService {
         }
       });
     }
+    if (params.modelo !== undefined && params.modelo !== null) {
+      this.modelosSelected = [];
+      params.modelo.forEach((modelo) => {
+        if (modelo !== null) {
+          this.modelosSelected.push(true);
+        } else {
+          this.modelosSelected.push(false);
+        }
+      });
+    }
   }
 
   resetFilters() {
@@ -120,6 +139,16 @@ export class FilterControlService {
     // Labels tipos de anomalias
     this.selectedTipoLabels = [this.selectedTipoDefaultLabel];
     this.labelTipoDefaultStatus = true;
+
+    // MODELO DE MÓDULOS
+    const modSel: boolean[] = [];
+    this.modelosSelected.forEach((sel) => {
+      modSel.push(false);
+    });
+    this.modelosSelected = modSel;
+    // Labels modelo de módulos
+    this.selectedModeloLabels = [this.selectedModeloDefaultLabel];
+    this.labelModeloDefaultStatus = true;
 
     // CLASE
     this.claseSelected = [false, false, false];
@@ -151,7 +180,9 @@ export class FilterControlService {
     this.minGradiente = 0;
     this.maxGradiente = 80;
     this.labelTipoDefaultStatus = true;
+    this.labelModeloDefaultStatus = true;
     this.selectedTipoLabels = [this.selectedTipoDefaultLabel];
+    this.selectedModeloLabels = [this.selectedModeloDefaultLabel];
     this.tiposSelected = [];
     this.claseSelected = [false, false, false];
     this.criticidadSelected = [false, false, false, false, false];
@@ -246,6 +277,35 @@ export class FilterControlService {
   set labelTipoDefaultStatus(value: boolean) {
     this._labelTipoDefaultStatus = value;
     this.labelTipoDefaultStatus$.next(value);
+  }
+
+  /* MODELO DE MÓDULOS */
+  get modelosSelected() {
+    return this._modelosSelected;
+  }
+
+  set modelosSelected(value: boolean[]) {
+    this._modelosSelected = value;
+    this.modelosSelected$.next(value);
+  }
+
+  /* Labels modelo de módulos */
+  get selectedModeloLabels() {
+    return this._selectedModeloLabels;
+  }
+
+  set selectedModeloLabels(value: string[]) {
+    this._selectedModeloLabels = value;
+    this.selectedModeloLabels$.next(value);
+  }
+
+  get labelModeloDefaultStatus() {
+    return this._labelModeloDefaultStatus;
+  }
+
+  set labelModeloDefaultStatus(value: boolean) {
+    this._labelModeloDefaultStatus = value;
+    this.labelModeloDefaultStatus$.next(value);
   }
 
   /* CLASE */

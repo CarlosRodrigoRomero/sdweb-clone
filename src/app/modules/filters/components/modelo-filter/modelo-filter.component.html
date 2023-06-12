@@ -1,0 +1,25 @@
+<div class="filtro">
+    <h5>{{ 'Modelo' | translate }}</h5>
+    <button class="tipo-select" mat-stroked-button [matMenuTriggerFor]="menu">
+      <span *ngIf="defaultLabelStatus" class="filter-default">{{ defaultSelectLabel }}</span>
+      <span *ngIf="!defaultLabelStatus" class="filter-selected">{{ selectedLabels.toString() }}</span>
+      <mat-icon>keyboard_arrow_down</mat-icon>
+    </button>
+    <mat-menu class="menu-modelo" #menu="matMenu">
+      <div>
+        <li mat-menu-item *ngFor="let modeloElem of modelosElem; index as i" (click)="stopPropagation($event)">
+          <mat-checkbox
+            [checked]="modelosSelected[modeloElem.modelo]"
+            [id]="'modelo_' + modeloElem.modelo"
+            [name]="modeloElem.label"
+            [value]="i"
+            (change)="onChangeFiltroTipo($event)"
+          >
+            <span style="font-size: 15px">
+              {{ modeloElem.label | translate }}
+            </span>
+          </mat-checkbox>
+        </li>
+      </div>
+    </mat-menu>
+  </div>

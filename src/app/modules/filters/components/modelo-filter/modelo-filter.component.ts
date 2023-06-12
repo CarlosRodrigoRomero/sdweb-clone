@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 
 import { MatCheckboxChange } from '@angular/material/checkbox';
@@ -14,42 +14,41 @@ import { FilterControlService } from '@data/services/filter-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
 
-import { TipoElemFilter } from '@core/models/tipoPcFilter';
+import { ModeloFilter } from '@core/models/modeloFilter';
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
 
-import { COLOR } from '@data/constants/color';
-import { GLOBAL } from '@data/constants/global';
 
-export interface LabelTipo {
-  tipo: number;
+export interface LabelModelo {
+  modelo: number;
   label?: string;
   count?: number;
   completed?: boolean;
-  color?: string;
 }
 
 @Component({
-  selector: 'app-tipo-filter',
-  templateUrl: './tipo-filter.component.html',
-  styleUrls: ['./tipo-filter.component.css'],
+  selector: 'app-modelo-filter',
+  templateUrl: './modelo-filter.component.html',
+  styleUrls: ['./modelo-filter.component.css']
 })
-export class TipoFilterComponent implements OnInit, OnDestroy {
-  tiposElem: LabelTipo[] = [];
-  filtroTipo: TipoElemFilter;
-  filterTipoCounts: number[] = [];
+export class ModeloFilterComponent implements OnInit, OnDestroy {
+
+  modelosElem: LabelModelo[] = [];
+  filtroModelo: ModeloFilter;
+  filterModeloCounts: number[] = [];
 
   defaultLabelStatus = true;
-  defaultSelectLabel = 'Tipo de anomalía';
+  defaultSelectLabel = 'Modelo';
   selectedLabels: string[] = [this.defaultSelectLabel];
 
-  tiposSelected: boolean[];
-  selection = new SelectionModel<LabelTipo>(true, []);
+  modelosSelected: boolean[];
+  selection = new SelectionModel<LabelModelo>(true, []);
 
   public plantaId: string;
   private planta: PlantaInterface;
   public informesIdList: string[];
   public allAnomalias: Anomalia[];
+  public allModelos: string[];
 
   public labelsCategoria: string[];
   public coloresCategoria: string[];
@@ -71,10 +70,12 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.plantaId = this.reportControlService.plantaId;
     this.informesIdList = this.reportControlService.informesIdList;
+    // const anomalias = this.anomaliaService.getRealAnomalias(this.reportControlService.allAnomalias);
+    // this.modelos = [...new Set(anomalias.map((anomalia) => `${anomalia.modulo.marca} (${anomalia.modulo.potencia}W)`))]
+
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
     );
-
     this.subscriptions.add(
       this.plantaService
         .getPlanta(this.plantaId)
@@ -89,72 +90,58 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
         .subscribe((anomalias) => {
           // filtramos las anomalias que ya no consideramos anomalias
           this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
-          this.tiposElem = [];
-          // obtenermos los labels de todas las anomalias
-          this._getAllCategorias(this.allAnomalias);
-          this.labelsCategoria.forEach((label, i) => {
-            this.tiposElem.push({ tipo: GLOBAL.labels_tipos.indexOf(label), label, color: this.coloresCategoria[i] });
-
-            this.tiposSelected.push(false);
-          });
-
-          this.numsCategoria.forEach((num) => {
-            this.filterTipoCounts.push(
-              this.allAnomalias
-                .filter((elem) => elem.informeId === this.selectedInformeId)
-                // tslint:disable-next-line: triple-equals
-                .filter((elem) => elem.tipo == num).length
-            );
-          });
-        })
+          this.allModelos = [...new Set (this.allAnomalias.map((anomalia) => `${anomalia.modulo.marca} (${anomalia.modulo.potencia}W)`))].sort();
+          this.modelosElem = this.allModelos.map((modelo, i) => ({ modelo: i, label: modelo}));
+        })  
     );
-
     // nos suscribimos a los tipos seleccionados de filter control
     this.subscriptions.add(
-      this.filterControlService.tiposSelected$.subscribe((tiposSel) => (this.tiposSelected = tiposSel))
+      this.filterControlService.modelosSelected$.subscribe((modelosSel) => (this.modelosSelected = modelosSel))
     );
 
     // nos suscribimos a los labels del filter control
     this.subscriptions.add(
-      this.filterControlService.selectedTipoLabels$.subscribe((labels) => (this.selectedLabels = labels))
+      this.filterControlService.selectedModeloLabels$.subscribe((labels) => (this.selectedLabels = labels))
     );
 
     // nos suscribimos al estado en el control de filtros
     this.subscriptions.add(
-      this.filterControlService.labelTipoDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value))
+      this.filterControlService.labelModeloDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value))
     );
 
     this.subscriptions.add(
-      this.translate.stream('Tipo de anomalia').subscribe((res: string) => {
+      this.translate.stream('Modelo de módulo').subscribe((res: string) => {
         this.defaultSelectLabel = res;
       })
     );
   }
-  
+
   onChangeFiltroTipo(event: MatCheckboxChange) {
+    var marca: string;
+    var potencia: number;
+    ({marca, potencia} = this.getModuleProperties(event.source.name));
+    // var potencia: number = Number(event.source.name.split(' - ')[1]);
     if (event.checked) {
-      this.filtroTipo = new TipoElemFilter(
+      this.filtroModelo = new ModeloFilter(
         event.source.id,
-        'tipo',
-        GLOBAL.labels_tipos.indexOf(event.source.name),
-        this.tiposElem.length,
-        Number(event.source.value)
+        'modelo',
+        marca,
+        potencia
       );
-      this.filterService.addFilter(this.filtroTipo);
+      this.filterService.addFilter(this.filtroModelo);
 
-      this.filterControlService.tiposSelected[Number(event.source.id.replace('tipo_', ''))] = true;
-
-      // añadimos el tipo seleccionado a la variable
+      this.filterControlService.modelosSelected[Number(event.source.id.replace('modelo_', ''))] = true;
+      // añadimos el modelo seleccionado a la variable
       if (this.selectedLabels[0] !== this.defaultSelectLabel) {
-        this.filterControlService.selectedTipoLabels.push(event.source.name);
+        this.filterControlService.selectedModeloLabels.push(event.source.name);
       } else {
-        this.filterControlService.labelTipoDefaultStatus = false;
-        this.filterControlService.selectedTipoLabels = [event.source.name];
+        this.filterControlService.labelModeloDefaultStatus = false;
+        this.filterControlService.selectedModeloLabels = [event.source.name];
       }
     } else {
       this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
         filters
-          .filter((filter) => filter.type === 'tipo')
+          .filter((filter) => filter.type === 'modelo')
           .forEach((filter) => {
             if (filter.id === event.source.id) {
               this.filterService.deleteFilter(filter);
@@ -162,45 +149,31 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
           })
       );
 
-      this.filterControlService.tiposSelected[Number(event.source.id.replace('tipo_', ''))] = false;
+      this.filterControlService.modelosSelected[Number(event.source.id.replace('modelo_', ''))] = false;
 
       // eliminamos el 'tipo' de seleccionados
       this.selectedLabels = this.selectedLabels.filter((sel) => sel !== event.source.name);
       // si era el último ponemos el label por defecto
       if (this.selectedLabels.length === 0) {
-        this.filterControlService.labelTipoDefaultStatus = true;
+        this.filterControlService.labelModeloDefaultStatus = true;
         this.selectedLabels.push(this.defaultSelectLabel);
       }
     }
+  }
+
+  getModuleProperties(label: string) {
+    var marca = label.split(' ').slice(0, -1).join(' ');
+    // Para la potencia tenemos que quitarle el último caracter que es un 'W' y los paréntesis
+    var potencia = Number(label.split(' ').slice(-1)[0].slice(1, -2));
+    return {marca, potencia};
   }
 
   stopPropagation(event) {
     event.stopPropagation();
   }
 
-  private _getAllCategorias(anomalias): void {
-    const allNumCategorias = Array(GLOBAL.labels_tipos.length)
-      .fill(0)
-      .map((_, i) => i + 1);
-
-    const labelsCategoria = Array<string>();
-    const coloresCategoria = Array<string>();
-    const numsCategoria = Array<number>();
-
-    allNumCategorias.forEach((i) => {
-      if (anomalias.filter((anom) => anom.tipo === i).length > 0) {
-        labelsCategoria.push(GLOBAL.labels_tipos[i]);
-        coloresCategoria.push(COLOR.colores_tipos[i]);
-        numsCategoria.push(i);
-      }
-    });
-
-    this.labelsCategoria = labelsCategoria;
-    this.coloresCategoria = coloresCategoria;
-    this.numsCategoria = numsCategoria;
-  }
-
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
+
 }
