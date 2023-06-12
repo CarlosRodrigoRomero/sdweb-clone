@@ -295,23 +295,27 @@ export class MapCreateMapComponent implements OnInit {
 
     layer.setVisible(clipping.visible);
 
+    layer.setZIndex(0);
+
     this.geoTiffLayers.push(layer);
 
     this.map.addLayer(layer);
   }
 
   private updateGeoTiffs(min: number, max: number) {
-    /// Eliminamos las capas antiguas
-    if (this.geoTiffLayers.length > 0) {
-      this.geoTiffLayers.forEach((layer, index) => {
-        layer.setZIndex(index);
-
-        this.map.removeLayer(layer);
-      });
-    }
-
     this.clippings.forEach((clipping) => {
       this.addGeoTiffs(clipping, min, max);
+
+      setTimeout(() => {
+        /// Eliminamos las capas antiguas
+        if (this.geoTiffLayers.length > 1) {
+          this.geoTiffLayers.forEach((layer, index) => {
+            if (index < this.geoTiffLayers.length - 1) {
+              this.map.removeLayer(layer);
+            }
+          });
+        }
+      }, 5000);
     });
   }
 
