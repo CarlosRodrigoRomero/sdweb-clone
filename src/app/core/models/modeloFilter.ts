@@ -24,15 +24,8 @@ export class ModeloFilter implements FilterInterface {
     return null;
   }
 
-  // Obtenemos la marca y la potencia del módulo a partir de su label
-  getModuleProperties(label: string) {
-    var marca = label.split(' ').slice(0, -1).join(' ');
-    // Para la potencia tenemos que quitarle el último caracter que es un 'W' y los paréntesis
-    var potencia = Number(label.split(' ').slice(-1)[0].slice(1, -2));
-    return {marca, potencia};
-  }
-
   setModuleLabel(module: ModuloInterface): string{
+    // Si el módulo tiene marca, se muestra la marca y la potencia
     let label: string;
     if (module.marca) {
       label = `${module.marca} (${module.potencia}W)`;

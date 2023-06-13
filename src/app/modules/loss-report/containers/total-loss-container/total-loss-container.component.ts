@@ -28,7 +28,6 @@ export class TotalLossContainerComponent implements OnInit, OnDestroy {
         const selectedReport = this.reportControlService.informes.find((informe) => informe.id === informeId);
 
         const anomaliasInforme = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId);
-        // const anomaliasInforme = this.anomaliaService.getRealAnomalias(this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId));
         this.numTotalAnoms = anomaliasInforme.length;
         const fixableAnoms = anomaliasInforme.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo));
         this.numFixableAnoms = fixableAnoms.length;
