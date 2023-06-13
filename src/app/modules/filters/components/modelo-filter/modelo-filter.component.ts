@@ -109,23 +109,18 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.translate.stream('Modelo de módulo').subscribe((res: string) => {
+      this.translate.stream('Modelo módulo').subscribe((res: string) => {
         this.defaultSelectLabel = res;
       })
     );
   }
 
   onChangeFiltroTipo(event: MatCheckboxChange) {
-    var marca: string;
-    var potencia: number;
-    ({marca, potencia} = this.getModuleProperties(event.source.name));
-    // var potencia: number = Number(event.source.name.split(' - ')[1]);
     if (event.checked) {
       this.filtroModelo = new ModeloFilter(
         event.source.id,
         'modelo',
-        marca,
-        potencia
+        event.source.name
       );
       this.filterService.addFilter(this.filtroModelo);
 
@@ -160,12 +155,6 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
     }
   }
 
-  getModuleProperties(label: string) {
-    var marca = label.split(' ').slice(0, -1).join(' ');
-    // Para la potencia tenemos que quitarle el último caracter que es un 'W' y los paréntesis
-    var potencia = Number(label.split(' ').slice(-1)[0].slice(1, -2));
-    return {marca, potencia};
-  }
 
   setModuleLabel(module: ModuloInterface): string{
     let label: string;

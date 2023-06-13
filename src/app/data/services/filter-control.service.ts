@@ -43,7 +43,7 @@ export class FilterControlService {
 
   private _labelModeloDefaultStatus = true;
   public labelModeloDefaultStatus$ = new BehaviorSubject<boolean>(this._labelModeloDefaultStatus);
-  public selectedModeloDefaultLabel = 'Modelo de módulo';
+  public selectedModeloDefaultLabel = 'Modelo módulo';
   private _selectedModeloLabels: string[] = [this.selectedModeloDefaultLabel];
   public selectedModeloLabels$ = new BehaviorSubject<string[]>(this._selectedModeloLabels);
   public modelosSelectedDefault: boolean[] = [];
