@@ -41,11 +41,23 @@ export class FilterControlService {
   private _tiposSelected: boolean[] = [];
   public tiposSelected$ = new BehaviorSubject<boolean[]>(this._tiposSelected);
 
+  private _labelModeloDefaultStatus = true;
+  public labelModeloDefaultStatus$ = new BehaviorSubject<boolean>(this._labelModeloDefaultStatus);
+  public selectedModeloDefaultLabel = 'Modelo módulo';
+  private _selectedModeloLabels: string[] = [this.selectedModeloDefaultLabel];
+  public selectedModeloLabels$ = new BehaviorSubject<string[]>(this._selectedModeloLabels);
+  public modelosSelectedDefault: boolean[] = [];
+  private _modelosSelected: boolean[] = [];
+  public modelosSelected$ = new BehaviorSubject<boolean[]>(this._modelosSelected);
+
   private _claseSelected: boolean[] = [false, false, false];
   public claseSelected$ = new BehaviorSubject<boolean[]>(this._claseSelected);
 
   private _criticidadSelected: boolean[] = [false, false, false, false, false];
   public criticidadSelected$ = new BehaviorSubject<boolean[]>(this._criticidadSelected);
+
+  private _reparableSelected: boolean[] = [false, false];
+  public reparableSelected$ = new BehaviorSubject<boolean[]>(this._reparableSelected);
 
   private _activeDrawArea: boolean = false;
   public activeDrawArea$ = new BehaviorSubject<boolean>(this._activeDrawArea);
@@ -80,6 +92,9 @@ export class FilterControlService {
     if (params.criticidad !== undefined && params.criticidad !== null) {
       this.criticidadSelected = params.criticidad;
     }
+    if (params.reparable !== undefined && params.reparable !== null) {
+      this.reparableSelected = params.reparable;
+    }
     if (params.tipo !== undefined && params.tipo !== null) {
       this.tiposSelected = [];
       params.tipo.forEach((tipo) => {
@@ -87,6 +102,16 @@ export class FilterControlService {
           this.tiposSelected.push(true);
         } else {
           this.tiposSelected.push(false);
+        }
+      });
+    }
+    if (params.modelo !== undefined && params.modelo !== null) {
+      this.modelosSelected = [];
+      params.modelo.forEach((modelo) => {
+        if (modelo !== null) {
+          this.modelosSelected.push(true);
+        } else {
+          this.modelosSelected.push(false);
         }
       });
     }
@@ -115,11 +140,24 @@ export class FilterControlService {
     this.selectedTipoLabels = [this.selectedTipoDefaultLabel];
     this.labelTipoDefaultStatus = true;
 
+    // MODELO DE MÓDULOS
+    const modSel: boolean[] = [];
+    this.modelosSelected.forEach((sel) => {
+      modSel.push(false);
+    });
+    this.modelosSelected = modSel;
+    // Labels modelo de módulos
+    this.selectedModeloLabels = [this.selectedModeloDefaultLabel];
+    this.labelModeloDefaultStatus = true;
+
     // CLASE
     this.claseSelected = [false, false, false];
 
     // CRITICIDAD
     this.criticidadSelected = [false, false, false, false, false];
+
+    // REPARABLE
+    this.reparableSelected = [false, false];
 
     // AREA
     this.activeDrawArea = false;
@@ -142,10 +180,13 @@ export class FilterControlService {
     this.minGradiente = 0;
     this.maxGradiente = 80;
     this.labelTipoDefaultStatus = true;
+    this.labelModeloDefaultStatus = true;
     this.selectedTipoLabels = [this.selectedTipoDefaultLabel];
+    this.selectedModeloLabels = [this.selectedModeloDefaultLabel];
     this.tiposSelected = [];
     this.claseSelected = [false, false, false];
     this.criticidadSelected = [false, false, false, false, false];
+    this.reparableSelected = [false, false];
     this.activeDrawArea = false;
     this.activeDeleteArea = false;
   }
@@ -238,6 +279,35 @@ export class FilterControlService {
     this.labelTipoDefaultStatus$.next(value);
   }
 
+  /* MODELO DE MÓDULOS */
+  get modelosSelected() {
+    return this._modelosSelected;
+  }
+
+  set modelosSelected(value: boolean[]) {
+    this._modelosSelected = value;
+    this.modelosSelected$.next(value);
+  }
+
+  /* Labels modelo de módulos */
+  get selectedModeloLabels() {
+    return this._selectedModeloLabels;
+  }
+
+  set selectedModeloLabels(value: string[]) {
+    this._selectedModeloLabels = value;
+    this.selectedModeloLabels$.next(value);
+  }
+
+  get labelModeloDefaultStatus() {
+    return this._labelModeloDefaultStatus;
+  }
+
+  set labelModeloDefaultStatus(value: boolean) {
+    this._labelModeloDefaultStatus = value;
+    this.labelModeloDefaultStatus$.next(value);
+  }
+
   /* CLASE */
   get claseSelected() {
     return this._claseSelected;
@@ -256,6 +326,16 @@ export class FilterControlService {
   set criticidadSelected(value: boolean[]) {
     this._criticidadSelected = value;
     this.criticidadSelected$.next(value);
+  }
+
+   /* ANOMALÍAS REPARABLES */
+   get reparableSelected() {
+    return this._reparableSelected;
+  }
+
+  set reparableSelected(value: boolean[]) {
+    this._reparableSelected = value;
+    this.reparableSelected$.next(value);
   }
 
   /* AREA */
