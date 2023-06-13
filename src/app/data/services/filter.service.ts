@@ -66,8 +66,6 @@ export class FilterService {
   addFilter(filter: FilterInterface) {
     // comprobamos que no es de tipo 'multiple'
     if (!this.multipleFilters.includes(filter.type)) {
-      console.log("Previous filters: ", this.filters);
-      console.log("New filter: ", filter);
       // eliminamos, si lo hubiera, el filtro anterior del mismo tipo que el recibido
       this.filters = this.filters.filter((f) => f.type !== filter.type);
       // añadimos el nuevo filtro

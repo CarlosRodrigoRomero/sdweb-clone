@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { ReportControlService } from '@data/services/report-control.service';
 
 import { GLOBAL } from '@data/constants/global';
+import { AnomaliaService } from '@data/services/anomalia.service';
 
 @Component({
   selector: 'app-total-loss-container',
@@ -19,7 +20,7 @@ export class TotalLossContainerComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private reportControlService: ReportControlService) {}
+  constructor(private reportControlService: ReportControlService, private anomaliaService: AnomaliaService) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -27,6 +28,7 @@ export class TotalLossContainerComponent implements OnInit, OnDestroy {
         const selectedReport = this.reportControlService.informes.find((informe) => informe.id === informeId);
 
         const anomaliasInforme = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId);
+        // const anomaliasInforme = this.anomaliaService.getRealAnomalias(this.reportControlService.allAnomalias.filter((anom) => anom.informeId === informeId));
         this.numTotalAnoms = anomaliasInforme.length;
         const fixableAnoms = anomaliasInforme.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo));
         this.numFixableAnoms = fixableAnoms.length;

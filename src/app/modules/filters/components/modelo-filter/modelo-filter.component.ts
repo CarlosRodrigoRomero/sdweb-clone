@@ -17,6 +17,7 @@ import { PlantaService } from '@data/services/planta.service';
 import { ModeloFilter } from '@core/models/modeloFilter';
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
+import { ModuloInterface } from '@core/models/modulo';
 
 
 export interface LabelModelo {
@@ -70,8 +71,6 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.plantaId = this.reportControlService.plantaId;
     this.informesIdList = this.reportControlService.informesIdList;
-    // const anomalias = this.anomaliaService.getRealAnomalias(this.reportControlService.allAnomalias);
-    // this.modelos = [...new Set(anomalias.map((anomalia) => `${anomalia.modulo.marca} (${anomalia.modulo.potencia}W)`))]
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
@@ -90,7 +89,7 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
         .subscribe((anomalias) => {
           // filtramos las anomalias que ya no consideramos anomalias
           this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
-          this.allModelos = [...new Set (this.allAnomalias.map((anomalia) => `${anomalia.modulo.marca} (${anomalia.modulo.potencia}W)`))].sort();
+          this.allModelos = [...new Set (this.allAnomalias.map((anomalia) => this.setModuleLabel(anomalia.modulo)))].sort();
           this.modelosElem = this.allModelos.map((modelo, i) => ({ modelo: i, label: modelo}));
         })  
     );
@@ -166,6 +165,16 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
     // Para la potencia tenemos que quitarle el último caracter que es un 'W' y los paréntesis
     var potencia = Number(label.split(' ').slice(-1)[0].slice(1, -2));
     return {marca, potencia};
+  }
+
+  setModuleLabel(module: ModuloInterface): string{
+    let label: string;
+    if (module.marca) {
+      label = `${module.marca} (${module.potencia}W)`;
+    } else {
+      label = `${module.potencia}W`;
+    }
+    return label
   }
 
   stopPropagation(event) {
