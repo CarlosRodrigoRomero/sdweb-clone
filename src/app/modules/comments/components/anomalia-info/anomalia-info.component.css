@@ -7,6 +7,12 @@
   font-size: 14px;
 }
 
+.elems-info {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+}
+
 .elem-info {
   display: flex;
   gap: 0.5rem;

@@ -1,0 +1,5 @@
+.elem-info {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}

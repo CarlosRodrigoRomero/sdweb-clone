@@ -115,9 +115,9 @@ export class AnomaliaInfoService {
         if (modulo.hasOwnProperty('marca')) {
           labelModulo = labelModulo.concat(modulo.marca.toString()).concat(' ');
         }
-        if (modulo.hasOwnProperty('modelo')) {
-          labelModulo = labelModulo.concat(modulo.modelo.toString()).concat(' ');
-        }
+        // if (modulo.hasOwnProperty('modelo')) {
+        //   labelModulo = labelModulo.concat(modulo.modelo.toString()).concat(' ');
+        // }
         if (modulo.hasOwnProperty('potencia')) {
           labelModulo = labelModulo.concat('(').concat(modulo.potencia.toString()).concat(' W)');
         }

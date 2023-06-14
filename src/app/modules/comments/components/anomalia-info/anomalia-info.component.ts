@@ -18,6 +18,7 @@ interface AnomaliaInfo {
   numAnom: number;
   localizacion: string;
   tipo: string;
+  modulo: string;
 }
 
 @Component({
@@ -60,13 +61,24 @@ export class AnomaliaInfoComponent implements OnInit, AfterViewInit, OnDestroy {
         this.editInput = false;
 
         if (this.anomaliaSelected !== undefined) {
-          this.anomaliaInfo = {
-            numAnom: this.anomaliaSelected.numAnom,
-            localizacion: this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(
+          let localizacion: string;
+          if (this.plantaFija) {
+            localizacion = this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(
               this.anomaliaSelected,
               this.reportControlService.planta
-            ),
+            );
+          } else {
+            localizacion = this.anomaliaInfoService.getPosicionModuloLabel(
+              this.anomaliaSelected,
+              this.reportControlService.planta
+            );
+          }
+
+          this.anomaliaInfo = {
+            numAnom: this.anomaliaSelected.numAnom,
+            localizacion,
             tipo: this.anomaliaInfoService.getTipoLabel(this.anomaliaSelected),
+            modulo: this.anomaliaInfoService.getModuloLabel(this.anomaliaSelected),
           };
 
           if (this.anomaliaSelected.hasOwnProperty('numeroSerie')) {
@@ -95,6 +107,7 @@ export class AnomaliaInfoComponent implements OnInit, AfterViewInit, OnDestroy {
   private buildForm() {
     this.form = this.formBuilder.group({
       numeroSerie: [, Validators.required],
+      módulo: [, Validators.required],
     });
   }
 

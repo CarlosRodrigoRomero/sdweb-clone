@@ -17,6 +17,8 @@ import { ZonesCommentsComponent } from './components/zones-comments/zones-commen
 import { MapViewControlComponent } from './components/map-view-control/map-view-control.component';
 import { MapSeguidoresCommentsComponent } from './components/map-seguidores-comments/map-seguidores-comments.component';
 import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.component';
+import { ModuleInputComponent } from './components/module-input/module-input.component';
+import { SerialNumberInputComponent } from './components/serial-number-input/serial-number-input.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +35,8 @@ import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.
     MapViewControlComponent,
     MapSeguidoresCommentsComponent,
     SeguidorInfoComponent,
+    ModuleInputComponent,
+    SerialNumberInputComponent,
   ],
   imports: [CommonModule, CommentsRoutingModule, SharedModule],
   exports: [CommentsAreaComponent],

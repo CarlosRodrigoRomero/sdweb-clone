@@ -183,24 +183,6 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
 
     const geoLocSource = geoLocLayer.getSource() as VectorSource<any>;
 
-    // navigator.geolocation.watchPosition(
-    //   (pos) => {
-    //     const coords = [pos.coords.longitude, pos.coords.latitude];
-    //     const accuracy = circular(coords, pos.coords.accuracy);
-    //     geoLocSource.clear(true);
-    //     geoLocSource.addFeatures([
-    //       new Feature(accuracy.transform('EPSG:4326', this.map.getView().getProjection())),
-    //       new Feature(new Point(fromLonLat(coords))),
-    //     ]);
-    //   },
-    //   (error) => {
-    //     alert(`ERROR: ${error.message}`);
-    //   },
-    //   {
-    //     enableHighAccuracy: true,
-    //   }
-    // );
-
     // Añade la geolocalización
     const geolocation = new Geolocation({
       // Habilita la opción de proyección en el constructor de geolocalización.
@@ -210,26 +192,6 @@ export class MapSeguidoresCommentsComponent implements OnInit, OnDestroy {
         enableHighAccuracy: true,
       },
     });
-
-    function el(id) {
-      return document.getElementById(id);
-    }
-
-    // update the HTML page when the position changes.
-    geolocation.on('change', function () {
-      el('accuracy').innerText = geolocation.getAccuracy() + ' [m]';
-      el('altitude').innerText = geolocation.getAltitude() + ' [m]';
-      el('altitudeAccuracy').innerText = geolocation.getAltitudeAccuracy() + ' [m]';
-      el('heading').innerText = geolocation.getHeading() + ' [rad]';
-      el('speed').innerText = geolocation.getSpeed() + ' [m/s]';
-    });
-
-    // Añade la orientación
-    // geolocation.on('change:heading', () => {
-    //   // Aquí puedes manejar los cambios en la orientación.
-    //   var heading = geolocation.getHeading() || 0;
-    //   console.log(heading);
-    // });
 
     const positionFeature = new Feature();
     positionFeature.setStyle(

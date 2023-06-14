@@ -1,0 +1,20 @@
+<div class="elem-info">
+  <span class="elem-info-label">{{ 'Nº de serie' | translate }}</span>
+  <div *ngIf="!editInput" class="read-input">
+    <span>{{
+      anomaliaSelected.hasOwnProperty('numeroSerie') ? anomaliaSelected.numeroSerie : ('Desconocido' | translate)
+    }}</span>
+    <button mat-icon-button (click)="editInput = true">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+  <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+    <mat-form-field *ngIf="editInput" appearance="fill">
+      <mat-label>{{ 'Nº serie' | translate }}</mat-label>
+      <input matInput formControlName="numeroSerie" />
+      <button mat-icon-button matSuffix type="submit">
+        <mat-icon>done</mat-icon>
+      </button>
+    </mat-form-field>
+  </form>
+</div>
