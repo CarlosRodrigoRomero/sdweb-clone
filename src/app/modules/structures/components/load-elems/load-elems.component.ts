@@ -91,44 +91,42 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
   }
 
   private loadRawModules(zones?: LocationAreaInterface[]) {
-    this.structuresService
-      .getModulosBrutos()
-      .pipe(take(1))
-      .subscribe((modulos) => {
-        this.structuresService.allRawModules = modulos;
+    this.structuresService.getModulosBrutos().then((modulos) => {
+      console.log('Todos los ' + modulos.length + ' modulos en bruto cargados');
+      this.structuresService.allRawModules = modulos;
 
-        let selectedModules: RawModule[] = [];
+      let selectedModules: RawModule[] = [];
 
-        if (zones) {
-          zones.forEach((zone) => {
-            const coordsZone = this.olMapService.pathToCoordinate(zone.path);
-            const polygonZone = new Polygon([coordsZone]);
+      if (zones) {
+        zones.forEach((zone) => {
+          const coordsZone = this.olMapService.pathToCoordinate(zone.path);
+          const polygonZone = new Polygon([coordsZone]);
 
-            const includedModules = modulos.filter((modulo) => {
-              let centroid;
-              if (modulo.hasOwnProperty('centroid_gps_long')) {
-                centroid = [modulo.centroid_gps_long, modulo.centroid_gps_lat] as Coordinate;
-              } else {
-                centroid = this.olMapService.getCentroid(modulo.coords);
-              }
-              return polygonZone.intersectsCoordinate(centroid);
-            });
-
-            selectedModules.push(...includedModules);
+          const includedModules = modulos.filter((modulo) => {
+            let centroid;
+            if (modulo.hasOwnProperty('centroid_gps_long')) {
+              centroid = [modulo.centroid_gps_long, modulo.centroid_gps_lat] as Coordinate;
+            } else {
+              centroid = this.olMapService.getCentroid(modulo.coords);
+            }
+            return polygonZone.intersectsCoordinate(centroid);
           });
-        } else {
-          selectedModules = modulos;
-        }
 
-        this.structuresService.loadedRawModules = selectedModules;
+          selectedModules.push(...includedModules);
+        });
+      } else {
+        selectedModules = modulos;
+      }
 
-        if (selectedModules.length > 0) {
-          // calculamos las medias y desviaciones
-          this.structuresService.setInitialAveragesAndStandardDeviations();
-        }
+      this.structuresService.loadedRawModules = selectedModules;
 
-        this.filterService.initService(selectedModules);
-      });
+      if (selectedModules.length > 0) {
+        // calculamos las medias y desviaciones
+        this.structuresService.setInitialAveragesAndStandardDeviations();
+      }
+
+      this.filterService.initService(selectedModules);
+    });
   }
 
   private loadModuleGroups(zones?: LocationAreaInterface[]) {
@@ -136,6 +134,8 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
       .getModuleGroups()
       .pipe(take(1))
       .subscribe((modGroups) => {
+        console.log('Todas las ' + modGroups.length + ' agrupaciones cargadas');
+
         let selectedModGroups: ModuleGroup[] = [];
 
         if (zones) {
@@ -163,6 +163,8 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
       .getNormModules()
       .pipe(take(1))
       .subscribe((normModules) => {
+        console.log('Todos los ' + normModules.length + ' modulos normalizados cargados');
+
         let selectedNormModules: NormalizedModule[] = [];
 
         if (zones) {
