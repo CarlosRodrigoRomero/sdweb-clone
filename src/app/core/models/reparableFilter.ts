@@ -1,6 +1,7 @@
 import { FilterInterface } from './filter';
 import { FilterableElement } from './filterableInterface';
 import { Seguidor } from './seguidor';
+
 import { GLOBAL } from '../../data/constants/global';
 
 export class ReparableFilter implements FilterInterface {

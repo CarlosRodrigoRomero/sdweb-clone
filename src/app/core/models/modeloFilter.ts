@@ -6,15 +6,15 @@ export class ModeloFilter implements FilterInterface {
   id: string;
   type: string;
   modulo: string;
-  modelo: string;
-  potencia: number;
+  numOfModelos: number;
+  position: number;
 
-  constructor(id: string, type: string, modulo: string, potencia?: number, modelo?: string,) {
+  constructor(id: string, type: string, modulo: string, numOfModelos: number, position: number) {
     this.id = id;
     this.type = type;
     this.modulo = modulo;
-    this.modelo = modelo;
-    this.potencia = potencia;
+    this.numOfModelos = numOfModelos;
+    this.position = position;
   }
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {

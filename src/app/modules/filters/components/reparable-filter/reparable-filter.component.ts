@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+
 import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
@@ -6,7 +7,6 @@ import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
 import { FilterService } from '@data/services/filter.service';
 import { FilterControlService } from '@data/services/filter-control.service';
-import { AnomaliaService } from '@data/services/anomalia.service';
 
 import { ReparableFilter } from '@core/models/reparableFilter';
 
@@ -34,7 +34,6 @@ export class ReparableFilterComponent implements OnInit {
   constructor(
     private filterService: FilterService,
     private filterControlService: FilterControlService,
-    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit(): void {

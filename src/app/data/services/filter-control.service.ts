@@ -50,6 +50,15 @@ export class FilterControlService {
   private _modelosSelected: boolean[] = [];
   public modelosSelected$ = new BehaviorSubject<boolean[]>(this._modelosSelected);
 
+  private _labelZonaDefaultStatus = true;
+  public labelZonaDefaultStatus$ = new BehaviorSubject<boolean>(this._labelZonaDefaultStatus);
+  public selectedZonaDefaultLabel = 'Zona';
+  private _selectedZonaLabels: string[] = [this.selectedZonaDefaultLabel];
+  public selectedZonaLabels$ = new BehaviorSubject<string[]>(this._selectedZonaLabels);
+  public zonasSelectedDefault: boolean[] = [];
+  private _zonasSelected: boolean[] = [];
+  public zonasSelected$ = new BehaviorSubject<boolean[]>(this._zonasSelected);
+
   private _claseSelected: boolean[] = [false, false, false];
   public claseSelected$ = new BehaviorSubject<boolean[]>(this._claseSelected);
 
@@ -115,6 +124,16 @@ export class FilterControlService {
         }
       });
     }
+    if (params.zonas !== undefined && params.zonas !== null) {
+      this.zonasSelected = [];
+      params.zonas.forEach((zona) => {
+        if (zona !== null) {
+          this.zonasSelected.push(true);
+        } else {
+          this.zonasSelected.push(false);
+        }
+      });
+    }
   }
 
   resetFilters() {
@@ -150,6 +169,16 @@ export class FilterControlService {
     this.selectedModeloLabels = [this.selectedModeloDefaultLabel];
     this.labelModeloDefaultStatus = true;
 
+    // ZONAS
+    const zonaSel: boolean[] = [];
+    this.zonasSelected.forEach((sel) => {
+      zonaSel.push(false);
+    });
+    this.zonasSelected = zonaSel;
+    // Labels zonas
+    this.selectedZonaLabels = [this.selectedZonaDefaultLabel];
+    this.labelZonaDefaultStatus = true;
+
     // CLASE
     this.claseSelected = [false, false, false];
 
@@ -180,9 +209,11 @@ export class FilterControlService {
     this.minGradiente = 0;
     this.maxGradiente = 80;
     this.labelTipoDefaultStatus = true;
-    this.labelModeloDefaultStatus = true;
     this.selectedTipoLabels = [this.selectedTipoDefaultLabel];
+    this.labelModeloDefaultStatus = true;
     this.selectedModeloLabels = [this.selectedModeloDefaultLabel];
+    this.labelZonaDefaultStatus = true;
+    this.selectedZonaLabels = [this.selectedModeloDefaultLabel];
     this.tiposSelected = [];
     this.claseSelected = [false, false, false];
     this.criticidadSelected = [false, false, false, false, false];
@@ -306,6 +337,35 @@ export class FilterControlService {
   set labelModeloDefaultStatus(value: boolean) {
     this._labelModeloDefaultStatus = value;
     this.labelModeloDefaultStatus$.next(value);
+  }
+
+  /* ZONAS */
+  get zonasSelected() {
+    return this._zonasSelected;
+  }
+
+  set zonasSelected(value: boolean[]) {
+    this._zonasSelected = value;
+    this.zonasSelected$.next(value);
+  }
+
+  /* Labels zonas */
+  get selectedZonaLabels() {
+    return this._selectedZonaLabels;
+  }
+
+  set selectedZonaLabels(value: string[]) {
+    this._selectedZonaLabels = value;
+    this.selectedZonaLabels$.next(value);
+  }
+
+  get labelZonaDefaultStatus() {
+    return this._labelZonaDefaultStatus;
+  }
+
+  set labelZonaDefaultStatus(value: boolean) {
+    this._labelZonaDefaultStatus = value;
+    this.labelZonaDefaultStatus$.next(value);
   }
 
   /* CLASE */

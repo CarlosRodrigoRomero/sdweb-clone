@@ -10,7 +10,8 @@ import { ReportControlService } from '@data/services/report-control.service';
 })
 export class FiltersPanelComponent{
   @Input() filtrosActivos: boolean;
-  @Input() mostrarFiltroModelo: boolean;
+  @Input() showFiltroModelo: boolean;
+  @Input() showFiltroZona: boolean;
   @Output() cleanFilters = new EventEmitter();
 
   clickCleanFilters() {
