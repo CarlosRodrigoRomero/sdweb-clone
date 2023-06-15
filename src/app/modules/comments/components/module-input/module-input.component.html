@@ -1,1 +1,9 @@
-<p>module-input works!</p>
+<div class="elem-info">
+  <span class="elem-info-label">{{ 'Módulo' | translate }}</span>
+  <div class="read-input">
+    <span>{{ modulo }}</span>
+    <button mat-icon-button (click)="openDialog()">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+</div>
