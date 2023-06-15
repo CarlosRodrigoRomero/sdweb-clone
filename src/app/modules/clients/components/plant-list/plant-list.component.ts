@@ -73,6 +73,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     this.plantas = this.portfolioControlService.listaPlantas;
     this.informes = this.portfolioControlService.listaInformes;
     const plantsData = [];
+    console.log(this.informes.filter(x=>x.tiposAnomalias[11] != 0));
 
     this.plantas.forEach((planta) => {
       const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);

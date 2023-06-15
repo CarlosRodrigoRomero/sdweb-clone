@@ -5,7 +5,6 @@ import { Subscription } from 'rxjs';
 import { ReportControlService } from '@data/services/report-control.service';
 
 import { GLOBAL } from '@data/constants/global';
-import { AnomaliaService } from '@data/services/anomalia.service';
 
 @Component({
   selector: 'app-total-loss-container',
@@ -20,7 +19,7 @@ export class TotalLossContainerComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private reportControlService: ReportControlService, private anomaliaService: AnomaliaService) {}
+  constructor(private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
     this.subscriptions.add(

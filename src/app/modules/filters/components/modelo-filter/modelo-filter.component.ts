@@ -93,7 +93,7 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
           this.modelosElem = this.allModelos.map((modelo, i) => ({ modelo: i, label: modelo}));
         })  
     );
-    // nos suscribimos a los tipos seleccionados de filter control
+    // nos suscribimos a los modelos seleccionados de filter control
     this.subscriptions.add(
       this.filterControlService.modelosSelected$.subscribe((modelosSel) => (this.modelosSelected = modelosSel))
     );
@@ -120,10 +120,11 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
       this.filtroModelo = new ModeloFilter(
         event.source.id,
         'modelo',
-        event.source.name
+        event.source.name,
+        this.modelosElem.length,
+        Number(event.source.value)
       );
       this.filterService.addFilter(this.filtroModelo);
-
       this.filterControlService.modelosSelected[Number(event.source.id.replace('modelo_', ''))] = true;
       // añadimos el modelo seleccionado a la variable
       if (this.selectedLabels[0] !== this.defaultSelectLabel) {
