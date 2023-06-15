@@ -74,58 +74,61 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
       const selectedTaskZones = this.zones.filter((zone) => zone.completed);
       if (selectedTaskZones.length < this.zones.length) {
         const selectedZones = this.largestZones.filter((zone) => selectedTaskZones.find((t) => t.id === zone.id));
-        this.loadRawModules(selectedZones);
-        this.loadNormModules(selectedZones);
+        this.loadRawModules(selectedZones).then(() => this.loadNormModules(selectedZones));
       } else {
         // cargamos todos los modulos cuando seleccionamos todas las zonas
-        this.loadRawModules();
-        this.loadNormModules();
+        this.loadRawModules().then(() => this.loadNormModules());
       }
     } else {
       // cargamos todos los modulos cuando no hay zonas
-      this.loadRawModules();
-      this.loadNormModules();
+      this.loadRawModules().then(() => this.loadNormModules());
     }
     // cargamos todos los grupos siempre
     this.loadModuleGroups();
   }
 
-  private loadRawModules(zones?: LocationAreaInterface[]) {
-    this.structuresService.getModulosBrutos().then((modulos) => {
-      console.log('Todos los ' + modulos.length + ' modulos en bruto cargados');
-      this.structuresService.allRawModules = modulos;
+  private loadRawModules(zones?: LocationAreaInterface[]): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const modulos = await this.structuresService.getModulosBrutos();
+        console.log('Todos los ' + modulos.length + ' modulos en bruto cargados');
+        this.structuresService.allRawModules = modulos;
 
-      let selectedModules: RawModule[] = [];
+        let selectedModules: RawModule[] = [];
 
-      if (zones) {
-        zones.forEach((zone) => {
-          const coordsZone = this.olMapService.pathToCoordinate(zone.path);
-          const polygonZone = new Polygon([coordsZone]);
+        if (zones) {
+          // Calcular las polígonas de las zonas una sola vez antes del bucle
+          const polygons = zones.map((zone) => new Polygon([this.olMapService.pathToCoordinate(zone.path)]));
 
-          const includedModules = modulos.filter((modulo) => {
+          for (let modulo of modulos) {
             let centroid;
             if (modulo.hasOwnProperty('centroid_gps_long')) {
               centroid = [modulo.centroid_gps_long, modulo.centroid_gps_lat] as Coordinate;
             } else {
               centroid = this.olMapService.getCentroid(modulo.coords);
             }
-            return polygonZone.intersectsCoordinate(centroid);
-          });
 
-          selectedModules.push(...includedModules);
-        });
-      } else {
-        selectedModules = modulos;
+            // Verificar si el módulo se encuentra dentro de alguna de las polígonas
+            if (polygons.some((polygon) => polygon.intersectsCoordinate(centroid))) {
+              selectedModules.push(modulo);
+            }
+          }
+        } else {
+          selectedModules = modulos;
+        }
+
+        this.structuresService.loadedRawModules = selectedModules;
+
+        if (selectedModules.length > 0) {
+          // calculamos las medias y desviaciones
+          this.structuresService.setInitialAveragesAndStandardDeviations();
+        }
+
+        this.filterService.initService(selectedModules);
+        resolve();
+      } catch (error) {
+        reject(error);
       }
-
-      this.structuresService.loadedRawModules = selectedModules;
-
-      if (selectedModules.length > 0) {
-        // calculamos las medias y desviaciones
-        this.structuresService.setInitialAveragesAndStandardDeviations();
-      }
-
-      this.filterService.initService(selectedModules);
     });
   }
 
@@ -133,23 +136,23 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
     this.structuresService
       .getModuleGroups()
       .pipe(take(1))
-      .subscribe((modGroups) => {
+      .subscribe(async (modGroups) => {
         console.log('Todas las ' + modGroups.length + ' agrupaciones cargadas');
 
         let selectedModGroups: ModuleGroup[] = [];
 
         if (zones) {
-          zones.forEach((zone) => {
-            const coordsZone = this.olMapService.pathToCoordinate(zone.path);
-            const polygonZone = new Polygon([coordsZone]);
+          // Calcular las polígonas de las zonas una sola vez antes del bucle
+          const polygons = zones.map((zone) => new Polygon([this.olMapService.pathToCoordinate(zone.path)]));
 
-            const includedModGroups = modGroups.filter((modGroup) => {
-              const centroid = this.olMapService.getCentroid(modGroup.coords);
-              return polygonZone.intersectsCoordinate(centroid);
-            });
+          for (let modGroup of modGroups) {
+            const centroid = this.olMapService.getCentroid(modGroup.coords);
 
-            selectedModGroups.push(...includedModGroups);
-          });
+            // Verificar si el grupo de módulos se encuentra dentro de alguna de las polígonas
+            if (polygons.some((polygon) => polygon.intersectsCoordinate(centroid))) {
+              selectedModGroups.push(modGroup);
+            }
+          }
         } else {
           selectedModGroups = modGroups;
         }
@@ -158,33 +161,29 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
       });
   }
 
-  private loadNormModules(zones?: LocationAreaInterface[]) {
-    this.structuresService
-      .getNormModules()
-      .pipe(take(1))
-      .subscribe((normModules) => {
-        console.log('Todos los ' + normModules.length + ' modulos normalizados cargados');
+  private async loadNormModules(zones?: LocationAreaInterface[]) {
+    const normModules = await this.structuresService.getNormModules();
+    console.log('Todos los ' + normModules.length + ' modulos normalizados cargados');
 
-        let selectedNormModules: NormalizedModule[] = [];
+    let selectedNormModules: NormalizedModule[] = [];
 
-        if (zones) {
-          zones.forEach((zone) => {
-            const coordsZone = this.olMapService.pathToCoordinate(zone.path);
-            const polygonZone = new Polygon([coordsZone]);
+    if (zones) {
+      // Calcular las polígonas de las zonas una sola vez antes del bucle
+      const polygons = zones.map((zone) => new Polygon([this.olMapService.pathToCoordinate(zone.path)]));
 
-            const includedNormMods = normModules.filter((normMod) => {
-              const centroid = [normMod.centroid_gps.long, normMod.centroid_gps.lat] as Coordinate;
-              return polygonZone.intersectsCoordinate(centroid);
-            });
+      for (let normMod of normModules) {
+        const centroid = [normMod.centroid_gps.long, normMod.centroid_gps.lat] as Coordinate;
 
-            selectedNormModules.push(...includedNormMods);
-          });
-        } else {
-          selectedNormModules = normModules;
+        // Verificar si el módulo normalizado se encuentra dentro de alguna de las polígonas
+        if (polygons.some((polygon) => polygon.intersectsCoordinate(centroid))) {
+          selectedNormModules.push(normMod);
         }
+      }
+    } else {
+      selectedNormModules = normModules;
+    }
 
-        this.structuresService.allNormModules = selectedNormModules;
-      });
+    this.structuresService.allNormModules = selectedNormModules;
   }
 
   private zoneTaskName(zone: LocationAreaInterface): string {

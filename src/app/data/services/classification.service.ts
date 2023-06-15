@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, from } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 
 import { Feature } from 'ol';
@@ -89,7 +89,8 @@ export class ClassificationService {
             }
 
             // obtenemos los modulos normalizados
-            return this.structuresService.getNormModules(this.thermalLayer);
+            // utilizamos 'from' para convertir la Promise en un Observable
+            return from(this.structuresService.getNormModules(this.thermalLayer));
           })
         )
         .pipe(take(1))
