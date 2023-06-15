@@ -391,9 +391,6 @@ export class StructuresService {
         const data = doc.data();
         data.id = doc.id;
 
-        // Convertimos el objeto en un array
-        data.coords = Object.values(data.coords);
-
         return data;
       });
 
