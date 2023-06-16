@@ -70,7 +70,6 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
               this.numAnoms = this.reportControlService.allAnomalias.filter(
                 (anom) => anom.informeId === this.selectedInformeId
               ).length;
-
               return this.filterService.filteredElements$;
             })
           )
