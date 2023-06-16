@@ -73,34 +73,23 @@ export class ZonaFilterComponent implements OnInit {
     this.subscriptions.add(
       this.plantaService
         .getPlanta(this.plantaId)
-        .pipe(
-          take(1),
-          switchMap((planta) => {
-            this.planta = planta;
-            this.planta = planta;
-            // Una vez obtenida la planta, usamos el servicio de zonas para obtener las zonas de la planta
-            this.zonesService.initService(planta).then((init) => (this.serviceInit = init));
-            this.zones = this.zonesService.zonesBySize[0];
-            this.zones = this.zones.sort((a, b) => parseInt(a.globalCoords[0]) - parseInt(b.globalCoords[0]));
-            // Nos suscribimos al servicio de anomalías para obtener las zonas donde hay anomalías
-            return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.reportControlService.informes);
-          })
-        )
-        
-        .subscribe((anomalias) => {
-          let allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
-          let allZonasAnomalias = [...new Set (allAnomalias.map((anomalia) => anomalia.globalCoords[0]))];
-          // Filtramos para quedarnos solo con las zonas que tienen anomalías
-          this.zones = this.zones.filter((zona) => allZonasAnomalias.includes(zona.globalCoords[0]));
+        .pipe(take(1))
+        .subscribe((planta) => {
+          this.planta = planta;
+          this.planta = planta;
+          // Una vez obtenida la planta, usamos el servicio de zonas para obtener las zonas de la planta
+          this.zonesService.initService(planta).then((init) => (this.serviceInit = init));
+          this.zones = this.zonesService.zonesBySize[0];
+          this.zones = this.zones.sort((a, b) => parseInt(a.globalCoords[0]) - parseInt(b.globalCoords[0]));
+
           this.zones.forEach((zone, i) => {
             this.zonasPcs.push({ label: this.zoneTaskName(zone), zona: zone.globalCoords[0], idZona: i });
             this.zonasSelected.push(false);
           });
-        })  
+        })
     );
 
-    
-    // nos suscribimos a los tipos seleccionados de filter control
+    // nos suscribimos a las zonas seleccionadas de filter control
     this.subscriptions.add(
       this.filterControlService.zonasSelected$.subscribe((zonasSel) => (this.zonasSelected = zonasSel))
     );
