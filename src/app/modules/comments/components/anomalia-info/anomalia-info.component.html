@@ -9,6 +9,8 @@
       <span class="subtitulo">{{ anomaliaInfo.localizacion }}</span>
     </div>
 
+    <app-anom-status-select [anomaliaSelected]="anomaliaSelected"></app-anom-status-select>
+
     <app-serial-number-input [anomaliaSelected]="anomaliaSelected"></app-serial-number-input>
 
     <app-module-input [anomaliaSelected]="anomaliaSelected"></app-module-input>
