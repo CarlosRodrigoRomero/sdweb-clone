@@ -72,7 +72,6 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
     this.plantas = this.portfolioControlService.listaPlantas;
     this.informes = this.portfolioControlService.listaInformes;
-
     const plantsData = [];
 
     this.plantas.forEach((planta) => {

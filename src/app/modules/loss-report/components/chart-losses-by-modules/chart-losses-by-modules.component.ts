@@ -111,7 +111,6 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
           this.initChart(this.theme.split('-')[0]);
         })
     );
-
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
