@@ -1,11 +1,9 @@
 <div class="elem-info">
   <span class="elem-info-label">{{ label | translate }}</span>
   <div *ngIf="!editInput" class="read-input">
-    <span>{{
-      anomaliaSelected.hasOwnProperty('numeroSerie') ? anomaliaSelected.numeroSerie : ('Desconocido' | translate)
-    }}</span>
+    <span class="subtitulo">{{ comentario }}</span>
     <button mat-icon-button (click)="editInput = true">
-      <mat-icon>edit</mat-icon>
+      <mat-icon class="edit-icon" >edit</mat-icon>
     </button>
   </div>
   <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">

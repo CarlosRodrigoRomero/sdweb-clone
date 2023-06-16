@@ -1,11 +1,10 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { AnomaliaService } from '@data/services/anomalia.service';
-import { PcService } from '@data/services/pc.service';
-import { ReportControlService } from '@data/services/report-control.service';
+import { ComentariosService } from '@data/services/comentarios.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { Comentario } from '@core/models/comentario';
 
 @Component({
   selector: 'app-comment-input',
@@ -19,13 +18,9 @@ export class CommentInputComponent implements OnChanges {
 
   editInput = false;
   form: FormGroup;
+  comentario: string;
 
-  constructor(
-    private reportControlService: ReportControlService,
-    private pcService: PcService,
-    private anomaliaService: AnomaliaService,
-    private formBuilder: FormBuilder
-  ) {
+  constructor(private formBuilder: FormBuilder, private comentariosService: ComentariosService) {
     this.buildForm();
   }
 
@@ -35,48 +30,62 @@ export class CommentInputComponent implements OnChanges {
       this.editInput = false;
 
       if (this.anomaliaSelected !== undefined) {
-        if (this.anomaliaSelected.hasOwnProperty('comment')) {
-          this.form.patchValue({ numeroSerie: this.anomaliaSelected.numeroSerie });
+        if (
+          this.anomaliaSelected.hasOwnProperty('comentarios') &&
+          this.anomaliaSelected.comentarios.length > 0 &&
+          this.anomaliaSelected.comentarios.filter((com) => com.tipo === this.type).length > 0
+        ) {
+          this.comentario = this.anomaliaSelected.comentarios.find((com) => com.tipo === this.type).texto;
+          this.form.patchValue({ comment: this.comentario });
         } else {
-          this.form.patchValue({ numeroSerie: null });
+          this.comentario = null;
+          this.form.patchValue({ comment: null });
         }
       }
     }
+  }
+
+  private buildForm() {
+    this.form = this.formBuilder.group({
+      comment: [],
+    });
   }
 
   onSubmit(event: Event) {
     event.preventDefault();
     if (this.form.valid) {
-      if (this.form.get('numeroSerie').value !== null) {
-        if (this.reportControlService.plantaFija) {
-          this.updateAnomalia(this.form.get('numeroSerie').value, 'numeroSerie');
+      const comentario: Comentario = {
+        tipo: this.type,
+        texto: this.form.get('comment').value,
+        datetime: Date.now(),
+        anomaliaId: this.anomaliaSelected.id,
+        informeId: this.anomaliaSelected.informeId,
+      };
+
+      if (this.anomaliaSelected.hasOwnProperty('comentarios') && this.anomaliaSelected.comentarios.length > 0) {
+        // averiguamos el indice del comentario que estamos editando
+        const index = this.anomaliaSelected.comentarios.findIndex((com) => com.tipo === this.type);
+
+        if (index >= 0) {
+          comentario.id = this.anomaliaSelected.comentarios[index].id;
+          // si existe y no recibimos ningún valor lo eliminamos
+          if (this.form.get('comment').value === '') {
+            this.comentariosService.deleteComentario(comentario.id);
+          } else {
+            // si existe y recibimos un valor, lo actualizamos
+            this.comentariosService.updateComentario(comentario);
+          }
         } else {
-          this.updatePc(this.form.get('numeroSerie').value, 'numeroSerie');
+          // si no existe, lo creamos
+          this.comentariosService.addComentario(comentario);
         }
-
-        // volvemos el input a no editable
-        this.editInput = false;
+      } else {
+        this.comentariosService.addComentario(comentario);
       }
+
+      this.comentario = this.form.get('comment').value;
     }
-  }
-
-  updateAnomalia(value: any, field: string) {
-    // la actualizamos en la anomalía local
-    this.anomaliaSelected[field] = value;
-    // la actualizamos en la DB
-    this.anomaliaService.updateAnomaliaField(this.anomaliaSelected.id, field, value);
-  }
-
-  updatePc(value: any, field: string) {
-    // la actualizamos en la anomalía local
-    this.anomaliaSelected[field] = value;
-    // la actualizamos en la DB
-    this.pcService.updatePcField(this.anomaliaSelected.id, field, value);
-  }
-
-  private buildForm() {
-    this.form = this.formBuilder.group({
-      comment: [, Validators.required],
-    });
+    // volvemos el input a no editable
+    this.editInput = false;
   }
 }

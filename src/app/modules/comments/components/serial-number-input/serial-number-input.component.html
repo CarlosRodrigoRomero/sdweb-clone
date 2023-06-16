@@ -5,7 +5,7 @@
       anomaliaSelected.hasOwnProperty('numeroSerie') ? anomaliaSelected.numeroSerie : ('Desconocido' | translate)
     }}</span>
     <button mat-icon-button (click)="editInput = true">
-      <mat-icon>edit</mat-icon>
+      <mat-icon class="edit-icon" >edit</mat-icon>
     </button>
   </div>
   <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
