@@ -48,9 +48,7 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
         if (this.zonesService.zonesBySize.length > 0) {
           this.thereAreZones = true;
 
-          this.largestZones = this.zonesService.zonesBySize[0];
-          console.log('ZONAS2', this.zonesService.zonesBySize[0].sort((a, b) => a.globalCoords[0].localeCompare(b.globalCoords[0])));
-          
+          this.largestZones = this.zonesService.zonesBySize[0];          
           // las ordenamos por su global mayor
           this.largestZones = this.largestZones.sort((a, b) => parseInt(a.globalCoords[0]) - parseInt(b.globalCoords[0]));
 
@@ -66,8 +64,6 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
         }
       }
     });
-    // console.log('ZONAS2', this.zonesService.zonesBySize);
-    console.log('ZONAS', this.zones);
 
     this.subscriptions.add(this.structuresService.modulesLoaded$.subscribe((load) => (this.modulesLoaded = load)));
   }
