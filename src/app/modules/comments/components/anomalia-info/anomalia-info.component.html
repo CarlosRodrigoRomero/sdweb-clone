@@ -13,6 +13,18 @@
 
     <app-module-input [anomaliaSelected]="anomaliaSelected"></app-module-input>
 
+    <app-comment-input
+      [anomaliaSelected]="anomaliaSelected"
+      [label]="'Comentario'"
+      [type]="'anomalia'"
+    ></app-comment-input>
+    <app-comment-input [anomaliaSelected]="anomaliaSelected" [label]="'Curva IV'" [type]="'iv'"></app-comment-input>
+    <app-comment-input
+      [anomaliaSelected]="anomaliaSelected"
+      [label]="'Actuaciones'"
+      [type]="'actuaciones'"
+    ></app-comment-input>
+
     <div *ngIf="plantaFija" id="pos-map" class="elem-info">
       <span class="titulo">{{ 'Ir al mapa' | translate }}</span>
       <button mat-icon-button (click)="goToAnomMap()">

@@ -20,6 +20,7 @@ import { SeguidorInfoComponent } from './components/seguidor-info/seguidor-info.
 import { ModuleInputComponent } from './components/module-input/module-input.component';
 import { SerialNumberInputComponent } from './components/serial-number-input/serial-number-input.component';
 import { ModuleInputDialogComponent } from './components/module-input-dialog/module-input-dialog.component';
+import { CommentInputComponent } from './components/comment-input/comment-input.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { ModuleInputDialogComponent } from './components/module-input-dialog/mod
     ModuleInputComponent,
     SerialNumberInputComponent,
     ModuleInputDialogComponent,
+    CommentInputComponent,
   ],
   imports: [CommonModule, CommentsRoutingModule, SharedModule],
   exports: [CommentsAreaComponent],
