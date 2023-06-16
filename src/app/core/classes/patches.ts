@@ -14,6 +14,7 @@ export class Patches {
       'DrZWBkxkw1QF4aZOBZ5D', // Pizarro 1/06/2023
       'J6hpthPQHrIqciuf5LYQ', // Pizarro 3/06/2023
       'ighFmQO3ovf5JPoxLdt4', // Pizarro 4/06/2023
+      'pBzaUDKSsS0sjOC3YnCO', // Pizarro 15/06/2023
     ];
     const plantasIds: string[] = [
       'AyKgsY6F3TqGQGYNaOUY', // Logrosan
