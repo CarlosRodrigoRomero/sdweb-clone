@@ -36,7 +36,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { MatTreeModule } from '@angular/material/tree';
 import { ReportContentComponent } from './modules/fixed-plant/components/report-content/report-content.component';
 import { SimpleBackgroundComponent } from './layout/components/simple-background/simple-background.component';
 import { PredictionDialogComponent } from './modules/prediction-report/components/prediction-dialog/prediction-dialog.component';

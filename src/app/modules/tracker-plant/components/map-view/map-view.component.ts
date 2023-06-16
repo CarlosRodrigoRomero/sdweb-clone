@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ComponentFactoryResolver } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
 
 import { MatSidenav } from '@angular/material/sidenav';
 
@@ -13,12 +13,16 @@ import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ResetServices } from '@data/services/reset-services.service';
 import { ViewReportService } from '@data/services/view-report.service';
+import { FilterService } from '@data/services/filter.service';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
 import { DynamicSeguidorListDirective } from '@modules/tracker-plant/directives/dynamic-seguidor-list.directive';
+import { DynamicFiltersDirective } from '@modules/filters/directives/dynamic-filters.directive';
 
 import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
 import { SeguidorListContainer } from '@modules/tracker-plant/containers/seguidor-list-container/seguidor-list-container.component';
+import { FiltersPanelContainerComponent } from '@modules/filters/containers/filters-panel-container/filters-panel-container.component';
+
 
 @Component({
   selector: 'app-map-view',
@@ -27,6 +31,7 @@ import { SeguidorListContainer } from '@modules/tracker-plant/containers/seguido
 })
 export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   public rightOpened = false;
+  public filtersOpened = false;
   public statsOpened: boolean;
   public seguidorViewOpened: boolean;
   public notSharedReport = true;
@@ -43,12 +48,14 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
+  @ViewChild('sidenavFilters') sidenavFilters: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
   @ViewChild('sidenavSeguidorView') sidenavSeguidorView: MatSidenav;
 
   @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
   @ViewChild(DynamicSeguidorListDirective) dynamicSegList: DynamicSeguidorListDirective;
+  @ViewChild(DynamicFiltersDirective) dynamicFilters: DynamicFiltersDirective;
 
   constructor(
     private reportControlService: ReportControlService,
@@ -60,7 +67,8 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
     private zonesService: ZonesService,
     private resetServices: ResetServices,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private viewReportService: ViewReportService
+    private viewReportService: ViewReportService,
+    private filterService: FilterService,
   ) {}
 
   ngOnInit(): void {
@@ -104,7 +112,6 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // para S2E vista simplificada siempre
     // this.viewReportService.simplifiedView = true;
-
     // para S2E vista MAE de inicio
     this.viewReportService.reportViewSelected = 'mae';
     this.subscriptions.add(
@@ -121,6 +128,13 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.dynamicSegList.viewContainerRef.clear();
     this.dynamicSegList.viewContainerRef.createComponent(component);
+  }
+
+  loadFilters() {
+    const component = this.componentFactoryResolver.resolveComponentFactory(FiltersPanelContainerComponent);
+    
+    this.dynamicFilters.viewContainerRef.clear();
+    this.dynamicFilters.viewContainerRef.createComponent(component);
   }
 
   loadStats() {

@@ -8,9 +8,9 @@
 
   <mat-sidenav-content>
     <mat-sidenav-container class="main-container" [hasBackdrop]="false">
-      <!-- SIDENAV FILTROS -->
+      
+      <!-- SIDENAV LISTA ANOMALIAS -->
       <mat-sidenav
-        *ngIf="showFilters"
         #sidenavLeft
         opened
         mode="side"
@@ -20,27 +20,29 @@
         position="start"
       >
         <div class="titulo">
-          <h4>{{ 'filtros' | translate | titlecase }}</h4>
-        </div>
-        <app-filters-panel-container></app-filters-panel-container>
-      </mat-sidenav>
-
-      <!-- SIDENAV LISTA ANOMALIAS -->
-      <mat-sidenav
-        #sidenavRight
-        class="right-sidenav"
-        position="end"
-        disableClose
-        (openedChange)="rightOpened = !rightOpened"
-      >
-        <div class="titulo">
           <h4>{{ 'Listado de anomalías' | translate }}</h4>
         </div>
 
-        <ng-template appDynamicAnomaliaList></ng-template>
+        <!-- <ng-template appDynamicAnomaliaList></ng-template> -->
 
-        <!-- <app-anomalia-list-container></app-anomalia-list-container> -->
+        <app-anomalia-list-container></app-anomalia-list-container>
       </mat-sidenav>
+      
+      <!-- SIDENAV FILTROS -->
+      <mat-sidenav
+        #sidenavFilters
+        [(opened)]="filtersOpened"
+        [fixedInViewport]="true"
+        class="right-sidenav"
+        position="end"
+      >
+        <div class="titulo">
+          <h4>{{ 'filtros' | translate | titlecase }}</h4>
+        </div>
+        <ng-template appDynamicFilters></ng-template>
+      </mat-sidenav>
+
+      
 
       <mat-sidenav-content>
         <div class="rel">
@@ -62,13 +64,13 @@
               <app-leyenda-container class="leyenda-no-tipo" *ngIf="viewSelected !== 'tipo'"></app-leyenda-container>
             </div>
 
-            <div class="btns-export">
+            <!-- <div class="btns-export"> -->
               <!-- BOTON COMPARTIR -->
-              <app-share-report *ngIf="!sharedReport"></app-share-report>
+              <!-- <app-share-report *ngIf="!sharedReport"></app-share-report> -->
 
               <!-- BOTON DESCARGAS -->
-              <app-download-report *ngIf="!sharedReport || completeView"></app-download-report>
-            </div>
+              <!-- <app-download-report *ngIf="!sharedReport || completeView"></app-download-report> -->
+            <!-- </div> -->
 
             <button mat-raised-button class="btn-open-controls" (click)="showControls()">
               <mat-icon>tune</mat-icon>
@@ -93,33 +95,45 @@
           </div>
         </div>
 
-        <div>
+        
           <!-- BOTON SIDENAV LISTA ANOMALIAS -->
-          <button
-            mat-raised-button
-            class="btn-right"
-            (click)="loadAnomList(); sidenavRight.toggle()"
-            matTooltip="{{ 'Lista anomalías' | translate }}"
-            matTooltipClass="tooltip-style"
-          >
-            <mat-icon>list_alt</mat-icon>
-            <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
-            <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
-          </button>
+        <div class="btn-wrapper">
+          <div class="btn-group btns-export_">
+            <!-- BOTON COMPARTIR -->
+            <app-share-report *ngIf="!sharedReport"></app-share-report>
 
-          <!-- BOTON SIDENAV STATS -->
-          <button
-            *ngIf="!sharedReport || completeView"
-            mat-raised-button
-            class="btn-right-stats stats"
-            (click)="loadStats(); sidenavStats.toggle()"
-            matTooltip="{{ 'Estadísticas' | translate }}"
-            matTooltipClass="tooltip-style"
-            [disabled]="noAnomsReport"
-          >
-            <mat-icon class="stats">query_stats</mat-icon>
-            <mat-icon class="stats">keyboard_arrow_left</mat-icon>
-          </button>
+            <!-- BOTON DESCARGAS -->
+            <app-download-report *ngIf="!sharedReport || completeView"></app-download-report>
+          </div>
+          <div class="btn-group btns-info">
+
+            <!-- BOTON SIDENAV STATS -->
+            <button
+              *ngIf="!sharedReport || completeView"
+              mat-raised-button
+              class="btn-right-stats stats"
+              (click)="loadStats(); sidenavStats.toggle()"
+              matTooltip="{{ 'Estadísticas' | translate }}"
+              matTooltipClass="tooltip-style"
+              [disabled]="noAnomsReport"
+            >
+              <mat-icon class="stats">query_stats</mat-icon>
+              <mat-icon class="stats">keyboard_arrow_left</mat-icon>
+            </button>
+
+            <!-- BOTON FILTROS -->
+            <button
+              mat-raised-button
+              class="btn-right"
+              (click)="loadFilters(); sidenavFilters.toggle()"
+              matTooltip="{{ 'Filtros' | translate }}"
+              matTooltipClass="tooltip-style"
+            >
+              <mat-icon>filter_alt</mat-icon>
+              <mat-icon *ngIf="!filtersOpened">keyboard_arrow_left</mat-icon>
+              <mat-icon *ngIf="filtersOpened">keyboard_arrow_right</mat-icon>
+            </button>
+          </div>
         </div>
       </mat-sidenav-content>
     </mat-sidenav-container>
