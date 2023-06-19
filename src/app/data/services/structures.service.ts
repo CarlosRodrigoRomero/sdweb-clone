@@ -195,13 +195,13 @@ export class StructuresService {
       if (!lastDoc) {
         collection = this.afs.collection<RawModule>(
           'thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto',
-          (ref) => ref.orderBy('image_name').limit(pageSize)
+          (ref) => ref.orderBy('area').limit(pageSize)
         );
       } else {
         // Si lastDoc no es nulo, empieza después del último documento obtenido.
         collection = this.afs.collection<RawModule>(
           'thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto',
-          (ref) => ref.orderBy('image_name').startAfter(lastDoc).limit(pageSize)
+          (ref) => ref.orderBy('area').startAfter(lastDoc).limit(pageSize)
         );
       }
 
@@ -376,13 +376,13 @@ export class StructuresService {
       if (!lastDoc) {
         collection = this.afs.collection<NormalizedModule>(
           'thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados',
-          (ref) => ref.orderBy('image_name').limit(pageSize)
+          (ref) => ref.orderBy('agrupacionId').limit(pageSize)
         );
       } else {
         // Si lastDoc no es nulo, empieza después del último documento obtenido.
         collection = this.afs.collection<NormalizedModule>(
           'thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados',
-          (ref) => ref.orderBy('image_name').startAfter(lastDoc).limit(pageSize)
+          (ref) => ref.orderBy('agrupacionId').startAfter(lastDoc).limit(pageSize)
         );
       }
 
