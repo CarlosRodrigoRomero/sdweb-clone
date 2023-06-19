@@ -117,7 +117,7 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
           selectedModules = modulos;
         }
 
-        this.structuresService.loadedRawModules = selectedModules;
+        this.structuresService.allRawModules = selectedModules;
 
         if (selectedModules.length > 0) {
           // calculamos las medias y desviaciones
@@ -136,7 +136,7 @@ export class LoadElemsComponent implements OnInit, OnDestroy {
     this.structuresService
       .getModuleGroups()
       .pipe(take(1))
-      .subscribe(async (modGroups) => {
+      .subscribe((modGroups) => {
         console.log('Todas las ' + modGroups.length + ' agrupaciones cargadas');
 
         let selectedModGroups: ModuleGroup[] = [];
