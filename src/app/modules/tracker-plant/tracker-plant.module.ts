@@ -6,7 +6,6 @@ import { SharedModule } from '@shared/shared.module';
 import { FiltersModule } from '@modules/filters/filters.module';
 import { StatsPlantModule } from '@modules/stats-plant/stats-plant.module';
 import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module';
-import { AnomaliesModule } from '@modules/anomalies/anomalies.module';
 
 import { SeguidorListContainer } from './containers/seguidor-list-container/seguidor-list-container.component';
 
@@ -59,7 +58,6 @@ import { DynamicSeguidorListDirective } from './directives/dynamic-seguidor-list
     StatsPlantModule,
     SharedPlantsModule,
     SharedModule,
-    AnomaliesModule,
   ],
 })
 export class TrackerPlantModule {}

@@ -50,7 +50,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
     this.tipoPlanta = this.planta.tipo;
 
     // si cargamos vista informe directamente, nos subscribimos al informe seleccionado
-    if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
+    if (this.router.url.includes('fixed') || this.router.url.includes('tracker') || this.router.url.includes('rooftop')) {
       this.subscription.add(
         this.reportControlService.selectedInformeId$
           .pipe(
@@ -93,7 +93,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
 
     this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationStart) {
-        if (event.url.includes('fixed') || event.url.includes('tracker')) {
+        if (event.url.includes('fixed') || event.url.includes('tracker') || event.url.includes('rooftop')) {
           // si navegamos a vista informe nos suscribimos al informe seleccionado
           this.subscription.add(
             this.reportControlService.selectedInformeId$.subscribe((informeId) => {

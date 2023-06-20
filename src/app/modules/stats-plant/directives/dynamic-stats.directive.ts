@@ -4,5 +4,5 @@ import { Directive, ViewContainerRef } from '@angular/core';
   selector: '[appDynamicStats]',
 })
 export class DynamicStatsDirective {
-  constructor(public viewContainerRef: ViewContainerRef) {}
+  constructor(public viewContainerRef: ViewContainerRef) {console.log("HOLA")}
 }

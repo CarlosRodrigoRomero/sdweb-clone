@@ -288,7 +288,7 @@ export class ReportControlService {
                     switchMap((informe) => {
                       this.informes = [informe];
 
-                      if (this.router.url.includes('fixed')) {
+                      if (this.router.url.includes('fixed') || this.router.url.includes('rooftop')) {
                         this.plantaFija = true;
 
                         return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);

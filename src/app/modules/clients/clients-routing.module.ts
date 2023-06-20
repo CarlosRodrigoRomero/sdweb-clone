@@ -31,6 +31,11 @@ const routes: Routes = [
         loadChildren: () => import('@modules/tracker-plant/tracker-plant.module').then((m) => m.TrackerPlantModule),
         canActivate: [AuthGuard],
       },
+      {
+        path: 'rooftop',
+        loadChildren: () => import('@modules/rooftop-plant/rooftop-plant.module').then((m) => m.RooftopPlantModule),
+        canActivate: [AuthGuard],
+      },
       { path: '', redirectTo: 'plants', pathMatch: 'full' },
     ],
   },
