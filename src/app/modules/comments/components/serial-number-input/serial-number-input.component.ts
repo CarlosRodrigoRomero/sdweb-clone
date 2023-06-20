@@ -35,7 +35,7 @@ export class SerialNumberInputComponent implements OnInit {
       this.editInput = false;
 
       if (this.anomaliaSelected !== undefined) {
-        if (this.anomaliaSelected.hasOwnProperty('numeroSerie')) {
+        if (this.anomaliaSelected.hasOwnProperty('numeroSerie') && this.anomaliaSelected.numeroSerie !== '') {
           this.form.patchValue({ numeroSerie: this.anomaliaSelected.numeroSerie });
         } else {
           this.form.patchValue({ numeroSerie: null });
@@ -76,7 +76,7 @@ export class SerialNumberInputComponent implements OnInit {
 
   private buildForm() {
     this.form = this.formBuilder.group({
-      numeroSerie: [, Validators.required],
+      numeroSerie: [],
     });
   }
 }

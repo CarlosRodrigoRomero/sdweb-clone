@@ -1,13 +1,13 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule, PLATFORM_ID } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
-import { AngularFirestoreModule, SETTINGS } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreModule, SETTINGS } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 
 import { HotkeyModule } from 'angular2-hotkeys';
@@ -82,7 +82,31 @@ export function createTranslateLoader(http: HttpClient) {
       },
     }),
   ],
-  providers: [{ provide: SETTINGS, useValue: {} }, AuthService, WINDOW_PROVIDERS],
+  providers: [
+    { provide: SETTINGS, useValue: {} },
+    AuthService,
+    WINDOW_PROVIDERS,
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: (platformId: Object, db: AngularFirestore) => {
+    //     return () => {
+    //       if (isPlatformBrowser(platformId)) {
+    //         // Aplicamos solo a mobile
+    //         if (window.innerWidth < 600) {
+    //           return db.firestore
+    //             .enablePersistence()
+    //             .catch((err) => console.error('Could not enable persistence', err));
+    //         }
+    //       }
+    //       // Si no estamos en un navegador o si la pantalla es más grande,
+    //       // simplemente resolvemos la promesa inmediatamente.
+    //       return Promise.resolve();
+    //     };
+    //   },
+    //   deps: [PLATFORM_ID, AngularFirestore],
+    //   multi: true,
+    // },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
