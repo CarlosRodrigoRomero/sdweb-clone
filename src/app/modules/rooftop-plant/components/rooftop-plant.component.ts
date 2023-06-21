@@ -6,7 +6,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { ResetServices } from '@data/services/reset-services.service';
 
 @Component({
-  selector: 'app-fixed-plant',
+  selector: 'app-rooftop-plant',
   templateUrl: './rooftop-plant.component.html',
   styleUrls: ['./rooftop-plant.component.css'],
 })

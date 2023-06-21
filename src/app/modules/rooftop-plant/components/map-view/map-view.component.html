@@ -1,5 +1,11 @@
+
+<div class="map-view">
+  <div class="panel-anomalias" #sidenavLeft>
+    <app-anomalia-list-container></app-anomalia-list-container>
+  </div>
+
 <!-- <app-loading *ngIf="!mapLoaded"></app-loading> -->
-<mat-sidenav-container class="stats-container" [hasBackdrop]="true" (backdropClick)="sidenavStats.toggle()">
+  <mat-sidenav-container class="stats-container" [hasBackdrop]="true" (backdropClick)="sidenavStats.toggle()">
     <!-- SIDENAV STATS -->
     <mat-sidenav #sidenavStats class="stats-sidenav" position="end">
       <!-- cargamos el modulo Stats -->
@@ -10,7 +16,7 @@
       <mat-sidenav-container class="main-container" [hasBackdrop]="false">
         
         <!-- SIDENAV LISTA ANOMALIAS -->
-        <mat-sidenav
+        <!-- <mat-sidenav
           #sidenavLeft
           opened
           mode="side"
@@ -18,15 +24,9 @@
           class="left-sidenav"
           [fixedTopGap]="80"
           position="start"
-        >
-          <!-- <div class="titulo">
-            <h4>{{ 'Listado de anomalías' | translate }}</h4>
-          </div> -->
-  
-          <!-- <ng-template appDynamicAnomaliaList></ng-template> -->
-  
+        > 
           <app-anomalia-list-container></app-anomalia-list-container>
-        </mat-sidenav>
+        </mat-sidenav> -->
         
         <!-- SIDENAV FILTROS -->
         <mat-sidenav
@@ -144,4 +144,4 @@
   <app-download-progress-bar class="progress-bar" *ngIf="generatingDownload"></app-download-progress-bar>
   
   <div class="dark-trasp-background" *ngIf="generatingDownload"></div>
-  
+</div>

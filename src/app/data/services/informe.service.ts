@@ -124,6 +124,8 @@ export class InformeService {
   }
 
   getInformesDePlanta(plantaId: string): Observable<InformeInterface[]> {
+    // Creamos parche para la prueba de Cubiertas (que tenga datos de la cubierta de Valladolid)
+    if (plantaId == 'SbOqGOnXshuECaRV0I6C') {plantaId = 'KVPR5NHugpbRgS1wicO6';}
     const query$ = this.afs.collection<InformeInterface>('informes', (ref) => ref.where('plantaId', '==', plantaId));
     return query$.snapshotChanges().pipe(
       map((actions) =>

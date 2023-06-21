@@ -48,7 +48,7 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
-
+    
     this.subscriptions.add(
       this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSeleccionada = view))
     );
@@ -59,10 +59,10 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
           .pipe(
             switchMap((informeId) => {
               this.selectedInformeId = informeId;
-
+              console.log(this.allData);
               if (this.selectedInformeId !== undefined) {
                 this.dataInforme = this.allData.filter((data) => data.informeId === this.selectedInformeId);
-
+                
                 this.dataSource = new MatTableDataSource(this.dataInforme);
 
                 this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;

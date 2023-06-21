@@ -87,7 +87,9 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   private getTipoInforme(tipo: string): string {
     if (tipo === 'seguidores') {
       return 'tracker';
-    } else {
+    } else if (tipo === 'cubierta'){
+      return 'rooftop';
+    }else {
       return 'fixed';
     }
   }
