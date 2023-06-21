@@ -68,6 +68,11 @@ export class CommentsComponent implements OnInit, OnDestroy {
                   numComs = null;
                 }
 
+                let estado = 'Pendiente';
+                if (anom.hasOwnProperty('status') && anom.status !== '') {
+                  estado = anom.status;
+                }
+
                 this.anomsData.push({
                   id: anom.id,
                   numAnom: anom.numAnom,
@@ -82,6 +87,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
                   // horaUltCom,
                   anomalia: anom,
                   fecha: fechaUltCom,
+                  estado,
                 });
               }
             });

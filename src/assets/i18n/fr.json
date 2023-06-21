@@ -312,5 +312,9 @@
   "Fabricante": "Fabricant",
   "MAE por fabricante": "MEA par fabricant",
   "1 eje": "axe simple",
-  "Este módulo tiene suciedad": "Ce module est sale"
+  "Este módulo tiene suciedad": "Ce module est sale",
+  "Estado": "État",
+  "Pendiente": "Pente",
+  "Revisada": "Révisée",
+  "Reparada": "Réparée"
 }

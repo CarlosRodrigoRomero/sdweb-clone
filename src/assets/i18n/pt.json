@@ -315,5 +315,9 @@
   "Fabricante": "Fabricante",
   "MAE por fabricante": "MDE por fabricante",
   "1 eje": "eixo simples",
-  "Este módulo tiene suciedad": "Este módulo está sujo"
+  "Este módulo tiene suciedad": "Este módulo está sujo",
+  "Estado": "Estado",
+  "Pendiente": "Pendente",
+  "Revisada": "Revisada",
+  "Reparada": "Reparada"
 }

@@ -315,5 +315,9 @@
   "Fabricante": "Fabricante",
   "MAE por fabricante": "MAE por fabricante",
   "1 eje": "1 eje",
-  "Este módulo tiene suciedad": "Este módulo tiene suciedad"
+  "Este módulo tiene suciedad": "Este módulo tiene suciedad",
+  "Estado": "Estado",
+  "Pendiente": "Pendiente",
+  "Revisada": "Revisada",
+  "Reparada": "Reparada"
 }

@@ -56,8 +56,17 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'Estado' | translate }}</th>
+        <td mat-cell (click)="selectElems(row)" *matCellDef="let row">
+          <div class="cell-content">
+            {{ row.estado | translate | titlecase }}
+          </div>
+        </td>
+      </ng-container>
+
       <!-- Fecha -->
-      <ng-container matColumnDef="fecha">
+      <!-- <ng-container matColumnDef="fecha">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'Último comentario' | translate }}</th>
         <td mat-cell (click)="selectElems(row)" *matCellDef="let row">
           <div *ngIf="row.fecha !== null" class="row-data">
@@ -65,17 +74,17 @@
             <span class="small-data">{{ row.fecha | date : 'dd/MM/yyyy' }}</span>
           </div>
         </td>
-      </ng-container>
+      </ng-container> -->
 
       <!-- Nº de comentarios -->
-      <ng-container matColumnDef="numComs">
+      <!-- <ng-container matColumnDef="numComs">
         <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
         <td mat-cell (click)="selectElems(row)" *matCellDef="let row">
           <div class="num-comentarios" *ngIf="row.numComs !== null">
             <span>{{ row.numComs }}</span>
           </div>
         </td>
-      </ng-container>
+      </ng-container> -->
 
       <!-- Ir al mapa -->
       <ng-container matColumnDef="map">
