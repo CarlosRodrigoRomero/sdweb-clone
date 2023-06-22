@@ -128,9 +128,7 @@ export class ReportControlService {
               // obtenemos los informes de la planta
               switchMap((informes) => {
                 this.informes = informes;
-                // Creamos parche para la prueba de Cubiertas (que tenga datos de la cubierta de Valladolid)
-                // if (this.informes.id == 'SbgRMw4yF0aXzM1QMVrH') {this.informes = 'pctr39Q7FTHNua9zsTKb';}
-                console.log(this.informes);
+
                 // si el user no es admin aplicamos el parche
                 if (!this.authService.userIsAdmin(this.user)) {
                   // parche plantas que compró Plenium a RIOS

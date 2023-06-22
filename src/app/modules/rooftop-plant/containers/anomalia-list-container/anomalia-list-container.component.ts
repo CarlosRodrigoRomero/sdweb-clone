@@ -59,7 +59,6 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
           .pipe(
             switchMap((informeId) => {
               this.selectedInformeId = informeId;
-              console.log(this.allData);
               if (this.selectedInformeId !== undefined) {
                 this.dataInforme = this.allData.filter((data) => data.informeId === this.selectedInformeId);
                 
