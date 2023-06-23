@@ -32,7 +32,7 @@ import { COLOR } from '@data/constants/color';
 @Injectable({
   providedIn: 'root',
 })
-export class AnomaliasControlService {
+export class AnomaliasControlCubiertasService {
   public map: Map;
   public selectedInformeId: string;
   private _anomaliaSelect: Anomalia = undefined;
@@ -220,13 +220,7 @@ export class AnomaliasControlService {
             type: 'anomalia',
           },
         });
-        const iconStyle = new Style({
-          image: new Icon({
-            anchor: [0.5, 0.5],
-            src: '../../../assets/icons/location-pin-grave.png',
-          }),
-        });
-        featurePoint.setStyle(iconStyle);
+        featurePoint.setStyle(this.getStyleAnomalias(false));
         source.addFeature(featurePoint);
       }
         // source.addFeature(feature);
@@ -238,6 +232,7 @@ export class AnomaliasControlService {
     // añadimos la nueva interaccion
     this.addSelectInteraction();
   }
+  
 
   private removeSelectAnomaliaInteractions() {
     if (this.map !== undefined) {
@@ -457,15 +452,45 @@ export class AnomaliasControlService {
   }
 
   private getStyleAnomalias(focus: boolean) {
-    console.log(this.anomaliaSelect);
-    const estilosView = {
-      mae: this.getStylePerdidas(focus),
-      cc: this.getStyleCelsCalientes(focus),
-      grad: this.getStyleGradienteNormMax(focus),
-      tipo: this.getStyleTipos(focus),
+    console.log("Hols");
+    return (feature) => {
+      const colorsView = {
+        mae: this.getColorMae(feature, 1),
+        cc: this.getColorCelsCalientes(feature, 1),
+        grad: this.getColorGradienteNormMax(feature, 1),
+        tipo: this.getColorTipo(feature),
+      };
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        return new Style({
+          image: new Icon({
+            src: "assets/icons/location-pin-leve.png",
+            anchor: [0.5, 0.5],
+            scale: 0.8,
+            color: focus ? 'white' : colorsView[this.toggleViewSelected],
+          }),
+        });
+      }
     };
 
-    return estilosView[this.toggleViewSelected];
+    // return estilosView[this.toggleViewSelected];
+  }
+
+  getStylePoint(focused: boolean) {
+    
+  }
+
+  private getIconGradienteNormMax(feature: Feature<any>) {
+    if (feature !== undefined) {
+      const grad = Number(feature.getProperties().properties.gradienteNormalizado);
+
+      if (grad < 10){
+        return "assets/icons/location-pin-leve.png"
+      } else if (grad >= 10 && grad < 40){
+        return "assets/icons/location-pin-medio.png"
+      } else if (grad >= 40){
+        return "assets/icons/location-pin-grave.png"
+      }
+    }
   }
 
   // ESTILOS PERDIDAS

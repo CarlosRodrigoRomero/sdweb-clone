@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 
 import { take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
@@ -17,7 +17,7 @@ import { PlantaService } from '@data/services/planta.service';
 import { MapControlService } from '../../services/map-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
-import { AnomaliasControlCubiertasService } from '@data/services/anomalias-control-cubiertas.service';
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { DirtyAnomsService } from '@data/services/dirty-anoms.service';
 
@@ -25,13 +25,17 @@ import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
 import { InformeInterface } from '@core/models/informe';
+import { I } from '@angular/cdk/keycodes';
 
 @Component({
-  selector: 'app-map',
-  templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css'],
+  selector: 'app-map-anom',
+  templateUrl: './map-anom.component.html',
+  styleUrls: ['./map-anom.component.css']
 })
-export class MapComponent implements OnInit, OnDestroy {
+export class MapAnomComponent implements OnInit {
+
+  @Input() anomalia: Anomalia;
+
   public planta: PlantaInterface;
   private informes: InformeInterface[];
   public map: Map;
@@ -65,7 +69,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private plantaService: PlantaService,
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
-    private anomaliasControlService: AnomaliasControlCubiertasService,
+    private anomaliasControlService: AnomaliasControlService,
     private reportControlService: ReportControlService,
     private dirtyAnomsService: DirtyAnomsService
   ) {}
@@ -200,7 +204,7 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     this.subscriptions.add(
-      this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
+      this.olMapService.createMap('mapAnom', layers, view, defaultControls({ attribution: false })).subscribe((map) => {
         this.map = map;
 
         if (this.map !== undefined) {
@@ -265,4 +269,5 @@ export class MapComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
   }
+
 }

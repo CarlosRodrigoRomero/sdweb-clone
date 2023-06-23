@@ -20,6 +20,7 @@ import { AnomaliaListComponent } from './components/anomalia-list/anomalia-list.
 import { MapComponent } from './components/map/map.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { RooftopPlantComponent } from './components/rooftop-plant.component';
+import { MapAnomComponent } from './components/map-anom/map-anom.component';
 
 
 
@@ -30,7 +31,8 @@ import { RooftopPlantComponent } from './components/rooftop-plant.component';
     MapComponent,
     MapViewComponent,
     RooftopPlantComponent,
-    AnomaliaListContainer
+    AnomaliaListContainer,
+    MapAnomComponent
   ],
   imports: [
     CommonModule,

@@ -4,7 +4,6 @@ import {
   EventEmitter,
   Input,
   OnChanges,
-  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -59,29 +58,25 @@ export class AnomaliaListComponent implements OnChanges {
     if (changes.dataSource && changes.dataSource.currentValue) {
       this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
-      this.rowId = this.anomaliaSelected.id;
-      this.scrollTo();
     }
+    // Si seleccionamos una anomalía debemos cambiar a la página de la tabla para mostrar la anomalía correcta.
     if (changes.anomaliaSelected && changes.anomaliaSelected.currentValue) {
       var page = this.findPage()
-      // console.log("Cambio: ", changes.anomaliaSelected);
       if (this.paginator.pageIndex != page - 1){
-        // console.log("Antes de cambiar de página: ");
         this.paginator.pageIndex = page - 1;
         this.dataSource.paginator = this.paginator;
-        // console.log("Después de cambiar de página: ");
+        // Esperamos 1.6 segundos antes de hacer scroll para que la tabla se cargue
         await new Promise(resolve => setTimeout(resolve, 1600));
-        console.log("After awaiting");
       }
+      // Una vez hayamos cambiado de página, hacemos scroll hasta la anomalía seleccionada
       this.rowId = this.anomaliaSelected.id;
-      console.log("Before Scrolling");
+      console.log(this.anomaliaSelected);
       this.scrollTo();
+      // Expandimos la anomalía seleccionada
       let row = this.findRow();
-      console.log("Before Expanding");
+      // El cambio en la snomalía seleccionada se detecta no sólo cuando seleccionamos una anomalía en el mapa, sino también
+      // si se selecciona en la lista. 
       this.expandRow(row);
-      console.log("After Expanding");
-      // console.log("This is the row", row);
-      // this.expandedRow = this.expandedRow === row ? null : row; 
     }
   }
 
@@ -94,7 +89,7 @@ export class AnomaliaListComponent implements OnChanges {
     let elem = this.rows.find((row) => row.nativeElement.id === id.toString());
     let target = elem?.nativeElement;
     let distanceToTop = target.getBoundingClientRect().top;
-    console.log(distanceToTop)
+
     if ((distanceToTop > 400) || (distanceToTop < 0)){
       target.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }  
@@ -144,7 +139,6 @@ export class AnomaliaListComponent implements OnChanges {
   }
 
   expandRow(row: any) {
-    console.log(this.expandedRow === row);
     this.expandedRow = this.expandedRow === row ? null : row;
   }
 

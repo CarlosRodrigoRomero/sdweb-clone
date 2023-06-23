@@ -1,0 +1,12 @@
+.mapAnom {
+    height: 170px;
+    width: 170px;
+    /* visibility: hidden; */
+  }
+
+::ng-deep .ol-zoom {
+    left: unset;
+    right: 10px;
+    top: unset;
+    bottom: 10px;
+  }

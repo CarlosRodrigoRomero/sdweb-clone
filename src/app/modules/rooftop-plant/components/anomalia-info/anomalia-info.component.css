@@ -66,6 +66,20 @@
   .link-descarga {
     padding: 0 4px;
   }
+
+  .anom-img-wrapper{
+    display: flex;
+    height:170px;
+    width: 100%;
+    justify-content:space-around;
+    padding:10px;
+  }
+
+  .anom-map{
+    position:absolute;
+    top:0;
+    left:0;
+  }
   
   @media (max-width: 500px) {
     .popup-desktop {
