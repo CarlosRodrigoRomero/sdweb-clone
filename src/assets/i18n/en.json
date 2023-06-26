@@ -237,7 +237,7 @@
   "Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles.": "Inspect modules, inverter operating status, wiring, connectors, and fuses.",
   "Revisar módulo en campo para determinar causa.": "Examine field module to determine cause.",
   "Revisar módulo y diodos bypass para un correcto funcionamiento con polaridad inversa.": "Check module and bypass diodes for proper reverse polarity operation.",
-  "Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.": "Note that voltage increases due to insulation loss.",
+  "En algunos casos, si la causa del cortocircuito es algo simple, como un problema con el cableado, podría ser posible repararlo. Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.": "In some cases, if the cause of the short circuit is something simple, such as a problem with the wiring, it could be possible to repair it. Keep in mind that the voltage increases due to the loss of insulation.",
   "Reclamar a garantía en su caso.": "Claim warranty if applicable.",
   "Cambiar el diodo bypass en caso de que sea este el motivo.": "Change the bypass diode if it is the cause.",
   "Se recomienda la limpieza del módulo si se estima que no va a llover pronto, con el fin de evitar daños al módulo.": "It is recommended to clean the module if rain is not expected soon, in order to prevent damage to the module.",
