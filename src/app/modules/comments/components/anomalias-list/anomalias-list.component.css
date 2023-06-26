@@ -38,9 +38,9 @@
   overflow-y: auto;
 }
 
-.location-col {
+/* .location-col {
   max-width: 100px;
-}
+} */
 
 .loc-header {
   display: flex;

@@ -22,6 +22,7 @@ import { SerialNumberInputComponent } from './components/serial-number-input/ser
 import { ModuleInputDialogComponent } from './components/module-input-dialog/module-input-dialog.component';
 import { CommentInputComponent } from './components/comment-input/comment-input.component';
 import { AnomStatusSelectComponent } from './components/anom-status-select/anom-status-select.component';
+import { AnomaliaInfoEditableComponent } from './components/anomalia-info-editable/anomalia-info-editable.component';
 
 @NgModule({
   declarations: [
@@ -43,8 +44,9 @@ import { AnomStatusSelectComponent } from './components/anom-status-select/anom-
     ModuleInputDialogComponent,
     CommentInputComponent,
     AnomStatusSelectComponent,
+    AnomaliaInfoEditableComponent,
   ],
   imports: [CommonModule, CommentsRoutingModule, SharedModule],
-  exports: [CommentsAreaComponent],
+  exports: [CommentsAreaComponent, AnomaliaInfoEditableComponent],
 })
 export class CommentsModule {}

@@ -9,23 +9,7 @@
       <span class="subtitulo">{{ anomaliaInfo.localizacion }}</span>
     </div>
 
-    <app-anom-status-select [anomaliaSelected]="anomaliaSelected"></app-anom-status-select>
-
-    <app-serial-number-input [anomaliaSelected]="anomaliaSelected"></app-serial-number-input>
-
-    <app-module-input [anomaliaSelected]="anomaliaSelected"></app-module-input>
-
-    <app-comment-input
-      [anomaliaSelected]="anomaliaSelected"
-      [label]="'Comentario'"
-      [type]="'anomalia'"
-    ></app-comment-input>
-    <app-comment-input [anomaliaSelected]="anomaliaSelected" [label]="'Curva IV'" [type]="'iv'"></app-comment-input>
-    <app-comment-input
-      [anomaliaSelected]="anomaliaSelected"
-      [label]="'Actuaciones'"
-      [type]="'actuaciones'"
-    ></app-comment-input>
+    <app-anomalia-info-editable [anomaliaSelected]="anomaliaSelected"></app-anomalia-info-editable>
 
     <div *ngIf="plantaFija" id="pos-map" class="elem-info">
       <span class="titulo">{{ 'Ir al mapa' | translate }}</span>
