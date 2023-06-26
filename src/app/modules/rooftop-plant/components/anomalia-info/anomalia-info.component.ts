@@ -321,6 +321,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
         camaraNombre,
       },
     };
+    console.log("Info adicional", this.infoAdicional);
   }
 
   unixToDate(unix: number): string[] {

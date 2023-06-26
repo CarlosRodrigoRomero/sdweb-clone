@@ -140,6 +140,7 @@ export class AnomaliaListComponent implements OnChanges {
 
   expandRow(row: any) {
     this.expandedRow = this.expandedRow === row ? null : row;
+    console.log("Parece que se ha expandido");
   }
 
 }

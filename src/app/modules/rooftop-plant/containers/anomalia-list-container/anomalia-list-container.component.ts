@@ -8,7 +8,7 @@ import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { FilterService } from '@data/services/filter.service';
-import { AnomaliasControlService } from '@data/services/anomalias-control.service';
+import { AnomaliasControlCubiertasService } from '@data/services/anomalias-control-cubiertas.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ViewReportService } from '@data/services/view-report.service';
@@ -40,7 +40,7 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
 
   constructor(
     public filterService: FilterService,
-    private anomaliasControlService: AnomaliasControlService,
+    private anomaliasControlService: AnomaliasControlCubiertasService,
     private reportControlService: ReportControlService,
     private olMapService: OlMapService,
     private viewReportService: ViewReportService

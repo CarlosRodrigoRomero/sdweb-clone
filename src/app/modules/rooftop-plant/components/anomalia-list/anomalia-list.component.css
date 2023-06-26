@@ -146,6 +146,14 @@
   tr.example-detail-row {
     height: 0;
   }
+
+  app-anomalia-info{
+    width:100%;
+  }
+
+  td.mat-cell:last-of-type{
+    padding-right: 0;
+  }
   
 
   

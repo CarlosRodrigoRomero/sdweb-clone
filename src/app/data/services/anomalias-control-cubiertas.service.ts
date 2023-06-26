@@ -108,7 +108,7 @@ export class AnomaliasControlCubiertasService {
 
     const perdidasLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStylePerdidas(false),
+      style: this.getStyleAnomalias(false, 'mae'),
       visible: false,
     });
     perdidasLayer.setProperties({
@@ -120,7 +120,7 @@ export class AnomaliasControlCubiertasService {
 
     const celsCalientesLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleCelsCalientes(false),
+      style: this.getStyleAnomalias(false, 'cc'),
       visible: false,
     });
     celsCalientesLayer.setProperties({
@@ -132,7 +132,7 @@ export class AnomaliasControlCubiertasService {
 
     const gradNormMaxLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleGradienteNormMax(false),
+      style: this.getStyleAnomalias(false, 'grad'),
       visible: false,
     });
     gradNormMaxLayer.setProperties({
@@ -145,7 +145,7 @@ export class AnomaliasControlCubiertasService {
     const tiposLayer = new VectorImageLayer({
       // declutter: true,
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleTipos(false),
+      style: this.getStyleAnomalias(false, 'tipo'),
       visible: false,
     });
     tiposLayer.setProperties({
@@ -195,7 +195,7 @@ export class AnomaliasControlCubiertasService {
       anomaliasInforme.forEach((anom) => {
         if (anom.featureType === 'Polygon') {
         var feature = new Feature({
-          geometry: new Polygon([anom.featureCoords]),
+          geometry: new Point(anom.featureCoords[1]),
           properties: {
             view: l.getProperties().view,
             anomaliaId: anom.id,
@@ -358,7 +358,6 @@ export class AnomaliasControlCubiertasService {
             const anomalia = this.listaAnomalias.find((anom) => anom.id === anomaliaId);
 
             this.anomaliaSelect = anomalia;
-
             // aplicamos estilos
             this.setExternalStyle(anomaliaId, true);
 
@@ -451,8 +450,8 @@ export class AnomaliasControlCubiertasService {
     this.anomaliaService.addAnomalia(anomalia);
   }
 
-  private getStyleAnomalias(focus: boolean) {
-    console.log("Hols");
+  private getStyleAnomalias(focus: boolean, selection?: string) {
+    selection = selection ? selection : this.toggleViewSelected;
     return (feature) => {
       const colorsView = {
         mae: this.getColorMae(feature, 1),
@@ -463,47 +462,10 @@ export class AnomaliasControlCubiertasService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         return new Style({
           image: new Icon({
-            src: "assets/icons/location-pin-leve.png",
+            src: "assets/icons/location-pin-hovered.png",
             anchor: [0.5, 0.5],
             scale: 0.8,
             color: focus ? 'white' : colorsView[this.toggleViewSelected],
-          }),
-        });
-      }
-    };
-
-    // return estilosView[this.toggleViewSelected];
-  }
-
-  getStylePoint(focused: boolean) {
-    
-  }
-
-  private getIconGradienteNormMax(feature: Feature<any>) {
-    if (feature !== undefined) {
-      const grad = Number(feature.getProperties().properties.gradienteNormalizado);
-
-      if (grad < 10){
-        return "assets/icons/location-pin-leve.png"
-      } else if (grad >= 10 && grad < 40){
-        return "assets/icons/location-pin-medio.png"
-      } else if (grad >= 40){
-        return "assets/icons/location-pin-grave.png"
-      }
-    }
-  }
-
-  // ESTILOS PERDIDAS
-  getStylePerdidas(focused: boolean) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorMae(feature, 1),
-            width: 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
           }),
         });
       }
@@ -516,44 +478,10 @@ export class AnomaliasControlCubiertasService {
     return Colors.getColor(perdidas, [0.3, 0.5], opacity);
   }
 
-  // ESTILOS CELS CALIENTES
-  private getStyleCelsCalientes(focused) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorCelsCalientes(feature, 1),
-            width: 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
-          }),
-        });
-      }
-    };
-  }
-
   private getColorCelsCalientes(feature: Feature<any>, opacity: number): string {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
     return Colors.getColor(gradNormMax, [10, 40], opacity);
-  }
-
-  // ESTILOS GRADIENTE NORMALIZADO MAX
-  private getStyleGradienteNormMax(focused) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorGradienteNormMax(feature, 1),
-            width: 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
-          }),
-        });
-      }
-    };
   }
 
   private getColorGradienteNormMax(feature: Feature<any>, opacity: number) {
@@ -562,27 +490,9 @@ export class AnomaliasControlCubiertasService {
     return Colors.getColor(gradNormMax, [10, 40], opacity);
   }
 
-  // ESTILO POR TIPOS
-  private getStyleTipos(focused: boolean) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorTipo(feature),
-            width: 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(0, 0, 255, 0)',
-          }),
-        });
-      }
-    };
-  }
-
   private getColorTipo(feature: Feature<any>) {
     if (feature !== undefined) {
       const tipo = Number(feature.getProperties().properties.tipo);
-
       return COLOR.colores_tipos[tipo];
     }
   }
