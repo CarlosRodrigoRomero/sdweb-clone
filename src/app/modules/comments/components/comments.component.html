@@ -1,8 +1,12 @@
 <app-loading *ngIf="!anomaliasLoaded"></app-loading>
 <div *ngIf="anomaliasLoaded">
-  <div *ngIf="!networkStatus" class="alert-internet" role="alert">
-    <span>{{ 'SIN INTERNET' | translate }}</span>
-  </div>
+  <mat-card *ngIf="!networkStatus" class="alert-internet" role="alert">
+    <span class="alert-internet-large">{{ 'SIN INTERNET' | translate }}</span>
+    <span class="alert-internet-small">{{
+      'Todo lo hecho hasta ahora está guardado. Si quieres conservar lo que hagas a partir de ahora, no cierres la pantalla antes de que desaparezca este mensaje'
+        | translate
+    }}</span>
+  </mat-card>
 
   <div class="content">
     <mat-sidenav-container class="main-container" [hasBackdrop]="false">

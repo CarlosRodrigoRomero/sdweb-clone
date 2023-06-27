@@ -78,6 +78,7 @@ export interface PcInterface {
   numAnom?: number;
   autoEstId?: string;
   comentarios?: Comentario[];
+  status?: string;
 }
 
 export class Pc implements PcInterface, ElementoPlantaInterface {
@@ -152,6 +153,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   numAnom?: number;
   autoEstId?: string;
   comentarios?: Comentario[];
+  status?: string;
 
   constructor(pc: PcInterface) {
     Object.assign(this, pc);

@@ -1,0 +1,9 @@
+.elem-info {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.elem-info-label {
+  font-size: 12px;
+}

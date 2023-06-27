@@ -1,0 +1,13 @@
+<div class="elem-info">
+  <span class="elem-info-label">{{ 'Estado' | translate }}</span>
+  <form [formGroup]="form" class="example-form">
+    <mat-form-field>
+      <mat-label>Estado</mat-label>
+      <mat-select formControlName="status" (selectionChange)="changeStatus()">
+        <mat-option *ngFor="let st of status" [value]="st">
+          {{ st | titlecase }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</div>

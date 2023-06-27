@@ -21,6 +21,7 @@ import { CritCriticidad } from '@core/models/critCriticidad';
 
 import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
+import { Comentario } from '@core/models/comentario';
 
 @Injectable({
   providedIn: 'root',
@@ -115,9 +116,9 @@ export class AnomaliaInfoService {
         if (modulo.hasOwnProperty('marca')) {
           labelModulo = labelModulo.concat(modulo.marca.toString()).concat(' ');
         }
-        if (modulo.hasOwnProperty('modelo')) {
-          labelModulo = labelModulo.concat(modulo.modelo.toString()).concat(' ');
-        }
+        // if (modulo.hasOwnProperty('modelo')) {
+        //   labelModulo = labelModulo.concat(modulo.modelo.toString()).concat(' ');
+        // }
         if (modulo.hasOwnProperty('potencia')) {
           labelModulo = labelModulo.concat('(').concat(modulo.potencia.toString()).concat(' W)');
         }
@@ -534,23 +535,16 @@ export class AnomaliaInfoService {
     return numeroSerie;
   }
 
-  getComentariosString(anomalia: Anomalia): string {
-    let stringComentarios = '';
+  getComentariosString(anomalia: Anomalia): string[] {
     if (anomalia.hasOwnProperty('comentarios') && anomalia.comentarios.length > 0) {
-      stringComentarios = anomalia.comentarios
-        .map(
-          (com) =>
-            'Comentario: ' +
-            com.texto +
-            ' - Fecha: ' +
-            formatDate(com.datetime, 'dd/MM/yyyy HH:mm', this.locale) +
-            ' - Tipo: ' +
-            com.tipo
-        )
-        .join(' ; ');
+      const comentario: Comentario = anomalia.comentarios.find((c) => c.tipo === 'anomalia');
+      const curvaIV: Comentario = anomalia.comentarios.find((c) => c.tipo === 'iv');
+      const actuaciones: Comentario = anomalia.comentarios.find((c) => c.tipo === 'actuaciones');
+
+      return [comentario ? comentario.texto : '', curvaIV ? curvaIV.texto : '', actuaciones ? actuaciones.texto : ''];
     }
 
-    return stringComentarios;
+    return ['', '', ''];
   }
 
   resetService() {
