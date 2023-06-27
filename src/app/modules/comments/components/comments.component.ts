@@ -1,5 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
-
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Subscription, fromEvent, merge, of } from 'rxjs';
@@ -30,6 +30,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
   plantaFija: boolean;
   networkStatus: boolean;
   networkStatus$: Subscription = Subscription.EMPTY;
+  offlineCount = 0;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -37,7 +38,8 @@ export class CommentsComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private comentariosControlService: ComentariosControlService,
     private anomaliaInfoService: AnomaliaInfoService,
-    private resetServices: ResetServices
+    private resetServices: ResetServices,
+    private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +70,11 @@ export class CommentsComponent implements OnInit, OnDestroy {
                   numComs = null;
                 }
 
+                let estado = 'Pendiente';
+                if (anom.hasOwnProperty('status') && anom.status !== '') {
+                  estado = anom.status;
+                }
+
                 this.anomsData.push({
                   id: anom.id,
                   numAnom: anom.numAnom,
@@ -82,6 +89,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
                   // horaUltCom,
                   anomalia: anom,
                   fecha: fechaUltCom,
+                  estado,
                 });
               }
             });
@@ -123,6 +131,14 @@ export class CommentsComponent implements OnInit, OnDestroy {
       .pipe(map(() => navigator.onLine))
       .subscribe((status) => {
         this.networkStatus = status;
+
+        if (this.networkStatus && this.offlineCount > 0) {
+          this.openSnackBar();
+        }
+
+        if (!status) {
+          this.offlineCount++;
+        }
       });
   }
 
@@ -150,6 +166,13 @@ export class CommentsComponent implements OnInit, OnDestroy {
 
     // Cancela el evento para evitar la navegación hacia atrás
     event.preventDefault();
+  }
+
+  openSnackBar() {
+    this._snackBar.open('CAMBIOS GUARDADOS', '', {
+      verticalPosition: 'top',
+      duration: 5000,
+    });
   }
 
   ngOnDestroy(): void {
