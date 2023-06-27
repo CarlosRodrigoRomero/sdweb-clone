@@ -52,7 +52,9 @@ interface Fila {
   camaraSN?: number;
   modulo?: string;
   numeroSerie?: string;
-  comentarios?: string;
+  comentario?: string;
+  curvaIV?: string;
+  actuaciones?: string;
 }
 
 @Component({
@@ -70,9 +72,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private informeSelected: InformeInterface;
   private planta: PlantaInterface;
   private allElems: FilterableElement[];
-  private _linksCargados = 0;
-  private linksCargados$ = new BehaviorSubject<number>(this._linksCargados);
-  private limiteImgs = 2000;
   private translation: Translation;
   private language: string;
   private headersColors = ['FFE5E7E9', 'FFF5B7B1', 'FFD4EFDF', 'FFABD5FF', 'FFE5E7E9'];
@@ -85,9 +84,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     private excelService: ExcelService,
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
-    private datePipe: DatePipe,
     private decimalPipe: DecimalPipe,
-    private storage: AngularFireStorage,
     private anomaliaInfoService: AnomaliaInfoService,
     private downloadReportService: DownloadReportService,
     private anomaliaService: AnomaliaService,
@@ -153,33 +150,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     this.anomaliasInforme.forEach((anom, index) => this.getRowData(anom, index));
 
     this.downloadExcel();
-
-    // incluimos urls de imagenes solo en seguidores y hasta cierto limite
-    // if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
-    //   // con este contador impedimos que se descarge más de una vez debido a la suscripcion
-    //   let downloads = 0;
-
-    //   this.subscriptions.add(
-    //     this.linksCargados$.subscribe((linksCargados) => {
-    //       // indicamos el progreso en la barra de progreso
-    //       this.downloadReportService.progressBarValue = Math.round(
-    //         (linksCargados / this.anomaliasInforme.length) * 100
-    //       );
-
-    //       // cuando esten todas las filas cargadas descargamos el excel
-    //       if (linksCargados / 2 === this.anomaliasInforme.length && downloads === 0) {
-    //         this.downloadExcel();
-
-    //         // reseteamos el contador de filas
-    //         this.linksCargados = 0;
-
-    //         downloads++;
-    //       }
-    //     })
-    //   );
-    // } else {
-    //   this.downloadExcel();
-    // }
   }
 
   downloadExcel(): void {
@@ -204,11 +174,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
   private getColumnas() {
     this.columnas[0].push(this.translation.t('# Anomalía'));
-
-    // if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
-    //   this.columnas[0].push(this.translation.t('Imagen térmica'));
-    //   this.columnas[0].push(this.translation.t('Imagen visual'));
-    // }
 
     if (!this.reportControlService.plantaFija) {
       this.columnas[1].push(this.translation.t('Temperatura referencia') + ' (ºC)');
@@ -265,24 +230,16 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     this.columnas[4].push(this.translation.t('Módulo'));
     this.columnas[4].push(this.translation.t('Nº de serie'));
-    this.columnas[4].push(this.translation.t('O&M'));
+    this.columnas[4].push(this.translation.t('Comentarios'));
+    this.columnas[4].push(this.translation.t('Curvas IV'));
+    this.columnas[4].push(this.translation.t('Actuaciones'));
   }
 
   private getRowData(anomalia: Anomalia, index: number) {
     const row: Fila = {};
 
-    // let localId;
-    // if (anomalia.hasOwnProperty('localId')) {
-    //   localId = anomalia.localId;
-    // } else {
-    //   localId = this.anomaliaService.getLocalId(anomalia, this.planta);
-    // }
-    // row.localId = localId;
     row.numAnom = anomalia.numAnom;
-    // if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
-    //   row.thermalImage = null;
-    //   row.visualImage = null;
-    // }
+
     if (!this.reportControlService.plantaFija) {
       row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
     }
@@ -359,55 +316,9 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     row.numeroSerie = this.anomaliaInfoService.getNumeroSerie(anomalia);
 
-    row.comentarios = this.anomaliaInfoService.getComentariosString(anomalia);
+    [row.comentario, row.curvaIV, row.actuaciones] = this.anomaliaInfoService.getComentariosString(anomalia);
 
     this.json[index] = row;
-
-    // if (!this.reportControlService.plantaFija && this.anomaliasInforme.length < this.limiteImgs) {
-    //   this.storage
-    //     .ref(`informes/${this.informeSelected.id}/jpg/${(anomalia as PcInterface).archivoPublico}`)
-    //     .getDownloadURL()
-    //     .toPromise()
-    //     .then((urlThermal) => {
-    //       row.thermalImage = urlThermal;
-
-    //       if (row.visualImage !== undefined) {
-    //         this.json[index] = row;
-    //       }
-
-    //       this.linksCargados++;
-    //     })
-    //     .catch((err) => {
-    //       row.thermalImage = null;
-
-    //       console.log(err);
-
-    //       this.linksCargados++;
-    //     });
-
-    //   this.storage
-    //     .ref(`informes/${this.informeSelected.id}/jpgVisual/${(anomalia as PcInterface).archivoPublico}`)
-    //     .getDownloadURL()
-    //     .toPromise()
-    //     .then((urlVisual) => {
-    //       row.visualImage = urlVisual;
-
-    //       if (row.thermalImage !== undefined) {
-    //         this.json[index] = row;
-    //       }
-
-    //       this.linksCargados++;
-    //     })
-    //     .catch((err) => {
-    //       row.visualImage = null;
-
-    //       console.log(err);
-
-    //       this.linksCargados++;
-    //     });
-    // } else {
-    //   this.json[index] = row;
-    // }
   }
 
   clearData() {
@@ -418,15 +329,4 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
-
-  //////////////////////////////////////////////////////////////////////////////////////////////
-
-  // get linksCargados(): number {
-  //   return this._linksCargados;
-  // }
-
-  // set linksCargados(value: number) {
-  //   this._linksCargados = value;
-  //   this.linksCargados$.next(value);
-  // }
 }

@@ -1,6 +1,6 @@
 export interface Comentario {
   id?: string;
-  tipo: string;
+  tipo: string; // 'anomalia', 'iv', 'actuaciones'
   texto: string;
   datetime: number;
   anomaliaId: string;
