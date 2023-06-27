@@ -1,9 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
+import { Subscription } from 'rxjs';
+
 import { FilterService } from '@data/services/filter.service';
 import { FilterControlService } from '@data/services/filter-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
-import { Subscription } from 'rxjs';
+import { ReportControlService } from '@data/services/report-control.service';
+
+import { ModuloInterface } from '@core/models/modulo';
 
 @Component({
   selector: 'app-filters-panel-container',
@@ -12,6 +16,8 @@ import { Subscription } from 'rxjs';
 })
 export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
   filtrosActivos = false;
+  showFiltroModelo = false;
+  showFiltroZona = false;
   hasCriticidad = false;
 
   private subscriptions: Subscription = new Subscription();
@@ -19,11 +25,12 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
   constructor(
     private filterService: FilterService,
     private filterControlService: FilterControlService,
-    private anomaliaService: AnomaliaService
+    private anomaliaService: AnomaliaService,
+    private reportControlService: ReportControlService
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.add(
+      this.subscriptions.add(
       this.filterService.filters$.subscribe((filters) => {
         if (filters.length > 0) {
           this.filtrosActivos = true;
@@ -32,6 +39,23 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    // Comprobamos si hay anomalías en más de un modelo de módulo, y si sólo hay uno no mostramos el filtro
+    const anomalias = this.anomaliaService.getRealAnomalias(this.reportControlService.allAnomalias);
+    const modelos = [...new Set(anomalias.map((anomalia) => this.setModuleLabel(anomalia.modulo)))];
+    if (modelos.length > 1) {
+      this.showFiltroModelo = true;
+    } else {
+      this.showFiltroModelo = false;
+    }
+    // Comprobamos si las anomalías tienen zonas asociadas; si no existen zonas, no mostramos el filtro
+    const zonas = [...new Set(anomalias.map((anomalia) => anomalia.globalCoords[0]))];
+    this.showFiltroZona = zonas.length > 1;
+    // if (zonas.length > 1) {
+    //   this.showFiltroZona = true;
+    // } else {
+    //   this.showFiltroZona = false;
+    // }
 
     this.subscriptions.add(this.anomaliaService.hasCriticidad$.subscribe((value) => (this.hasCriticidad = value)));
   }
@@ -46,5 +70,15 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+  }
+
+  setModuleLabel(module: ModuloInterface): string{
+    let label: string;
+    if (module.marca) {
+      label = `${module.marca} (${module.potencia}W)`;
+    } else {
+      label = `${module.potencia}W`;
+    }
+    return label
   }
 }

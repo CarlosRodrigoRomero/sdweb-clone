@@ -1,23 +1,17 @@
 .content {
-  position: fixed;
+  position: absolute;
+}
+
+app-seguidor-info {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 9;
 }
 
 .anomalia-content {
-  width: 100%;
   height: calc(100vh - 86px);
-  display: grid;
-  grid-template-rows: min-content auto;
-  overflow: hidden;
-}
-
-.top-row {
-  display: flex;
-  width: 100%;
-  gap: 0.5rem;
-}
-
-.bottom-row {
-  overflow: auto;
+  overflow-y: auto;
 }
 
 .back-btn {

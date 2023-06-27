@@ -89,7 +89,6 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
         .subscribe((anomalias) => {
           // filtramos las anomalias que ya no consideramos anomalias
           this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
-
           this.tiposElem = [];
           // obtenermos los labels de todas las anomalias
           this._getAllCategorias(this.allAnomalias);
@@ -131,7 +130,7 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
       })
     );
   }
-
+  
   onChangeFiltroTipo(event: MatCheckboxChange) {
     if (event.checked) {
       this.filtroTipo = new TipoElemFilter(

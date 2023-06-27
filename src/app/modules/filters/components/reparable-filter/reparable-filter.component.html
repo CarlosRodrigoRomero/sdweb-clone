@@ -1,0 +1,15 @@
+<div class="filtro">
+    <h5>{{ 'Anomalías reparables' | translate }}</h5>
+    <mat-button-toggle-group class="reparables-group" #group="matButtonToggleGroup" multiple="true">
+      <mat-button-toggle
+        class="reparables-toggle"
+        *ngFor="let elem of reparableElems; index as i"
+        [id]="i + 1"
+        [name]="elem.label"
+        [checked]="reparableSelected[i]"
+        (change)="onChangeReparableFilter($event)"
+        >{{ elem.label | translate }}
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  

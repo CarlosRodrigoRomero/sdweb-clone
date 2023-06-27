@@ -35,6 +35,7 @@ import { MapDivisionsService } from './map-divisions.service';
 import { MapDivisionControlService } from './map-division-control.service';
 import { MapClippingService } from './map-clipping.service';
 import { MapClippingControlService } from './map-clipping-control.service';
+import { DirtyAnomsService } from './dirty-anoms.service';
 
 @Injectable({
   providedIn: 'root',
@@ -75,7 +76,8 @@ export class ResetServices {
     private mapDivisionsService: MapDivisionsService,
     private mapDivisionControlService: MapDivisionControlService,
     private mapClippingService: MapClippingService,
-    private mapClippingControlService: MapClippingControlService
+    private mapClippingControlService: MapClippingControlService,
+    private dirtyAnomsService: DirtyAnomsService
   ) {}
 
   resetAllServices() {
@@ -114,6 +116,7 @@ export class ResetServices {
     this.mapDivisionControlService.resetService();
     this.mapClippingService.resetService();
     this.mapClippingControlService.resetService();
+    this.dirtyAnomsService.resetService();
   }
 
   resetReportsServices() {
