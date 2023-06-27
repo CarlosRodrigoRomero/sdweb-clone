@@ -86,6 +86,7 @@ export function createTranslateLoader(http: HttpClient) {
     { provide: SETTINGS, useValue: {} },
     AuthService,
     WINDOW_PROVIDERS,
+    // PERSISTENCIA DE DATOS NO FUNCIONA BIEN. SE QUEDA LA VERSIÓN DE CACHE FIJA Y NO VUELVE A ACTUALIZARSE AUNQUE HAYA CAMBIOS
     // {
     //   provide: APP_INITIALIZER,
     //   useFactory: (platformId: Object, db: AngularFirestore) => {
@@ -93,9 +94,15 @@ export function createTranslateLoader(http: HttpClient) {
     //       if (isPlatformBrowser(platformId)) {
     //         // Aplicamos solo a mobile
     //         if (window.innerWidth < 600) {
-    //           return db.firestore
-    //             .enablePersistence()
-    //             .catch((err) => console.error('Could not enable persistence', err));
+    //           return db.firestore.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+    //             if (err.code === 'failed-precondition') {
+    //               console.log('Multipe tabs open, persistence can only be enabled in one tab at a a time.');
+    //             } else if (err.code === 'unimplemented') {
+    //               console.log(
+    //                 'The current browser does not support all of the features required to enable persistence'
+    //               );
+    //             }
+    //           });
     //         }
     //       }
     //       // Si no estamos en un navegador o si la pantalla es más grande,

@@ -319,5 +319,6 @@
   "Estado": "Status",
   "Pendiente": "Pending",
   "Revisada": "Checked",
-  "Reparada": "Fixed"
+  "Reparada": "Fixed",
+  "Todo lo hecho hasta ahora está guardado. Si quieres conservar lo que hagas a partir de ahora, no cierres la pantalla antes de que desaparezca este mensaje": "Everything done so far is saved. If you want to keep what you do from now on, do not close the screen before this message disappears"
 }
