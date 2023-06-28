@@ -14,9 +14,10 @@ import { RecommendedActionsPredictionContainerComponent } from './containers/rec
 import { ChartTypesLossesReportComponent } from './components/chart-types-losses-report/chart-types-losses-report.component';
 import { ChartPredictionMaeReportComponent } from './components/chart-prediction-mae-report/chart-prediction-mae-report.component';
 import { ChartSankeyPowerReportComponent } from './components/chart-sankey-power-report/chart-sankey-power-report.component';
+import { ChartSankeyPredictionComponent } from './components/chart-sankey-prediction/chart-sankey-prediction.component';
 
 @NgModule({
-  declarations: [PredictionReportComponent, ChartSankeyReportComponent, ChartPredictionNumAnomsReportComponent, RecommendedActionsPredictionComponent, RecommendedActionsPredictionContainerComponent, ChartTypesLossesReportComponent, ChartPredictionMaeReportComponent, ChartSankeyPowerReportComponent],
+  declarations: [PredictionReportComponent, ChartSankeyReportComponent, ChartPredictionNumAnomsReportComponent, RecommendedActionsPredictionComponent, RecommendedActionsPredictionContainerComponent, ChartTypesLossesReportComponent, ChartPredictionMaeReportComponent, ChartSankeyPowerReportComponent, ChartSankeyPredictionComponent],
   imports: [CommonModule, PredictionReportRoutingModule, SharedModule, NgApexchartsModule],
 })
 export class PredictionReportModule {}
