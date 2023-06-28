@@ -89,8 +89,6 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
         .subscribe((anomalias) => {
           // filtramos las anomalias que ya no consideramos anomalias
           this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
-          console.log(this.allAnomalias);
-          console.log("Hola");
           this.tiposElem = [];
           // obtenermos los labels de todas las anomalias
           this._getAllCategorias(this.allAnomalias);

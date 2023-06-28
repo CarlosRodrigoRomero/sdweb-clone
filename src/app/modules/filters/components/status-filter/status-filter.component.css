@@ -1,37 +1,53 @@
 .filtro {
-    margin-bottom: 20px;
-  }
-  
-  h5 {
-    margin-bottom: 15px;
-    font-weight: 400;
-  }
-  
-  :host ::ng-deep {
-    .reparables-group .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
-      line-height: 36px;
-      padding: 0 10px;
-    }
-  
-    .mat-button-toggle {
-      font-size: 15px;
-      font-weight: 400;
-    }
-  
-    .mat-button-toggle-checked {
-      background-color: #d32f2f;
-      color: white !important;
-      font-weight: 500;
-    }
-  }
-  
-  .status-group {
-    left: 50%;
-    transform: translate(-50%, 0%);
-  }
-  
-  .text-label {
-    font-size: 14px;
-    font-weight: 400;
-  }
-  
+  margin-bottom: 15px;
+}
+
+h5 {
+  margin-bottom: 15px;
+  font-weight: 400;
+}
+
+.status-select {
+  width: 100%;
+}
+
+.filter-default {
+  font-weight: 200;
+  /* color: grey; */
+}
+
+.filter-selected {
+  display: inline-block;
+  width: 170px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  color: #d32f2f;
+}
+
+:host ::ng-deep .menu-status .mat-menu-content:not(:empty) {
+  min-width: 280px;
+}
+
+li {
+  list-style-type: none;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.counts-status {
+  margin-left: 10px;
+}
+
+.mat-menu-item {
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.labelWrapper{
+  width: 120px;
+  display: flex;
+  justify-content: space-between;
+}

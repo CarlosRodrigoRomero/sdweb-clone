@@ -115,7 +115,7 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
     );
   }
 
-  onChangeFiltroTipo(event: MatCheckboxChange) {
+  onChangeFiltroModelo(event: MatCheckboxChange) {
     if (event.checked) {
       this.filtroModelo = new ModeloFilter(
         event.source.id,

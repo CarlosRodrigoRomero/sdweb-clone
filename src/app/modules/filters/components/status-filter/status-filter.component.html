@@ -1,15 +1,28 @@
 <div class="filtro">
-    <h5>{{ 'status' | translate | titlecase }}</h5>
-    <mat-button-toggle-group class="status-group" #group="matButtonToggleGroup" multiple="true">
-      <mat-button-toggle
-        *ngFor="let elem of statusElems; index as i"
-        [id]="(i + 1)"
-        [name]="elem.label"
-        [checked]="statusSelected[i]"
-        (change)="onChangeStatusFilter($event)"
-      >
-        {{ elem.label }}
-      </mat-button-toggle>
-    </mat-button-toggle-group>
-  </div>
+    <h5>{{'Status' | translate}}</h5>
+    <button class="status-select" mat-stroked-button [matMenuTriggerFor]="menu">
+        <span *ngIf="defaultLabelStatus" class="filter-default">{{ defaultSelectLabel }}</span>
+        <span *ngIf="!defaultLabelStatus" class="filter-selected">{{ selectedLabels.toString() }}</span>
+        <mat-icon>keyboard_arrow_down</mat-icon>
+    </button>
+    <mat-menu class="menu-status" #menu="matMenu">
+        <div>
+          <li mat-menu-item *ngFor="let statusElem of statusElems; index as i" (click)="stopPropagation($event)">
+            <mat-checkbox
+              [checked]="statusSelected[statusElem.status]"
+              [id]="(i+1)"
+              [name]="statusElem.label"
+              [value]="i"
+              (change)="onChangeFiltroStatus($event)"
+            >
+            <div class="labelWrapper">
+                <span style="font-size: 15px"> {{ statusElem.label | translate }} </span>
+                <span style="font-weight: 700"> {{ statusElem.nAnomalias }} </span>
+            </div>
+            </mat-checkbox>
+          </li>
+        </div>
+      </mat-menu>
+</div>
+  
   

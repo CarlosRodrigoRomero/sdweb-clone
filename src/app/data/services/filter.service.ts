@@ -163,7 +163,6 @@ export class FilterService {
             .forEach((fil) => fil.applyFilter(elements).forEach((elem) => newFiltrableElements.push(elem)));
           // añadimos un array de cada tipo
           everyFilterFiltrableElements.push(newFiltrableElements);
-          
         }
       });
     }
