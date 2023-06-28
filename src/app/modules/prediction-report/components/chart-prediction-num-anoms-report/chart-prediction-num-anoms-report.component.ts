@@ -63,24 +63,26 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
   ngOnInit(): void {
     this.checkTranslate();
 
-    // const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
-    // const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
+    const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
+    const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
 
-    // const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+    const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
 
-    // const nextYearFixableLastReportAnoms = lastReportAnoms.filter((anom) =>
-    //   GLOBAL.fixableTypes.includes(anom.tipoNextYear)
-    // );
+    const nextYearFixableLastReportAnoms = lastReportAnoms.filter((anom) =>
+      GLOBAL.fixableTypes.includes(anom.tipoNextYear)
+    );
 
-    // const fixableAnomsData = [fixableLastReportAnoms.length, nextYearFixableLastReportAnoms.length];
-    // const unfixableAnomsData = [
-    //   lastReportAnoms.length - fixableLastReportAnoms.length,
-    //   lastReportAnoms.length - nextYearFixableLastReportAnoms.length,
-    // ];
+    const fixableAnomsData = [fixableLastReportAnoms.length, nextYearFixableLastReportAnoms.length];
+    const unfixableAnomsData = [
+      lastReportAnoms.length - fixableLastReportAnoms.length,
+      lastReportAnoms.length - nextYearFixableLastReportAnoms.length,
+    ];
 
-    const totalAnomsData = [1586, 1689];
-    const fixableAnomsData = [246, 299];
-    const unfixableAnomsData = [1340, 1390];
+    const totalAnomsData = [fixableAnomsData[0] + unfixableAnomsData[0], fixableAnomsData[1] + unfixableAnomsData[1]];
+
+    // const totalAnomsData = [1586, 1689];
+    // const fixableAnomsData = [246, 299];
+    // const unfixableAnomsData = [1340, 1390];
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => {
       this.chartOptions = {
