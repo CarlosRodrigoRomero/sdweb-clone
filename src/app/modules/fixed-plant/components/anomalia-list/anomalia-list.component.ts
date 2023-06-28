@@ -38,6 +38,11 @@ export class AnomaliaListComponent implements OnChanges {
       this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
     }
+
+    if (changes.anomaliaSelected && changes.anomaliaSelected.currentValue) {
+      console.log(this.anomaliaSelected)
+    }
+
   }
 
   applyFilter(event: Event) {

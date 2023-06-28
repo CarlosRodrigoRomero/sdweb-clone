@@ -260,7 +260,6 @@ export class ReportControlService {
           .then((doc) => {
             if (doc.exists) {
               const params = doc.data() as ParamsFilterShare;
-              console.log("PARAMS: ", params);
               this.plantaId = params.plantaId;
               this.selectedInformeId = params.informeId;
               this.informesIdList = [this.selectedInformeId];
@@ -315,7 +314,6 @@ export class ReportControlService {
                         }
                       });
                     }
-                    console.log("VAMOS POR auqi: ", this.allFilterableElements)
                     // iniciamos filter service
                     this.filterService
                       .initService(this.allFilterableElements, true, this.sharedId)

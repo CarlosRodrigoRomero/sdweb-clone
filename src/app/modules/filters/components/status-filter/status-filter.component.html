@@ -1,0 +1,15 @@
+<div class="filtro">
+    <h5>{{ 'status' | translate | titlecase }}</h5>
+    <mat-button-toggle-group class="status-group" #group="matButtonToggleGroup" multiple="true">
+      <mat-button-toggle
+        *ngFor="let elem of statusElems; index as i"
+        [id]="(i + 1)"
+        [name]="elem.label"
+        [checked]="statusSelected[i]"
+        (change)="onChangeStatusFilter($event)"
+      >
+        {{ elem.label }}
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  
