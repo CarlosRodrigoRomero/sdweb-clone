@@ -100,11 +100,11 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
     this.dataPlot = [];
     this.getAllCategorias(anomaliasLastReport);
 
-    this.dataPlot.push(this.calculateFakeDataPlot(anomaliasLastReport));
-    this.dataPlot.push(this.calculateFakeDataPlot(anomaliasLastReport, true));
+    // this.dataPlot.push(this.calculateFakeDataPlot(anomaliasLastReport));
+    // this.dataPlot.push(this.calculateFakeDataPlot(anomaliasLastReport, true));
 
-    // this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport));
-    // this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport, true));
+    this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport));
+    this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport, true));
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => this.initChart(theme.split('-')[0]));
 
