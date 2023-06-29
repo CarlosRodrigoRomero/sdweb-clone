@@ -114,7 +114,6 @@ export class StatusFilterComponent implements OnInit {
       );
 
       this.filterControlService.statusSelected[indexSelected] = false;
-          console.log(this.selectedLabels);
       // eliminamos el 'status' de seleccionados
       this.selectedLabels = this.selectedLabels.filter((sel) => sel !== event.source.name);
       // si era el último ponemos el label por defecto

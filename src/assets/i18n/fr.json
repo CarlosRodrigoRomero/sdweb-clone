@@ -36,6 +36,7 @@
   "clase": "classe",
   "criticidad": "criticité",
   "Borrar area": "Effacer la zone",
+  "área": "zone",
   "Cancelar dibujo": "Annuler le dessin",
   "Dibujar area": "Dessiner une zone",
   "Muy baja": "Très bas",
@@ -312,5 +313,9 @@
   "Fabricante": "Fabricant",
   "MAE por fabricante": "MEA par fabricant",
   "1 eje": "axe simple",
-  "Este módulo tiene suciedad": "Ce module est sale"
+  "Este módulo tiene suciedad": "Ce module est sale",
+  "status": "status",
+  "pendiente": "en attente",
+  "revisada": "révisée",
+  "reparada": "réparée"
 }

@@ -38,6 +38,7 @@
   "clase": "class",
   "criticidad": "criticality",
   "Borrar area": "Delete area",
+  "área": "area",
   "Cancelar dibujo": "Cancel drawing",
   "Dibujar area": "Draw area",
   "Muy baja": "Very low",
@@ -315,5 +316,9 @@
   "Fabricante": "Manufacturer",
   "MAE por fabricante": "ESM by manufacturer",
   "1 eje": "single axis",
-  "Este módulo tiene suciedad": "This module is dirty"
+  "Este módulo tiene suciedad": "This module is dirty",
+  "status": "status",
+  "pendiente": "pending",
+  "revisada": "reviewed",
+  "reparada": "repaired"
 }

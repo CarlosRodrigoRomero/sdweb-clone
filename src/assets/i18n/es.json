@@ -38,6 +38,7 @@
   "clase": "clase",
   "criticidad": "criticidad",
   "Borrar area": "Borrar área",
+  "área": "área",
   "Cancelar dibujo": "Cancelar dibujo",
   "Dibujar area": "Dibujar área",
   "Muy baja": "Muy baja",
@@ -315,5 +316,9 @@
   "Fabricante": "Fabricante",
   "MAE por fabricante": "MAE por fabricante",
   "1 eje": "1 eje",
-  "Este módulo tiene suciedad": "Este módulo tiene suciedad"
+  "Este módulo tiene suciedad": "Este módulo tiene suciedad",
+  "status": "status",
+  "pendiente": "pendiente",
+  "revisada": "revisada",
+  "reparada": "reparada"
 }

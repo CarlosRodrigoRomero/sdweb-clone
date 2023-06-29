@@ -168,16 +168,6 @@ export class ShareReportService {
             !this.params.criticidad[(filter as CriticidadFilter).criticidad];
         }
         break;
-        case 'status':
-          if (this.params.status === undefined || this.params.status === null) {  
-            this.params.status = [false, false, false];
-            this.params.status[(filter as StatusFilter).statusNumber] =
-              !this.params.status[(filter as StatusFilter).statusNumber];
-          } else {
-            this.params.status[(filter as StatusFilter).statusNumber] =
-              !this.params.status[(filter as StatusFilter).statusNumber];
-          }
-          break;
       case 'modulo':
         this.params.modulo = (filter as ModuloPcFilter).modulo;
         break;
@@ -216,6 +206,18 @@ export class ShareReportService {
           } else {
             this.params.zonas[(filter as ZonaFilter).position] = (filter as ZonaFilter).zona;
           }
+        break;
+        case 'status':
+          if (this.params.status === undefined || this.params.status === null) {
+            // inicializamos el array tipo con valores null
+            this.params.status = [];
+            for (let i = 0; i < 3; i++) {
+              this.params.status.push(null);
+            }
+            this.params.status[(filter as StatusFilter).statusNumber] = (filter as StatusFilter).status;
+          } else {
+            this.params.status[(filter as StatusFilter).statusNumber] = (filter as StatusFilter).status;
+          }
           break;
       // case 'zona':
       //   this.params.zona = (filter as ZonaFilter).zona;
@@ -251,10 +253,6 @@ export class ShareReportService {
         this.params.criticidad[(filter as CriticidadFilter).criticidad] =
           !this.params.criticidad[(filter as CriticidadFilter).criticidad];
         break;
-      case 'status':
-        this.params.status[(filter as StatusFilter).statusNumber] =
-          !this.params.status[(filter as StatusFilter).statusNumber];
-        break;
       case 'modulo':
         this.params.modulo = null;
         break;
@@ -266,6 +264,9 @@ export class ShareReportService {
         break;
       case 'zona':
         this.params.zonas[(filter as ZonaFilter).position] = null;
+        break;
+      case 'status':
+        this.params.status[(filter as StatusFilter).statusNumber] = null;
         break;
     }
   }
@@ -371,17 +372,17 @@ export class ShareReportService {
             });
           }
         }
-        if (Object.keys(this.params).includes('status')) {
-          let posibleStatus = ['pendiente', 'revisada', 'reparada'];
-          if (this.params.status !== null) {
-            this.params.status.forEach((status, index) => {
-              if (status) {
-                const statusFilter = new StatusFilter(index.toString(), 'status', posibleStatus[index], index);
-                filters.push(statusFilter);
-              }
-            });
-          }
-        }
+        // if (Object.keys(this.params).includes('status')) {
+        //   let posibleStatus = ['pendiente', 'revisada', 'reparada'];
+        //   if (this.params.status !== null) {
+        //     this.params.status.forEach((status, index) => {
+        //       if (status) {
+        //         const statusFilter = new StatusFilter(index.toString(), 'status', posibleStatus[index], index);
+        //         filters.push(statusFilter);
+        //       }
+        //     });
+        //   }
+        // }
         if (Object.keys(this.params).includes('reparable')) {
           var isReparable = [true, false]
           if (this.params.reparable !== null) {
@@ -444,12 +445,21 @@ export class ShareReportService {
             this.filterControlService.zonasSelected = zonasSelected;
           }
         }
-        // if (Object.keys(this.params).includes('zona')) {
-        //   if (this.params.zona !== null) {
-        //     const zonaFilter = new ZonaFilter('', 'zona', this.params.zona);
-        //     filters.push(zonaFilter);
-        //   }
-        // }
+        if (Object.keys(this.params).includes('status')) {
+          if (this.params.status !== null) {
+            let statusSelected = this.filterControlService.statusSelected;
+            this.params.status.forEach((s, index) => {
+              if (s !== undefined && s !== null) {
+                const statusFilter = new StatusFilter(String(index), 'status', s, index);
+                filters.push(statusFilter);
+
+                statusSelected[s] = true;
+              }
+            });
+
+            this.filterControlService.statusSelected = statusSelected;
+          }
+        }
 
         filters;
       } else {

@@ -38,6 +38,7 @@
   "clase": "classe",
   "criticidad": "criticidade",
   "Borrar area": "Apagar área",
+  "área": "área",
   "Cancelar dibujo": "Cancelar desenho",
   "Dibujar area": "Desenhar área",
   "Muy baja": "Muito baixa",
@@ -315,5 +316,9 @@
   "Fabricante": "Fabricante",
   "MAE por fabricante": "MDE por fabricante",
   "1 eje": "eixo simples",
-  "Este módulo tiene suciedad": "Este módulo está sujo"
+  "Este módulo tiene suciedad": "Este módulo está sujo",
+  "status": "status",
+  "pendiente": "pendente",
+  "revisada": "revisada",
+  "reparada": "reparada"
 }

@@ -113,9 +113,6 @@ export class FilterControlService {
     if (params.criticidad !== undefined && params.criticidad !== null) {
       this.criticidadSelected = params.criticidad;
     }
-    if (params.status !== undefined && params.status !== null) {
-      this.statusSelected = params.status;
-    }
     if (params.reparable !== undefined && params.reparable !== null) {
       this.reparableSelected = params.reparable;
     }
