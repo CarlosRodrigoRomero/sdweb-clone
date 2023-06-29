@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs';
 
 import { TranslateService } from '@ngx-translate/core';
 
-import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
 import { FilterService } from '@data/services/filter.service';
@@ -30,7 +29,7 @@ export class StatusFilterComponent implements OnInit {
   allComplete: boolean;
   filtroStatus: StatusFilter;
   public statusSelected: boolean[] = [false, false, false];
-  labels = ['pendiente', 'revisada', 'reparada']
+  labels = ['Pendiente', 'Revisada', 'Reparada']
 
   defaultLabelStatus = true;
   defaultSelectLabel = 'Status';
@@ -70,7 +69,7 @@ export class StatusFilterComponent implements OnInit {
   );
 
   this.subscriptions.add(
-    this.translate.stream('Status').subscribe((res: string) => {
+    this.translate.stream('Estado').subscribe((res: string) => {
       this.defaultSelectLabel = res;
     })
   );

@@ -317,8 +317,10 @@
   "MAE por fabricante": "MAE por fabricante",
   "1 eje": "1 eje",
   "Este módulo tiene suciedad": "Este módulo tiene suciedad",
-  "status": "status",
-  "pendiente": "pendiente",
-  "revisada": "revisada",
-  "reparada": "reparada"
+  "Estado": "Estado",
+  "Pendiente": "Pendiente",
+  "Revisada": "Revisada",
+  "Reparada": "Reparada",
+  "Todo lo hecho hasta ahora está guardado. Si quieres conservar lo que hagas a partir de ahora, no cierres la pantalla antes de que desaparezca este mensaje": "Todo lo hecho hasta ahora está guardado. Si quieres conservar lo que hagas a partir de ahora, no cierres la pantalla antes de que desaparezca este mensaje"
+
 }

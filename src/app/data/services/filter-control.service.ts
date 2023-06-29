@@ -61,7 +61,7 @@ export class FilterControlService {
 
   private _labelStatusDefaultStatus = true;
   public labelStatusDefaultStatus$ = new BehaviorSubject<boolean>(this._labelStatusDefaultStatus);
-  public selectedStatusDefaultLabel = 'Status';
+  public selectedStatusDefaultLabel = 'Estado';
   private _selectedStatusLabels: string[] = [this.selectedStatusDefaultLabel];
   public selectedStatusLabels$ = new BehaviorSubject<string[]>(this._selectedStatusLabels);
   public statusSelectedDefault: boolean[] = [];
