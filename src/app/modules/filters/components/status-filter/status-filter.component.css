@@ -7,7 +7,7 @@ h5 {
   font-weight: 400;
 }
 
-.zona-select {
+.status-select {
   width: 100%;
 }
 
@@ -26,7 +26,7 @@ h5 {
   color: #d32f2f;
 }
 
-:host ::ng-deep .menu-zona .mat-menu-content:not(:empty) {
+:host ::ng-deep .menu-status .mat-menu-content:not(:empty) {
   min-width: 280px;
 }
 
@@ -36,14 +36,18 @@ li {
   margin-right: 10px;
 }
 
-.counts-zona {
-  line-height: 2.9;
-  margin-top: -6px;
-  text-align: end;
+.counts-status {
+  margin-left: 10px;
 }
 
 .mat-menu-item {
   height: 30px;
   display: flex;
   align-items: center;
+}
+
+.labelWrapper{
+  width: 120px;
+  display: flex;
+  justify-content: space-between;
 }

@@ -182,6 +182,10 @@ export class ReportControlService {
                   const seguidores = this.allFilterableElements as Seguidor[];
                   seguidores.forEach((seg) => {
                     if (seg.anomaliasCliente.length > 0) {
+                      // Guardamos las anomalías de suciedad aparte
+                      this.dirtyAnoms.push(...seg.anomaliasCliente.filter((anom) => anom.tipo === 11));
+                      // Filtramos las anomlías reales
+                      seg.anomaliasCliente = this.anomaliaService.getRealAnomalias(seg.anomaliasCliente);
                       this.allAnomalias.push(...seg.anomaliasCliente);
                     }
                   });
@@ -305,11 +309,11 @@ export class ReportControlService {
 
                       (this.allFilterableElements as Seguidor[]).forEach((seg) => {
                         if (seg.anomaliasCliente.length > 0) {
+                          seg.anomaliasCliente = this.anomaliaService.getRealAnomalias(seg.anomaliasCliente);
                           this.allAnomalias.push(...seg.anomaliasCliente);
                         }
                       });
                     }
-
                     // iniciamos filter service
                     this.filterService
                       .initService(this.allFilterableElements, true, this.sharedId)

@@ -14,9 +14,12 @@ import { TempMaxFilter } from '@core/models/tempMaxFilter';
 import { AreaFilter } from '@core/models/areaFilter';
 import { ClaseFilter } from '@core/models/claseFilter';
 import { CriticidadFilter } from '@core/models/criticidadFilter';
+import { StatusFilter } from '@core/models/statusFilter';
 import { ModuloPcFilter } from '@core/models/moduloFilter';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { ZonaFilter } from '@core/models/zonaFilter';
+import { ModeloFilter } from '@core/models/modeloFilter';
+import { ReparableFilter } from '@core/models/reparableFilter';
 import { ParamsFilterShare } from '@core/models/paramsFilterShare';
 
 @Injectable({
@@ -141,6 +144,18 @@ export class ShareReportService {
           this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[(filter as ClaseFilter).clase - 1];
         }
         break;
+      case 'reparable':
+          const indexSelected = (filter as ReparableFilter).reparable ? 0 : 1;
+          if (this.params.reparable === undefined || this.params.reparable === null) {
+            this.params.reparable = [false, false];
+            
+            this.params.reparable[indexSelected] = !this.params.reparable[indexSelected];
+          } else {
+            // Como es un filtro simple, cuando se selecciona uno, el otro se deselecciona
+            this.params.reparable = [false, false];
+            this.params.reparable[indexSelected] = !this.params.reparable[indexSelected];            
+          }
+          break;
       case 'criticidad':
         if (this.params.criticidad === undefined || this.params.criticidad === null) {
           const criticidad = new Array(this.anomaliaService.criterioCriticidad.labels.length).fill(false);
@@ -168,9 +183,42 @@ export class ShareReportService {
           this.params.tipo[(filter as TipoElemFilter).position] = (filter as TipoElemFilter).tipo;
         }
         break;
-      case 'zona':
-        this.params.zona = (filter as ZonaFilter).zona;
+        case 'modelo':
+        if (this.params.modelo === undefined || this.params.modelo === null) {
+          // inicializamos el array tipo con valores null
+          this.params.modelo = [];
+          for (let i = 0; i < (filter as ModeloFilter).numOfModelos; i++) {
+            this.params.modelo.push(null);
+          }
+          this.params.modelo[(filter as ModeloFilter).position] = (filter as ModeloFilter).modulo;
+        } else {
+          this.params.modelo[(filter as ModeloFilter).position] = (filter as ModeloFilter).modulo;
+        }
         break;
+        case 'zona':
+          if (this.params.zonas === undefined || this.params.zonas === null) {
+            // inicializamos el array tipo con valores null
+            this.params.zonas = [];
+            for (let i = 0; i < (filter as ZonaFilter).numOfZonas; i++) {
+              this.params.zonas.push(null);
+            }
+            this.params.zonas[(filter as ZonaFilter).position] = (filter as ZonaFilter).zona;
+          } else {
+            this.params.zonas[(filter as ZonaFilter).position] = (filter as ZonaFilter).zona;
+          }
+        break;
+        case 'status':
+          if (this.params.status === undefined || this.params.status === null) {
+            // inicializamos el array tipo con valores null
+            this.params.status = [];
+            for (let i = 0; i < 3; i++) {
+              this.params.status.push(null);
+            }
+            this.params.status[(filter as StatusFilter).statusNumber] = (filter as StatusFilter).status;
+          } else {
+            this.params.status[(filter as StatusFilter).statusNumber] = (filter as StatusFilter).status;
+          }
+          break;
     }
   }
 
@@ -192,8 +240,12 @@ export class ShareReportService {
         this.params.area = null;
         break;
       case 'clase':
-        this.params.clase[(filter as ClaseFilter).clase - 1] = !this.params.clase[(filter as ClaseFilter).clase - 1];
+        const indexSelected = (filter as ClaseFilter).clase ? 0 : 1;
+        this.params.clase[indexSelected] = !this.params.clase[indexSelected];
         break;
+      case 'reparable':
+        const indexSelectedReparable = (filter as ReparableFilter).reparable ? 0 : 1;
+        this.params.reparable[indexSelectedReparable] = !this.params.reparable[indexSelectedReparable];
       case 'criticidad':
         this.params.criticidad[(filter as CriticidadFilter).criticidad] =
           !this.params.criticidad[(filter as CriticidadFilter).criticidad];
@@ -204,8 +256,14 @@ export class ShareReportService {
       case 'tipo':
         this.params.tipo[(filter as TipoElemFilter).position] = null;
         break;
+      case 'modelo':
+        this.params.modelo[(filter as ModeloFilter).position] = null;
+        break;
       case 'zona':
-        this.params.zona = null;
+        this.params.zonas[(filter as ZonaFilter).position] = null;
+        break;
+      case 'status':
+        this.params.status[(filter as StatusFilter).statusNumber] = null;
         break;
     }
   }
@@ -311,6 +369,17 @@ export class ShareReportService {
             });
           }
         }
+        if (Object.keys(this.params).includes('reparable')) {
+          var isReparable = [true, false]
+          if (this.params.reparable !== null) {
+            this.params.reparable.forEach((rep, index) => {
+              if (rep) {
+                const reparableFilter = new ReparableFilter(index.toString(), 'reparable', isReparable[index]);
+                filters.push(reparableFilter);
+              }
+            });
+          }
+        }
         if (Object.keys(this.params).includes('modulo')) {
           if (this.params.modulo !== null) {
             const moduloFilter = new ModuloPcFilter('', 'modulo', this.params.modulo);
@@ -332,10 +401,49 @@ export class ShareReportService {
             this.filterControlService.tiposSelected = tiposSelected;
           }
         }
-        if (Object.keys(this.params).includes('zona')) {
-          if (this.params.zona !== null) {
-            const zonaFilter = new ZonaFilter('', 'zona', this.params.zona);
-            filters.push(zonaFilter);
+        if (Object.keys(this.params).includes('modelo')) {
+          if (this.params.modelo !== null) {
+            let modelosSelected = this.filterControlService.modelosSelected;
+            this.params.modelo.forEach((modelo, index, modelos) => {
+              if (modelo !== undefined && modelo !== null) {
+                const modeloFilter = new ModeloFilter(`modelo_${modelo}`, 'modelo', modelo, modelos.length, index);
+                filters.push(modeloFilter);
+
+                modelosSelected[modelo] = true;
+              }
+            });
+
+            this.filterControlService.modelosSelected = modelosSelected;
+          }
+        }
+        if (Object.keys(this.params).includes('zonas')) {
+          if (this.params.zonas !== null) {
+            let zonasSelected = this.filterControlService.zonasSelected;
+            this.params.zonas.forEach((zona, index, zonas) => {
+              if (zona !== undefined && zona !== null) {
+                const zonaFilter = new ZonaFilter(zona, 'zona', zona, zonas.length, index);
+                filters.push(zonaFilter);
+
+                zonasSelected[zona] = true;
+              }
+            });
+
+            this.filterControlService.zonasSelected = zonasSelected;
+          }
+        }
+        if (Object.keys(this.params).includes('status')) {
+          if (this.params.status !== null) {
+            let statusSelected = this.filterControlService.statusSelected;
+            this.params.status.forEach((s, index) => {
+              if (s !== undefined && s !== null) {
+                const statusFilter = new StatusFilter(String(index), 'status', s, index);
+                filters.push(statusFilter);
+
+                statusSelected[s] = true;
+              }
+            });
+
+            this.filterControlService.statusSelected = statusSelected;
           }
         }
 

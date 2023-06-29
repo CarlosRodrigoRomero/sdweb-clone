@@ -18,6 +18,9 @@ import { AspectRatioFilterComponent } from './components/aspect-ratio-filter/asp
 import { AreaModuloBrutoFilterComponent } from './components/area-modulo-bruto-filter/area-modulo-bruto-filter.component';
 import { AreaFilterContainerComponent } from './containers/area-filter-container/area-filter-container.component';
 import { FiltersPanelContainerComponent } from './containers/filters-panel-container/filters-panel-container.component';
+import { ReparableFilterComponent } from './components/reparable-filter/reparable-filter.component';
+import { ModeloFilterComponent } from './components/modelo-filter/modelo-filter.component';
+import { StatusFilterComponent } from './components/status-filter/status-filter.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +39,9 @@ import { FiltersPanelContainerComponent } from './containers/filters-panel-conta
     AreaModuloBrutoFilterComponent,
     AreaFilterContainerComponent,
     FiltersPanelContainerComponent,
+    ReparableFilterComponent,
+    ModeloFilterComponent,
+    StatusFilterComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [

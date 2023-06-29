@@ -1,17 +1,25 @@
 <div class="filtro">
-  <h5>Zona</h5>
-  <div>
-    <li *ngFor="let zona of zonasPcs; index as i">
-      <mat-checkbox
-        [(ngModel)]="zona.completed"
-        [id]="'zona_' + (i + 1)"
-        [name]="zona.label"
-        (change)="onChangeFiltroZona($event)"
-      >
-        <span style="font-size: 15px">
-          {{ zona.label }}
-        </span>
-      </mat-checkbox>
-    </li>
-  </div>
+  <h5>{{ 'Zona' | translate }}</h5>
+  <button class="zona-select" mat-stroked-button [matMenuTriggerFor]="menu">
+    <span *ngIf="defaultLabelStatus" class="filter-default">{{ defaultSelectLabel }}</span>
+    <span *ngIf="!defaultLabelStatus" class="filter-selected">{{ selectedLabels.toString() }}</span>
+    <mat-icon>keyboard_arrow_down</mat-icon>
+  </button>
+  <mat-menu class="menu-zona" #menu="matMenu">
+    <div>
+      <li mat-menu-item *ngFor="let zona of zonasPcs; index as i" (click)="stopPropagation($event)">
+        <mat-checkbox
+          [checked]="zonasSelected[zona.idZona]"
+          [id]="zona.zona"
+          [name]="zona.label"
+          [value]="i"
+          (change)="onChangeFiltroZona($event)"
+        >
+          <span style="font-size: 15px">
+            {{ zona.label | translate }}
+          </span>
+        </mat-checkbox>
+      </li>
+    </div>
+  </mat-menu>
 </div>
