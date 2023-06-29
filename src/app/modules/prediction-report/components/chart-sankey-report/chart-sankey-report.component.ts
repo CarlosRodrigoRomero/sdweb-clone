@@ -73,13 +73,11 @@ export class ChartSankeyReportComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // this.loadData();
+    this.loadData();
 
     // this.setChartHeight();
 
-    // this.setColors();
-
-    this.loadFakeData();
+    // this.loadFakeData();
 
     this.loadChart();
 
@@ -107,9 +105,9 @@ export class ChartSankeyReportComponent implements OnInit {
     const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
 
     // DEMO
-    // lastReportAnoms.forEach((anom) => {
-    //   anom.tipoNextYear = this.tipoRandom();
-    // });
+    lastReportAnoms.forEach((anom) => {
+      anom.tipoNextYear = this.tipoRandom();
+    });
 
     GLOBAL.sortedAnomsTipos.forEach((tipo, index) => {
       const anomsTipo = lastReportAnoms.filter((anom) => anom.tipo === tipo);
@@ -119,7 +117,7 @@ export class ChartSankeyReportComponent implements OnInit {
 
         if (uniqueNextTipos.length > 0) {
           // checkeamos si el color se ha añadido ya y si no lo añadimos
-          // this.addColor(tipo);
+          this.addColor(tipo);
 
           uniqueNextTipos.forEach((uniqueNextTipo) => {
             const anomsTipoNext = anomsTipo.filter((anom) => anom.tipoNextYear === uniqueNextTipo);
@@ -138,17 +136,14 @@ export class ChartSankeyReportComponent implements OnInit {
                 take(1)
               )
               .subscribe((res: string) => {
-                const to = res;
+                // agregamos un espacio porque un diagrama sankey no acepta ir de un un nodo a otro con el mismo nombre
+                const to = res + ' ';
 
                 this.chartData.push([from, to, count]);
               });
 
-            // const from = GLOBAL.labels_tipos[tipo];
-            // const to = GLOBAL.labels_tipos[uniqueNextTipo];
-            // console.log(from, to, count);
-
             // checkeamos si el color se ha añadido ya y si no lo añadimos
-            // this.addColor(uniqueNextTipo);
+            this.addColor(uniqueNextTipo);
           });
         }
       }
@@ -197,38 +192,6 @@ export class ChartSankeyReportComponent implements OnInit {
     }
   }
 
-  private setColors() {
-    const nodes: string[] = [];
-    const colors: any[] = [];
-
-    // añadimos primero los nodos de la izquierda
-    this.chartData
-      .filter((_, index) => index > 0)
-      .map((row) => row[0])
-      .forEach((from) => {
-        if (!nodes.includes(from)) {
-          nodes.push(from);
-        }
-      });
-
-    // después los de la derecha
-    this.chartData
-      .filter((_, index) => index > 0)
-      .map((row) => row[1])
-      .forEach((from) => {
-        if (!nodes.includes(from)) {
-          nodes.push(from);
-        }
-      });
-
-    // añadimos los colores
-    nodes.forEach((node) => {
-      const tipo = GLOBAL.labels_tipos.indexOf(node);
-      const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
-      this.colors_nodes.push(color);
-    });
-  }
-
   private loadChart() {
     GoogleCharts.load(() => this.drawChart(), { packages: ['sankey'] });
   }
@@ -240,8 +203,8 @@ export class ChartSankeyReportComponent implements OnInit {
   }
 
   private tipoRandom(): number {
-    // Crea un array con los números 4, 8, 9 y 10
-    var numeros = [4, 12, 20, 21];
+    // var numeros = [4, 12, 20, 21];
+    var numeros = GLOBAL.fixableTypes;
 
     // Genera un número aleatorio entre los elementos del array
     var indiceAleatorio = Math.floor(Math.random() * numeros.length);
