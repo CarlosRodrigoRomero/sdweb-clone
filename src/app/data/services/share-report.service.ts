@@ -219,9 +219,6 @@ export class ShareReportService {
             this.params.status[(filter as StatusFilter).statusNumber] = (filter as StatusFilter).status;
           }
           break;
-      // case 'zona':
-      //   this.params.zona = (filter as ZonaFilter).zona;
-      //   break;
     }
   }
 
@@ -372,17 +369,6 @@ export class ShareReportService {
             });
           }
         }
-        // if (Object.keys(this.params).includes('status')) {
-        //   let posibleStatus = ['pendiente', 'revisada', 'reparada'];
-        //   if (this.params.status !== null) {
-        //     this.params.status.forEach((status, index) => {
-        //       if (status) {
-        //         const statusFilter = new StatusFilter(index.toString(), 'status', posibleStatus[index], index);
-        //         filters.push(statusFilter);
-        //       }
-        //     });
-        //   }
-        // }
         if (Object.keys(this.params).includes('reparable')) {
           var isReparable = [true, false]
           if (this.params.reparable !== null) {
