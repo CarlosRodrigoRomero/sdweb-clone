@@ -26,6 +26,8 @@ export class ChartSankeyReportComponent implements OnInit {
   @ViewChild('sankeyChart', { static: true }) sankeyChartElement: ElementRef;
 
   chartData: any[][] = [['From', 'To', '#']];
+  colorsLeftNodes: any[] = [];
+  colorsRightNodes: any[] = [];
   colors_nodes = [];
   colors = {
     'Módulo en CA (string)': 'red',
@@ -42,7 +44,7 @@ export class ChartSankeyReportComponent implements OnInit {
       node: {
         nodePadding: 16,
         width: 10,
-        colors: [COLOR.dark_orange],
+        colors: this.colors_nodes,
         label: { fontSize: 12, color: '#fff', bold: false, italic: false },
       },
       link: {
@@ -52,7 +54,7 @@ export class ChartSankeyReportComponent implements OnInit {
         //   // stroke: 'black', // Color of the link border.
         //   // strokeWidth: 1, // Thickness of the link border (default 0).
         // },
-        colors: [COLOR.dark_neutral],
+        colors: this.colors_nodes,
         colorMode: 'gradient',
       },
     },
@@ -75,8 +77,6 @@ export class ChartSankeyReportComponent implements OnInit {
   ngOnInit(): void {
     this.loadData();
 
-    // this.setChartHeight();
-
     // this.loadFakeData();
 
     this.loadChart();
@@ -84,15 +84,7 @@ export class ChartSankeyReportComponent implements OnInit {
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          let color = COLOR.dark_orange;
-          if (theme === 'dark-theme') {
-            color = COLOR.dark_orange;
-          } else {
-            color = COLOR.light_orange;
-          }
-
           this.chartOptions.sankey.node.label.color = this.themeService.textColor;
-          this.chartOptions.sankey.node.colors = [color];
 
           this.loadChart();
         }
@@ -113,13 +105,13 @@ export class ChartSankeyReportComponent implements OnInit {
       const anomsTipo = lastReportAnoms.filter((anom) => anom.tipo === tipo);
 
       if (anomsTipo.length > 0) {
+        // checkeamos si el color se ha añadido ya y si no lo añadimos
+        this.addLeftColor(index, tipo);
+
         const uniqueNextTipos = MathOperations.getUniqueElemsArray(anomsTipo.map((anom) => anom.tipoNextYear));
 
         if (uniqueNextTipos.length > 0) {
-          // checkeamos si el color se ha añadido ya y si no lo añadimos
-          this.addColor(tipo);
-
-          uniqueNextTipos.forEach((uniqueNextTipo) => {
+          uniqueNextTipos.forEach((uniqueNextTipo, i) => {
             const anomsTipoNext = anomsTipo.filter((anom) => anom.tipoNextYear === uniqueNextTipo);
             const count = anomsTipoNext.length;
             let from: string;
@@ -143,11 +135,14 @@ export class ChartSankeyReportComponent implements OnInit {
               });
 
             // checkeamos si el color se ha añadido ya y si no lo añadimos
-            this.addColor(uniqueNextTipo);
+            this.addRightColor(index, i, uniqueNextTipo);
           });
         }
       }
     });
+
+    // formamos el array de colores
+    this.unifyColors();
   }
 
   private loadFakeData() {
@@ -178,18 +173,38 @@ export class ChartSankeyReportComponent implements OnInit {
     });
   }
 
-  private setChartHeight() {
-    const numRows = this.chartData.length - 1;
-    const height = numRows * 16;
-
-    this.chartOptions.height = height;
+  private addLeftColor(index: number, tipo: number) {
+    const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
+    this.colorsLeftNodes.push({
+      index,
+      color,
+    });
   }
 
-  private addColor(tipo: number) {
+  private addRightColor(indexLeft: number, index: number, tipo: number) {
     const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
-    if (!this.colors_nodes.includes(color)) {
-      this.colors_nodes.push(color);
+
+    if (!this.colorsRightNodes.some((node) => node.color === color)) {
+      this.colorsRightNodes.push({
+        indexLeft,
+        index,
+        color,
+      });
     }
+  }
+
+  private unifyColors() {
+    this.colorsLeftNodes.forEach((leftNode) => {
+      // Add the color from the left node
+      this.colors_nodes.push(leftNode.color);
+
+      // Find and add the colors from the right nodes with the same indexLeft
+      let rightColors = this.colorsRightNodes
+        .filter((rightNode) => rightNode.indexLeft === leftNode.index)
+        .map((node) => node.color);
+
+      this.colors_nodes.push(...rightColors);
+    });
   }
 
   private loadChart() {
