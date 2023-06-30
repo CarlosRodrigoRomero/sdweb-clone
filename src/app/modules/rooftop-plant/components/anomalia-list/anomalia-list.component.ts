@@ -12,6 +12,9 @@ import {
   ViewChildren
 } from '@angular/core';
 
+import { from } from 'rxjs';
+import { concatMap } from 'rxjs/operators';
+
 import {animate, state, style, transition, trigger} from '@angular/animations';
 
 import { MatPaginator } from '@angular/material/paginator';
@@ -20,6 +23,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatRow } from '@angular/material/table';
 
 import { Anomalia } from '@core/models/anomalia';
+
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 
 @Component({
   selector: 'app-anomalia-list',
@@ -53,6 +58,8 @@ export class AnomaliaListComponent implements OnChanges {
 
   displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'perdidas', 'comentarios'];
 
+  constructor(private anomaliasControlService: AnomaliasControlService) {}
+
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
 
     if (changes.dataSource && changes.dataSource.currentValue) {
@@ -61,22 +68,47 @@ export class AnomaliaListComponent implements OnChanges {
     }
     // Si seleccionamos una anomalía debemos cambiar a la página de la tabla para mostrar la anomalía correcta.
     if (changes.anomaliaSelected && changes.anomaliaSelected.currentValue) {
-      var page = this.findPage()
-      if (this.paginator.pageIndex != page - 1){
-        this.paginator.pageIndex = page - 1;
-        this.dataSource.paginator = this.paginator;
-        // Esperamos 1.6 segundos antes de hacer scroll para que la tabla se cargue
-        await new Promise(resolve => setTimeout(resolve, 1600));
-      }
-      // Una vez hayamos cambiado de página, hacemos scroll hasta la anomalía seleccionada
-      this.rowId = this.anomaliaSelected.id;
-      console.log(this.anomaliaSelected);
-      this.scrollTo();
-      // Expandimos la anomalía seleccionada
-      let row = this.findRow();
-      // El cambio en la snomalía seleccionada se detecta no sólo cuando seleccionamos una anomalía en el mapa, sino también
-      // si se selecciona en la lista. 
-      this.expandRow(row);
+
+      await new Promise(resolve => {
+        var page = this.findPage()
+        if (this.paginator.pageIndex != page - 1){
+          this.paginator.pageIndex = page - 1;
+          this.dataSource.paginator = this.paginator;
+          // Esperamos 1.6 segundos antes de hacer scroll para que la tabla se cargue
+          // Si se produce cambio de página, hacemos scroll instantáneo al principio de la tabla para que 
+          // se produzca el efecto visual de hacer scroll a la anomalía. Si no, hay veces que no se ve el efecto
+          // porque la anomalía está en la misma posición en otra página.
+          // document.getElementById("table-anomalias").scrollTo({ top: 0, left: 0});
+          resolve(true);
+          // setTimeout(resolve, 1000);
+        } else {
+          resolve(false);
+        }
+        // setTimeout(resolve, 1000)
+      }).then((value: boolean) => {
+        console.log("El valor es: ", value)
+        // console.log("Scroll");
+        // return new Promise(resolve => {
+        //   this.rowId = this.anomaliaSelected.id;
+        //   // console.log(this.anomaliaSelected);
+        //   this.scrollToIndex(this.rowId);
+        //   resolve(1);
+        // })
+
+        let row = this.findRow();
+        this.expandRow(row);
+
+      }).then(() => {
+        
+        // El cambio en la snomalía seleccionada se detecta no sólo cuando seleccionamos una anomalía en el mapa, sino también
+        // si se selecciona en la lista. 
+        // let row = this.findRow();
+        // this.expandRow(row);
+        // console.log("Expand");
+
+        this.rowId = this.anomaliaSelected.id;
+        this.scrollTo();
+      }) ;
     }
   }
 
@@ -89,10 +121,11 @@ export class AnomaliaListComponent implements OnChanges {
     let elem = this.rows.find((row) => row.nativeElement.id === id.toString());
     let target = elem?.nativeElement;
     let distanceToTop = target.getBoundingClientRect().top;
-
-    if ((distanceToTop > 400) || (distanceToTop < 0)){
-      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    }  
+    document.getElementById("table-anomalias").scrollTo({ top: 0, left: 0});
+    target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    // if ((distanceToTop > 400) || (distanceToTop < 0)){
+    //   target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    // }  
   }
 
   findPage(): number {
