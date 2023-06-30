@@ -78,7 +78,6 @@ export class AnomaliaListComponent implements OnChanges {
           // Si se produce cambio de página, hacemos scroll instantáneo al principio de la tabla para que 
           // se produzca el efecto visual de hacer scroll a la anomalía. Si no, hay veces que no se ve el efecto
           // porque la anomalía está en la misma posición en otra página.
-          // document.getElementById("table-anomalias").scrollTo({ top: 0, left: 0});
           resolve(true);
           // setTimeout(resolve, 1000);
         } else {
@@ -121,7 +120,6 @@ export class AnomaliaListComponent implements OnChanges {
     let elem = this.rows.find((row) => row.nativeElement.id === id.toString());
     let target = elem?.nativeElement;
     let distanceToTop = target.getBoundingClientRect().top;
-    document.getElementById("table-anomalias").scrollTo({ top: 0, left: 0});
     target.scrollIntoView({ block: 'start', behavior: 'smooth' });
     // if ((distanceToTop > 400) || (distanceToTop < 0)){
     //   target.scrollIntoView({ block: 'center', behavior: 'smooth' });
