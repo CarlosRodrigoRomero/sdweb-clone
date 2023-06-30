@@ -16,11 +16,13 @@ export class StatusFilter implements FilterInterface {
   }
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
+    console.log(this.status);
+    console.log(elems);
     return elems.filter((elem) => {
       if (elem.hasOwnProperty('anomaliasCliente')) {
-        return (elem as Seguidor).anomaliasCliente.filter((anom) => anom.status == this.status).length > 0;
+        return (elem as Seguidor).anomaliasCliente.filter((anom) => anom.status === this.status.toLowerCase()).length > 0;
       } else {
-        return elem.status == this.status;
+        return elem.status == this.status.toLowerCase();
       }
     });
   }

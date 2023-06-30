@@ -1,11 +1,31 @@
 .panel {
   padding: 10px;
   min-width: 250px;
+  overflow-y: hidden;
+  
 }
 
 .clean-filters {
-  position: absolute;
+  /* position: absolute;
   top: 15px;
-  right: 15px;
+  right: 15px; */
   font-size: 16px;
+}
+
+.titulo {
+  /* margin: 4px 10px 0; */
+  width: 250px;
+  height:48px;
+  padding-bottom:8px;
+  margin: -10px 0 0 0;
+  display: flex;
+  justify-content: space-between;
+  text-align:center;
+  position:fixed;
+  background-color: #37474F;
+  z-index: 10;
+}
+
+.filters{
+  margin-top: 40px;
 }

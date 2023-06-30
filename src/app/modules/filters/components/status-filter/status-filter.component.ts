@@ -77,7 +77,7 @@ export class StatusFilterComponent implements OnInit {
     this.subscriptions.add(
       this.filterService.filteredElements$.subscribe((filElem) => {
         this.statusElems.forEach((elem) => {
-          elem.nAnomalias = filElem.filter((x) => x.status === elem.label).length;
+          elem.nAnomalias = filElem.filter((x) => x.status === elem.label.toLowerCase()).length;
         });
       })
     );
