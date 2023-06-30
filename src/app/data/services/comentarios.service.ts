@@ -35,6 +35,20 @@ export class ComentariosService {
       });
   }
 
+  updateComentario(comentario: Comentario): Promise<void> {
+    return this.afs
+      .collection('comentarios/')
+      .doc(comentario.id)
+      .update(comentario)
+      .then((res) => {
+        console.log('Comentario con id ' + comentario.id + ' actualizado correctamente');
+      })
+      .catch((err) => {
+        console.log('Error al actualizar comentario con id ' + comentario.id);
+        console.log(err);
+      });
+  }
+
   getComentariosAnomalia(anomaliaId: string): Observable<Comentario[]> {
     return this.afs
       .collection<Comentario>('comentarios', (ref) => ref.where('anomaliaId', '==', anomaliaId))

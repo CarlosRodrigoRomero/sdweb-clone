@@ -38,6 +38,7 @@
   "clase": "clase",
   "criticidad": "criticidad",
   "Borrar area": "Borrar área",
+  "área": "área",
   "Cancelar dibujo": "Cancelar dibujo",
   "Dibujar area": "Dibujar área",
   "Muy baja": "Muy baja",
@@ -237,7 +238,7 @@
   "Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles.": "Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles.",
   "Revisar módulo en campo para determinar causa.": "Revisar módulo en campo para determinar causa.",
   "Revisar módulo y diodos bypass para un correcto funcionamiento con polaridad inversa.": "Revisar módulo y diodos bypass para un correcto funcionamiento con polaridad inversa.",
-  "Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.": "Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.",
+  "En algunos casos, si la causa del cortocircuito es algo simple, como un problema con el cableado, podría ser posible repararlo. Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.": "En algunos casos, si la causa del cortocircuito es algo simple, como un problema con el cableado, podría ser posible repararlo. Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.",
   "Reclamar a garantía en su caso.": "Reclamar a garantía en su caso.",
   "Cambiar el diodo bypass en caso de que sea este el motivo.": "Cambiar el diodo bypass en caso de que sea este el motivo.",
   "Se recomienda la limpieza del módulo si se estima que no va a llover pronto, con el fin de evitar daños al módulo.": "Se recomienda la limpieza del módulo si se estima que no va a llover pronto, con el fin de evitar daños al módulo.",
@@ -315,5 +316,10 @@
   "Fabricante": "Fabricante",
   "MAE por fabricante": "MAE por fabricante",
   "1 eje": "1 eje",
-  "Este módulo tiene suciedad": "Este módulo tiene suciedad"
+  "Este módulo tiene suciedad": "Este módulo tiene suciedad",
+  "Estado": "Estado",
+  "Pendiente": "Pendiente",
+  "Revisada": "Revisada",
+  "Reparada": "Reparada",
+  "Todo lo hecho hasta ahora está guardado. Si quieres conservar lo que hagas a partir de ahora, no cierres la pantalla antes de que desaparezca este mensaje": "Todo lo hecho hasta ahora está guardado. Si quieres conservar lo que hagas a partir de ahora, no cierres la pantalla antes de que desaparezca este mensaje"
 }

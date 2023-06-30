@@ -21,6 +21,7 @@ export interface RowAnomData {
   tipo: string;
   localizacion: string;
   posicion: string;
+  estado: string;
   fechaUltCom?: string;
   horaUltCom?: string;
   anomalia?: Anomalia;
@@ -40,7 +41,7 @@ export class AnomaliasListComponent implements OnInit, OnChanges {
   @Input() dataSource: MatTableDataSource<RowAnomData>;
   @Input() anomsData: RowAnomData[];
   @Input() anomaliaSelected: Anomalia;
-  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'fecha', 'numComs', 'map'];
+  displayedColumns: string[] = ['numAnom', 'tipo', 'localizacion', 'estado', 'map'];
   headerLocLabel = '';
   plantaFija;
 

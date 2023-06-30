@@ -21,6 +21,7 @@ import { FiltersPanelContainerComponent } from './containers/filters-panel-conta
 import { ReparableFilterComponent } from './components/reparable-filter/reparable-filter.component';
 import { ModeloFilterComponent } from './components/modelo-filter/modelo-filter.component';
 import { DynamicFiltersDirective } from './directives/dynamic-filters.directive';
+import { StatusFilterComponent } from './components/status-filter/status-filter.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { DynamicFiltersDirective } from './directives/dynamic-filters.directive'
     FiltersPanelContainerComponent,
     ReparableFilterComponent,
     ModeloFilterComponent,
+    StatusFilterComponent,
     DynamicFiltersDirective,
   ],
   imports: [CommonModule, SharedModule],
