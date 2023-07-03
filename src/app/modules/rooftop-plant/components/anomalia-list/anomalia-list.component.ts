@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 
 import { from } from 'rxjs';
-import { concatMap } from 'rxjs/operators';
+import { concatMap, first } from 'rxjs/operators';
 
 import {animate, state, style, transition, trigger} from '@angular/animations';
 
@@ -25,6 +25,11 @@ import { MatRow } from '@angular/material/table';
 import { Anomalia } from '@core/models/anomalia';
 
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
+
+interface Page{
+    page: number;
+    firstRowInPage: any;
+} 
 
 @Component({
   selector: 'app-anomalia-list',
@@ -68,65 +73,132 @@ export class AnomaliaListComponent implements OnChanges {
     }
     // Si seleccionamos una anomalía debemos cambiar a la página de la tabla para mostrar la anomalía correcta.
     if (changes.anomaliaSelected && changes.anomaliaSelected.currentValue) {
+      var {page, firstRowInPage} = this.findPage();
+        // if (this.paginator.pageIndex != page - 1){
+        //   this.paginator.pageIndex = page - 1;
+        //   this.dataSource.paginator = this.paginator;
+        //   // Esperamos 1.6 segundos antes de hacer scroll para que la tabla se cargue
+        //   // Si se produce cambio de página, hacemos scroll instantáneo al principio de la tabla para que 
+        //   // se produzca el efecto visual de hacer scroll a la anomalía. Si no, hay veces que no se ve el efecto
+        //   // porque la anomalía está en la misma posición en otra página.
+        //   setTimeout(()=>{}, 1000);
+        //   // setTimeout(resolve, 1000);
+        // }
 
-      await new Promise(resolve => {
-        var page = this.findPage()
-        if (this.paginator.pageIndex != page - 1){
-          this.paginator.pageIndex = page - 1;
-          this.dataSource.paginator = this.paginator;
-          // Esperamos 1.6 segundos antes de hacer scroll para que la tabla se cargue
-          // Si se produce cambio de página, hacemos scroll instantáneo al principio de la tabla para que 
-          // se produzca el efecto visual de hacer scroll a la anomalía. Si no, hay veces que no se ve el efecto
-          // porque la anomalía está en la misma posición en otra página.
-          resolve(true);
-          // setTimeout(resolve, 1000);
-        } else {
-          resolve(false);
-        }
-        // setTimeout(resolve, 1000)
-      }).then((value: boolean) => {
-        console.log("El valor es: ", value)
-        // console.log("Scroll");
-        // return new Promise(resolve => {
-        //   this.rowId = this.anomaliaSelected.id;
-        //   // console.log(this.anomaliaSelected);
-        //   this.scrollToIndex(this.rowId);
-        //   resolve(1);
-        // })
-
-        let row = this.findRow();
-        this.expandRow(row);
-
-      }).then(() => {
         
-        // El cambio en la snomalía seleccionada se detecta no sólo cuando seleccionamos una anomalía en el mapa, sino también
-        // si se selecciona en la lista. 
+
+        // this.rowId = this.anomaliaSelected.id;
+        // this.scrollToIndex(firstRowInPage.id);
+        // this.selectedRowId = this.rowId
+        // this.scrollToIndex(this.rowId, true);
+
         // let row = this.findRow();
         // this.expandRow(row);
-        // console.log("Expand");
 
-        this.rowId = this.anomaliaSelected.id;
-        this.scrollTo();
-      }) ;
+      if (this.paginator.pageIndex != page - 1){
+        await new Promise(resolve => {
+          this.paginator.pageIndex = page - 1;
+          this.dataSource.paginator = this.paginator;
+          resolve(true);
+        }).then(()=>{
+          let row = this.findRow();
+          this.expandRow(row);
+          return new Promise(resolve => {
+            setTimeout(()=>resolve(true), 100);
+          });
+        }).then(()=>{
+          this.scrollToIndex(firstRowInPage.id, false);
+        }).then(()=>{
+          this.rowId = this.anomaliaSelected.id;
+          this.scrollToIndex(this.rowId, true);
+        })
+      } else {
+        let row = this.findRow();
+        this.expandRow(row);
+        // this.scrollToIndex(firstRowInPage.id, false);
+        // this.rowId = this.anomaliaSelected.id;
+        // this.scrollToIndex(this.rowId, true);
+      }
+
+      // await new Promise(resolve => {
+      //   // var page = this.findPage()
+      //   if (this.paginator.pageIndex != page - 1){
+      //     this.paginator.pageIndex = page - 1;
+      //     this.dataSource.paginator = this.paginator;
+      //     // Esperamos 1.6 segundos antes de hacer scroll para que la tabla se cargue
+      //     // Si se produce cambio de página, hacemos scroll instantáneo al principio de la tabla para que 
+      //     // se produzca el efecto visual de hacer scroll a la anomalía. Si no, hay veces que no se ve el efecto
+      //     // porque la anomalía está en la misma posición en otra página.
+      //     setTimeout(()=>{}, 1000);
+      //     resolve(true);
+      //     // setTimeout(resolve, 1000);
+      //   } else {
+      //     resolve(false);
+      //   }
+      //   // setTimeout(resolve, 1000)
+      // }).then((value: boolean) => {
+      //   // console.log("Scroll");
+      //   // return new Promise(resolve => {
+      //   //   this.rowId = this.anomaliaSelected.id;
+      //   //   // console.log(this.anomaliaSelected);
+      //   //   this.scrollToIndex(this.rowId);
+      //   //   resolve(1);
+      //   // })
+      //   console.log(value)
+      //   console.log("Expand");
+      //   let row = this.findRow();
+      //   this.expandRow(row);
+        
+
+        
+
+      // }).then((value)=>{
+      //   console.log("Scroll to first");
+      //   this.scrollToIndex(firstRowInPage.id, false);
+      //   return new Promise(resolve => {
+      //     // console.log(this.anomaliaSelected);
+          
+      //     setTimeout(()=>resolve(2), 400);
+      //   })
+        
+      // }).then((value) => {
+      //   console.log(value)
+      //   // El cambio en la snomalía seleccionada se detecta no sólo cuando seleccionamos una anomalía en el mapa, sino también
+      //   // si se selecciona en la lista. 
+      //   // let row = this.findRow();
+      //   // this.expandRow(row);
+      //   // console.log("Expand");
+      //   console.log("Scroll to selected");
+      //   this.rowId = this.anomaliaSelected.id;
+      //   this.scrollToIndex(this.rowId, true);
+        
+      // }) ;
     }
   }
 
-  scrollTo(): void {
-    this.scrollToIndex(this.rowId);
+  scrollTo(firstRowInPage): void {
+    // this.scrollToIndex(this.rowId, firstRowInPage);
   }
 
-  private scrollToIndex(id: string): void {
-    this.selectedRowId = id;
+  private scrollToIndex(id: string, smooth?: boolean): void {
+    // this.selectedRowId = id;
     let elem = this.rows.find((row) => row.nativeElement.id === id.toString());
     let target = elem?.nativeElement;
     let distanceToTop = target.getBoundingClientRect().top;
-    target.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    // if ((distanceToTop > 400) || (distanceToTop < 0)){
-    //   target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    // }  
+    // console.log(distanceToTop)
+    // target.scrollTo({ top: 100, left: 0, behavior: 'smooth' });
+    if (smooth){
+      // console.log(distanceToTop)
+      target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      // target.scrollBy(0, -distanceToTop);
+    } else {
+      target.scrollIntoView({ block: 'start', behavior: 'auto' });
+    }
+    
   }
+  
 
-  findPage(): number {
+  findPage(): Page {
     var sortCol = this.sort.active
     var sortDir = this.sort.direction
     var sortedData = this.dataSource.data.sort((a, b) => {
@@ -139,7 +211,8 @@ export class AnomaliaListComponent implements OnChanges {
     var pageSize = this.paginator.pageSize;
     var anomIndexInSortedData = sortedData.findIndex(x => x.id == this.anomaliaSelected.id);
     var page = Math.floor(anomIndexInSortedData / pageSize) + 1;
-    return page
+    var firstRowInPage = sortedData[(page - 1) * pageSize]
+    return {page, firstRowInPage}
   }
 
   findRow(): any{
@@ -171,7 +244,6 @@ export class AnomaliaListComponent implements OnChanges {
 
   expandRow(row: any) {
     this.expandedRow = this.expandedRow === row ? null : row;
-    console.log("Parece que se ha expandido");
   }
 
 }

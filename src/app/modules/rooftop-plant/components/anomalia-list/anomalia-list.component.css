@@ -1,6 +1,8 @@
 .lista {
     margin: 5px;
   }
+
+  thead{display: none !important;}
   
   .buscar-input {
     width: 100%;
