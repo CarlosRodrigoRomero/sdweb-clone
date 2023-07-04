@@ -164,6 +164,7 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
     this.anomaliasControlService.prevAnomaliaSelect = row.anomalia;
 
     this.anomaliasControlService.anomaliaSelect = row.anomalia;
+    this.anomaliasControlService.selectionMethod = 'list';
     this.anomaliasControlService.setExternalStyle(row.id, true);
 
     // centramos la vista al hacer click

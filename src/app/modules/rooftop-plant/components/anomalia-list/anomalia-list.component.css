@@ -1,8 +1,30 @@
 .lista {
     margin: 5px;
+    position:relative;
   }
 
-  thead{display: none !important;}
+  :host ::ng-deep thead{
+    position:absolute;
+    top:0px;
+    width: 100%;
+    top: 73px;
+    
+    box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.2), 0px 0px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  }
+
+  :host ::ng-deep tbody{
+    margin-top: 70.5px;
+  }
+
+    
+  .tabla-container {
+    position: auto;
+    /* height: calc(100vh - 306px); */
+    height: calc(100vh - 200px - 56.5px);
+    overflow: auto;
+    /* height: calc(100% - 56.5px); */
+    margin-top: 56.5px;
+  }
   
   .buscar-input {
     width: 100%;
@@ -23,6 +45,24 @@
   :host ::ng-deep td.mat-cell:first-of-type {
     padding-left: 0px;
   }
+
+  :host ::ng-deep th.mat-header-cell:first-of-type, th.mat-header-cell:last-of-type{
+    padding: 0;
+  }
+
+  :host ::ng-deep .mat-header-row{
+    /* width:100%; */
+    display: flex;
+    align-items: center
+    
+  }
+
+  th{
+    height:100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   
   table {
     width: 100%;
@@ -32,13 +72,7 @@
   ::-webkit-scrollbar {
     width: 0px;
   }
-  
-  .tabla-container {
-    position: relative;
-    /* height: calc(100vh - 306px); */
-    height: calc(100vh - 200px);
-    overflow: auto;
-  }
+
   
   .label-tipo {
     display: inline-flex;
@@ -66,12 +100,28 @@
   .mat-column-colors{
     width:5%;
   }
+
+  .mat-column-numAnom {
+    word-wrap: break-word !important;
+    white-space: unset !important;
+    flex: 0 0 8% !important;
+    width: 8% !important;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  
+    /* word-break: break-word; */
+  
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
   
   .mat-column-tipo {
     word-wrap: break-word !important;
     white-space: unset !important;
-    flex: 0 0 40% !important;
-    width: 40% !important;
+    flex: 0 0 57% !important;
+    width: 57% !important;
     overflow-wrap: break-word;
     word-wrap: break-word;
   
@@ -86,8 +136,24 @@
   .mat-column-perdidas {
     word-wrap: break-word !important;
     white-space: unset !important;
-    flex: 0 0 18% !important;
-    width: 18% !important;
+    flex: 0 0 15% !important;
+    width: 15% !important;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  
+    /* word-break: break-word; */
+  
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+
+  .mat-column-comentarios {
+    word-wrap: break-word !important;
+    white-space: unset !important;
+    flex: 0 0 15% !important;
+    width: 15% !important;
     overflow-wrap: break-word;
     word-wrap: break-word;
   
@@ -99,7 +165,7 @@
     hyphens: auto;
   }
   
-  .mat-column-temp {
+  /* .mat-column-temp {
     word-wrap: break-word !important;
     white-space: unset !important;
     flex: 0 0 20% !important;
@@ -107,29 +173,13 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
   
-    /* word-break: break-word; */
-  
     -ms-hyphens: auto;
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
     hyphens: auto;
-  }
+  } */
   
-  .mat-column-gradiente {
-    word-wrap: break-word !important;
-    white-space: unset !important;
-    flex: 0 0 22% !important;
-    width: 22% !important;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-  
-    /* word-break: break-word; */
-  
-    -ms-hyphens: auto;
-    -moz-hyphens: auto;
-    -webkit-hyphens: auto;
-    hyphens: auto;
-  }
+
   
   .mat-row.selected {
     background-color: rgb(187, 187, 187);

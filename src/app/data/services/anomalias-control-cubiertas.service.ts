@@ -37,6 +37,8 @@ export class AnomaliasControlCubiertasService {
   public selectedInformeId: string;
   private _anomaliaSelect: Anomalia = undefined;
   public anomaliaSelect$ = new BehaviorSubject<Anomalia>(this._anomaliaSelect);
+  private _selectionMethod: string = undefined;
+  public selectionMethod$ = new BehaviorSubject<string>(this._selectionMethod);
   private _anomaliaHover: Anomalia = undefined;
   public anomaliaHover$ = new BehaviorSubject<Anomalia>(this._anomaliaHover);
   private prevFeatureHover: any;
@@ -350,6 +352,7 @@ export class AnomaliasControlCubiertasService {
         if (this.anomaliaSelect !== undefined) {
           this.setExternalStyle(this.anomaliaSelect.id, false);
           this.anomaliaSelect = undefined;
+          this.selectionMethod = undefined;
         }
 
         if (e.selected.length > 0) {
@@ -358,6 +361,7 @@ export class AnomaliasControlCubiertasService {
             const anomalia = this.listaAnomalias.find((anom) => anom.id === anomaliaId);
 
             this.anomaliaSelect = anomalia;
+            this.selectionMethod = 'map';
             // aplicamos estilos
             this.setExternalStyle(anomaliaId, true);
 
@@ -386,6 +390,7 @@ export class AnomaliasControlCubiertasService {
           this.setExternalStyle(this.anomaliaSelect.id, false);
 
           this.anomaliaSelect = undefined;
+          this.selectionMethod = undefined;
         }
       }
     });
@@ -520,6 +525,7 @@ export class AnomaliasControlCubiertasService {
     this.anomaliaHover = undefined;
     this.prevFeatureHover = undefined;
     this.prevAnomaliaSelect = undefined;
+    this.selectionMethod = undefined;
     this.listaAnomalias = [];
     this.anomaliaLayers = [];
     this.sharedReportNoFilters = false;
@@ -548,6 +554,15 @@ export class AnomaliasControlCubiertasService {
   set anomaliaSelect(value: Anomalia) {
     this._anomaliaSelect = value;
     this.anomaliaSelect$.next(value);
+  }
+
+  get selectionMethod() {
+    return this._selectionMethod;
+  }
+
+  set selectionMethod(value: string) {
+    this._selectionMethod = value;
+    this.selectionMethod$.next(value);
   }
 
   get anomaliaHover() {
