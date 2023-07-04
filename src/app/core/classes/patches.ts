@@ -154,4 +154,17 @@ export class Patches {
 
     return [tempMin, tempMax];
   }
+
+  static patchOlmedilla(informeId: string, isAdmin?: boolean) {
+    // PARCHE OLMEDILLA 169MW JUN 2023
+    if (informeId === '5pl2FYGfYcgSUI5TJElc') {
+      if (isAdmin) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }

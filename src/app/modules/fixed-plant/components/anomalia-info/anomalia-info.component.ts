@@ -34,6 +34,7 @@ import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 
 import { GLOBAL } from '@data/constants/global';
+import { Patches } from '@core/classes/patches';
 
 interface InfoAdicional {
   id?: string;
@@ -132,7 +133,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
           if (this.informeSelected !== undefined) {
             // parche Omedilla 169MW 2023
             if (this.informeSelected.id === '5pl2FYGfYcgSUI5TJElc' && !this.isAdmin) {
-              this.showLocation = false;
+              this.showLocation = Patches.patchOlmedilla(this.informeSelected.id, this.isAdmin);
             }
           }
 
