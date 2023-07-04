@@ -15,6 +15,7 @@ export class Patches {
       'J6hpthPQHrIqciuf5LYQ', // Pizarro 3/06/2023
       'ighFmQO3ovf5JPoxLdt4', // Pizarro 4/06/2023
       'pBzaUDKSsS0sjOC3YnCO', // Pizarro 15/06/2023
+      '5pl2FYGfYcgSUI5TJElc', // Olmedilla 169MW Jun 2023
     ];
     const plantasIds: string[] = [
       'AyKgsY6F3TqGQGYNaOUY', // Logrosan
