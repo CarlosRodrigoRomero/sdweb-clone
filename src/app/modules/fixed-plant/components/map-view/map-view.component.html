@@ -1,7 +1,7 @@
 <!-- <app-loading *ngIf="!mapLoaded"></app-loading> -->
-<mat-sidenav-container class="stats-container" [hasBackdrop]="true" (backdropClick)="sidenavStats.toggle()">
+<mat-sidenav-container class="stats-container" [hasBackdrop]="true">
   <!-- SIDENAV STATS -->
-  <mat-sidenav #sidenavStats class="stats-sidenav" position="end">
+  <mat-sidenav #sidenavStats class="stats-sidenav" position="end" [disableClose]="true">
     <!-- cargamos el modulo Stats -->
     <ng-template appDynamicStats></ng-template>
   </mat-sidenav>
