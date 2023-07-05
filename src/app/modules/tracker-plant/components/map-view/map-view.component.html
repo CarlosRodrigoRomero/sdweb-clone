@@ -7,7 +7,7 @@
   <mat-sidenav-content>
     <mat-sidenav-container class="stats-container">
       <!-- SIDENAV STATS -->
-      <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end">
+      <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end" [disableClose]="true">
         <!-- cargamos el modulo Stats -->
         <ng-template appDynamicStats></ng-template>
       </mat-sidenav>
