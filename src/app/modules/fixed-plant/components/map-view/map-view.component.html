@@ -1,3 +1,8 @@
+<div class="map-view">
+  <div class="panel-anomalias" #sidenavLeft>
+    <app-anomalia-list-container></app-anomalia-list-container>
+  </div>
+
 <!-- <app-loading *ngIf="!mapLoaded"></app-loading> -->
 <mat-sidenav-container class="stats-container" [hasBackdrop]="true" (backdropClick)="sidenavStats.toggle()">
   <!-- SIDENAV STATS -->
@@ -9,7 +14,7 @@
   <mat-sidenav-content>
     <mat-sidenav-container class="main-container" [hasBackdrop]="false">
       <!-- SIDENAV FILTROS -->
-      <mat-sidenav
+      <!-- <mat-sidenav
         *ngIf="showFilters"
         #sidenavLeft
         opened
@@ -23,7 +28,7 @@
           <h4>{{ 'filtros' | translate | titlecase }}</h4>
         </div>
         <app-filters-panel-container></app-filters-panel-container>
-      </mat-sidenav>
+      </mat-sidenav> -->
 
       <!-- SIDENAV LISTA ANOMALIAS -->
       <mat-sidenav
@@ -130,3 +135,4 @@
 <app-download-progress-bar class="progress-bar" *ngIf="generatingDownload"></app-download-progress-bar>
 
 <div class="dark-trasp-background" *ngIf="generatingDownload"></div>
+</div>

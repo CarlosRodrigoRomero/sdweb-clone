@@ -1,3 +1,15 @@
+.map-view{
+  display: grid;
+  grid-template-columns: 30% 70%;
+  gap: 0.8rem;
+}
+
+.panel-anomalias{
+  padding: 5px;
+  border-radius: 8px;
+  background-color: #37474f;
+}
+
 .rel {
   position: relative;
 }

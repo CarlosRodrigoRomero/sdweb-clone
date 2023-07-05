@@ -1,0 +1,90 @@
+.popup {
+    display: flex;
+    align-items: flex-end;
+  }
+  
+  .popup-desktop {
+    width: max-content;
+    padding: 0px;
+    border-radius: 8px;
+  }
+  
+  :host ::ng-deep .mat-tab-label {
+    padding: 0px !important;
+    min-width: 80px !important;
+  }
+  
+  .admin-inputs {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .input {
+    max-width: 50px;
+  }
+  
+  .tab-content {
+    margin: 16px 24px;
+  }
+  
+  .tab-comments {
+    margin: 0px 24px 16px 24px;
+    max-height: 300px;
+  }
+  
+  .popup-hover {
+    width: max-content;
+    border-radius: 8px;
+  }
+  
+  .popup-hover-content {
+    justify-content: space-between;
+  }
+  
+  .elemento {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .titulo {
+    font-size: 1rem;
+  }
+  
+  .subtitulo {
+    font-weight: 300;
+    font-size: 1.1rem;
+  }
+  
+  .titulo-resalt {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+  
+  .link-descarga {
+    padding: 0 4px;
+  }
+
+  .anom-img-wrapper{
+    display: flex;
+    height:170px;
+    width: 100%;
+    justify-content:space-around;
+    padding:10px;
+  }
+
+  .anom-map{
+    position:absolute;
+    top:0;
+    left:0;
+  }
+  
+  @media (max-width: 500px) {
+    .popup-desktop {
+      width: 94vw;
+      left: -10px;
+    }
+  }
+  

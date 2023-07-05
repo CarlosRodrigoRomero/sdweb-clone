@@ -17,7 +17,7 @@ import { PlantaService } from '@data/services/planta.service';
 import { MapControlService } from '../../services/map-control.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ShareReportService } from '@data/services/share-report.service';
-import { AnomaliasControlCubiertasService } from '@data/services/anomalias-control-cubiertas.service';
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { DirtyAnomsService } from '@data/services/dirty-anoms.service';
 
@@ -65,7 +65,7 @@ export class MapComponent implements OnInit, OnDestroy {
     private plantaService: PlantaService,
     private olMapService: OlMapService,
     private shareReportService: ShareReportService,
-    private anomaliasControlService: AnomaliasControlCubiertasService,
+    private anomaliasControlService: AnomaliasControlService,
     private reportControlService: ReportControlService,
     private dirtyAnomsService: DirtyAnomsService
   ) {}

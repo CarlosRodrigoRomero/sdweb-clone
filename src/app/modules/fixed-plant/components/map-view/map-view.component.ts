@@ -14,7 +14,7 @@ import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-s
 import { DynamicAnomaliaListDirective } from '@modules/fixed-plant/directives/dynamic-anomalia-list.directive';
 
 import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
-import { AnomaliaListContainer } from '@modules/fixed-plant/containers/anomalia-list-container/anomalia-list-container.component';
+import { AnomaliaListContainer } from '@modules/anomalies/containers/anomalia-list-container/anomalia-list-container.component';
 
 import { Patches } from '@core/classes/patches';
 

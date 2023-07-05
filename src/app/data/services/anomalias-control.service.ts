@@ -37,6 +37,8 @@ export class AnomaliasControlService {
   public selectedInformeId: string;
   private _anomaliaSelect: Anomalia = undefined;
   public anomaliaSelect$ = new BehaviorSubject<Anomalia>(this._anomaliaSelect);
+  private _selectionMethod: string = undefined;
+  public selectionMethod$ = new BehaviorSubject<string>(this._selectionMethod);
   private _anomaliaHover: Anomalia = undefined;
   public anomaliaHover$ = new BehaviorSubject<Anomalia>(this._anomaliaHover);
   private prevFeatureHover: any;
@@ -108,7 +110,7 @@ export class AnomaliasControlService {
 
     const perdidasLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStylePerdidas(false),
+      style: this.getStyleAnomalias(false, undefined, 'mae'),
       visible: false,
     });
     perdidasLayer.setProperties({
@@ -120,7 +122,7 @@ export class AnomaliasControlService {
 
     const celsCalientesLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleCelsCalientes(false),
+      style: this.getStyleAnomalias(false, undefined, 'cc'),
       visible: false,
     });
     celsCalientesLayer.setProperties({
@@ -132,7 +134,7 @@ export class AnomaliasControlService {
 
     const gradNormMaxLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleGradienteNormMax(false),
+      style: this.getStyleAnomalias(false, undefined, 'grad'),
       visible: false,
     });
     gradNormMaxLayer.setProperties({
@@ -145,7 +147,7 @@ export class AnomaliasControlService {
     const tiposLayer = new VectorImageLayer({
       // declutter: true,
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleTipos(false),
+      style: this.getStyleAnomalias(false, undefined, 'tipo'),
       visible: false,
     });
     tiposLayer.setProperties({
@@ -204,6 +206,7 @@ export class AnomaliasControlService {
             perdidas: anom.perdidas,
             gradienteNormalizado: anom.gradienteNormalizado,
             type: 'anomalia',
+            featureType: 'Polygon',
           },
         });
         source.addFeature(feature);
@@ -218,15 +221,10 @@ export class AnomaliasControlService {
             perdidas: anom.perdidas,
             gradienteNormalizado: anom.gradienteNormalizado,
             type: 'anomalia',
+            featureType: 'Point',
           },
         });
-        const iconStyle = new Style({
-          image: new Icon({
-            anchor: [0.5, 0.5],
-            src: '../../../assets/icons/location-pin-grave.png',
-          }),
-        });
-        featurePoint.setStyle(iconStyle);
+        featurePoint.setStyle(this.getStyleAnomalias(false));
         source.addFeature(featurePoint);
       }
         // source.addFeature(feature);
@@ -296,27 +294,27 @@ export class AnomaliasControlService {
             if (feature !== undefined) {
               // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
               if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-                this.prevFeatureHover.setStyle(this.getStyleAnomalias(false));
+                this.prevFeatureHover.setStyle(this.getStyleAnomalias(false, this.prevFeatureHover.featureType));
               }
 
               const anomaliaId = feature.getProperties().properties.anomaliaId;
               const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
-
-              feature.setStyle(this.getStyleAnomalias(true));
+              
+              feature.setStyle(this.getStyleAnomalias(true, feature.getProperties().properties.featureType));
 
               this.anomaliaHover = anomalia;
 
               this.prevFeatureHover = feature;
             } else {
               if (this.anomaliaHover !== undefined) {
-                this.setExternalStyle(this.anomaliaHover.id, false);
+                this.setExternalStyle(this.anomaliaHover.id, false, this.anomaliaHover.featureType);
 
                 this.anomaliaHover = undefined;
               }
             }
           } else {
             if (this.anomaliaHover !== undefined) {
-              this.setExternalStyle(this.anomaliaHover.id, false);
+              this.setExternalStyle(this.anomaliaHover.id, false, this.anomaliaHover.featureType);
 
               this.anomaliaHover = undefined;
             }
@@ -353,7 +351,7 @@ export class AnomaliasControlService {
         this.anomaliaHover = undefined;
 
         if (this.anomaliaSelect !== undefined) {
-          this.setExternalStyle(this.anomaliaSelect.id, false);
+          this.setExternalStyle(this.anomaliaSelect.id, false, this.anomaliaSelect.featureType);
           this.anomaliaSelect = undefined;
         }
 
@@ -365,10 +363,10 @@ export class AnomaliasControlService {
             this.anomaliaSelect = anomalia;
 
             // aplicamos estilos
-            this.setExternalStyle(anomaliaId, true);
+            this.setExternalStyle(anomaliaId, true, this.anomaliaSelect.featureType);
 
             if (this.prevAnomaliaSelect !== undefined && this.prevAnomaliaSelect.id !== anomaliaId) {
-              this.setExternalStyle(this.prevAnomaliaSelect.id, false);
+              this.setExternalStyle(this.prevAnomaliaSelect.id, false, this.prevAnomaliaSelect.featureType);
             }
 
             this.prevAnomaliaSelect = anomalia;
@@ -389,7 +387,7 @@ export class AnomaliasControlService {
         .filter((item) => item.getProperties().properties.informeId === this.selectedInformeId);
       if (feature.length === 0) {
         if (this.anomaliaSelect !== undefined) {
-          this.setExternalStyle(this.anomaliaSelect.id, false);
+          this.setExternalStyle(this.anomaliaSelect.id, false, this.anomaliaSelect.featureType);
 
           this.anomaliaSelect = undefined;
         }
@@ -456,16 +454,53 @@ export class AnomaliasControlService {
     this.anomaliaService.addAnomalia(anomalia);
   }
 
-  private getStyleAnomalias(focus: boolean) {
-    console.log(this.anomaliaSelect);
-    const estilosView = {
-      mae: this.getStylePerdidas(focus),
-      cc: this.getStyleCelsCalientes(focus),
-      grad: this.getStyleGradienteNormMax(focus),
-      tipo: this.getStyleTipos(focus),
+  private getStyleAnomalias(focus: boolean, featureType?: string, selection?: string) {
+    selection = selection ? selection : this.toggleViewSelected;
+    console.log(this.anomaliaSelect)
+    return (feature) => {
+      const colorsView = {
+        mae: this.getColorMae(feature, 1),
+        cc: this.getColorCelsCalientes(feature, 1),
+        grad: this.getColorGradienteNormMax(feature, 1),
+        tipo: this.getColorTipo(feature),
+      };
+      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
+        console.log("Pues hemos entrado")
+        featureType = feature.getProperties().properties.featureType;
+        let color = colorsView[this.toggleViewSelected];
+        switch (featureType){
+          case 'Point':
+            return this.getStylePoint(focus, color);
+            break;
+          case 'Polygon':
+            return this.getStylePolygon(focus, color);
+            break;
+        }
+      }
     };
+  }
 
-    return estilosView[this.toggleViewSelected];
+  private getStylePoint(focused: boolean, color: string) {
+    return new Style({
+      image: new Icon({
+        src: "assets/icons/location-pin-hovered.png",
+        anchor: [0.5, 0.5],
+        scale: 0.8,
+        color: focused ? 'white' : color,
+      }),
+    });
+  }
+
+  private getStylePolygon(focused: boolean, color: string) {
+    return new Style({
+      stroke: new Stroke({
+        color: focused ? 'white' : color,
+        width: 4,
+      }),
+      fill: new Fill({
+        color: 'rgba(255,255,255, 0)',
+      }),
+    });
   }
 
   // ESTILOS PERDIDAS
@@ -490,6 +525,8 @@ export class AnomaliasControlService {
 
     return Colors.getColor(perdidas, [0.3, 0.5], opacity);
   }
+
+
 
   // ESTILOS CELS CALIENTES
   private getStyleCelsCalientes(focused) {
@@ -562,7 +599,7 @@ export class AnomaliasControlService {
     }
   }
 
-  setExternalStyle(anomaliaId: string, focused: boolean) {
+  setExternalStyle(anomaliaId: string, focused: boolean, featureType: string) {
     const layersInforme = this.anomaliaLayers.filter(
       (layer) => layer.getProperties().informeId === this.selectedInformeId
     );
@@ -573,9 +610,9 @@ export class AnomaliasControlService {
     layersView.forEach((layer) => features.push(...(layer.getSource() as VectorSource<any>).getFeatures()));
     const feature = features.find((f) => f.getProperties().properties.anomaliaId === anomaliaId);
     if (focused) {
-      feature.setStyle(this.getStyleAnomalias(true));
+      feature.setStyle(this.getStyleAnomalias(true, featureType));
     } else {
-      feature.setStyle(this.getStyleAnomalias(false));
+      feature.setStyle(this.getStyleAnomalias(false, featureType));
     }
   }
 
@@ -585,6 +622,7 @@ export class AnomaliasControlService {
     this.anomaliaHover = undefined;
     this.prevFeatureHover = undefined;
     this.prevAnomaliaSelect = undefined;
+    this.selectionMethod = undefined;
     this.listaAnomalias = [];
     this.anomaliaLayers = [];
     this.sharedReportNoFilters = false;
@@ -613,6 +651,15 @@ export class AnomaliasControlService {
   set anomaliaSelect(value: Anomalia) {
     this._anomaliaSelect = value;
     this.anomaliaSelect$.next(value);
+  }
+
+  get selectionMethod() {
+    return this._selectionMethod;
+  }
+
+  set selectionMethod(value: string) {
+    this._selectionMethod = value;
+    this.selectionMethod$.next(value);
   }
 
   get anomaliaHover() {

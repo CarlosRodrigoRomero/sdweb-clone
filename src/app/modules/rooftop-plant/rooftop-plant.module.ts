@@ -12,11 +12,8 @@ import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module'
 import { FiltersModule } from '@modules/filters/filters.module';
 import { CubiertaRoutingModule } from './rooftop-plant-routing.module';
 import { StatsPlantModule } from '@modules/stats-plant/stats-plant.module';
+import { AnomaliesModule } from '@modules/anomalies/anomalies.module';
 
-import { AnomaliaListContainer } from './containers/anomalia-list-container/anomalia-list-container.component';
-
-import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.component';
-import { AnomaliaListComponent } from './components/anomalia-list/anomalia-list.component';
 import { MapComponent } from './components/map/map.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { RooftopPlantComponent } from './components/rooftop-plant.component';
@@ -26,12 +23,10 @@ import { MapAnomComponent } from './components/map-anom/map-anom.component';
 
 @NgModule({
   declarations: [
-    AnomaliaInfoComponent,
-    AnomaliaListComponent,
     MapComponent,
     MapViewComponent,
     RooftopPlantComponent,
-    AnomaliaListContainer,
+    
     MapAnomComponent
   ],
   imports: [
@@ -43,7 +38,8 @@ import { MapAnomComponent } from './components/map-anom/map-anom.component';
     IvyCarouselModule,
     SwiperModule,
     CubiertaRoutingModule,
-    StatsPlantModule
+    StatsPlantModule,
+    AnomaliesModule
   ],
   exports: [MapViewComponent],
 })
