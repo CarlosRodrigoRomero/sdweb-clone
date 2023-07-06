@@ -470,25 +470,28 @@ export class AnomaliaService {
       }
       if (criterioCriticidad.hasOwnProperty('rangosDT')) {
         if (criticidad === null) {
-          // aquellas que dependen del gradiente y la temperatura Max
-          if (criterioCriticidad.hasOwnProperty('rangosTMax')) {
-            for (let index = 0; index < criterioCriticidad.rangosTMax.length; index++) {
-              const rangoTMax = criterioCriticidad.rangosTMax[index];
-              const rangosDT = criterioCriticidad.rangosDT[index];
-
-              // solo aplicamos la temperatura Max para el ultimo rango
-              if (index === criterioCriticidad.rangosTMax.length - 1) {
-                if (anomalia.temperaturaMax >= rangoTMax || anomalia.gradienteNormalizado >= rangosDT) {
-                  criticidad = index;
-                }
-              } else {
-                if (anomalia.gradienteNormalizado >= rangosDT) {
-                  criticidad = index;
+          // solo para el criterio de Plenium
+          if (criterioCriticidad.id === 'cMYx030Kyp7hLhtUoYdQ') {
+            // aquellas que dependen del gradiente y la temperatura Max
+            if (criterioCriticidad.hasOwnProperty('rangosTMax')) {
+              for (let index = 0; index < criterioCriticidad.rangosTMax.length; index++) {
+                const rangoTMax = criterioCriticidad.rangosTMax[index];
+                const rangoDT = criterioCriticidad.rangosDT[index];
+                // para las LEVES solo buscamos que superen el rangoDT inferior
+                if (index === 0) {
+                  if (anomalia.gradienteNormalizado >= rangoDT) {
+                    criticidad = index;
+                  }
+                // para las GRAVES buscamos que sean CCs y superen el rangoDT superior
+                } else if (anomalia.tipo === 8 || anomalia.tipo === 9) {
+                  if (anomalia.temperaturaMax >= rangoTMax || anomalia.gradienteNormalizado >= rangoDT) {
+                    criticidad = index;
+                  }
                 }
               }
             }
           } else {
-            // aquellas que solo dependen del gradiente
+            // el resto de criterios
             criterioCriticidad.rangosDT.forEach((value, index) => {
               if (anomalia.gradienteNormalizado >= value) {
                 criticidad = index;
