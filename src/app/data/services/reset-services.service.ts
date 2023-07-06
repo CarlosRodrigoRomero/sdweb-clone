@@ -30,6 +30,12 @@ import { SeguidoresControlCommentsService } from './seguidores-control-comments.
 import { ViewCommentsService } from './view-comments.service';
 import { ZonesCommentControlService } from './zones-comment-control.service';
 import { PdfService } from './pdf.service';
+import { CreateMapService } from './create-map.service';
+import { MapDivisionsService } from './map-divisions.service';
+import { MapDivisionControlService } from './map-division-control.service';
+import { MapClippingService } from './map-clipping.service';
+import { MapClippingControlService } from './map-clipping-control.service';
+import { DirtyAnomsService } from './dirty-anoms.service';
 
 @Injectable({
   providedIn: 'root',
@@ -65,7 +71,13 @@ export class ResetServices {
     private seguidoresControlCommentsService: SeguidoresControlCommentsService,
     private viewCommentsService: ViewCommentsService,
     private zonesCommentControlService: ZonesCommentControlService,
-    private pdfService: PdfService
+    private pdfService: PdfService,
+    private createMapService: CreateMapService,
+    private mapDivisionsService: MapDivisionsService,
+    private mapDivisionControlService: MapDivisionControlService,
+    private mapClippingService: MapClippingService,
+    private mapClippingControlService: MapClippingControlService,
+    private dirtyAnomsService: DirtyAnomsService
   ) {}
 
   resetAllServices() {
@@ -99,6 +111,12 @@ export class ResetServices {
     this.viewCommentsService.resetService();
     this.zonesCommentControlService.resetService();
     this.pdfService.resetService();
+    this.createMapService.resetService();
+    this.mapDivisionsService.resetService();
+    this.mapDivisionControlService.resetService();
+    this.mapClippingService.resetService();
+    this.mapClippingControlService.resetService();
+    this.dirtyAnomsService.resetService();
   }
 
   resetReportsServices() {

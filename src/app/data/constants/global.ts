@@ -74,7 +74,7 @@ export let GLOBAL = {
     'PID regular', // 20
     'PID irregular', // 21
   ],
-  fixableTypes: [6, 11, 14, 15, 17, 18, 19, 20, 21],
+  fixableTypes: [6, 7, 11, 14, 15, 17, 18, 19, 20, 21],
   labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [
     '0', // Para que coincida el indice con el tipo de anomalia
@@ -94,7 +94,7 @@ export let GLOBAL = {
     'Caja de conexiones caliente', // 14
     'Módulo con sombras', // 15
     'Yellowing', // 16
-    'Módulo en string con baja producción', // 17
+    'Módulo en string en circuito abierto', // 17
     'PID en fase temprana', // 18
     'Falta módulo', // 19
     'PID regular', // 20
@@ -132,7 +132,7 @@ export let GLOBAL = {
     'Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles.', // 4
     'Revisar módulo en campo para determinar causa.', // 5
     'Revisar módulo y diodos bypass para un correcto funcionamiento con polaridad inversa.', // 6
-    'Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.', // 7
+    'En algunos casos, si la causa del cortocircuito es algo simple, como un problema con el cableado, podría ser posible repararlo. Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.', // 7
     'Reclamar a garantía en su caso.', // 8
     'Reclamar a garantía en su caso.', // 9
     'Cambiar el diodo bypass en caso de que sea este el motivo.', // 10

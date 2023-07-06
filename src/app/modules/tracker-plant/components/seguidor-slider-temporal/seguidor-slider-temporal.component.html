@@ -1,4 +1,4 @@
-<div class="content" *ngIf="sliderLoaded">
+<mat-card class="content" *ngIf="sliderLoaded">
   <div class="temporal-slider">
     <ngx-slider
       (valueChange)="onChangeTemporalSlider($event)"
@@ -6,4 +6,4 @@
       [options]="optionsTemporalSlider"
     ></ngx-slider>
   </div>
-</div>
+</mat-card>

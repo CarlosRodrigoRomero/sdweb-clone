@@ -26,9 +26,6 @@ export class RefreshComponent implements OnInit {
   }
 
   private refreshNormModules() {
-    this.structuresService
-      .getNormModules()
-      .pipe(take(1))
-      .subscribe((normMods) => (this.structuresService.allNormModules = normMods));
+    this.structuresService.getNormModules().then((normMods) => (this.structuresService.allNormModules = normMods));
   }
 }

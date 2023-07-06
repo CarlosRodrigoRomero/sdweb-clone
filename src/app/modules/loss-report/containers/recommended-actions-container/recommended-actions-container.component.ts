@@ -40,13 +40,13 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
       this.reportControlService.selectedInformeId$.subscribe((id) => {
         this.selectedReport = this.reportControlService.informes.find((informe) => informe.id === id);
 
-        const anomalias = this.reportControlService.allAnomalias;
+        const anomaliasReport = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === id);
 
         // obtenemos el numero de anomalias reparables
-        this.numFixableAnoms = this.getNumFixableAnoms(anomalias);
-        this.numUnfixableAnoms = anomalias.length - this.numFixableAnoms;
+        this.numFixableAnoms = this.getNumFixableAnoms(anomaliasReport);
+        this.numUnfixableAnoms = anomaliasReport.length - this.numFixableAnoms;
 
-        this.recomendedActions = this.calculateRecomendedActions(anomalias).sort((a, b) => b.mae - a.mae);
+        this.recomendedActions = this.calculateRecomendedActions(anomaliasReport).sort((a, b) => b.mae - a.mae);
 
         // calculamos el porcentaje de pérdidas que se pueden arreglar
         this.calculateFixableLosses();

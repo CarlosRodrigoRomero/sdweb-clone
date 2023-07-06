@@ -24,7 +24,10 @@
       ({{ anomaliaInfo.clase }})</span
     >
   </h5>
-  <app-comments *ngIf="showComments" [anomalia]="anomaliaSelected"></app-comments>
+
+  <h5 *ngIf="showComments" class="title">O&M</h5>
+  <app-anomalia-info-editable *ngIf="showComments" [anomaliaSelected]="anomaliaSelected"></app-anomalia-info-editable>
+
   <div *ngIf="!showComments" class="info">
     <div class="line-info">
       <div

@@ -11,6 +11,7 @@ import { SharedModule } from '@shared/shared.module';
 import { FiltersModule } from '@modules/filters/filters.module';
 import { StatsPlantModule } from '@modules/stats-plant/stats-plant.module';
 import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module';
+import { CommentsModule } from '@modules/comments/comments.module';
 
 import { AnomaliaListContainer } from './containers/anomalia-list-container/anomalia-list-container.component';
 
@@ -47,6 +48,7 @@ import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list
     StatsPlantModule,
     SharedPlantsModule,
     SharedModule,
+    CommentsModule,
   ],
   exports: [MapViewComponent],
 })

@@ -9,7 +9,6 @@ import { AuthService } from '@data/services/auth.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
-
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
 

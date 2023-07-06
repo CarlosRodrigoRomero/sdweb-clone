@@ -36,7 +36,7 @@
         >
         <span class="subtitulo">{{ criticidadLabels[anomaliaHover.criticidad] | translate }}</span>
       </div>
-      <div class="elemento">
+      <div class="elemento" *ngIf="showLocation">
         <span class="titulo">{{ 'localizacion' | translate | titlecase }}</span>
         <span class="subtitulo">{{ localizacion }}</span>
       </div>
@@ -86,7 +86,7 @@
               >
               <span class="subtitulo">{{ criticidadLabels[anomaliaSelect.criticidad] | translate }}</span>
             </div>
-            <div class="elemento">
+            <div class="elemento" *ngIf="showLocation">
               <span class="titulo">{{ 'localizacion' | translate | titlecase }}</span>
               <span class="subtitulo">{{ localizacion }}</span>
 
@@ -189,7 +189,7 @@
         </mat-tab>
         <mat-tab label="O&M">
           <div class="tab-comments">
-            <app-comments [anomalia]="anomaliaSelect"></app-comments>
+            <app-anomalia-info-editable [anomaliaSelected]="anomaliaSelect"></app-anomalia-info-editable>
           </div>
         </mat-tab>
       </mat-tab-group>

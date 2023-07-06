@@ -3,10 +3,24 @@
   margin-top: 76px;
 }
 
+.title {
+  font-size: 14px;
+}
+
+.elems-info {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+}
+
 .elem-info {
   display: flex;
   gap: 0.5rem;
   align-items: baseline;
+}
+
+.elem-info-label {
+  font-size: 12px;
 }
 
 .read-input {
@@ -15,12 +29,12 @@
 }
 
 .read-input span {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 500;
 }
 
 .subtitulo {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 500;
 }
 

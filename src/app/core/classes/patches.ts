@@ -9,7 +9,13 @@ export class Patches {
   static checkId(id: string): boolean {
     const informesIds: string[] = [
       'cAX7f55nKEQBzx7RcROI', // Casas de Don Pedro 2022
-      'RJh4Kfbg116FECvAMfgx', // Alqueva 2022
+      'RJh4Kfbg116FECvAMfgx', // Alqueva 2022,
+      'X8PNrQOPgGVTMx0ZCXjC', // prueba-pirineos 2023
+      'DrZWBkxkw1QF4aZOBZ5D', // Pizarro 1/06/2023
+      'J6hpthPQHrIqciuf5LYQ', // Pizarro 3/06/2023
+      'ighFmQO3ovf5JPoxLdt4', // Pizarro 4/06/2023
+      'pBzaUDKSsS0sjOC3YnCO', // Pizarro 15/06/2023
+      '5pl2FYGfYcgSUI5TJElc', // Olmedilla 169MW Jun 2023
     ];
     const plantasIds: string[] = [
       'AyKgsY6F3TqGQGYNaOUY', // Logrosan
@@ -49,7 +55,7 @@ export class Patches {
         return dateBerenis2;
 
       default:
-        return undefined;
+        return anomalia;
     }
   }
 
@@ -148,5 +154,18 @@ export class Patches {
     }
 
     return [tempMin, tempMax];
+  }
+
+  static patchOlmedilla(informeId: string, isAdmin?: boolean) {
+    // PARCHE OLMEDILLA 169MW JUN 2023
+    if (informeId === '5pl2FYGfYcgSUI5TJElc') {
+      if (isAdmin) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

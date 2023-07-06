@@ -39,4 +39,6 @@ export interface InformeInterface {
   numsCriticidad?: number[];
   servidorCapas?: string;
   empresaId?: string[];
+  drone?: string;
+  droneCalibracion?: string;
 }

@@ -7,6 +7,8 @@ import { PortfolioControlService } from '@data/services/portfolio-control.servic
 import { ReportControlService } from '@data/services/report-control.service';
 import { ZonesService } from '@data/services/zones.service';
 
+import { Patches } from '@core/classes/patches';
+
 @Component({
   selector: 'app-planta-stats',
   templateUrl: './planta-stats.component.html',
@@ -20,6 +22,7 @@ export class PlantaStatsComponent implements OnInit, OnDestroy {
   portfolioLoaded = false;
   completeView = false;
   thereAreCCs = true;
+  showLocation = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -70,6 +73,9 @@ export class PlantaStatsComponent implements OnInit, OnDestroy {
     this.reportControlService.allAnomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length > 0
       ? (this.thereAreCCs = true)
       : (this.thereAreCCs = false);
+
+    // PARCHE OLMEDILLA 2023
+    this.showLocation = Patches.patchOlmedilla(this.reportControlService.selectedInformeId);
   }
 
   closeSidenav() {

@@ -41,6 +41,14 @@ export class AuthService {
     try {
       const firebaseUser = await this.afAuth.signInWithEmailAndPassword(email, password);
 
+      // Custom event que se lanza al hacer login para registrarse en Google Analytics
+      window['dataLayer'] = window['dataLayer'] || [];
+      window['dataLayer'].push({
+      'event': 'login',
+      'userID': firebaseUser.user.uid,
+      'solardroneUser': firebaseUser.user.email.includes('@solardrone.es'),
+      });
+
       return this.userService.getUser(firebaseUser.user.uid);
 
       // return this.user;

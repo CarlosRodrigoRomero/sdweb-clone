@@ -78,7 +78,7 @@ export class AnomaliasControlCommentsService {
           informeId: anom.informeId,
           type: 'anomalia',
           checked: anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0,
-          label: 'F' + anom.localX + 'C' + anom.localY,
+          label: 'F' + anom.localY + 'C' + anom.localX,
         },
       });
 

@@ -10,6 +10,7 @@ import { MapDivisionControlService } from '@data/services/map-division-control.s
 import { OlMapService } from '@data/services/ol-map.service';
 import { MapClippingService } from '@data/services/map-clipping.service';
 import { CreateMapService } from '@data/services/create-map.service';
+import { MapClippingControlService } from '@data/services/map-clipping-control.service';
 
 import { MapDivision } from '@core/models/mapDivision';
 import { MapClipping } from '@core/models/mapClipping';
@@ -38,7 +39,8 @@ export class ListCreateMapContainerComponent implements OnInit, OnDestroy {
     private mapDivisionControlService: MapDivisionControlService,
     private olMapService: OlMapService,
     private mapClippingService: MapClippingService,
-    private createMapService: CreateMapService
+    private createMapService: CreateMapService,
+    private mapClippingControlService: MapClippingControlService
   ) {}
 
   ngOnInit(): void {
@@ -49,10 +51,10 @@ export class ListCreateMapContainerComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       combineLatest([this.mapDivisionsService.getMapDivisions(), this.mapClippingService.getMapClippings()]).subscribe(
         ([mapDivisions, mapClippings]) => {
-          this.mapDivisions = mapDivisions;
+          this.mapDivisions = mapDivisions.filter((d) => mapClippings.map((c) => c.id).includes(d.id) === false);
           this.mapClippings = mapClippings;
 
-          this.dataSource = new MatTableDataSource([...mapDivisions, ...mapClippings]);
+          this.dataSource = new MatTableDataSource([...this.mapDivisions, ...this.mapClippings]);
         }
       )
     );
@@ -66,6 +68,14 @@ export class ListCreateMapContainerComponent implements OnInit, OnDestroy {
     );
   }
 
+  selectElem(row: any) {
+    if (row.type === 'division') {
+      this.selectDivision(row);
+    } else {
+      this.selectClipping(row);
+    }
+  }
+
   hoverDivision(row: any) {
     let elem;
     if (row.type === 'division') {
@@ -75,42 +85,38 @@ export class ListCreateMapContainerComponent implements OnInit, OnDestroy {
     } else {
       elem = this.mapClippings.find((clipping) => clipping.id === row.id);
     }
-
-    // if (this.anomaliasControlService.anomaliaSelect === undefined) {
-    //   if (row.hovered) {
-    //     this.anomaliasControlService.anomaliaHover = row.anomalia;
-    //   } else {
-    //     this.anomaliasControlService.anomaliaHover = undefined;
-    //   }
-    //   this.anomaliasControlService.setExternalStyle(row.id, row.hovered);
-    // }
   }
 
-  selectDivision(row: any) {
+  private selectDivision(row: any) {
     const division = this.mapDivisions.find((division) => division.id === row.id);
 
-    // quitamos el hover de la anomalia
-    // this.anomaliasControlService.anomaliaHover = undefined;
-
-    // reiniciamos el estilo a la anterior anomalia
-    // if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
-    //   this.anomaliasControlService.setExternalStyle(this.anomaliasControlService.prevAnomaliaSelect.id, false);
-    // }
-    // this.anomaliasControlService.prevAnomaliaSelect = row.anomalia;
-
     this.mapDivisionControlService.mapDivisionSelected = division;
-    // this.anomaliasControlService.setExternalStyle(row.id, true);
 
     // centramos la vista al hacer click
-    this.centerView(division);
+    // this.centerView(division);
   }
 
   deleteDivision(id: string) {
     this.mapDivisionsService.deleteMapDivision(id);
   }
 
-  private centerView(mapDivision: MapDivision) {
-    this.map.getView().setCenter(mapDivision.coords[0]);
+  private selectClipping(row: any) {
+    const clipping = this.mapClippings.find((clipping) => clipping.id === row.id);
+
+    this.mapClippingControlService.mapClippingSelected = clipping;
+
+    // centramos la vista al hacer click
+    // this.centerView(clipping);
+  }
+
+  hideClipping(id: string) {
+    const clipping = this.mapClippings.find((clipping) => clipping.id === id);
+    clipping.visible = !clipping.visible;
+    this.mapClippingService.updateMapClipping(clipping);
+  }
+
+  private centerView(mapElem: MapElement) {
+    this.map.getView().setCenter(mapElem.coords[0]);
   }
 
   ngOnDestroy(): void {

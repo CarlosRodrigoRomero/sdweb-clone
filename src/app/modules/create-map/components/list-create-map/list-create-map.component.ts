@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -21,7 +12,7 @@ import { PlantaInterface } from '@core/models/planta';
   styleUrls: ['./list-create-map.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListCreateMapComponent implements OnChanges {
+export class ListCreateMapComponent {
   @Input() planta: PlantaInterface;
   @Input() displayedColumns: string;
   @Input() dataSource: MatTableDataSource<any>;
@@ -30,16 +21,11 @@ export class ListCreateMapComponent implements OnChanges {
   @Output() rowSelected = new EventEmitter<any>();
   @Output() rowHovered = new EventEmitter<any>();
   @Output() mapDivisionDelete = new EventEmitter<any>();
+  @Output() mapClippingHide = new EventEmitter<any>();
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor() {}
-
-  ngOnChanges(changes: SimpleChanges) {
-    // if (changes.mapDivisionSelected && this.mapDivisionSelected) {
-    //   this.scrollToRow(this.mapDivisionSelected);
-    // }
-  }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;

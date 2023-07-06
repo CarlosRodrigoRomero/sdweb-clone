@@ -15,8 +15,6 @@ import { SliderTemporalComponent } from './components/slider-temporal/slider-tem
 import { ViewControlComponent } from './components/view-control/view-control.component';
 import { ViewToggleComponent } from './components/view-toggle/view-toggle.component';
 import { LeyendaComponent } from './components/leyenda/leyenda.component';
-import { CommentsComponent } from './components/comments/comments.component';
-import { CommentComponent } from './components/comment/comment.component';
 import { PdfComponent } from './components/pdf/pdf.component';
 import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component';
 import { PdfEmailSelectComponent } from './components/pdf-email-select/pdf-email-select.component';
@@ -41,8 +39,6 @@ import { AddPlantUserDialogComponent } from './components/add-plant-user-dialog/
     ViewControlComponent,
     ViewToggleComponent,
     LeyendaComponent,
-    CommentsComponent,
-    CommentComponent,
     PdfComponent,
     PdfDialogComponent,
     PdfEmailSelectComponent,
@@ -64,7 +60,6 @@ import { AddPlantUserDialogComponent } from './components/add-plant-user-dialog/
     SliderTemporalComponent,
     ViewControlComponent,
     ViewToggleComponent,
-    CommentsComponent,
     GroupByZonesViewComponent,
     LeyendaContainerComponent,
   ],

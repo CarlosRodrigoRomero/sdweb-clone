@@ -70,4 +70,8 @@ export class MapDivisionsService {
   deleteMapDivision(id: string): Promise<void> {
     return this.mapDivisionsCollection.doc(id).delete();
   }
+
+  resetService() {
+    this.mapDivisionsCollection = undefined;
+  }
 }

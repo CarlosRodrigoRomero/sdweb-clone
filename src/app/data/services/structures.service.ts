@@ -183,24 +183,50 @@ export class StructuresService {
       });
   }
 
-  getModulosBrutos(): Observable<RawModule[]> {
-    const query$ = this.afs
-      .collection<RawModule>('thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto')
-      .snapshotChanges()
-      .pipe(
-        map((actions) =>
-          actions.map((doc) => {
-            const data = doc.payload.doc.data();
-            data.id = doc.payload.doc.id;
+  async getModulosBrutos(): Promise<RawModule[]> {
+    const pageSize = 10000; // Número de documentos por página.
+    let lastDoc: firebase.firestore.QueryDocumentSnapshot;
+    let allModulos: RawModule[] = [];
 
-            // Convertimos el objeto en un array
-            data.coords = Object.values(data.coords);
+    while (true) {
+      let collection;
 
-            return data;
-          })
-        )
-      );
-    return query$;
+      // Si lastDoc es nulo, es la primera página.
+      if (!lastDoc) {
+        collection = this.afs.collection<RawModule>(
+          'thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto',
+          (ref) => ref.orderBy('area').limit(pageSize)
+        );
+      } else {
+        // Si lastDoc no es nulo, empieza después del último documento obtenido.
+        collection = this.afs.collection<RawModule>(
+          'thermalLayers/' + this.thermalLayer.id + '/modulosEnBruto',
+          (ref) => ref.orderBy('area').startAfter(lastDoc).limit(pageSize)
+        );
+      }
+
+      const snapshot = await collection.get().toPromise();
+      const modulos = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        data.id = doc.id;
+
+        // Convertimos el objeto en un array
+        data.coords = Object.values(data.coords);
+
+        return data;
+      });
+
+      allModulos.push(...modulos); // Agregamos los documentos a la lista total.
+      console.log(allModulos.length + ' módulos en bruto cargados');
+      lastDoc = snapshot.docs[snapshot.docs.length - 1]; // Almacenamos el último documento.
+
+      // Si tenemos menos documentos de los solicitados, significa que hemos alcanzado el final.
+      if (snapshot.size < pageSize) {
+        break;
+      }
+    }
+
+    return allModulos; // Devolvemos todos los documentos obtenidos.
   }
 
   getFiltersParams(): Observable<FilterModuloBruto[]> {
@@ -314,24 +340,71 @@ export class StructuresService {
       });
   }
 
-  getNormModules(thermalLayer?: ThermalLayerInterface): Observable<NormalizedModule[]> {
+  // getNormModules(thermalLayer?: ThermalLayerInterface): Observable<NormalizedModule[]> {
+  //   if (thermalLayer !== undefined) {
+  //     this.thermalLayer = thermalLayer;
+  //   }
+  //   const query$ = this.afs
+  //     .collection<NormalizedModule>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
+  //     .snapshotChanges()
+  //     .pipe(
+  //       map((actions) =>
+  //         actions.map((doc) => {
+  //           const data = doc.payload.doc.data();
+  //           const id = doc.payload.doc.id;
+
+  //           return { id, ...data };
+  //         })
+  //       )
+  //     );
+  //   return query$;
+  // }
+
+  async getNormModules(thermalLayer?: ThermalLayerInterface): Promise<NormalizedModule[]> {
     if (thermalLayer !== undefined) {
       this.thermalLayer = thermalLayer;
     }
-    const query$ = this.afs
-      .collection<NormalizedModule>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
-      .snapshotChanges()
-      .pipe(
-        map((actions) =>
-          actions.map((doc) => {
-            const data = doc.payload.doc.data();
-            const id = doc.payload.doc.id;
 
-            return { id, ...data };
-          })
-        )
-      );
-    return query$;
+    const pageSize = 10000; // Número de documentos por página.
+    let lastDoc: firebase.firestore.QueryDocumentSnapshot;
+    let allModulos: NormalizedModule[] = [];
+
+    while (true) {
+      let collection;
+
+      // Si lastDoc es nulo, es la primera página.
+      if (!lastDoc) {
+        collection = this.afs.collection<NormalizedModule>(
+          'thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados',
+          (ref) => ref.orderBy('agrupacionId').limit(pageSize)
+        );
+      } else {
+        // Si lastDoc no es nulo, empieza después del último documento obtenido.
+        collection = this.afs.collection<NormalizedModule>(
+          'thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados',
+          (ref) => ref.orderBy('agrupacionId').startAfter(lastDoc).limit(pageSize)
+        );
+      }
+
+      const snapshot = await collection.get().toPromise();
+      const modulos = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        data.id = doc.id;
+
+        return data;
+      });
+
+      allModulos.push(...modulos); // Agregamos los documentos a la lista total.
+      console.log(allModulos.length + ' módulos normalizados cargados');
+      lastDoc = snapshot.docs[snapshot.docs.length - 1]; // Almacenamos el último documento.
+
+      // Si tenemos menos documentos de los solicitados, significa que hemos alcanzado el final.
+      if (snapshot.size < pageSize) {
+        break;
+      }
+    }
+
+    return allModulos; // Devolvemos todos los documentos obtenidos.
   }
 
   addNormModule(module: NormalizedModule) {

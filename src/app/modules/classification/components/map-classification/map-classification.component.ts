@@ -18,6 +18,7 @@ import { DoubleClickZoom, Select, Translate } from 'ol/interaction';
 import { OSM } from 'ol/source';
 import { click } from 'ol/events/condition';
 import LineString from 'ol/geom/LineString';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 import moment from 'moment';
 
@@ -53,7 +54,7 @@ export class MapClassificationComponent implements OnInit {
   private thermalLayers: TileLayer<any>[];
   private normModules: NormalizedModule[];
   private listaAnomalias: Anomalia[] = [];
-  private normModLayer: VectorLayer<any> = undefined;
+  private normModLayer: VectorImageLayer<any> = undefined;
   private prevFeatureHover: Feature<any>;
   thermalLayerVisibility = true;
   private palette = PALETTE.ironPalette;
@@ -175,7 +176,7 @@ export class MapClassificationComponent implements OnInit {
   }
 
   private createNormModLayer() {
-    this.normModLayer = new VectorLayer({
+    this.normModLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
       style: this.getStyleNormMod(false),
     });

@@ -19,9 +19,9 @@ export class CreateMapService {
   informe: InformeInterface;
   private _createMode = false;
   createMode$ = new BehaviorSubject<boolean>(this._createMode);
-  private _sliderMin: number = 31.7997;
+  private _sliderMin: number = 30;
   sliderMin$ = new BehaviorSubject<number>(this._sliderMin);
-  private _sliderMax: number = 70.2184;
+  private _sliderMax: number = 90;
   sliderMax$ = new BehaviorSubject<number>(this._sliderMax);
 
   constructor(private router: Router, private informeService: InformeService, private plantaService: PlantaService) {}
@@ -46,6 +46,15 @@ export class CreateMapService {
           initService(true);
         });
     });
+  }
+
+  resetService() {
+    this.informeId = undefined;
+    this.planta = undefined;
+    this.informe = undefined;
+    this.createMode = false;
+    this.sliderMin = 30;
+    this.sliderMax = 90;
   }
 
   ////////////////////////////////////////////////////////////

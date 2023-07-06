@@ -1,38 +1,21 @@
 <div *ngIf="anomaliaSelected" class="content">
-  <h5 class="title">
+  <span class="title">
     {{ 'Anomalía' | translate }} {{ anomaliaInfo.numAnom }} <b>({{ anomaliaInfo.tipo | translate }})</b>
-  </h5>
+  </span>
 
-  <div *ngIf="plantaFija" class="elem-info">
-    <span class="titulo">{{ 'Localización' | translate }}</span>
-    <span class="subtitulo">{{ anomaliaInfo.localizacion }}</span>
-  </div>
+  <div class="elems-info">
+    <div class="elem-info">
+      <span class="elem-info-label">{{ 'Localización' | translate }}</span>
+      <span class="subtitulo">{{ anomaliaInfo.localizacion }}</span>
+    </div>
 
-  <div class="elem-info">
-    <span>{{ 'Nº de serie' | translate }}</span>
-    <div *ngIf="!editInput" class="read-input">
-      <span>{{
-        anomaliaSelected.hasOwnProperty('numeroSerie') ? anomaliaSelected.numeroSerie : ('Desconocido' | translate)
-      }}</span>
-      <button mat-icon-button (click)="editInput = true">
-        <mat-icon>edit</mat-icon>
+    <app-anomalia-info-editable [anomaliaSelected]="anomaliaSelected"></app-anomalia-info-editable>
+
+    <div *ngIf="plantaFija" id="pos-map" class="elem-info">
+      <span class="titulo">{{ 'Ir al mapa' | translate }}</span>
+      <button mat-icon-button (click)="goToAnomMap()">
+        <mat-icon>place</mat-icon>
       </button>
     </div>
-    <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
-      <mat-form-field *ngIf="editInput" appearance="fill">
-        <mat-label>{{ 'Nº serie' | translate }}</mat-label>
-        <input matInput formControlName="numeroSerie" />
-        <button mat-icon-button matSuffix type="submit" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-          <mat-icon>done</mat-icon>
-        </button>
-      </mat-form-field>
-    </form>
-  </div>
-
-  <div id="pos-map" class="elem-info">
-    <span class="titulo">{{ 'Ir al mapa' | translate }}</span>
-    <button mat-icon-button (click)="goToAnomMap()">
-      <mat-icon>place</mat-icon>
-    </button>
   </div>
 </div>

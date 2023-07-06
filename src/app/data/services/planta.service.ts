@@ -231,7 +231,7 @@ export class PlantaService {
 
   getUniqueLargestLocAreas(locAreas: LocationAreaInterface[]): LocationAreaInterface[] {
     return locAreas.filter(
-      (locA, index, locAs) => locAs.map((loc) => loc.globalCoords[0]).indexOf(locA.globalCoords[0]) === index
+      (locA, index, locAs) => locAs.map((loc) => loc.globalCoords[0]).indexOf(locA.globalCoords[0]) === index && locA.globalCoords[0]
     );
   }
 

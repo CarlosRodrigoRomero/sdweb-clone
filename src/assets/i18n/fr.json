@@ -158,7 +158,7 @@
   "Resistencia anómala": "Résistance anormale",
   "Caja de conexiones caliente": "Boîte de connexion chauffée",
   "Módulo con sombras": "Module avec des ombres",
-  "Módulo en string con baja producción": "Module en chaîne avec une faible production",
+  "Módulo en string en circuito abierto": "Module en string en circuit ouvert",
   "PID en fase temprana": "PID en phase précoce",
   "localizacion": "emplacement",
   "Gradiente Temp. Normalizado": "Gradient Temp. Normalisé",
@@ -236,7 +236,7 @@
   "Revisar módulos, estado de operación del inversor, cableado, conectores y fusibles.": "Vérifier les modules, l'état de fonctionnement de l'onduleur, le câblage, les connecteurs et les fusibles.",
   "Revisar módulo en campo para determinar causa.": "Examiner le module sur le terrain pour déterminer la cause.",
   "Revisar módulo y diodos bypass para un correcto funcionamiento con polaridad inversa.": "Vérifier le module et les diodes de dérivation pour un fonctionnement correct en polarité inverse.",
-  "Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.": "Notez que la tension augmente en raison de la perte d'isolation.",
+  "En algunos casos, si la causa del cortocircuito es algo simple, como un problema con el cableado, podría ser posible repararlo. Tener en cuenta que el voltage aumenta debido a la pérdida de aislamiento.": "Dans certains cas, si la cause du court-circuit est quelque chose de simple, comme un problème de câblage, il pourrait être possible de le réparer. Gardez à l'esprit que la tension augmente en raison de la perte d'isolation.",
   "Reclamar a garantía en su caso.": "Faire une réclamation de garantie si applicable.",
   "Cambiar el diodo bypass en caso de que sea este el motivo.": "Changer la diode de dérivation si c'est la cause.",
   "Se recomienda la limpieza del módulo si se estima que no va a llover pronto, con el fin de evitar daños al módulo.": "Il est recommandé de nettoyer le module s'il n'est pas prévu de pluie prochainement, afin d'éviter d'endommager le module.",
@@ -313,5 +313,10 @@
   "Fabricante": "Fabricant",
   "MAE por fabricante": "MEA par fabricant",
   "1 eje": "axe simple",
-  "Este módulo tiene suciedad": "Ce module est sale"
+  "Este módulo tiene suciedad": "Ce module est sale",
+  "Estado": "État",
+  "Pendiente": "Pente",
+  "Revisada": "Révisée",
+  "Reparada": "Réparée",
+  "Todo lo hecho hasta ahora está guardado. Si quieres conservar lo que hagas a partir de ahora, no cierres la pantalla antes de que desaparezca este mensaje": "Tout ce qui a été fait jusqu'à présent est enregistré. Si vous souhaitez conserver ce que vous faites à partir de maintenant, ne fermez pas l'écran avant que ce message ne disparaisse"
 }

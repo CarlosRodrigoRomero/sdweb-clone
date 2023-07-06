@@ -11,10 +11,10 @@ export interface PcInterface {
   archivo?: string;
   archivoPublico?: string;
   tipo?: number;
-  local_x?: number;
-  local_y?: number;
-  numFilas?: number;
-  numColumnas?: number;
+  local_x?: number; // no se usa
+  local_y?: number; // no se usa
+  numFilas?: number; // no se usa
+  numColumnas?: number; // no se usa
   global_x?: any;
   global_y?: any;
   global_z?: any;
@@ -78,6 +78,7 @@ export interface PcInterface {
   numAnom?: number;
   autoEstId?: string;
   comentarios?: Comentario[];
+  status?: string;
 }
 
 export class Pc implements PcInterface, ElementoPlantaInterface {
@@ -152,6 +153,7 @@ export class Pc implements PcInterface, ElementoPlantaInterface {
   numAnom?: number;
   autoEstId?: string;
   comentarios?: Comentario[];
+  status?: string;
 
   constructor(pc: PcInterface) {
     Object.assign(this, pc);

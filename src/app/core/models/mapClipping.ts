@@ -6,5 +6,6 @@ export class MapClipping implements MapElement {
   coords: Coordinate[];
   type: string;
   numDivision?: number;
+  visible?: boolean;
   // mapId?: string;
 }

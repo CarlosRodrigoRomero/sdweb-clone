@@ -39,6 +39,7 @@ export class Anomalia implements FilterableElement {
   tipoSeguidor?: TipoSeguidor;
   numeroSerie?: string;
   comentarios?: Comentario[];
+  status?: string;
 
   constructor(
     tipo: number,
