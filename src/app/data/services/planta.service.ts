@@ -241,7 +241,7 @@ export class PlantaService {
 
   getPlantasDeEmpresa(user: UserInterface): Observable<PlantaInterface[]> {
     let query$: AngularFirestoreCollection<PlantaInterface>;
-    if (user.role === 2) {
+    if (user.role === 2 && user.plantas !== undefined) {
       query$ = this.afs.collection<PlantaInterface>('plantas');
       return query$.snapshotChanges().pipe(
         map((actions) =>
@@ -261,8 +261,19 @@ export class PlantaService {
       );
     } else if (this.auth.userIsAdmin(user)) {
       query$ = this.afs.collection<PlantaInterface>('plantas');
-    } else {
+    }
+    // else if (user.role === 6) {
+    //   query$ = this.afs.collection<PlantaInterface>('plantas', (ref) => ref.where('empresa', '==', user.empresaId));
+
+    // } 
+    else if (user.empresaId === undefined) {
+      //Se buscan las plantas de la empresa con la propiedad empresaId y no con el uid del usuario
+      console.log(user.empresaId);
       query$ = this.afs.collection<PlantaInterface>('plantas', (ref) => ref.where('empresa', '==', user.uid));
+    }
+    else {
+      console.log(user.empresaId);
+      query$ = this.afs.collection<PlantaInterface>('plantas', (ref) => ref.where('empresa', '==', user.empresaId));
     }
 
     return query$.snapshotChanges().pipe(

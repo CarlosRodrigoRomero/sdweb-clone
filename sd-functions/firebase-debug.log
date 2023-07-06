@@ -1,0 +1,322 @@
+[debug] [2023-06-23T10:54:09.880Z] ----------------------------------------------------------------------
+[debug] [2023-06-23T10:54:09.881Z] Command:       C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\firebase-tools\lib\bin\firebase.js functions:delete createUser --region REGION
+[debug] [2023-06-23T10:54:09.881Z] CLI Version:   12.4.0
+[debug] [2023-06-23T10:54:09.881Z] Platform:      win32
+[debug] [2023-06-23T10:54:09.881Z] Node Version:  v16.14.2
+[debug] [2023-06-23T10:54:09.882Z] Time:          Fri Jun 23 2023 12:54:09 GMT+0200 (hora de verano de Europa central)
+[debug] [2023-06-23T10:54:09.882Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-06-23T10:54:09.923Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-06-23T10:54:09.924Z] > authorizing via signed-in user (ruben.ferruses@solardrone.es)
+[debug] [2023-06-23T10:54:09.924Z] [iam] checking project sdweb-d33ce for permissions ["cloudfunctions.functions.delete","cloudfunctions.functions.list","firebase.projects.get"]
+[debug] [2023-06-23T10:54:09.925Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/sdweb-d33ce:testIamPermissions [none]
+[debug] [2023-06-23T10:54:09.925Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/sdweb-d33ce:testIamPermissions x-goog-quota-user=projects/sdweb-d33ce
+[debug] [2023-06-23T10:54:09.925Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/sdweb-d33ce:testIamPermissions {"permissions":["cloudfunctions.functions.delete","cloudfunctions.functions.list","firebase.projects.get"]}
+[debug] [2023-06-23T10:54:10.562Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/sdweb-d33ce:testIamPermissions 200
+[debug] [2023-06-23T10:54:10.562Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/sdweb-d33ce:testIamPermissions {"permissions":["cloudfunctions.functions.delete","cloudfunctions.functions.list","firebase.projects.get"]}
+[debug] [2023-06-23T10:54:10.563Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/sdweb-d33ce/adminSdkConfig [none]
+[debug] [2023-06-23T10:54:10.564Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/sdweb-d33ce/locations/-/functions [none]
+[debug] [2023-06-23T10:54:10.810Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/sdweb-d33ce/adminSdkConfig 200
+[debug] [2023-06-23T10:54:10.810Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/sdweb-d33ce/adminSdkConfig {"projectId":"sdweb-d33ce","databaseURL":"https://sdweb-d33ce.firebaseio.com","storageBucket":"sdweb-d33ce.appspot.com","locationId":"europe-west"}
+[debug] [2023-06-23T10:54:11.029Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/sdweb-d33ce/locations/-/functions 200
+[debug] [2023-06-23T10:54:11.029Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/sdweb-d33ce/locations/-/functions {"functions":[{"name":"projects/sdweb-d33ce/locations/europe-west1/functions/agrupaciones","sourceRepository":{"url":"https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_detection-cloud-functions/moveable-aliases/main/paths/","deployedUrl":"https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_detection-cloud-functions/revisions/9a033295cfc55e8b7d71e89a2fdfd17a1d4708a7/paths/"},"httpsTrigger":{"url":"https://europe-west1-sdweb-d33ce.cloudfunctions.net/agrupaciones","securityLevel":"SECURE_OPTIONAL"},"status":"ACTIVE","entryPoint":"agrupaciones","timeout":"540s","availableMemoryMb":8192,"serviceAccountEmail":"sdweb-d33ce@appspot.gserviceaccount.com","updateTime":"2022-10-07T15:56:39.841Z","versionId":"12","labels":{"deployment-tool":"console-cloud"},"runtime":"python39","ingressSettings":"ALLOW_ALL","buildId":"49539c33-c652-407f-9ba5-6fba254001a9","buildName":"projects/229404593483/locations/europe-west1/builds/49539c33-c652-407f-9ba5-6fba254001a9","dockerRegistry":"CONTAINER_REGISTRY"},{"name":"projects/sdweb-d33ce/locations/europe-west1/functions/clusters","sourceRepository":{"url":"https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_cloud-functions/moveable-aliases/main/paths/","deployedUrl":"https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_cloud-functions/revisions/ae14034a16eb293921481f38a12b77451dfb2f17/paths/"},"httpsTrigger":{"url":"https://europe-west1-sdweb-d33ce.cloudfunctions.net/clusters","securityLevel":"SECURE_OPTIONAL"},"status":"ACTIVE","entryPoint":"clusters","timeout":"200s","availableMemoryMb":2048,"serviceAccountEmail":"sdweb-d33ce@appspot.gserviceaccount.com","updateTime":"2021-08-05T07:21:44.730Z","versionId":"5","labels":{"deployment-tool":"console-cloud"},"runtime":"python39","ingressSettings":"ALLOW_ALL","buildId":"18eaba6d-64d1-4ce2-9f90-d627f2efc56f","buildName":"projects/229404593483/locations/europe-west1/builds/18eaba6d-64d1-4ce2-9f90-d627f2efc56f","dockerRegistry":"CONTAINER_REGISTRY"},{"name":"projects/sdweb-d33ce/locations/europe-west1/functions/estructura","sourceRepository":{"url":"https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_detection-cloud-functions/moveable-aliases/main/paths/","deployedUrl":"https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_detection-cloud-functions/revisions/185d6e54784e118bac4dfad4e22085b8c99dc9a0/paths/"},"httpsTrigger":{"url":"https://europe-west1-sdweb-d33ce.cloudfunctions.net/estructura","securityLevel":"SECURE_OPTIONAL"},"status":"ACTIVE","entryPoint":"estructura","timeout":"540s","availableMemoryMb":2048,"serviceAccountEmail":"sdweb-d33ce@appspot.gserviceaccount.com","updateTime":"2022-11-10T12:23:00.112Z","versionId":"34","labels":{"deployment-tool":"console-cloud"},"runtime":"python39","ingressSettings":"ALLOW_ALL","buildId":"2b80ccbe-459a-476d-838e-3b0200539129","buildName":"projects/229404593483/locations/europe-west1/builds/2b80ccbe-459a-476d-838e-3b0200539129","dockerRegistry":"CONTAINER_REGISTRY"},{"name":"projects/sdweb-d33ce/locations/europe-west1/functions/getTileImages","httpsTrigger":{"url":"https://europe-west1-sdweb-d33ce.cloudfunctions.net/getTileImages","securityLevel":"SECURE_ALWAYS"},"status":"ACTIVE","entryPoint":"getTileImages","timeout":"540s","availableMemoryMb":4096,"serviceAccountEmail":"sdweb-d33ce@appspot.gserviceaccount.com","updateTime":"2022-10-24T17:54:28.351Z","versionId":"6","labels":{"deployment-tool":"cli-firebase"},"sourceUploadUrl":"https://storage.googleapis.com/uploads-938209642258.europe-west1.cloudfunctions.appspot.com/5a61b3c1-666f-430b-a726-0e5bc1f1075d.zip","environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"sdweb-d33ce\",\"databaseURL\":\"https://sdweb-d33ce.firebaseio.com\",\"storageBucket\":\"sdweb-d33ce.appspot.com\",\"locationId\":\"europe-west\"}","GCLOUD_PROJECT":"sdweb-d33ce"},"runtime":"nodejs16","ingressSettings":"ALLOW_ALL","buildId":"74ff52dc-3a38-4b6f-8d55-743565285b11","buildName":"projects/229404593483/locations/europe-west1/builds/74ff52dc-3a38-4b6f-8d55-743565285b11","dockerRegistry":"ARTIFACT_REGISTRY"},{"name":"projects/sdweb-d33ce/locations/us-central1/functions/createUser","httpsTrigger":{"url":"https://us-central1-sdweb-d33ce.cloudfunctions.net/createUser","securityLevel":"SECURE_ALWAYS"},"status":"ACTIVE","entryPoint":"createUser","timeout":"60s","availableMemoryMb":256,"serviceAccountEmail":"sdweb-d33ce@appspot.gserviceaccount.com","updateTime":"2023-06-22T12:26:31.217Z","versionId":"1","labels":{"deployment-tool":"cli-firebase","deployment-callable":"true","firebase-functions-codebase":"sd-functions","firebase-functions-hash":"faeeb2037b330eeb70cf90b70e2414a467ec5197"},"sourceUploadUrl":"https://storage.googleapis.com/uploads-64287630024.us-central1.cloudfunctions.appspot.com/6187d20e-534c-444f-81c2-c114ca0ba7dc.zip","environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"sdweb-d33ce\",\"databaseURL\":\"https://sdweb-d33ce.firebaseio.com\",\"storageBucket\":\"sdweb-d33ce.appspot.com\",\"locationId\":\"europe-west\"}","GCLOUD_PROJECT":"sdweb-d33ce","EVENTARC_CLOUD_EVENT_SOURCE":"projects/sdweb-d33ce/locations/us-central1/functions/createUser"},"runtime":"nodejs18","ingressSettings":"ALLOW_ALL","buildId":"20ce5aa7-2613-4072-abb8-b627fd301b85","buildEnvironmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"buildName":"projects/229404593483/locations/us-central1/builds/20ce5aa7-2613-4072-abb8-b627fd301b85","dockerRegistry":"ARTIFACT_REGISTRY"},{"name":"projects/sdweb-d33ce/locations/us-central1/functions/firestoreExport_nueva","eventTrigger":{"eventType":"google.pubsub.topic.publish","resource":"projects/sdweb-d33ce/topics/initiateFirestoreExport_nuevo","service":"pubsub.googleapis.com","failurePolicy":{}},"status":"ACTIVE","entryPoint":"scheduledFirestoreExportNew","timeout":"60s","availableMemoryMb":256,"serviceAccountEmail":"sdweb-d33ce@appspot.gserviceaccount.com","updateTime":"2020-07-12T09:51:39.703Z","versionId":"2","labels":{"deployment-tool":"console-cloud"},"sourceUploadUrl":"https://storage.googleapis.com/gcf-upload-us-central1-17370913-9bd6-44bb-ba70-d7b5d5a5e81d/311af649-1515-4008-9127-59006bae190b.zip","runtime":"nodejs10","maxInstances":3000,"ingressSettings":"ALLOW_ALL","dockerRegistry":"CONTAINER_REGISTRY"},{"name":"projects/sdweb-d33ce/locations/us-central1/functions/rename","eventTrigger":{"eventType":"google.storage.object.finalize","resource":"projects/_/buckets/procesamiento-2023","service":"storage.googleapis.com","failurePolicy":{}},"status":"ACTIVE","entryPoint":"rename","timeout":"400s","availableMemoryMb":8192,"serviceAccountEmail":"sdweb-d33ce@appspot.gserviceaccount.com","updateTime":"2023-02-01T12:24:35.877Z","versionId":"26","labels":{"deployment-tool":"cli-gcloud"},"sourceUploadUrl":"https://storage.googleapis.com/uploads-64287630024.us-central1.cloudfunctions.appspot.com/f69abb55-cbdd-432a-a8b2-f914402082d4.zip","runtime":"python39","maxInstances":100,"ingressSettings":"ALLOW_ALL","buildId":"c2c2ed96-a30d-4a89-b003-dda362b560c7","buildName":"projects/229404593483/locations/us-central1/builds/c2c2ed96-a30d-4a89-b003-dda362b560c7","dockerRegistry":"CONTAINER_REGISTRY"},{"name":"projects/sdweb-d33ce/locations/us-central1/functions/sendMailPdf","eventTrigger":{"eventType":"google.storage.object.finalize","resource":"projects/_/buckets/sdweb-d33ce.appspot.com","service":"storage.googleapis.com","failurePolicy":{}},"status":"ACTIVE","entryPoint":"sendMailPdf","timeout":"120s","availableMemoryMb":1024,"serviceAccountEmail":"sdweb-d33ce@appspot.gserviceaccount.com","updateTime":"2023-05-03T08:44:51.518Z","versionId":"10","labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"b018e151a0299b845e283d5982746dd4d1b9c578"},"sourceUploadUrl":"https://storage.googleapis.com/uploads-64287630024.us-central1.cloudfunctions.appspot.com/127b29a9-2882-4d2a-93fc-c1fe9a8b9329.zip","environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"sdweb-d33ce\",\"databaseURL\":\"https://sdweb-d33ce.firebaseio.com\",\"storageBucket\":\"sdweb-d33ce.appspot.com\",\"locationId\":\"europe-west\"}","GCLOUD_PROJECT":"sdweb-d33ce","EVENTARC_CLOUD_EVENT_SOURCE":"projects/sdweb-d33ce/locations/us-central1/functions/sendMailPdf"},"runtime":"nodejs16","maxInstances":3000,"ingressSettings":"ALLOW_ALL","buildId":"36ef0481-edf2-4e55-9488-87883136460f","buildEnvironmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"buildName":"projects/229404593483/locations/us-central1/builds/36ef0481-edf2-4e55-9488-87883136460f","dockerRegistry":"ARTIFACT_REGISTRY"}]}
+[debug] [2023-06-23T10:54:11.029Z] GCFv1 function has a deprecated runtime: {
+  "name": "projects/sdweb-d33ce/locations/europe-west1/functions/agrupaciones",
+  "sourceRepository": {
+    "url": "https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_detection-cloud-functions/moveable-aliases/main/paths/",
+    "deployedUrl": "https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_detection-cloud-functions/revisions/9a033295cfc55e8b7d71e89a2fdfd17a1d4708a7/paths/"
+  },
+  "httpsTrigger": {
+    "url": "https://europe-west1-sdweb-d33ce.cloudfunctions.net/agrupaciones",
+    "securityLevel": "SECURE_OPTIONAL"
+  },
+  "status": "ACTIVE",
+  "entryPoint": "agrupaciones",
+  "timeout": "540s",
+  "availableMemoryMb": 8192,
+  "serviceAccountEmail": "sdweb-d33ce@appspot.gserviceaccount.com",
+  "updateTime": "2022-10-07T15:56:39.841Z",
+  "versionId": "12",
+  "labels": {
+    "deployment-tool": "console-cloud"
+  },
+  "runtime": "python39",
+  "ingressSettings": "ALLOW_ALL",
+  "buildId": "49539c33-c652-407f-9ba5-6fba254001a9",
+  "buildName": "projects/229404593483/locations/europe-west1/builds/49539c33-c652-407f-9ba5-6fba254001a9",
+  "dockerRegistry": "CONTAINER_REGISTRY"
+}
+[debug] [2023-06-23T10:54:11.030Z] GCFv1 function has a deprecated runtime: {
+  "name": "projects/sdweb-d33ce/locations/europe-west1/functions/clusters",
+  "sourceRepository": {
+    "url": "https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_cloud-functions/moveable-aliases/main/paths/",
+    "deployedUrl": "https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_cloud-functions/revisions/ae14034a16eb293921481f38a12b77451dfb2f17/paths/"
+  },
+  "httpsTrigger": {
+    "url": "https://europe-west1-sdweb-d33ce.cloudfunctions.net/clusters",
+    "securityLevel": "SECURE_OPTIONAL"
+  },
+  "status": "ACTIVE",
+  "entryPoint": "clusters",
+  "timeout": "200s",
+  "availableMemoryMb": 2048,
+  "serviceAccountEmail": "sdweb-d33ce@appspot.gserviceaccount.com",
+  "updateTime": "2021-08-05T07:21:44.730Z",
+  "versionId": "5",
+  "labels": {
+    "deployment-tool": "console-cloud"
+  },
+  "runtime": "python39",
+  "ingressSettings": "ALLOW_ALL",
+  "buildId": "18eaba6d-64d1-4ce2-9f90-d627f2efc56f",
+  "buildName": "projects/229404593483/locations/europe-west1/builds/18eaba6d-64d1-4ce2-9f90-d627f2efc56f",
+  "dockerRegistry": "CONTAINER_REGISTRY"
+}
+[debug] [2023-06-23T10:54:11.030Z] GCFv1 function has a deprecated runtime: {
+  "name": "projects/sdweb-d33ce/locations/europe-west1/functions/estructura",
+  "sourceRepository": {
+    "url": "https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_detection-cloud-functions/moveable-aliases/main/paths/",
+    "deployedUrl": "https://source.developers.google.com/projects/sdweb-d33ce/repos/github_solardron-tech_detection-cloud-functions/revisions/185d6e54784e118bac4dfad4e22085b8c99dc9a0/paths/"
+  },
+  "httpsTrigger": {
+    "url": "https://europe-west1-sdweb-d33ce.cloudfunctions.net/estructura",
+    "securityLevel": "SECURE_OPTIONAL"
+  },
+  "status": "ACTIVE",
+  "entryPoint": "estructura",
+  "timeout": "540s",
+  "availableMemoryMb": 2048,
+  "serviceAccountEmail": "sdweb-d33ce@appspot.gserviceaccount.com",
+  "updateTime": "2022-11-10T12:23:00.112Z",
+  "versionId": "34",
+  "labels": {
+    "deployment-tool": "console-cloud"
+  },
+  "runtime": "python39",
+  "ingressSettings": "ALLOW_ALL",
+  "buildId": "2b80ccbe-459a-476d-838e-3b0200539129",
+  "buildName": "projects/229404593483/locations/europe-west1/builds/2b80ccbe-459a-476d-838e-3b0200539129",
+  "dockerRegistry": "CONTAINER_REGISTRY"
+}
+[debug] [2023-06-23T10:54:11.030Z] GCFv1 function has a deprecated runtime: {
+  "name": "projects/sdweb-d33ce/locations/us-central1/functions/rename",
+  "eventTrigger": {
+    "eventType": "google.storage.object.finalize",
+    "resource": "projects/_/buckets/procesamiento-2023",
+    "service": "storage.googleapis.com",
+    "failurePolicy": {}
+  },
+  "status": "ACTIVE",
+  "entryPoint": "rename",
+  "timeout": "400s",
+  "availableMemoryMb": 8192,
+  "serviceAccountEmail": "sdweb-d33ce@appspot.gserviceaccount.com",
+  "updateTime": "2023-02-01T12:24:35.877Z",
+  "versionId": "26",
+  "labels": {
+    "deployment-tool": "cli-gcloud"
+  },
+  "sourceUploadUrl": "https://storage.googleapis.com/uploads-64287630024.us-central1.cloudfunctions.appspot.com/f69abb55-cbdd-432a-a8b2-f914402082d4.zip",
+  "runtime": "python39",
+  "maxInstances": 100,
+  "ingressSettings": "ALLOW_ALL",
+  "buildId": "c2c2ed96-a30d-4a89-b003-dda362b560c7",
+  "buildName": "projects/229404593483/locations/us-central1/builds/c2c2ed96-a30d-4a89-b003-dda362b560c7",
+  "dockerRegistry": "CONTAINER_REGISTRY"
+}
+[debug] [2023-06-23T10:54:11.030Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/sdweb-d33ce/locations/-/functions filter=environment%3D%22GEN_2%22
+[debug] [2023-06-23T10:54:11.650Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/sdweb-d33ce/locations/-/functions 200
+[debug] [2023-06-23T10:54:11.650Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/sdweb-d33ce/locations/-/functions {"functions":[{"name":"projects/sdweb-d33ce/locations/europe-west1/functions/modulosbruto-to-modulosnormalizados","buildConfig":{"build":"projects/229404593483/locations/europe-west1/builds/cb3e474b-2f03-433f-bc30-69ea631cd1b2","runtime":"python39","entryPoint":"main_modulosbruto_to_modulosnormalizados","source":{"storageSource":{"bucket":"gcf-v2-sources-229404593483-europe-west1","object":"modulosbruto-to-modulosnormalizados/function-source.zip"}},"sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-229404593483-europe-west1","object":"modulosbruto-to-modulosnormalizados/function-source.zip","generation":"1687278176832139"}}},"serviceConfig":{"service":"projects/sdweb-d33ce/locations/europe-west1/services/modulosbruto-to-modulosnormalizados","timeoutSeconds":60,"maxInstanceCount":5000,"ingressSettings":"ALLOW_ALL","uri":"https://modulosbruto-to-modulosnormalizados-rcpywurt6q-ew.a.run.app","serviceAccountEmail":"cloudfunctionsinvoker@sdweb-d33ce.iam.gserviceaccount.com","availableMemory":"4096M","allTrafficOnLatestRevision":true,"revision":"modulosbruto-to-modulosnormalizados-00028-zot","maxInstanceRequestConcurrency":1,"availableCpu":"2"},"state":"ACTIVE","updateTime":"2023-06-20T16:24:50.687681719Z","labels":{"deployment-tool":"cli-gcloud"},"environment":"GEN_2","url":"https://europe-west1-sdweb-d33ce.cloudfunctions.net/modulosbruto-to-modulosnormalizados"},{"name":"projects/sdweb-d33ce/locations/europe-west1/functions/cog-creator","buildConfig":{"build":"projects/229404593483/locations/europe-west1/builds/5be4530c-54b5-41df-98df-dd21327925bc","runtime":"python39","entryPoint":"main_cog_creator","source":{"storageSource":{"bucket":"gcf-v2-sources-229404593483-europe-west1","object":"cog-creator/function-source.zip"}},"sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-229404593483-europe-west1","object":"cog-creator/function-source.zip","generation":"1687348425524458"}}},"serviceConfig":{"service":"projects/sdweb-d33ce/locations/europe-west1/services/cog-creator","timeoutSeconds":540,"maxInstanceCount":20,"ingressSettings":"ALLOW_ALL","uri":"https://cog-creator-rcpywurt6q-ew.a.run.app","serviceAccountEmail":"229404593483-compute@developer.gserviceaccount.com","availableMemory":"4096M","allTrafficOnLatestRevision":true,"revision":"cog-creator-00006-nev","maxInstanceRequestConcurrency":1,"availableCpu":"2"},"eventTrigger":{"trigger":"projects/sdweb-d33ce/locations/europe-west1/triggers/cog-creator-591739","triggerRegion":"europe-west1","eventType":"google.cloud.storage.object.v1.finalized","eventFilters":[{"attribute":"bucket","value":"maps-cog-solardrone"}],"pubsubTopic":"projects/sdweb-d33ce/topics/eventarc-europe-west1-cog-creator-591739-899","serviceAccountEmail":"229404593483-compute@developer.gserviceaccount.com","retryPolicy":"RETRY_POLICY_DO_NOT_RETRY"},"state":"ACTIVE","updateTime":"2023-06-21T11:54:46.977314884Z","labels":{"deployment-tool":"cli-gcloud"},"environment":"GEN_2","url":"https://europe-west1-sdweb-d33ce.cloudfunctions.net/cog-creator"},{"name":"projects/sdweb-d33ce/locations/europe-west1/functions/imagenes-anomalias","buildConfig":{"build":"projects/229404593483/locations/europe-west1/builds/e690be44-cb08-443e-81ef-d851e40a76d5","runtime":"python39","entryPoint":"main_imagenes_anomalias","source":{"storageSource":{"bucket":"gcf-v2-sources-229404593483-europe-west1","object":"imagenes-anomalias/function-source.zip"}},"sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-229404593483-europe-west1","object":"imagenes-anomalias/function-source.zip","generation":"1686653995748642"}}},"serviceConfig":{"service":"projects/sdweb-d33ce/locations/europe-west1/services/imagenes-anomalias","timeoutSeconds":1200,"maxInstanceCount":5,"ingressSettings":"ALLOW_ALL","uri":"https://imagenes-anomalias-rcpywurt6q-ew.a.run.app","serviceAccountEmail":"cloudfunctionsinvoker@sdweb-d33ce.iam.gserviceaccount.com","availableMemory":"8192M","allTrafficOnLatestRevision":true,"revision":"imagenes-anomalias-00001-yer","maxInstanceRequestConcurrency":1,"availableCpu":"2"},"state":"ACTIVE","updateTime":"2023-06-13T11:01:08.294850398Z","labels":{"deployment-tool":"cli-gcloud"},"environment":"GEN_2","url":"https://europe-west1-sdweb-d33ce.cloudfunctions.net/imagenes-anomalias"},{"name":"projects/sdweb-d33ce/locations/europe-west1/functions/datos-anomalia","buildConfig":{"build":"projects/229404593483/locations/europe-west1/builds/6cb99803-b053-41be-92db-8ed79b1dfbbe","runtime":"python39","entryPoint":"main_datos_anomalia","source":{"storageSource":{"bucket":"gcf-v2-sources-229404593483-europe-west1","object":"datos-anomalia/function-source.zip"}},"sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-229404593483-europe-west1","object":"datos-anomalia/function-source.zip","generation":"1687339932371394"}}},"serviceConfig":{"service":"projects/sdweb-d33ce/locations/europe-west1/services/datos-anomalia","timeoutSeconds":540,"maxInstanceCount":1000,"ingressSettings":"ALLOW_ALL","uri":"https://datos-anomalia-rcpywurt6q-ew.a.run.app","serviceAccountEmail":"cloudfunctionsinvoker@sdweb-d33ce.iam.gserviceaccount.com","minInstanceCount":1,"availableMemory":"8Gi","allTrafficOnLatestRevision":true,"revision":"datos-anomalia-00017-zul","maxInstanceRequestConcurrency":1,"availableCpu":"2"},"state":"ACTIVE","updateTime":"2023-06-21T09:35:05.101543741Z","labels":{"deployment-tool":"cli-gcloud"},"environment":"GEN_2","url":"https://europe-west1-sdweb-d33ce.cloudfunctions.net/datos-anomalia"}]}
+[debug] [2023-06-23T10:54:11.650Z] GCFv2 function has a deprecated runtime: {
+  "name": "projects/sdweb-d33ce/locations/europe-west1/functions/modulosbruto-to-modulosnormalizados",
+  "buildConfig": {
+    "build": "projects/229404593483/locations/europe-west1/builds/cb3e474b-2f03-433f-bc30-69ea631cd1b2",
+    "runtime": "python39",
+    "entryPoint": "main_modulosbruto_to_modulosnormalizados",
+    "source": {
+      "storageSource": {
+        "bucket": "gcf-v2-sources-229404593483-europe-west1",
+        "object": "modulosbruto-to-modulosnormalizados/function-source.zip"
+      }
+    },
+    "sourceProvenance": {
+      "resolvedStorageSource": {
+        "bucket": "gcf-v2-sources-229404593483-europe-west1",
+        "object": "modulosbruto-to-modulosnormalizados/function-source.zip",
+        "generation": "1687278176832139"
+      }
+    }
+  },
+  "serviceConfig": {
+    "service": "projects/sdweb-d33ce/locations/europe-west1/services/modulosbruto-to-modulosnormalizados",
+    "timeoutSeconds": 60,
+    "maxInstanceCount": 5000,
+    "ingressSettings": "ALLOW_ALL",
+    "uri": "https://modulosbruto-to-modulosnormalizados-rcpywurt6q-ew.a.run.app",
+    "serviceAccountEmail": "cloudfunctionsinvoker@sdweb-d33ce.iam.gserviceaccount.com",
+    "availableMemory": "4096M",
+    "allTrafficOnLatestRevision": true,
+    "revision": "modulosbruto-to-modulosnormalizados-00028-zot",
+    "maxInstanceRequestConcurrency": 1,
+    "availableCpu": "2"
+  },
+  "state": "ACTIVE",
+  "updateTime": "2023-06-20T16:24:50.687681719Z",
+  "labels": {
+    "deployment-tool": "cli-gcloud"
+  },
+  "environment": "GEN_2",
+  "url": "https://europe-west1-sdweb-d33ce.cloudfunctions.net/modulosbruto-to-modulosnormalizados"
+}
+[warn] Converting a function to an endpoint with an invalid memory option 3906.25
+[debug] [2023-06-23T10:54:11.652Z] GCFv2 function has a deprecated runtime: {
+  "name": "projects/sdweb-d33ce/locations/europe-west1/functions/cog-creator",
+  "buildConfig": {
+    "build": "projects/229404593483/locations/europe-west1/builds/5be4530c-54b5-41df-98df-dd21327925bc",
+    "runtime": "python39",
+    "entryPoint": "main_cog_creator",
+    "source": {
+      "storageSource": {
+        "bucket": "gcf-v2-sources-229404593483-europe-west1",
+        "object": "cog-creator/function-source.zip"
+      }
+    },
+    "sourceProvenance": {
+      "resolvedStorageSource": {
+        "bucket": "gcf-v2-sources-229404593483-europe-west1",
+        "object": "cog-creator/function-source.zip",
+        "generation": "1687348425524458"
+      }
+    }
+  },
+  "serviceConfig": {
+    "service": "projects/sdweb-d33ce/locations/europe-west1/services/cog-creator",
+    "timeoutSeconds": 540,
+    "maxInstanceCount": 20,
+    "ingressSettings": "ALLOW_ALL",
+    "uri": "https://cog-creator-rcpywurt6q-ew.a.run.app",
+    "serviceAccountEmail": "229404593483-compute@developer.gserviceaccount.com",
+    "availableMemory": "4096M",
+    "allTrafficOnLatestRevision": true,
+    "revision": "cog-creator-00006-nev",
+    "maxInstanceRequestConcurrency": 1,
+    "availableCpu": "2"
+  },
+  "eventTrigger": {
+    "trigger": "projects/sdweb-d33ce/locations/europe-west1/triggers/cog-creator-591739",
+    "triggerRegion": "europe-west1",
+    "eventType": "google.cloud.storage.object.v1.finalized",
+    "eventFilters": [
+      {
+        "attribute": "bucket",
+        "value": "maps-cog-solardrone"
+      }
+    ],
+    "pubsubTopic": "projects/sdweb-d33ce/topics/eventarc-europe-west1-cog-creator-591739-899",
+    "serviceAccountEmail": "229404593483-compute@developer.gserviceaccount.com",
+    "retryPolicy": "RETRY_POLICY_DO_NOT_RETRY"
+  },
+  "state": "ACTIVE",
+  "updateTime": "2023-06-21T11:54:46.977314884Z",
+  "labels": {
+    "deployment-tool": "cli-gcloud"
+  },
+  "environment": "GEN_2",
+  "url": "https://europe-west1-sdweb-d33ce.cloudfunctions.net/cog-creator"
+}
+[warn] Converting a function to an endpoint with an invalid memory option 3906.25
+[debug] [2023-06-23T10:54:11.653Z] GCFv2 function has a deprecated runtime: {
+  "name": "projects/sdweb-d33ce/locations/europe-west1/functions/imagenes-anomalias",
+  "buildConfig": {
+    "build": "projects/229404593483/locations/europe-west1/builds/e690be44-cb08-443e-81ef-d851e40a76d5",
+    "runtime": "python39",
+    "entryPoint": "main_imagenes_anomalias",
+    "source": {
+      "storageSource": {
+        "bucket": "gcf-v2-sources-229404593483-europe-west1",
+        "object": "imagenes-anomalias/function-source.zip"
+      }
+    },
+    "sourceProvenance": {
+      "resolvedStorageSource": {
+        "bucket": "gcf-v2-sources-229404593483-europe-west1",
+        "object": "imagenes-anomalias/function-source.zip",
+        "generation": "1686653995748642"
+      }
+    }
+  },
+  "serviceConfig": {
+    "service": "projects/sdweb-d33ce/locations/europe-west1/services/imagenes-anomalias",
+    "timeoutSeconds": 1200,
+    "maxInstanceCount": 5,
+    "ingressSettings": "ALLOW_ALL",
+    "uri": "https://imagenes-anomalias-rcpywurt6q-ew.a.run.app",
+    "serviceAccountEmail": "cloudfunctionsinvoker@sdweb-d33ce.iam.gserviceaccount.com",
+    "availableMemory": "8192M",
+    "allTrafficOnLatestRevision": true,
+    "revision": "imagenes-anomalias-00001-yer",
+    "maxInstanceRequestConcurrency": 1,
+    "availableCpu": "2"
+  },
+  "state": "ACTIVE",
+  "updateTime": "2023-06-13T11:01:08.294850398Z",
+  "labels": {
+    "deployment-tool": "cli-gcloud"
+  },
+  "environment": "GEN_2",
+  "url": "https://europe-west1-sdweb-d33ce.cloudfunctions.net/imagenes-anomalias"
+}
+[warn] Converting a function to an endpoint with an invalid memory option 7812.5
+[debug] [2023-06-23T10:54:11.654Z] GCFv2 function has a deprecated runtime: {
+  "name": "projects/sdweb-d33ce/locations/europe-west1/functions/datos-anomalia",
+  "buildConfig": {
+    "build": "projects/229404593483/locations/europe-west1/builds/6cb99803-b053-41be-92db-8ed79b1dfbbe",
+    "runtime": "python39",
+    "entryPoint": "main_datos_anomalia",
+    "source": {
+      "storageSource": {
+        "bucket": "gcf-v2-sources-229404593483-europe-west1",
+        "object": "datos-anomalia/function-source.zip"
+      }
+    },
+    "sourceProvenance": {
+      "resolvedStorageSource": {
+        "bucket": "gcf-v2-sources-229404593483-europe-west1",
+        "object": "datos-anomalia/function-source.zip",
+        "generation": "1687339932371394"
+      }
+    }
+  },
+  "serviceConfig": {
+    "service": "projects/sdweb-d33ce/locations/europe-west1/services/datos-anomalia",
+    "timeoutSeconds": 540,
+    "maxInstanceCount": 1000,
+    "ingressSettings": "ALLOW_ALL",
+    "uri": "https://datos-anomalia-rcpywurt6q-ew.a.run.app",
+    "serviceAccountEmail": "cloudfunctionsinvoker@sdweb-d33ce.iam.gserviceaccount.com",
+    "minInstanceCount": 1,
+    "availableMemory": "8Gi",
+    "allTrafficOnLatestRevision": true,
+    "revision": "datos-anomalia-00017-zul",
+    "maxInstanceRequestConcurrency": 1,
+    "availableCpu": "2"
+  },
+  "state": "ACTIVE",
+  "updateTime": "2023-06-21T09:35:05.101543741Z",
+  "labels": {
+    "deployment-tool": "cli-gcloud"
+  },
+  "environment": "GEN_2",
+  "url": "https://europe-west1-sdweb-d33ce.cloudfunctions.net/datos-anomalia"
+}
+[debug] [2023-06-23T10:54:11.657Z] TypeError: Cannot convert undefined or null to object
+    at Function.values (<anonymous>)
+    at C:\Users\Rubén\AppData\Roaming\nvm\v16.14.2\node_modules\firebase-tools\lib\deploy\functions\backend.js:253:37
+    at Array.reduce (<anonymous>)
+    at allEndpoints (C:\Users\Rubén\AppData\Roaming\nvm\v16.14.2\node_modules\firebase-tools\lib\deploy\functions\backend.js:252:45)
+    at Object.matchingBackend (C:\Users\Rubén\AppData\Roaming\nvm\v16.14.2\node_modules\firebase-tools\lib\deploy\functions\backend.js:276:28)
+    at Object.createDeploymentPlan (C:\Users\Rubén\AppData\Roaming\nvm\v16.14.2\node_modules\firebase-tools\lib\deploy\functions\release\planner.js:77:27)
+    at Command.actionFn (C:\Users\Rubén\AppData\Roaming\nvm\v16.14.2\node_modules\firebase-tools\lib\commands\functions-delete.js:44:26)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+[error] 
+[error] Error: An unexpected error has occurred.

@@ -132,7 +132,7 @@ export class ReportControlService {
                 // si el user no es admin aplicamos el parche
                 if (!this.authService.userIsAdmin(this.user)) {
                   // parche plantas que compró Plenium a RIOS
-                  this.informes = Patches.plantsTwoClients(this.user.uid, informes);
+                  this.informes = Patches.plantsTwoClients(this.user.empresaId, informes);
                 }
 
                 if (this.planta.tipo !== 'seguidores') {

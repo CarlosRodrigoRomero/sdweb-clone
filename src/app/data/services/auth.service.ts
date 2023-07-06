@@ -10,6 +10,9 @@ import { switchMap } from 'rxjs/operators';
 import { UserService } from './user.service';
 
 import { UserInterface } from '@core/models/user';
+import { HttpClient } from '@angular/common/http';
+
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +21,11 @@ export class AuthService {
   private user: UserInterface = {}; // Guarda los datos de usuario registrado
   user$: Observable<UserInterface>;
 
-  constructor(private afAuth: AngularFireAuth, private afs: AngularFirestore, private userService: UserService) {
+  constructor(private afAuth: AngularFireAuth, 
+    private afs: AngularFirestore, 
+    private userService: UserService, 
+    private http: HttpClient
+) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap((user) => {
         if (user) {
@@ -30,7 +37,7 @@ export class AuthService {
     );
   }
 
-  async signIn(email: string, password: string) {
+  async signIn(email: string, password: string = "password") {
     try {
       const firebaseUser = await this.afAuth.signInWithEmailAndPassword(email, password);
 
@@ -46,8 +53,15 @@ export class AuthService {
     return this.afAuth.sendPasswordResetEmail(passwordResetEmail);
   }
 
-  signUp(email: string, password: string) {
+  signUp(email: string, password: string = "password") {
     return this.afAuth.createUserWithEmailAndPassword(email, password);
+  }
+
+  createUser(email: string, password: string = "password"): Observable<any> {
+    const functionsUrl = `${environment.firebaseFunctionsUrl}/createUser`;
+    const payload = { email, password };
+  
+    return this.http.post(functionsUrl, payload);
   }
 
   signOut() {

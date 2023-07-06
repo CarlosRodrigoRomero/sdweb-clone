@@ -1,0 +1,23 @@
+<div class="create-user">
+    <h3>Añadir usuario</h3>
+  
+    <div class="create-user-content">
+  
+    <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+      <mat-card>
+        <mat-card-content>
+  
+          <mat-form-field class="example-full-width">
+            <mat-label>email</mat-label>
+            <input matInput formControlName="email" />
+          </mat-form-field>
+
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button mat-dialog-close>Cancelar</button>
+          <button mat-raised-button mat-dialog-close type="submit">Añadir</button>
+        </mat-card-actions>
+      </mat-card>
+    </form>
+  </div>
+  </div>
