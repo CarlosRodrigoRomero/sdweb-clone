@@ -120,6 +120,7 @@ export class ZonaFilterComponent implements OnInit {
         this.zonasPcs.length,
         Number(event.source.value)
       );
+      
       this.filterService.addFilter(this.filtroZona);
       this.filterControlService.zonasSelected[event.source.value] = true;
       // añadimos el modelo seleccionado a la variable

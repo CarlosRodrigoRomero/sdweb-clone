@@ -59,6 +59,15 @@ export class FilterControlService {
   private _zonasSelected: boolean[] = [];
   public zonasSelected$ = new BehaviorSubject<boolean[]>(this._zonasSelected);
 
+  private _labelStatusDefaultStatus = true;
+  public labelStatusDefaultStatus$ = new BehaviorSubject<boolean>(this._labelStatusDefaultStatus);
+  public selectedStatusDefaultLabel = 'Estado';
+  private _selectedStatusLabels: string[] = [this.selectedStatusDefaultLabel];
+  public selectedStatusLabels$ = new BehaviorSubject<string[]>(this._selectedStatusLabels);
+  public statusSelectedDefault: boolean[] = [];
+  private _statusSelected: boolean[] = [];
+  public statusSelected$ = new BehaviorSubject<boolean[]>(this._statusSelected);
+
   private _claseSelected: boolean[] = [false, false, false];
   public claseSelected$ = new BehaviorSubject<boolean[]>(this._claseSelected);
 
@@ -134,6 +143,16 @@ export class FilterControlService {
         }
       });
     }
+    if (params.status !== undefined && params.status !== null) {
+      this.statusSelected = [];
+      params.status.forEach((s) => {
+        if (s !== null) {
+          this.statusSelected.push(true);
+        } else {
+          this.statusSelected.push(false);
+        }
+      });
+    }
   }
 
   resetFilters() {
@@ -179,6 +198,16 @@ export class FilterControlService {
     this.selectedZonaLabels = [this.selectedZonaDefaultLabel];
     this.labelZonaDefaultStatus = true;
 
+    // STATUS
+    const statusSel: boolean[] = [];
+    this.statusSelected.forEach((sel) => {
+      statusSel.push(false);
+    });
+    this.statusSelected = statusSel;
+    // Labels status
+    this.selectedStatusLabels = [this.selectedStatusDefaultLabel];
+    this.labelStatusDefaultStatus = true;
+
     // CLASE
     this.claseSelected = [false, false, false];
 
@@ -213,8 +242,13 @@ export class FilterControlService {
     this.labelModeloDefaultStatus = true;
     this.selectedModeloLabels = [this.selectedModeloDefaultLabel];
     this.labelZonaDefaultStatus = true;
-    this.selectedZonaLabels = [this.selectedModeloDefaultLabel];
+    this.selectedZonaLabels = [this.selectedZonaDefaultLabel];
+    this.labelStatusDefaultStatus = true;
+    this.selectedStatusLabels = [this.selectedStatusDefaultLabel];
     this.tiposSelected = [];
+    this.statusSelected = [];
+    this.zonasSelected = [];
+    this.modelosSelected = [];
     this.claseSelected = [false, false, false];
     this.criticidadSelected = [false, false, false, false, false];
     this.reparableSelected = [false, false];
@@ -366,6 +400,35 @@ export class FilterControlService {
   set labelZonaDefaultStatus(value: boolean) {
     this._labelZonaDefaultStatus = value;
     this.labelZonaDefaultStatus$.next(value);
+  }
+
+  /* STATUS */
+  get statusSelected() {
+    return this._statusSelected;
+  }
+
+  set statusSelected(value: boolean[]) {
+    this._statusSelected = value;
+    this.statusSelected$.next(value);
+  }
+
+  /* Labels status */
+  get selectedStatusLabels() {
+    return this._selectedStatusLabels;
+  }
+
+  set selectedStatusLabels(value: string[]) {
+    this._selectedStatusLabels = value;
+    this.selectedStatusLabels$.next(value);
+  }
+
+  get labelStatusDefaultStatus() {
+    return this._labelStatusDefaultStatus;
+  }
+
+  set labelStatusDefaultStatus(value: boolean) {
+    this._labelStatusDefaultStatus = value;
+    this.labelStatusDefaultStatus$.next(value);
   }
 
   /* CLASE */

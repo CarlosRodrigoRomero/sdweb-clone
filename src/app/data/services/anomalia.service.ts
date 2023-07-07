@@ -190,6 +190,9 @@ export class AnomaliaService {
                 }
               }
             }
+            if (!data.hasOwnProperty('status')) {
+              data.status = 'pendiente';
+            }
             if (tipo === 'pcs') {
               data.localX = Number((data as PcInterface).local_x);
               data.localY = Number((data as PcInterface).local_y);

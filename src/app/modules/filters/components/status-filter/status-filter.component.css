@@ -1,0 +1,63 @@
+.filtro {
+  margin-bottom: 15px;
+}
+
+h5 {
+  margin-bottom: 15px;
+  font-weight: 400;
+}
+
+.status-select {
+  width: 100%;
+}
+
+.filter-default {
+  font-weight: 200;
+  /* color: grey; */
+}
+
+.filter-selected {
+  display: inline-block;
+  width: 170px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  color: #d32f2f;
+}
+
+:host ::ng-deep .menu-status .mat-menu-content:not(:empty) {
+  min-width: 280px;
+}
+
+li {
+  list-style-type: none;
+  padding:0;
+  width:100%;
+}
+
+.counts-status {
+  margin-left: 10px;
+}
+
+.mat-menu-item {
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+
+:host ::ng-deep .mat-checkbox-layout, .mat-checkbox{
+  width: 100%;
+}
+
+:host ::ng-deep .mat-checkbox-label{
+  width: 100%;
+}
+
+
+.labelWrapper{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}

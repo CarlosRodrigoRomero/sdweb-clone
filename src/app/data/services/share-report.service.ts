@@ -14,6 +14,7 @@ import { TempMaxFilter } from '@core/models/tempMaxFilter';
 import { AreaFilter } from '@core/models/areaFilter';
 import { ClaseFilter } from '@core/models/claseFilter';
 import { CriticidadFilter } from '@core/models/criticidadFilter';
+import { StatusFilter } from '@core/models/statusFilter';
 import { ModuloPcFilter } from '@core/models/moduloFilter';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { ZonaFilter } from '@core/models/zonaFilter';
@@ -150,7 +151,9 @@ export class ShareReportService {
             
             this.params.reparable[indexSelected] = !this.params.reparable[indexSelected];
           } else {
-            this.params.reparable[indexSelected] = !this.params.reparable[indexSelected];
+            // Como es un filtro simple, cuando se selecciona uno, el otro se deselecciona
+            this.params.reparable = [false, false];
+            this.params.reparable[indexSelected] = !this.params.reparable[indexSelected];            
           }
           break;
       case 'criticidad':
@@ -203,10 +206,19 @@ export class ShareReportService {
           } else {
             this.params.zonas[(filter as ZonaFilter).position] = (filter as ZonaFilter).zona;
           }
+        break;
+        case 'status':
+          if (this.params.status === undefined || this.params.status === null) {
+            // inicializamos el array tipo con valores null
+            this.params.status = [];
+            for (let i = 0; i < 3; i++) {
+              this.params.status.push(null);
+            }
+            this.params.status[(filter as StatusFilter).statusNumber] = (filter as StatusFilter).status;
+          } else {
+            this.params.status[(filter as StatusFilter).statusNumber] = (filter as StatusFilter).status;
+          }
           break;
-      // case 'zona':
-      //   this.params.zona = (filter as ZonaFilter).zona;
-      //   break;
     }
   }
 
@@ -231,6 +243,9 @@ export class ShareReportService {
         const indexSelected = (filter as ClaseFilter).clase ? 0 : 1;
         this.params.clase[indexSelected] = !this.params.clase[indexSelected];
         break;
+      case 'reparable':
+        const indexSelectedReparable = (filter as ReparableFilter).reparable ? 0 : 1;
+        this.params.reparable[indexSelectedReparable] = !this.params.reparable[indexSelectedReparable];
       case 'criticidad':
         this.params.criticidad[(filter as CriticidadFilter).criticidad] =
           !this.params.criticidad[(filter as CriticidadFilter).criticidad];
@@ -246,6 +261,9 @@ export class ShareReportService {
         break;
       case 'zona':
         this.params.zonas[(filter as ZonaFilter).position] = null;
+        break;
+      case 'status':
+        this.params.status[(filter as StatusFilter).statusNumber] = null;
         break;
     }
   }
@@ -352,10 +370,11 @@ export class ShareReportService {
           }
         }
         if (Object.keys(this.params).includes('reparable')) {
+          var isReparable = [true, false]
           if (this.params.reparable !== null) {
             this.params.reparable.forEach((rep, index) => {
               if (rep) {
-                const reparableFilter = new ReparableFilter(index.toString(), 'reparable', rep);
+                const reparableFilter = new ReparableFilter(index.toString(), 'reparable', isReparable[index]);
                 filters.push(reparableFilter);
               }
             });
@@ -412,12 +431,21 @@ export class ShareReportService {
             this.filterControlService.zonasSelected = zonasSelected;
           }
         }
-        // if (Object.keys(this.params).includes('zona')) {
-        //   if (this.params.zona !== null) {
-        //     const zonaFilter = new ZonaFilter('', 'zona', this.params.zona);
-        //     filters.push(zonaFilter);
-        //   }
-        // }
+        if (Object.keys(this.params).includes('status')) {
+          if (this.params.status !== null) {
+            let statusSelected = this.filterControlService.statusSelected;
+            this.params.status.forEach((s, index) => {
+              if (s !== undefined && s !== null) {
+                const statusFilter = new StatusFilter(String(index), 'status', s, index);
+                filters.push(statusFilter);
+
+                statusSelected[s] = true;
+              }
+            });
+
+            this.filterControlService.statusSelected = statusSelected;
+          }
+        }
 
         filters;
       } else {

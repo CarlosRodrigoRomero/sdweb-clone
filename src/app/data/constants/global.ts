@@ -46,6 +46,8 @@ export let GLOBAL = {
     'CoA 2: anomalía térmica: ver la causa y, si es necesario, arreglar en un periodo razonable.',
     'CoA 3: anomalía térmica relevante: posible interrupción de la operación normal del módulo, actuar en el corto plazo.',
   ],
+  labels_status: ['Pendiente de reparar', 'Revisada', 'Reparada'],
+  tipos_status: ['pendiente', 'revisada', 'reparada'],
   tipos_clase: [1, 2, 3],
   labels_criticidad: ['Muy baja', 'Baja', 'Media', 'Alta', 'Muy Alta'],
   tipos_criticidad: [1, 2, 3, 4, 5],

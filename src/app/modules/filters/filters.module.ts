@@ -20,6 +20,7 @@ import { AreaFilterContainerComponent } from './containers/area-filter-container
 import { FiltersPanelContainerComponent } from './containers/filters-panel-container/filters-panel-container.component';
 import { ReparableFilterComponent } from './components/reparable-filter/reparable-filter.component';
 import { ModeloFilterComponent } from './components/modelo-filter/modelo-filter.component';
+import { StatusFilterComponent } from './components/status-filter/status-filter.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { ModeloFilterComponent } from './components/modelo-filter/modelo-filter.
     FiltersPanelContainerComponent,
     ReparableFilterComponent,
     ModeloFilterComponent,
+    StatusFilterComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
