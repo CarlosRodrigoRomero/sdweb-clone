@@ -12,7 +12,7 @@
 
         <!-- MAE POR ZONAS -->
         <app-chart-mae-zonas
-          *ngIf="(thereAreZones && reportControlService.nombreGlobalCoords.length > 0) || completeView"
+          *ngIf="(thereAreZones && reportControlService.nombreGlobalCoords.length > 0 && showLocation) || completeView"
         ></app-chart-mae-zonas>
       </div>
       <div>
@@ -36,7 +36,7 @@
         <app-chart-cels-grad></app-chart-cels-grad>
 
         <!-- CC POR ZONAS -->
-        <app-chart-cels-por-zonas *ngIf="thereAreZones"></app-chart-cels-por-zonas>
+        <app-chart-cels-por-zonas *ngIf="thereAreZones && showLocation"></app-chart-cels-por-zonas>
       </div>
     </div>
   </mat-tab>
