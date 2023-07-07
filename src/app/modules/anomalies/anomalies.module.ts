@@ -6,6 +6,7 @@ import { AnomaliaInfoComponent } from './components/anomalia-info/anomalia-info.
 import { AnomaliaListComponent } from './components/anomalia-list/anomalia-list.component';
 import { AnomaliaListContainer } from './containers/anomalia-list-container/anomalia-list-container.component';
 import { FiltersModule } from '@modules/filters/filters.module';
+import { CommentsModule } from '@modules/comments/comments.module';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { FiltersModule } from '@modules/filters/filters.module';
   imports: [
     CommonModule,
     SharedModule,
-    FiltersModule
+    FiltersModule,
+    CommentsModule
   ],
   exports: [
     AnomaliaInfoComponent,

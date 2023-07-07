@@ -264,7 +264,6 @@ export class FilterService {
       // reseteamos parametros para compartir
       this.shareReportService.resetParams(filter);
     }
-
     this.processFilters();
   }
 

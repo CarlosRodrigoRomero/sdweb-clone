@@ -21,7 +21,7 @@ import { MatRow } from '@angular/material/table';
 
 import { Anomalia } from '@core/models/anomalia';
 
-import { AnomaliasControlCubiertasService } from '@data/services/anomalias-control-cubiertas.service';
+import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 
 interface Page{
     page: number;
@@ -61,7 +61,7 @@ export class AnomaliaListComponent implements OnChanges {
 
   displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'perdidas', 'comentarios'];
 
-  constructor(private anomaliasControlService: AnomaliasControlCubiertasService) {}
+  constructor(private anomaliasControlService: AnomaliasControlService) {}
 
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
 
@@ -71,7 +71,6 @@ export class AnomaliaListComponent implements OnChanges {
     }
     // Al seleccionar una anomalía, se dan varios pasos:
     if (changes.anomaliaSelected && changes.anomaliaSelected.currentValue) {
-      console.log('anomaliaSelected', this.anomaliaSelected);
       var {page, firstRowInPage} = this.findPage();
 
       if (this.paginator.pageIndex != page - 1){
@@ -83,32 +82,44 @@ export class AnomaliaListComponent implements OnChanges {
         }).then(()=>{
           // 2. Expandimos la fila de la anomalía seleccionada (expandimos primero ya que es lo que
           // mejor experiencia ofrece)
-          let row = this.findRow();
-          this.expandRow(row);
+          // let row = this.findRow();
+          // this.expandRow(row);
+          this.scrollToIndex(firstRowInPage.id, false);
           return new Promise(resolve => {
-            setTimeout(()=>resolve(true), 100);
+            setTimeout(()=>resolve(true), 200);
           });
         }).then(()=>{
           // 3. Hacemos scroll hasta la primera fila de la página (de este modo evitamos el efecto de
           // que la fila seleccionada no se vea porque se "ha ido hacia arriba" siguiendo el efecto que 
           // hace mat-table al hacer scroll)
-          this.scrollToIndex(firstRowInPage.id, false);
+          let row = this.findRow();
+          this.expandRow(row);
+          return new Promise(resolve => {
+            setTimeout(()=>resolve(true), 200);
+          });
+          // this.scrollToIndex(firstRowInPage.id, false);
         }).then(()=>{
           // Hacemos scroll hasta la fila seleccionada
           this.rowId = this.anomaliaSelected.id;
           this.scrollToIndex(this.rowId, true);
         })
+
       } else {
+        // Si la anomalía seleccionada está en la misma página que la que se está mostrando:
         let row = this.findRow();
         this.expandRow(row);
         // Si la selección se ha hecho desde el mapa, hacemos también el efecto scroll; Si se 
         // ha hecho desde la tabla, no queremos que se haga el scroll para evitar mala experiencia
         // de usuario.
+        console.log(this.anomaliasControlService.selectionMethod);
         if (this.anomaliasControlService.selectionMethod == 'map'){
           await new Promise(resolve => {
             resolve(true);
           }).then(()=>{
             this.scrollToIndex(firstRowInPage.id, false);
+            return new Promise(resolve => {
+              setTimeout(()=>resolve(true), 200);
+            });
           }).then(()=>{
             this.rowId = this.anomaliaSelected.id;
             this.scrollToIndex(this.rowId, true);

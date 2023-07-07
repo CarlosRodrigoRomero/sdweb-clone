@@ -45,6 +45,11 @@ export class ReparableFilterComponent implements OnInit {
     });
 
     this.subscriptions.add(
+      this.filterService.filteredElements$.subscribe((filters) => {
+      })
+    );
+
+    this.subscriptions.add(
       this.filterControlService.reparableSelected$.subscribe((sel) => (this.reparableSelected = sel))
     );
   }
@@ -61,10 +66,11 @@ export class ReparableFilterComponent implements OnInit {
       // Como es un filtro simple, hacemos uncheck del otro botón
       this.filterControlService.reparableSelected[Math.abs(indexSelected - 1)] = false;
     } else {
-      this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
+      this.filterService.filters$.pipe(take(1)).subscribe((filters) => {
         this.filterService.deleteFilter(
           filters.filter((filter) => filter.type === 'reparable')[0]
-        ));
+        )
+      });
       this.filterControlService.reparableSelected[indexSelected] = false;
     }
   }

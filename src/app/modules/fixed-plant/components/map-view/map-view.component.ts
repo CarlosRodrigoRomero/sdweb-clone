@@ -12,9 +12,11 @@ import { ResetServices } from '@data/services/reset-services.service';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
 import { DynamicAnomaliaListDirective } from '@modules/fixed-plant/directives/dynamic-anomalia-list.directive';
+import { DynamicFiltersDirective } from '@modules/filters/directives/dynamic-filters.directive';
 
 import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
 import { AnomaliaListContainer } from '@modules/anomalies/containers/anomalia-list-container/anomalia-list-container.component';
+import { FiltersPanelContainerComponent } from '@modules/filters/containers/filters-panel-container/filters-panel-container.component';
 
 import { Patches } from '@core/classes/patches';
 
@@ -26,6 +28,7 @@ import { Patches } from '@core/classes/patches';
 export class MapViewComponent implements OnInit, OnDestroy {
   plantaFija = true;
   rightOpened = false;
+  filtersOpened = false;
   // statsOpened: boolean;
   anomaliasLoaded = false;
   sharedReport = false;
@@ -45,9 +48,11 @@ export class MapViewComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
+  @ViewChild('sidenavFilters') sidenavFilters: MatSidenav;
 
   @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
   @ViewChild(DynamicAnomaliaListDirective) dynamicAnomList: DynamicAnomaliaListDirective;
+  @ViewChild(DynamicFiltersDirective) dynamicFilters: DynamicFiltersDirective;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -134,6 +139,13 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
     this.dynamicStats.viewContainerRef.clear();
     this.dynamicStats.viewContainerRef.createComponent(component);
+  }
+  
+  loadFilters() {
+    const component = this.componentFactoryResolver.resolveComponentFactory(FiltersPanelContainerComponent);
+
+    this.dynamicFilters.viewContainerRef.clear();
+    this.dynamicFilters.viewContainerRef.createComponent(component);
   }
 
   ngOnDestroy(): void {

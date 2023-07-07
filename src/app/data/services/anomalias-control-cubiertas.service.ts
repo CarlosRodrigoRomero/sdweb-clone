@@ -362,6 +362,7 @@ export class AnomaliasControlCubiertasService {
 
             this.anomaliaSelect = anomalia;
             this.selectionMethod = 'map';
+            console.log("HOLA")
             // aplicamos estilos
             this.setExternalStyle(anomaliaId, true);
 

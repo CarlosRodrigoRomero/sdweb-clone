@@ -57,6 +57,7 @@ export class MapComponent implements OnInit, OnDestroy {
   noAnomsReport = false;
   public coordsPointer;
   private popupDirtyAnoms: Overlay;
+  private popupAnomaliaInfo: Overlay;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -255,7 +256,17 @@ export class MapComponent implements OnInit, OnDestroy {
       position: undefined,
     });
 
+    // const containerInfo = document.getElementById('popup-anomalia-info');
+
+    // this.popupAnomaliaInfo = new Overlay({
+    //   id: 'popup-anomalia-info',
+    //   element: containerInfo,
+    //   position: undefined,
+    // });
+
     this.map.addOverlay(this.popupDirtyAnoms);
+    // this.map.addOverlay(this.popupAnomaliaInfo);
+    // console.log(this.map.getOverlays());
   }
 
   private transform(extent) {

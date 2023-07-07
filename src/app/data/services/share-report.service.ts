@@ -246,6 +246,7 @@ export class ShareReportService {
       case 'reparable':
         const indexSelectedReparable = (filter as ReparableFilter).reparable ? 0 : 1;
         this.params.reparable[indexSelectedReparable] = !this.params.reparable[indexSelectedReparable];
+        break;
       case 'criticidad':
         this.params.criticidad[(filter as CriticidadFilter).criticidad] =
           !this.params.criticidad[(filter as CriticidadFilter).criticidad];

@@ -353,6 +353,7 @@ export class AnomaliasControlService {
         if (this.anomaliaSelect !== undefined) {
           this.setExternalStyle(this.anomaliaSelect.id, false, this.anomaliaSelect.featureType);
           this.anomaliaSelect = undefined;
+          this.selectionMethod = undefined;
         }
 
         if (e.selected.length > 0) {
@@ -361,6 +362,7 @@ export class AnomaliasControlService {
             const anomalia = this.listaAnomalias.find((anom) => anom.id === anomaliaId);
 
             this.anomaliaSelect = anomalia;
+            this.selectionMethod = 'map';
 
             // aplicamos estilos
             this.setExternalStyle(anomaliaId, true, this.anomaliaSelect.featureType);
@@ -390,6 +392,7 @@ export class AnomaliasControlService {
           this.setExternalStyle(this.anomaliaSelect.id, false, this.anomaliaSelect.featureType);
 
           this.anomaliaSelect = undefined;
+          this.selectionMethod = undefined;
         }
       }
     });

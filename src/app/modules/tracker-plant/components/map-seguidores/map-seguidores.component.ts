@@ -171,6 +171,7 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
     });
 
     this.map.addOverlay(this.popup);
+    console.log(this.map);
   }
 
   ngOnDestroy(): void {

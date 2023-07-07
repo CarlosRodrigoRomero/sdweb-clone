@@ -1,0 +1,27 @@
+<div class="popup1">
+    <mat-card class="popup-hover" *ngIf="anomaliaHovered">
+      <mat-card-content class="popup-hover-content">
+        <div class="elemento">
+          <span class="titulo">{{ 'MAE' | translate }}</span>
+          <span class="subtitulo">{{ anomaliaHovered.perdidas * 100 | number : '1.0-2' }}%</span>
+        </div>
+        <!-- <div class="elemento">
+          <span class="titulo">&Delta;T Max {{ '(normalizado)' | translate }}</span>
+          <span class="subtitulo">{{ anomaliaHovered.gradienteNormalizado }}ºC</span>
+        </div> -->
+        <div class="elemento">
+          <span class="titulo">{{ 'Tipo' | translate }}</span>
+          <span class="subtitulo">{{ anomaliaHovered.tipo }}</span>
+        </div>
+        <div class="elemento">
+          <span class="titulo">{{ 'Temperatura Max' | translate }}</span>
+          <span class="subtitulo">{{ anomaliaHovered.temperaturaMax }}ºC</span>
+        </div>
+        <div class="elemento">
+          <span class="titulo">{{ 'localizacion' | translate | titlecase }}</span>
+          <span class="subtitulo">{{ localizacion }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  

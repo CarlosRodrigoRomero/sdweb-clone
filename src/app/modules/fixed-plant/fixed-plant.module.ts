@@ -26,6 +26,7 @@ import { LostDashboardComponent } from './components/lost-dashboard/lost-dashboa
 import { MapTestComponent } from './components/map-test/map-test.component';
 
 import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list.directive';
+import { AnomaliaPopupComponent } from './components/anomalia-popup/anomalia-popup.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list
     LostDashboardComponent,
     MapTestComponent,
     FixedPlantComponent,
+    AnomaliaPopupComponent,
   ],
   imports: [
     PlantaFijaRoutingModule,

@@ -1,10 +1,10 @@
-<div class="anom-img-wrapper">
+  <!-- <div class="anom-img-wrapper">
     <img src="../../../../../assets/images/thermal_image.png"/>
-    <img src="../../../../../assets/images/visual_image.png"/>
+    <img src="../../../../../assets/images/visual_image.png"/> -->
     <!-- <app-map-anom [anomalia]="anomaliaSelect"></app-map-anom> -->
-  </div>
+  <!-- </div> -->
   <mat-accordion *ngIf="anomaliaSelect" multi>
-    <mat-expansion-panel>
+    <mat-expansion-panel [expanded]="true">
       <mat-expansion-panel-header>
         <mat-panel-title>
             Información principal
@@ -126,7 +126,7 @@
             O&M
         </mat-panel-title>
       </mat-expansion-panel-header>
-      <app-comments [anomalia]="anomaliaSelect"></app-comments>
+      <app-anomalia-info-editable [anomaliaSelected]="anomaliaSelect"></app-anomalia-info-editable>
     </mat-expansion-panel>
   </mat-accordion>
     
