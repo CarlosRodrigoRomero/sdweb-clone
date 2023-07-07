@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import { TranslateService } from '@ngx-translate/core';
@@ -10,16 +10,15 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 
 import { FilterService } from '@data/services/filter.service';
 import { FilterControlService } from '@data/services/filter-control.service';
-import { AnomaliaService } from '@data/services/anomalia.service';
-import { ReportControlService } from '@data/services/report-control.service';
-import { AnomaliasControlService } from '@data/services/anomalias-control.service';
-import { PlantaService } from '@data/services/planta.service';
 
 import { StatusFilter } from '@core/models/statusFilter';
+import { Seguidor } from '@core/models/seguidor';
 
 import { GLOBAL } from '@data/constants/global';
 
+
 interface Status {
+  status: number;
   label?: string;
   completed?: boolean;
   nAnomalias?: number;
@@ -36,16 +35,14 @@ export class StatusFilterComponent implements OnInit {
   allComplete: boolean;
   filtroStatus: StatusFilter;
   public statusSelected: boolean[] = [false, false, false];
-  labels = {'Pendiente de reparar': 'pendiente', 'Revisada': 'revisada', 'Reparada': 'reparada'}
 
   defaultLabelStatus = true;
-  defaultSelectLabel = 'Status';
+  defaultSelectLabel = 'Estado';
   selectedLabels: string[] = [this.defaultSelectLabel];
 
   selectedInformeId: string;
   anomalias: any[];
 
-  // statusSelected: boolean[];
   selection = new SelectionModel<Status>(true, []);
 
   private subscriptions: Subscription = new Subscription();
@@ -53,77 +50,90 @@ export class StatusFilterComponent implements OnInit {
   constructor(
     private filterService: FilterService, 
     private filterControlService: FilterControlService,
-    private anomaliaService: AnomaliaService,
-    private reportControlService: ReportControlService,
-    private anomaliasControlService: AnomaliasControlService,
-    private plantaService: PlantaService,
-    private translate: TranslateService
-  ) {}
+    private translate: TranslateService,
+  ) { }
 
   ngOnInit(): void {
-    GLOBAL.labels_status.forEach((label) =>
+    GLOBAL.labels_status.forEach((label, i) =>
       this.statusElems.push({
+        status: i,
         label,
         completed: false,
       })
     );
    // nos suscribimos a los status seleccionados de filter control
-   this.subscriptions.add(
-    this.filterControlService.statusSelected$.subscribe((statusSel) => (this.statusSelected = statusSel))
-  );
+    this.subscriptions.add(
+      this.filterControlService.statusSelected$.subscribe((statusSel) => (this.statusSelected = statusSel))
+    );
 
-  // nos suscribimos a los labels del filter control
-  this.subscriptions.add(
-    this.filterControlService.selectedStatusLabels$.subscribe((labels) => (this.selectedLabels = labels))
-  );
+    // nos suscribimos a los labels del filter control
+    this.subscriptions.add(
+      this.filterControlService.selectedStatusLabels$.subscribe((labels) => (this.selectedLabels = labels))
+    );
 
-  // nos suscribimos al estado en el control de filtros
-  this.subscriptions.add(
-    this.filterControlService.labelStatusDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value))
-  );
-
-  this.subscriptions.add(
-    this.translate.stream('Estado').subscribe((res: string) => {
-      this.defaultSelectLabel = res;
-    })
-  );
+    // nos suscribimos al estado en el control de filtros
+    this.subscriptions.add(
+      this.filterControlService.labelStatusDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value))
+    );
 
     this.subscriptions.add(
-      this.filterService.filteredElements$.subscribe((filElem) => {
-        this.statusElems.forEach((elem) => {
-          elem.nAnomalias = filElem.filter((x) => x.status === GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(elem.label)]).length;
-        });
+      this.translate.stream('Estado').subscribe((res: string) => {
+        this.defaultSelectLabel = res;
       })
     );
 
+    // Nos suscribimos a los elementos filtrables para obtener el número de anomalias de cada status
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+      this.filterService.allFiltrableElements$.subscribe((anomalias) => {
+        this.statusElems.forEach((statusElem) => {
+          // Primero filtramos para obtener un array de anomalías o seguidores con el status correspondiente
+          let filtered = anomalias.filter((x) => {
+            if (x.hasOwnProperty('anomaliasCliente')){
+              return (x as Seguidor).anomaliasCliente.filter((anom) => anom.status === GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(statusElem.label)]).length > 0
+            } else {
+              return x.status === GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(statusElem.label)]
+            }
+          });
+          // Después sumamos todas las anomalías
+          statusElem.nAllAnomalias = filtered.reduce((acc, elem) => {
+            if (elem.hasOwnProperty('anomaliasCliente')){
+              return acc + (elem as Seguidor).anomaliasCliente.length
+            } else {
+              return acc + 1
+            }
+          }, 0);
+        });
+        // Mostramos solo los status presentes en alguna anomalía
+        this.statusElems = this.statusElems.filter(elem => elem.nAllAnomalias > 0);
+      })
     );
 
+  // Nos suscribimos a los elementos filtrados para obtener el número de anomalías de cada status
     this.subscriptions.add(
-      this.plantaService
-        .getPlanta(this.reportControlService.plantaId)
-        .pipe(
-          take(1),
-          switchMap((planta) => {
-            return this.anomaliaService.getAnomaliasPlanta$(planta, this.reportControlService.informes);
+      this.filterService.filteredElements$.subscribe((filElem) => {
+        this.statusElems.forEach((statusElem) => {
+          let filtered = filElem.filter((x) => {
+            if (x.hasOwnProperty('anomaliasCliente')) {
+              return (x as Seguidor).anomaliasCliente.filter((anom) => anom.status === GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(statusElem.label)]).length > 0;
+            } else {
+              return x.status == GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(statusElem.label)];
+            }
           })
-        )
-        .subscribe((anomalias) => {
-          // filtramos las anomalias que ya no consideramos anomalias
-          this.anomalias = this.anomaliaService.getRealAnomalias(anomalias);
-          // Claculamos el número de anomalias de cada status antes de filtrar
-          this.statusElems.forEach((elem) => {
-            elem.nAllAnomalias = this.anomalias.filter((x) => x.status === GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(elem.label)]).length;
-          });
-        })  
-    );
-    
+          statusElem.nAnomalias = filtered.reduce((acc, elem) => {
+            if (elem.hasOwnProperty('anomaliasCliente')){
+              return acc + (elem as Seguidor).anomaliasCliente.length
+            } else {
+              return acc + 1
+            }
+          }, 0);
+        });
+      })
+      
+    ); 
   }
 
   onChangeFiltroStatus(event: MatCheckboxChange) {
-    console.log(this.anomalias);
-    const indexSelected = Number(event.source.id) - 1;
+    const indexSelected = Number(event.source.id.replace('status_', '')) - 1;
     if (event.checked) {
       this.filtroStatus = new StatusFilter(
         event.source.id,
