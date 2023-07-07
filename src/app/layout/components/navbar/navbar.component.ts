@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { Notification } from '@layout/containers/navbar-container/navbar-container.component';
+import { Notification } from '@core/models/notification';
 
 @Component({
   selector: 'app-navbar',
@@ -10,6 +10,7 @@ import { Notification } from '@layout/containers/navbar-container/navbar-contain
 })
 export class NavbarComponent {
   @Input() loadContent: boolean;
+  @Input() loadPortfolioContent: boolean;
   @Input() tipoComentarios: boolean;
   @Input() isAdmin: boolean;
   @Input() isReport: boolean;

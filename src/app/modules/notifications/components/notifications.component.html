@@ -1,0 +1,12 @@
+<button class="btn-notif" *ngIf="hasNotifications" mat-icon-button [matMenuTriggerFor]="notifMenu">
+  <mat-icon matBadge="{{ notifications.length }}" matBadgeColor="primary">notifications</mat-icon>
+</button>
+<mat-menu class="notif-menu" #notifMenu="matMenu">
+  <button mat-menu-item (click)="applyFilter.emit(notification.filter)" *ngFor="let notification of notifications">
+    <div class="btn-content">
+      <mat-icon class="btn-icon">warning</mat-icon>
+      <span class="btn-label">{{ notification.content }}</span>
+      <span class="btn-label">{{ notification.plants.length }}</span>
+    </div>
+  </button>
+</mat-menu>
