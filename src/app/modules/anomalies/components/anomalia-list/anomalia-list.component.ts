@@ -111,7 +111,6 @@ export class AnomaliaListComponent implements OnChanges {
         // Si la selección se ha hecho desde el mapa, hacemos también el efecto scroll; Si se 
         // ha hecho desde la tabla, no queremos que se haga el scroll para evitar mala experiencia
         // de usuario.
-        console.log(this.anomaliasControlService.selectionMethod);
         if (this.anomaliasControlService.selectionMethod == 'map'){
           await new Promise(resolve => {
             resolve(true);

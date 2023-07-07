@@ -37,10 +37,6 @@ export class AnomaliaListComponent implements OnChanges {
     if (changes.dataSource && changes.dataSource.currentValue) {
       this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
-      console.log("Hola")
-    }
-    if (changes.anomaliaSelected && changes.anomaliaSelected.currentValue) {
-      console.log('Anomalia seleccionada: ', this.anomaliaSelected);
     }
   }
 
@@ -61,6 +57,5 @@ export class AnomaliaListComponent implements OnChanges {
   selectRow(row: any, zoom: boolean) {
     row.zoom = zoom;
     this.rowSelected.emit(row);
-    console.log(this.anomaliaSelected);
   }
 }

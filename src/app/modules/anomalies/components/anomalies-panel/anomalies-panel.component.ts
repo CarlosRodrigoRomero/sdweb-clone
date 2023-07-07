@@ -1,7 +1,4 @@
 import { Component, OnInit, Input } from '@angular/core';
-
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { switchMap, take } from 'rxjs/operators';
@@ -56,11 +53,9 @@ export class AnomaliesPanelComponent implements OnInit {
         )
         .subscribe((anomalias) => {
           // filtramos las anomalias que ya no consideramos anomalias
-          console.log(this.anomaliaService.getRealAnomalias(anomalias).slice(0,10))
-          this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias).slice(0,20);
+          this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
         })
     );
-    console.log(this.allAnomalias);
   }
 
   applyFilter(event: Event) {

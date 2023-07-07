@@ -18,7 +18,6 @@ export class ModeloFilter implements FilterInterface {
   }
 
   applyFilter(elems: FilterableElement[]): FilterableElement[] {
-    console.log(elems)
     return elems.filter((elem) => this.setModuleLabel(elem.modulo) == this.modulo);
   }
   unapplyFilter(elems: FilterableElement[]): FilterableElement[] {
