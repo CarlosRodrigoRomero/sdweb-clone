@@ -7,6 +7,7 @@
           [id]="'status_' + (j+1)"
           [name]="statusElem.label"
           [value]="i"
+          [disabled]="statusElem.disabled"
           (change)="onChangeFiltroStatus($event)"
         >
         <div class="labelWrapper">

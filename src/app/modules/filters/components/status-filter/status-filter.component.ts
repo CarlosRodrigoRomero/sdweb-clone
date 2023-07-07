@@ -23,6 +23,7 @@ interface Status {
   completed?: boolean;
   nAnomalias?: number;
   nAllAnomalias?: number;
+  disabled?: boolean;
 }
 @Component({
   selector: 'app-status-filter',
@@ -102,9 +103,12 @@ export class StatusFilterComponent implements OnInit {
               return acc + 1
             }
           }, 0);
+          // Mostramos solo los status presentes en alguna anomalía
+          statusElem.disabled = statusElem.nAllAnomalias === 0;
         });
-        // Mostramos solo los status presentes en alguna anomalía
-        this.statusElems = this.statusElems.filter(elem => elem.nAllAnomalias > 0);
+        
+        
+        // this.statusElems = this.statusElems.filter(elem => elem.nAllAnomalias > 0);
       })
     );
 
