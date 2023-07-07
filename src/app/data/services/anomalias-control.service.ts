@@ -456,7 +456,6 @@ export class AnomaliasControlService {
 
   private getStyleAnomalias(focus: boolean, featureType?: string, selection?: string) {
     selection = selection ? selection : this.toggleViewSelected;
-    console.log(this.anomaliaSelect)
     return (feature) => {
       const colorsView = {
         mae: this.getColorMae(feature, 1),
@@ -465,7 +464,6 @@ export class AnomaliasControlService {
         tipo: this.getColorTipo(feature),
       };
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        console.log("Pues hemos entrado")
         featureType = feature.getProperties().properties.featureType;
         let color = colorsView[this.toggleViewSelected];
         switch (featureType){

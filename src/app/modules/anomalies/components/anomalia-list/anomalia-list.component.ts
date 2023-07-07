@@ -71,7 +71,7 @@ export class AnomaliaListComponent implements OnChanges {
     }
     // Al seleccionar una anomalía, se dan varios pasos:
     if (changes.anomaliaSelected && changes.anomaliaSelected.currentValue) {
-      console.log("Entra");
+      console.log('anomaliaSelected', this.anomaliaSelected);
       var {page, firstRowInPage} = this.findPage();
 
       if (this.paginator.pageIndex != page - 1){
