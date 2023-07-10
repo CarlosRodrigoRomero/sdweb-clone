@@ -104,8 +104,8 @@
   .mat-column-numAnom {
     word-wrap: break-word !important;
     white-space: unset !important;
-    flex: 0 0 8% !important;
-    width: 8% !important;
+    flex: 0 0 10% !important;
+    width: 10% !important;
     overflow-wrap: break-word;
     word-wrap: break-word;
   
@@ -120,8 +120,8 @@
   .mat-column-tipo {
     word-wrap: break-word !important;
     white-space: unset !important;
-    flex: 0 0 57% !important;
-    width: 57% !important;
+    flex: 0 0 25% !important;
+    width: 25% !important;
     overflow-wrap: break-word;
     word-wrap: break-word;
   
@@ -165,11 +165,11 @@
     hyphens: auto;
   }
   
-  /* .mat-column-temp {
+  .mat-column-temp {
     word-wrap: break-word !important;
     white-space: unset !important;
-    flex: 0 0 20% !important;
-    width: 20% !important;
+    flex: 0 0 15% !important;
+    width: 15% !important;
     overflow-wrap: break-word;
     word-wrap: break-word;
   
@@ -177,7 +177,21 @@
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
     hyphens: auto;
-  } */
+  }
+
+  .mat-column-gradiente {
+    word-wrap: break-word !important;
+    white-space: unset !important;
+    flex: 0 0 15% !important;
+    width: 15% !important;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
   
 
   

@@ -59,7 +59,7 @@ export class AnomaliaListComponent implements OnChanges {
   selectedRowId: string;
   rowId: string;
 
-  displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'perdidas', 'comentarios'];
+  displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente', 'comentarios'];
 
   constructor(private anomaliasControlService: AnomaliasControlService) {}
 

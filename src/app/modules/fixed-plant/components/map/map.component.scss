@@ -34,8 +34,12 @@
 }
 
 .ol-popup {
-  position: absolute;
-  transform: translate(-50%, -105%);
+  // position: absolute;
+  // transform: translate(-50%, -105%);
+  // display: block;
+  position: relative;
+  margin-left: 1rem;
+  margin-top: 1rem;
 }
 
 .popup-label {
@@ -54,6 +58,10 @@
   right: 10px;
   top: unset;
   bottom: 10px;
+}
+
+::ng-deep .ol-selectable{
+  display: block !important;
 }
 
 // ::ng-deep .ol-control button {

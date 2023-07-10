@@ -282,7 +282,7 @@ export class AnomaliasControlService {
   private addOnHoverAction() {
     this.map.on('pointermove', (event) => {
       if (!this.olMapService.mapMoving) {
-        if (this.anomaliaSelect === undefined) {
+        if (this.anomaliaSelect === undefined || this.anomaliaSelect !== undefined) {
           if (this.map.hasFeatureAtPixel(event.pixel)) {
             const feature = this.map
               .getFeaturesAtPixel(event.pixel)
@@ -299,6 +299,9 @@ export class AnomaliasControlService {
 
               const anomaliaId = feature.getProperties().properties.anomaliaId;
               const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
+
+              const coords = anomalia.featureCoords[0];
+              this.setPopupPosition(coords);
               
               feature.setStyle(this.getStyleAnomalias(true, feature.getProperties().properties.featureType));
 
@@ -324,6 +327,12 @@ export class AnomaliasControlService {
         }
       }
     });
+  }
+
+  setPopupPosition(coords: Coordinate) {
+    const popupCoords = [coords[0] + 20, coords[1] + 20] as Coordinate;
+
+    this.map.getOverlayById('popup-anomalia-info').setPosition(popupCoords);
   }
 
   private addSelectInteraction() {

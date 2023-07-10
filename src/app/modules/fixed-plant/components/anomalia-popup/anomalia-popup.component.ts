@@ -7,6 +7,8 @@ import { ReportControlService } from '@data/services/report-control.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
+import { GLOBAL } from '@data/constants/global';
+
 @Component({
   selector: 'app-anomalia-popup',
   templateUrl: './anomalia-popup.component.html',
@@ -17,6 +19,9 @@ export class AnomaliaPopupComponent implements OnInit {
   numAnomalias: number;
   anomaliaHovered: Anomalia;
   localizacion: string;
+  tipoLabel: string;
+  showAnomaliaInfo = false;
+  showSuciedadInfo = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -28,9 +33,20 @@ export class AnomaliaPopupComponent implements OnInit {
   ngOnInit(): void {
     this.subscriptions.add(
       this.anomaliasControlService.anomaliaHover$.subscribe((anomalia) => {
+        console.log(anomalia)
         this.anomaliaHovered = anomalia;
         if (this.anomaliaHovered !== undefined) {
-          this.localizacion = this.getLocalizacionLabel(this.anomaliaHovered);
+          if (this.anomaliaHovered.tipo === 11) {
+            this.showAnomaliaInfo = false;
+            this.showSuciedadInfo = true;
+          } else {
+            this.showAnomaliaInfo = true;
+            this.showSuciedadInfo = false;
+            this.tipoLabel = GLOBAL.labels_tipos[this.anomaliaHovered.tipo];
+          }          
+        } else {
+          this.showAnomaliaInfo = false;
+          this.showSuciedadInfo = false;
         }
       })
     );
