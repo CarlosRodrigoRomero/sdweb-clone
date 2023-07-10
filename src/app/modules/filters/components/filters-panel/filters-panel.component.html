@@ -1,16 +1,22 @@
+
 <div class="panel">
-  <app-reparable-filter></app-reparable-filter>
-  <app-criticidad-filter></app-criticidad-filter>
-  <app-tipo-filter></app-tipo-filter>
-  <app-modelo-filter *ngIf="showFiltroModelo"></app-modelo-filter>
-  <app-zona-filter *ngIf="showFiltroZona"></app-zona-filter>
-  <app-perdidas-filter></app-perdidas-filter>
-  <app-temp-max-filter></app-temp-max-filter>
-  <app-gradient-filter></app-gradient-filter>
-  <!-- <app-status-filter></app-status-filter> -->
-  <app-area-filter-container></app-area-filter-container>
-  <app-clase-filter></app-clase-filter>
-  <button *ngIf="filtrosActivos" class="clean-filters" mat-button (click)="clickCleanFilters()" color="primary">
-    {{ 'Limpiar filtros' | translate }}
-  </button>
+  <div class="titulo">
+    <h4>{{ 'filtros' | translate | titlecase }}</h4>
+    <button *ngIf="filtrosActivos" class="clean-filters" mat-button (click)="clickCleanFilters()" color="primary">
+      {{ 'Limpiar filtros' | translate }}
+    </button>
+  </div>
+  <div class="filters">
+    <app-reparable-filter></app-reparable-filter>
+    <app-criticidad-filter></app-criticidad-filter>
+    <app-tipo-filter></app-tipo-filter>
+    <app-modelo-filter *ngIf="showFiltroModelo"></app-modelo-filter>
+    <app-zona-filter *ngIf="showFiltroZona"></app-zona-filter>
+    <app-status-filter></app-status-filter>
+    <app-perdidas-filter></app-perdidas-filter>
+    <app-temp-max-filter></app-temp-max-filter>
+    <app-gradient-filter></app-gradient-filter>
+    <app-area-filter-container></app-area-filter-container>
+    <app-clase-filter></app-clase-filter>
+  </div>
 </div>

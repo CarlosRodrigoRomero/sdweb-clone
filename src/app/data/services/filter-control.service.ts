@@ -74,9 +74,6 @@ export class FilterControlService {
   private _criticidadSelected: boolean[] = [false, false, false, false, false];
   public criticidadSelected$ = new BehaviorSubject<boolean[]>(this._criticidadSelected);
 
-  // private _statusSelected: boolean[] = [false, false, false];
-  // public statusSelected$ = new BehaviorSubject<boolean[]>(this._statusSelected);
-
   private _reparableSelected: boolean[] = [false, false];
   public reparableSelected$ = new BehaviorSubject<boolean[]>(this._reparableSelected);
 
@@ -217,9 +214,6 @@ export class FilterControlService {
     // CRITICIDAD
     this.criticidadSelected = [false, false, false, false, false];
 
-    // STATUS
-    this.statusSelected = [false, false, false];
-
     // REPARABLE
     this.reparableSelected = [false, false];
 
@@ -252,9 +246,11 @@ export class FilterControlService {
     this.labelStatusDefaultStatus = true;
     this.selectedStatusLabels = [this.selectedStatusDefaultLabel];
     this.tiposSelected = [];
+    this.statusSelected = [];
+    this.zonasSelected = [];
+    this.modelosSelected = [];
     this.claseSelected = [false, false, false];
     this.criticidadSelected = [false, false, false, false, false];
-    this.statusSelected = [false, false, false];
     this.reparableSelected = [false, false];
     this.activeDrawArea = false;
     this.activeDeleteArea = false;

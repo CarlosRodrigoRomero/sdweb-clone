@@ -32,8 +32,8 @@ h5 {
 
 li {
   list-style-type: none;
-  margin-left: 10px;
-  margin-right: 10px;
+  padding:0;
+  width:100%;
 }
 
 .counts-status {
@@ -46,8 +46,18 @@ li {
   align-items: center;
 }
 
+
+:host ::ng-deep .mat-checkbox-layout, .mat-checkbox{
+  width: 100%;
+}
+
+:host ::ng-deep .mat-checkbox-label{
+  width: 100%;
+}
+
+
 .labelWrapper{
-  width: 120px;
+  width: 100%;
   display: flex;
   justify-content: space-between;
 }

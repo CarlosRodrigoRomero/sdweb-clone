@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 
 import { take } from 'rxjs/operators';
@@ -12,11 +12,18 @@ import { FilterService } from '@data/services/filter.service';
 import { FilterControlService } from '@data/services/filter-control.service';
 
 import { StatusFilter } from '@core/models/statusFilter';
+import { Seguidor } from '@core/models/seguidor';
+
+import { GLOBAL } from '@data/constants/global';
+
 
 interface Status {
+  status: number;
   label?: string;
   completed?: boolean;
   nAnomalias?: number;
+  nAllAnomalias?: number;
+  disabled?: boolean;
 }
 @Component({
   selector: 'app-status-filter',
@@ -29,13 +36,14 @@ export class StatusFilterComponent implements OnInit {
   allComplete: boolean;
   filtroStatus: StatusFilter;
   public statusSelected: boolean[] = [false, false, false];
-  labels = ['Pendiente', 'Revisada', 'Reparada']
 
   defaultLabelStatus = true;
-  defaultSelectLabel = 'Status';
+  defaultSelectLabel = 'Estado';
   selectedLabels: string[] = [this.defaultSelectLabel];
 
-  // statusSelected: boolean[];
+  selectedInformeId: string;
+  anomalias: any[];
+
   selection = new SelectionModel<Status>(true, []);
 
   private subscriptions: Subscription = new Subscription();
@@ -43,48 +51,93 @@ export class StatusFilterComponent implements OnInit {
   constructor(
     private filterService: FilterService, 
     private filterControlService: FilterControlService,
-    private translate: TranslateService
-  ) {}
+    private translate: TranslateService,
+  ) { }
 
   ngOnInit(): void {
-    this.labels.forEach((label) =>
+    GLOBAL.labels_status.forEach((label, i) =>
       this.statusElems.push({
+        status: i,
         label,
         completed: false,
       })
     );
    // nos suscribimos a los status seleccionados de filter control
-   this.subscriptions.add(
-    this.filterControlService.statusSelected$.subscribe((statusSel) => (this.statusSelected = statusSel))
-  );
+    this.subscriptions.add(
+      this.filterControlService.statusSelected$.subscribe((statusSel) => (this.statusSelected = statusSel))
+    );
 
-  // nos suscribimos a los labels del filter control
-  this.subscriptions.add(
-    this.filterControlService.selectedStatusLabels$.subscribe((labels) => (this.selectedLabels = labels))
-  );
+    // nos suscribimos a los labels del filter control
+    this.subscriptions.add(
+      this.filterControlService.selectedStatusLabels$.subscribe((labels) => (this.selectedLabels = labels))
+    );
 
-  // nos suscribimos al estado en el control de filtros
-  this.subscriptions.add(
-    this.filterControlService.labelStatusDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value))
-  );
-
-  this.subscriptions.add(
-    this.translate.stream('Estado').subscribe((res: string) => {
-      this.defaultSelectLabel = res;
-    })
-  );
+    // nos suscribimos al estado en el control de filtros
+    this.subscriptions.add(
+      this.filterControlService.labelStatusDefaultStatus$.subscribe((value) => (this.defaultLabelStatus = value))
+    );
 
     this.subscriptions.add(
-      this.filterService.filteredElements$.subscribe((filElem) => {
-        this.statusElems.forEach((elem) => {
-          elem.nAnomalias = filElem.filter((x) => x.status === elem.label).length;
-        });
+      this.translate.stream('Estado').subscribe((res: string) => {
+        this.defaultSelectLabel = res;
       })
     );
+
+    // Nos suscribimos a los elementos filtrables para obtener el número de anomalias de cada status
+    this.subscriptions.add(
+      this.filterService.allFiltrableElements$.subscribe((anomalias) => {
+        this.statusElems.forEach((statusElem) => {
+          // Primero filtramos para obtener un array de anomalías o seguidores con el status correspondiente
+          let filtered = anomalias.filter((x) => {
+            if (x.hasOwnProperty('anomaliasCliente')){
+              return (x as Seguidor).anomaliasCliente.filter((anom) => anom.status === GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(statusElem.label)]).length > 0
+            } else {
+              return x.status === GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(statusElem.label)]
+            }
+          });
+          // Después sumamos todas las anomalías
+          statusElem.nAllAnomalias = filtered.reduce((acc, elem) => {
+            if (elem.hasOwnProperty('anomaliasCliente')){
+              return acc + (elem as Seguidor).anomaliasCliente.length
+            } else {
+              return acc + 1
+            }
+          }, 0);
+          // Mostramos solo los status presentes en alguna anomalía
+          statusElem.disabled = statusElem.nAllAnomalias === 0;
+        });
+        
+        
+        // this.statusElems = this.statusElems.filter(elem => elem.nAllAnomalias > 0);
+      })
+    );
+
+  // Nos suscribimos a los elementos filtrados para obtener el número de anomalías de cada status
+    this.subscriptions.add(
+      this.filterService.filteredElements$.subscribe((filElem) => {
+        this.statusElems.forEach((statusElem) => {
+          let filtered = filElem.filter((x) => {
+            if (x.hasOwnProperty('anomaliasCliente')) {
+              return (x as Seguidor).anomaliasCliente.filter((anom) => anom.status === GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(statusElem.label)]).length > 0;
+            } else {
+              return x.status == GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(statusElem.label)];
+            }
+          })
+          statusElem.nAnomalias = filtered.reduce((acc, elem) => {
+            if (elem.hasOwnProperty('anomaliasCliente')){
+              return acc + (elem as Seguidor).anomaliasCliente.length
+            } else {
+              return acc + 1
+            }
+          }, 0);
+        });
+      })
+      
+    ); 
   }
 
   onChangeFiltroStatus(event: MatCheckboxChange) {
-    const indexSelected = Number(event.source.id) - 1;
+    const indexSelected = Number(event.source.id.replace('status_', '')) - 1;
     if (event.checked) {
       this.filtroStatus = new StatusFilter(
         event.source.id,

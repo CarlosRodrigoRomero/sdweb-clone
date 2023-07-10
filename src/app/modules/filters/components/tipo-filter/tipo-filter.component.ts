@@ -141,7 +141,7 @@ export class TipoFilterComponent implements OnInit, OnDestroy {
         Number(event.source.value)
       );
       this.filterService.addFilter(this.filtroTipo);
-
+      console.log("Antes de cambiar el filtro: ", this.filterControlService.tiposSelected)
       this.filterControlService.tiposSelected[Number(event.source.id.replace('tipo_', ''))] = true;
 
       // añadimos el tipo seleccionado a la variable
