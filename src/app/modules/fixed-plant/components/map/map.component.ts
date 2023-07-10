@@ -227,7 +227,6 @@ export class MapComponent implements OnInit, OnDestroy {
             this.anomaliasControlService.anomaliaSelect$,
           ]).subscribe(([anomHover, anomSelect]) => {
             this.anomaliaHover = anomHover;
-            // console.log(this.anomaliaHover)
             this.anomaliaSelect = anomSelect;
           })
         );
@@ -249,14 +248,6 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private addPopupOverlay() {
-    // const container = document.getElementById('popup-dirty');
-
-    // this.popupDirtyAnoms = new Overlay({
-    //   id: 'popup-dirty',
-    //   element: container,
-    //   position: undefined,
-    // });
-
     const containerInfo = document.getElementById('popup-anomalia-info');
 
     this.popupAnomaliaInfo = new Overlay({
@@ -265,9 +256,7 @@ export class MapComponent implements OnInit, OnDestroy {
       position: undefined,
     });
 
-    // this.map.addOverlay(this.popupDirtyAnoms);
     this.map.addOverlay(this.popupAnomaliaInfo);
-    // console.log(this.map.getOverlays());
   }
 
   private transform(extent) {
