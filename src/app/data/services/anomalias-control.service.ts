@@ -293,9 +293,18 @@ export class AnomaliasControlService {
 
             if (feature !== undefined) {
               // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
-              if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-                this.prevFeatureHover.setStyle(this.getStyleAnomalias(false, this.prevFeatureHover.featureType));
+              if (this.anomaliaSelect !== undefined){
+                if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
+                  if (this.prevFeatureHover.getProperties().properties.anomaliaId !== this.anomaliaSelect.id) {
+                    this.prevFeatureHover.setStyle(this.getStyleAnomalias(false, this.prevFeatureHover.featureType));
+                  }
+                }
+              } else {
+                if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
+                  this.prevFeatureHover.setStyle(this.getStyleAnomalias(false, this.prevFeatureHover.featureType));  
+                }
               }
+              
 
               const anomaliaId = feature.getProperties().properties.anomaliaId;
               const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
@@ -316,9 +325,15 @@ export class AnomaliasControlService {
               }
             }
           } else {
-            if (this.anomaliaHover !== undefined) {
-              this.setExternalStyle(this.anomaliaHover.id, false, this.anomaliaHover.featureType);
-
+            if (this.anomaliaHover !== undefined  && this.anomaliaSelect !== undefined) {
+              if (this.anomaliaHover.id !== this.anomaliaSelect.id) {
+                this.setExternalStyle(this.anomaliaHover.id, false, this.anomaliaHover.featureType);
+              }
+              this.anomaliaHover = undefined;
+            } else {
+              if (this.anomaliaHover !== undefined) {
+                this.setExternalStyle(this.anomaliaHover.id, false, this.anomaliaHover.featureType);
+              }
               this.anomaliaHover = undefined;
             }
           }

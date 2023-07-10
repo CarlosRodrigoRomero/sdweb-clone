@@ -106,7 +106,7 @@ export class DirtyAnomsService {
 
           const anom = this.reportControlService.dirtyAnoms.find((anom) => anom.id === f.getProperties().properties.id);
 
-          this.map.getOverlayById('popup-dirty').setPosition(anom.featureCoords[0]);
+          this.map.getOverlayById('popup-anomalia-info').setPosition(anom.featureCoords[0]);
         }
       });
 
@@ -115,7 +115,7 @@ export class DirtyAnomsService {
           currentFeatureHover.setStyle(this.getStyleDirtyAnom(false));
           currentFeatureHover = undefined;
         }
-        this.map.getOverlayById('popup-dirty').setPosition(undefined);
+        this.map.getOverlayById('popup-anomalia-info').setPosition(undefined);
       }
     });
   }

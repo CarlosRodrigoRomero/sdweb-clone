@@ -33,7 +33,6 @@ export class AnomaliaPopupComponent implements OnInit {
   ngOnInit(): void {
     this.subscriptions.add(
       this.anomaliasControlService.anomaliaHover$.subscribe((anomalia) => {
-        console.log(anomalia)
         this.anomaliaHovered = anomalia;
         if (this.anomaliaHovered !== undefined) {
           if (this.anomaliaHovered.tipo === 11) {
