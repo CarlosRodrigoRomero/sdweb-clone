@@ -7,12 +7,14 @@ import { AnomaliaListComponent } from './components/anomalia-list/anomalia-list.
 import { AnomaliaListContainer } from './containers/anomalia-list-container/anomalia-list-container.component';
 import { FiltersModule } from '@modules/filters/filters.module';
 import { CommentsModule } from '@modules/comments/comments.module';
+import { AnomaliaPopupComponent } from './components/anomalia-popup/anomalia-popup.component';
 
 @NgModule({
   declarations: [
     AnomaliaInfoComponent,
     AnomaliaListComponent,
-    AnomaliaListContainer
+    AnomaliaListContainer,
+    AnomaliaPopupComponent
   ],
   imports: [
     CommonModule,
@@ -24,6 +26,7 @@ import { CommentsModule } from '@modules/comments/comments.module';
     AnomaliaInfoComponent,
     AnomaliaListComponent,
     AnomaliaListContainer,
+    AnomaliaPopupComponent
   ]
 })
 export class AnomaliesModule { }

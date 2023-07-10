@@ -143,14 +143,16 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
   }
 
   hoverAnomalia(row: any) {
-    if (this.anomaliasControlService.anomaliaSelect === undefined) {
+    // if (this.anomaliasControlService.anomaliaSelect === undefined) {
       if (row.hovered) {
         this.anomaliasControlService.anomaliaHover = row.anomalia;
+        let coords = row.anomalia.featureCoords[0];
+        this.anomaliasControlService.setPopupPosition(coords);
       } else {
         this.anomaliasControlService.anomaliaHover = undefined;
       }
       this.anomaliasControlService.setExternalStyle(row.id, row.hovered, row.anomalia.featureType);
-    }
+    // }
   }
 
   selectAnomalia(row: any) {

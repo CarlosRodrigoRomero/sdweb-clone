@@ -529,47 +529,13 @@ export class AnomaliasControlService {
   }
 
   // ESTILOS PERDIDAS
-  getStylePerdidas(focused: boolean) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorMae(feature, 1),
-            width: 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
-          }),
-        });
-      }
-    };
-  }
-
   private getColorMae(feature: Feature<any>, opacity: number): string {
     const perdidas = feature.getProperties().properties.perdidas as number;
 
     return Colors.getColor(perdidas, [0.3, 0.5], opacity);
   }
 
-
-
   // ESTILOS CELS CALIENTES
-  private getStyleCelsCalientes(focused) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorCelsCalientes(feature, 1),
-            width: 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
-          }),
-        });
-      }
-    };
-  }
-
   private getColorCelsCalientes(feature: Feature<any>, opacity: number): string {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
@@ -577,22 +543,6 @@ export class AnomaliasControlService {
   }
 
   // ESTILOS GRADIENTE NORMALIZADO MAX
-  private getStyleGradienteNormMax(focused) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorGradienteNormMax(feature, 1),
-            width: 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(255,255,255, 0)',
-          }),
-        });
-      }
-    };
-  }
-
   private getColorGradienteNormMax(feature: Feature<any>, opacity: number) {
     const gradNormMax = feature.getProperties().properties.gradienteNormalizado as number;
 
@@ -600,22 +550,6 @@ export class AnomaliasControlService {
   }
 
   // ESTILO POR TIPOS
-  private getStyleTipos(focused: boolean) {
-    return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        return new Style({
-          stroke: new Stroke({
-            color: focused ? 'white' : this.getColorTipo(feature),
-            width: 4,
-          }),
-          fill: new Fill({
-            color: 'rgba(0, 0, 255, 0)',
-          }),
-        });
-      }
-    };
-  }
-
   private getColorTipo(feature: Feature<any>) {
     if (feature !== undefined) {
       const tipo = Number(feature.getProperties().properties.tipo);

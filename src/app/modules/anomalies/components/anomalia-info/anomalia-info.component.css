@@ -62,6 +62,10 @@
     font-size: 1.1rem;
     margin:0;
   }
+
+  .subtitulo--localizacion{
+    font-size:1rem;
+  }
   
   .titulo-resalt {
     font-size: 20px;

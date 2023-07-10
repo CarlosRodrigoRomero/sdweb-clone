@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -42,6 +42,7 @@ export class AnomaliaPopupComponent implements OnInit {
             this.showAnomaliaInfo = true;
             this.showSuciedadInfo = false;
             this.tipoLabel = GLOBAL.labels_tipos[this.anomaliaHovered.tipo];
+            this.localizacion = this.getLocalizacionLabel(this.anomaliaHovered);
           }          
         } else {
           this.showAnomaliaInfo = false;
@@ -55,14 +56,12 @@ export class AnomaliaPopupComponent implements OnInit {
     let label = '';
 
     let globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
-    // quitamos la ultima global xq es la del seguidor
-    // globals = globals.filter((g, index) => index < globals.length - 1);
 
     globals.forEach((coord, index) => {
       if (coord !== undefined && coord !== null && coord !== '') {
         if (this.reportControlService.nombreGlobalCoords.length > 0) {
           const nombres = this.reportControlService.nombreGlobalCoords;
-          label += `${nombres[index]}: ${coord}`;
+          label += nombres[index] ? `${nombres[index]}: ${coord}` : `${coord}`;
         } else {
           label += `${coord}`;
         }
