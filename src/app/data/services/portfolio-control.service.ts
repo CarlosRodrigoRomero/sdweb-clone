@@ -409,6 +409,7 @@ export class PortfolioControlService {
   }
 
   resetService() {
+    this.initialized = false;
     this.plantaHovered = undefined;
     this.maePlantas = [];
     this.maeMedio = undefined;

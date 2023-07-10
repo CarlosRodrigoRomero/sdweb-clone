@@ -78,7 +78,6 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.portfolioControlService.initialized$.subscribe((value) => {
-        console.log(value);
         this.loadPortfolioContent = value;
       })
     );
