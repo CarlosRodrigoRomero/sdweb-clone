@@ -191,3 +191,7 @@ app-share-report {
   top: 12px;
   right: 15px;
 }
+
+:host ::ng-deep .mat-drawer-inner-container{
+  overflow-y:hidden;
+}
