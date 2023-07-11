@@ -60,6 +60,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
               this.informe = this.reportControlService.informes.find(
                 (informe) => informe.id === this.selectedInformeId
               );
+              console.log(this.informe)
 
               this.fechaSelectedInforme = this.informeService.getDateLabelInforme(this.informe);
 

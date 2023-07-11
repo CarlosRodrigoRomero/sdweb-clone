@@ -128,6 +128,7 @@ export class ReportControlService {
               // obtenemos los informes de la planta
               switchMap((informes) => {
                 this.informes = informes;
+                console.log('informes', informes);
 
                 // si el user no es admin aplicamos el parche
                 if (!this.authService.userIsAdmin(this.user)) {
@@ -389,7 +390,7 @@ export class ReportControlService {
 
   setMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
     const mae = this.getMaeInformeFija(anomalias, informe);
-
+    console.log('mae', mae);
     this.informeService.updateInformeField(informe.id, 'mae', mae);
   }
 
@@ -403,7 +404,6 @@ export class ReportControlService {
 
       mae = perdidasTotales / informe.numeroModulos;
     }
-
     return mae;
   }
 
