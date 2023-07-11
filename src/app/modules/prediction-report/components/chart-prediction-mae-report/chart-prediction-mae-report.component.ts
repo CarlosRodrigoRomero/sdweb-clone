@@ -73,23 +73,23 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
     this.checkTranslate();
 
     const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
-    // const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
+    const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
 
-    // const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
-    // const maeFixableLastReport = this.getMaeByAnoms(lastReport, fixableLastReportAnoms);
-    // const unfixableLastReportAnoms = lastReportAnoms.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipo));
-    // const maeUnfixableLastReport = this.getMaeByAnoms(lastReport, unfixableLastReportAnoms);
+    const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+    const maeFixableLastReport = this.getMaeByAnoms(lastReport, fixableLastReportAnoms);
+    const unfixableLastReportAnoms = lastReportAnoms.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipo));
+    const maeUnfixableLastReport = this.getMaeByAnoms(lastReport, unfixableLastReportAnoms);
 
-    // const fixableNextYearAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipoNextYear));
-    // const maeFixableNextYear = this.getMaeByAnoms(lastReport, fixableNextYearAnoms, true);
-    // const unfixableNextYearAnoms = lastReportAnoms.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipoNextYear));
-    // const maeUnfixableNextYear = this.getMaeByAnoms(lastReport, unfixableNextYearAnoms, true);
+    const fixableNextYearAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipoNextYear));
+    const maeFixableNextYear = this.getMaeByAnoms(lastReport, fixableNextYearAnoms, true);
+    const unfixableNextYearAnoms = lastReportAnoms.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipoNextYear));
+    const maeUnfixableNextYear = this.getMaeByAnoms(lastReport, unfixableNextYearAnoms, true);
 
-    // const maeTotalData = [maeFixableLastReport + maeUnfixableLastReport, maeFixableNextYear + maeUnfixableNextYear];
-    // const maeFixableData = [maeFixableLastReport, maeFixableNextYear];
-    // const maeUnfixableData = [maeUnfixableLastReport, maeUnfixableNextYear];
+    const maeTotalData = [maeFixableLastReport + maeUnfixableLastReport, maeFixableNextYear + maeUnfixableNextYear];
+    const maeFixableData = [maeFixableLastReport, maeFixableNextYear];
+    const maeUnfixableData = [maeUnfixableLastReport, maeUnfixableNextYear];
 
-    const [maeTotalData, maeFixableData, maeUnfixableData] = this.calculateFakeData(lastReport.numeroModulos);
+    // const [maeTotalData, maeFixableData, maeUnfixableData] = this.calculateFakeData(lastReport.numeroModulos);
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => {
       this.chartOptions = {

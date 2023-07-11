@@ -26,6 +26,8 @@ export class ChartSankeyReportComponent implements OnInit {
   @ViewChild('sankeyChart', { static: true }) sankeyChartElement: ElementRef;
 
   chartData: any[][] = [['From', 'To', '#']];
+  colorsLeftNodes: any[] = [];
+  colorsRightNodes: any[] = [];
   colors_nodes = [];
   colors = {
     'Módulo en CA (string)': 'red',
@@ -42,7 +44,7 @@ export class ChartSankeyReportComponent implements OnInit {
       node: {
         nodePadding: 16,
         width: 10,
-        colors: [COLOR.dark_orange],
+        colors: this.colors_nodes,
         label: { fontSize: 12, color: '#fff', bold: false, italic: false },
       },
       link: {
@@ -52,7 +54,7 @@ export class ChartSankeyReportComponent implements OnInit {
         //   // stroke: 'black', // Color of the link border.
         //   // strokeWidth: 1, // Thickness of the link border (default 0).
         // },
-        colors: [COLOR.dark_neutral],
+        colors: this.colors_nodes,
         colorMode: 'gradient',
       },
     },
@@ -73,28 +75,16 @@ export class ChartSankeyReportComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // this.loadData();
+    this.loadData();
 
-    // this.setChartHeight();
-
-    // this.setColors();
-
-    this.loadFakeData();
+    // this.loadFakeData();
 
     this.loadChart();
 
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          let color = COLOR.dark_orange;
-          if (theme === 'dark-theme') {
-            color = COLOR.dark_orange;
-          } else {
-            color = COLOR.light_orange;
-          }
-
           this.chartOptions.sankey.node.label.color = this.themeService.textColor;
-          this.chartOptions.sankey.node.colors = [color];
 
           this.loadChart();
         }
@@ -107,21 +97,21 @@ export class ChartSankeyReportComponent implements OnInit {
     const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
 
     // DEMO
-    // lastReportAnoms.forEach((anom) => {
-    //   anom.tipoNextYear = this.tipoRandom();
-    // });
+    lastReportAnoms.forEach((anom) => {
+      anom.tipoNextYear = this.tipoRandom();
+    });
 
     GLOBAL.sortedAnomsTipos.forEach((tipo, index) => {
       const anomsTipo = lastReportAnoms.filter((anom) => anom.tipo === tipo);
 
       if (anomsTipo.length > 0) {
+        // checkeamos si el color se ha añadido ya y si no lo añadimos
+        this.addLeftColor(index, tipo);
+
         const uniqueNextTipos = MathOperations.getUniqueElemsArray(anomsTipo.map((anom) => anom.tipoNextYear));
 
         if (uniqueNextTipos.length > 0) {
-          // checkeamos si el color se ha añadido ya y si no lo añadimos
-          // this.addColor(tipo);
-
-          uniqueNextTipos.forEach((uniqueNextTipo) => {
+          uniqueNextTipos.forEach((uniqueNextTipo, i) => {
             const anomsTipoNext = anomsTipo.filter((anom) => anom.tipoNextYear === uniqueNextTipo);
             const count = anomsTipoNext.length;
             let from: string;
@@ -138,21 +128,21 @@ export class ChartSankeyReportComponent implements OnInit {
                 take(1)
               )
               .subscribe((res: string) => {
-                const to = res;
+                // agregamos un espacio porque un diagrama sankey no acepta ir de un un nodo a otro con el mismo nombre
+                const to = res + ' ';
 
                 this.chartData.push([from, to, count]);
               });
 
-            // const from = GLOBAL.labels_tipos[tipo];
-            // const to = GLOBAL.labels_tipos[uniqueNextTipo];
-            // console.log(from, to, count);
-
             // checkeamos si el color se ha añadido ya y si no lo añadimos
-            // this.addColor(uniqueNextTipo);
+            this.addRightColor(index, i, uniqueNextTipo);
           });
         }
       }
     });
+
+    // formamos el array de colores
+    this.unifyColors();
   }
 
   private loadFakeData() {
@@ -183,49 +173,37 @@ export class ChartSankeyReportComponent implements OnInit {
     });
   }
 
-  private setChartHeight() {
-    const numRows = this.chartData.length - 1;
-    const height = numRows * 16;
-
-    this.chartOptions.height = height;
+  private addLeftColor(index: number, tipo: number) {
+    const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
+    this.colorsLeftNodes.push({
+      index,
+      color,
+    });
   }
 
-  private addColor(tipo: number) {
+  private addRightColor(indexLeft: number, index: number, tipo: number) {
     const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
-    if (!this.colors_nodes.includes(color)) {
-      this.colors_nodes.push(color);
+
+    if (!this.colorsRightNodes.some((node) => node.color === color)) {
+      this.colorsRightNodes.push({
+        indexLeft,
+        index,
+        color,
+      });
     }
   }
 
-  private setColors() {
-    const nodes: string[] = [];
-    const colors: any[] = [];
+  private unifyColors() {
+    this.colorsLeftNodes.forEach((leftNode) => {
+      // Add the color from the left node
+      this.colors_nodes.push(leftNode.color);
 
-    // añadimos primero los nodos de la izquierda
-    this.chartData
-      .filter((_, index) => index > 0)
-      .map((row) => row[0])
-      .forEach((from) => {
-        if (!nodes.includes(from)) {
-          nodes.push(from);
-        }
-      });
+      // Find and add the colors from the right nodes with the same indexLeft
+      let rightColors = this.colorsRightNodes
+        .filter((rightNode) => rightNode.indexLeft === leftNode.index)
+        .map((node) => node.color);
 
-    // después los de la derecha
-    this.chartData
-      .filter((_, index) => index > 0)
-      .map((row) => row[1])
-      .forEach((from) => {
-        if (!nodes.includes(from)) {
-          nodes.push(from);
-        }
-      });
-
-    // añadimos los colores
-    nodes.forEach((node) => {
-      const tipo = GLOBAL.labels_tipos.indexOf(node);
-      const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
-      this.colors_nodes.push(color);
+      this.colors_nodes.push(...rightColors);
     });
   }
 
@@ -240,8 +218,8 @@ export class ChartSankeyReportComponent implements OnInit {
   }
 
   private tipoRandom(): number {
-    // Crea un array con los números 4, 8, 9 y 10
-    var numeros = [4, 12, 20, 21];
+    // var numeros = [4, 12, 20, 21];
+    var numeros = GLOBAL.fixableTypes;
 
     // Genera un número aleatorio entre los elementos del array
     var indiceAleatorio = Math.floor(Math.random() * numeros.length);
