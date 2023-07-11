@@ -191,11 +191,8 @@ export class AnomaliaInfoService {
 
   getLocalizacionCompleteTranslateLabel(anomalia: Anomalia, planta: PlantaInterface) {
     let label = '';
-      let globals = [];
-    if (anomalia.hasOwnProperty('globalCoords')){
-      globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
-    }
     
+    const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
 
     globals.forEach((coord, index) => {
       if (coord !== undefined && coord !== null && coord !== '') {
@@ -230,6 +227,7 @@ export class AnomaliaInfoService {
           label += `${fila}: ${altura} / ${res}: ${columna}`;
         });
     }
+
     return label;
   }
 

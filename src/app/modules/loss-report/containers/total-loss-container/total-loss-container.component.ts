@@ -30,7 +30,7 @@ export class TotalLossContainerComponent implements OnInit, OnDestroy {
         this.numTotalAnoms = anomaliasInforme.length;
         const fixableAnoms = anomaliasInforme.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo));
         this.numFixableAnoms = fixableAnoms.length;
-        console.log(anomaliasInforme)
+
         this.totalMae = this.reportControlService.getMae(anomaliasInforme, selectedReport.numeroModulos);
         this.fixableMae = this.reportControlService.getMae(fixableAnoms, selectedReport.numeroModulos);
       })
