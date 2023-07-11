@@ -1,0 +1,9 @@
+.row-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left-content {
+  margin-right: 2rem;
+}
