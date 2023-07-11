@@ -21,18 +21,8 @@
     <!-- MENU RECALCULAR DATOS EN PORTFOLIO -->
     <!-- <app-portfolio-recalc *ngIf="isAdmin && !isReport && !isDemo"></app-portfolio-recalc> -->
 
-    <!-- BOTON NOTIFICACIONES PROVISIONAL -->
-    <button class="btn-notif" *ngIf="hasNotifications" mat-icon-button [matMenuTriggerFor]="notifMenu">
-      <mat-icon matBadge="{{ notifications.length }}" matBadgeColor="primary">notifications</mat-icon>
-    </button>
-    <mat-menu class="notif-menu" #notifMenu="matMenu">
-      <button mat-menu-item (click)="applyFilter.emit(notification.filter)" *ngFor="let notification of notifications">
-        <div class="btn-content">
-          <mat-icon class="btn-icon">warning</mat-icon>
-          <span class="btn-label">{{ notification.content }}</span>
-        </div>
-      </button>
-    </mat-menu>
+    <!-- NOTIFICACIONES DEL PORTFOLIO -->
+    <app-portfolio-notifications *ngIf="loadPortfolioContent"></app-portfolio-notifications>
 
     <!-- MENU DERECHA -->
     <app-right-menu-container></app-right-menu-container>
