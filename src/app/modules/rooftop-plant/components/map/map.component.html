@@ -2,14 +2,11 @@
 <!-- <div *ngIf="anomaliaSelect || anomaliaHover" id="popup">
   <app-anomalia-info [anomaliaSelect]="anomaliaSelect" [anomaliaHover]="anomaliaHover"></app-anomalia-info>
 </div> -->
+<div id="popup-anomalia-info" class="ol-popup">
+  <app-anomalia-popup></app-anomalia-popup>
+</div>
 
 <mat-card class="noAnoms" *ngIf="noAnomsReport">
   <mat-icon>done_outline</mat-icon>
   <span>Informe sin anomalías</span>
-</mat-card>
-
-<!-- <span class="coords-pointer">{{coordsPointer}}</span> -->
-
-<mat-card id="popup-dirty" class="ol-popup">
-  <span class="popup-label">{{ 'Este módulo tiene suciedad' | translate }}</span>
 </mat-card>
