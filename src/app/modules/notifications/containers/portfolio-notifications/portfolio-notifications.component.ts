@@ -43,22 +43,35 @@ export class PortfolioNotificationsComponent implements OnInit {
       if (this.checkMaeGraveNotification(informesRecientes[0])) {
         maeGravePlants.push(planta);
       }
+
+      if (informesRecientes.length > 1) {
+        // checkeamos el incremento de MAE
+        if (this.checkIncrementoMaeNotification(informesRecientes)) {
+          degradacionPlants.push(planta);
+        }
+      }
     });
 
-    this.notifications = [
-      {
-        content: 'Ha aparecido PID en las siguientes plantas',
+    if (pidsPlants.length > 0) {
+      this.notifications.push({
+        content: `Ha aparecido PID en ${pidsPlants.length} plantas`,
         plants: pidsPlants,
-      },
-      {
-        content: 'Las siguientes plantas tienen un MAE grave',
+      });
+    }
+
+    if (maeGravePlants.length > 0) {
+      this.notifications.push({
+        content: `${maeGravePlants.length} plantas tienen un MAE grave`,
         plants: maeGravePlants,
-      },
-      {
-        content: 'Las siguientes plantas han tenido una alta degradación',
+      });
+    }
+
+    if (degradacionPlants.length > 0) {
+      this.notifications.push({
+        content: `${degradacionPlants.length} plantas tienen una alta degradación`,
         plants: degradacionPlants,
-      },
-    ];
+      });
+    }
   }
 
   applyFilter(index: number) {
@@ -83,6 +96,18 @@ export class PortfolioNotificationsComponent implements OnInit {
 
   private checkMaeGraveNotification(informe: InformeInterface): boolean {
     if (informe.mae >= 0.01) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private checkIncrementoMaeNotification(informes: InformeInterface[]): boolean {
+    const maeMasReciente = informes[0].mae;
+    const maeMenosReciente = informes[1].mae;
+
+    // si maemasReciente es un 10% mayor que maeMenosReciente
+    if (maeMasReciente >= maeMenosReciente * 1.1) {
       return true;
     } else {
       return false;
