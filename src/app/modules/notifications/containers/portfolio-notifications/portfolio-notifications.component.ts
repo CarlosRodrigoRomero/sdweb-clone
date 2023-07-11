@@ -61,6 +61,12 @@ export class PortfolioNotificationsComponent implements OnInit {
     ];
   }
 
+  applyFilter(index: number) {
+    this.portfolioControlService.filteredPlants = this.portfolioControlService.listaPlantas.filter((planta) =>
+      this.notifications[index].plants.map((p) => p.id).includes(planta.id)
+    );
+  }
+
   private checkPidNotification(informe: InformeInterface): boolean {
     if (informe.hasOwnProperty('tiposAnomalias') && informe.tiposAnomalias.length > 0) {
       const numPids = informe.tiposAnomalias[18] + informe.tiposAnomalias[20] + informe.tiposAnomalias[21];

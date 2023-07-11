@@ -1,6 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
-
-import { PortfolioControlService } from '@data/services/portfolio-control.service';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { Notification } from '@core/models/notification';
 
@@ -12,14 +10,9 @@ import { Notification } from '@core/models/notification';
 export class NotificationsComponent implements OnInit {
   @Input() hasNotifications: boolean;
   @Input() notifications: Notification[];
+  @Output() applyFilter = new EventEmitter<number>();
 
-  constructor(private portfolioControlService: PortfolioControlService) {}
+  constructor() {}
 
   ngOnInit(): void {}
-
-  applyFilter() {
-    this.portfolioControlService.filteredPlants = this.portfolioControlService.listaPlantas.filter((planta) =>
-      this.notifications[0].plants.map((p) => p.id).includes(planta.id)
-    );
-  }
 }
