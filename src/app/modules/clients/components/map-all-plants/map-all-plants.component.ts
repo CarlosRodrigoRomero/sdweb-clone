@@ -148,53 +148,61 @@ export class MapAllPlantsComponent implements OnInit, OnDestroy {
   private addFeaturesLayer() {
     this.plantasSource = new VectorSource({});
 
-    this.plantas.forEach((planta) => {
-      const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
-      const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
+    this.subscriptions.add(
+      this.portfolioControlService.filteredPlants$.subscribe((plantas) => {
+        this.plantasSource.clear();
 
-      const feature = new Feature({
-        geometry: new Point(fromLonLat([planta.longitud, planta.latitud])),
-      });
+        plantas.forEach((planta) => {
+          const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
+          const informeReciente = informesPlanta.reduce((prev, current) =>
+            prev.fecha > current.fecha ? prev : current
+          );
 
-      feature.setId(planta.id);
+          const feature = new Feature({
+            geometry: new Point(fromLonLat([planta.longitud, planta.latitud])),
+          });
 
-      feature.setProperties({
-        planta,
-        informeReciente,
-      });
+          feature.setId(planta.id);
 
-      let iconSrc: string;
-      if (this.themeService.themeSelected === 'light-theme') {
-        iconSrc = 'assets/icons/location-pin-light-unhover.png';
-      } else {
-        iconSrc = 'assets/icons/location-pin-dark-unhover.png';
-      }
+          feature.setProperties({
+            planta,
+            informeReciente,
+          });
 
-      feature.setStyle(
-        new Style({
-          image: new Icon({
-            crossOrigin: 'anonymous',
-            src: iconSrc,
-            scale: 0.5,
-          }),
-        })
-      );
+          let iconSrc: string;
+          if (this.themeService.themeSelected === 'light-theme') {
+            iconSrc = 'assets/icons/location-pin-light-unhover.png';
+          } else {
+            iconSrc = 'assets/icons/location-pin-dark-unhover.png';
+          }
 
-      this.portfolioControlService.allFeatures.push(feature);
+          feature.setStyle(
+            new Style({
+              image: new Icon({
+                crossOrigin: 'anonymous',
+                src: iconSrc,
+                scale: 0.5,
+              }),
+            })
+          );
 
-      this.plantasSource.addFeature(feature);
-    });
+          this.portfolioControlService.allFeatures.push(feature);
 
-    const plantasLayer = new VectorLayer({
-      source: this.plantasSource,
-      style: this.getStyleOnHover(false, this.themeService.themeSelected),
-    });
+          this.plantasSource.addFeature(feature);
+        });
 
-    plantasLayer.setProperties({
-      name: 'plantas',
-    });
+        const plantasLayer = new VectorLayer({
+          source: this.plantasSource,
+          style: this.getStyleOnHover(false, this.themeService.themeSelected),
+        });
 
-    this.map.addLayer(plantasLayer);
+        plantasLayer.setProperties({
+          name: 'plantas',
+        });
+
+        this.map.addLayer(plantasLayer);
+      })
+    );
   }
 
   private addPointerOnHover() {

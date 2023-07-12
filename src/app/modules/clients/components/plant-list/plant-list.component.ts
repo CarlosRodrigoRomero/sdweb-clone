@@ -76,43 +76,47 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     this.informes = this.portfolioControlService.listaInformes;
     let plantsData = [];
 
-    this.portfolioControlService.filteredPlants$.subscribe((plantas) => {
-      plantsData = [];
+    this.subscriptions.add(
+      this.portfolioControlService.filteredPlants$.subscribe((plantas) => {
+        plantsData = [];
 
-      // checkeamos si se están mostrando todas para activar el boton de mostrarlas
-      if (plantas.length < this.plantas.length) {
-        this.btnShowAll = true;
-      } else {
-        this.btnShowAll = false;
-      }
-
-      plantas.forEach((planta) => {
-        const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
-        const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
-
-        let informesAntiguos: InformeInterface[] = [];
-        if (planta.tipo !== 'seguidores' && planta.id !== 'egF0cbpXnnBnjcrusoeR') {
-          informesAntiguos = informesPlanta.filter((informe) => informe.fecha < GLOBAL.newReportsDate);
+        // checkeamos si se están mostrando todas para activar el boton de mostrarlas
+        if (plantas.length < this.plantas.length) {
+          this.btnShowAll = true;
+        } else {
+          this.btnShowAll = false;
         }
 
-        plantsData.push({
-          nombre: planta.nombre,
-          potencia: planta.potencia,
-          mae: informeReciente.mae,
-          powerLoss: planta.potencia * informeReciente.mae,
-          fixablePower: informeReciente.fixablePower,
-          ultimaInspeccion: informeReciente.fecha,
-          informesAntiguos,
-          plantaId: planta.id,
-          tipo: planta.tipo,
-          informeReciente,
-          // color: this.portfolioControlService.getColorMae(informeReciente.mae),
-        });
-      });
+        plantas.forEach((planta) => {
+          const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
+          const informeReciente = informesPlanta.reduce((prev, current) =>
+            prev.fecha > current.fecha ? prev : current
+          );
 
-      this.dataSource.data = plantsData;
-      this.changeDetectorRefs.detectChanges();
-    });
+          let informesAntiguos: InformeInterface[] = [];
+          if (planta.tipo !== 'seguidores' && planta.id !== 'egF0cbpXnnBnjcrusoeR') {
+            informesAntiguos = informesPlanta.filter((informe) => informe.fecha < GLOBAL.newReportsDate);
+          }
+
+          plantsData.push({
+            nombre: planta.nombre,
+            potencia: planta.potencia,
+            mae: informeReciente.mae,
+            powerLoss: planta.potencia * informeReciente.mae,
+            fixablePower: informeReciente.fixablePower,
+            ultimaInspeccion: informeReciente.fecha,
+            informesAntiguos,
+            plantaId: planta.id,
+            tipo: planta.tipo,
+            informeReciente,
+            // color: this.portfolioControlService.getColorMae(informeReciente.mae),
+          });
+        });
+
+        this.dataSource.data = plantsData;
+        this.changeDetectorRefs.detectChanges();
+      })
+    );
 
     this.checkFixableMae(plantsData);
 
@@ -293,5 +297,9 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
   selectSortColumn(column: string) {
     this.sortedColumn = column;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
