@@ -100,6 +100,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('swiperRef', { static: false }) swiperRef?: SwiperComponent;
   @Input() anomaliaSelect: Anomalia;
   @Input() anomaliaHover: Anomalia;
+  // @Input() rowAnomalia: Anomalia;
 
   constructor(
     public anomaliaService: AnomaliaService,

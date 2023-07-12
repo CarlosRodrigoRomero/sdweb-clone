@@ -204,6 +204,12 @@
   td.mat-cell:last-of-type{
     padding-right: 0;
   }
+
+  .anomalia-wrapper{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
   
 
   

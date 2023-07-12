@@ -8,13 +8,15 @@ import { AnomaliaListContainer } from './containers/anomalia-list-container/anom
 import { FiltersModule } from '@modules/filters/filters.module';
 import { CommentsModule } from '@modules/comments/comments.module';
 import { AnomaliaPopupComponent } from './components/anomalia-popup/anomalia-popup.component';
+import { AnomaliaImgComponent } from './components/anomalia-img/anomalia-img.component';
 
 @NgModule({
   declarations: [
     AnomaliaInfoComponent,
     AnomaliaListComponent,
     AnomaliaListContainer,
-    AnomaliaPopupComponent
+    AnomaliaPopupComponent,
+    AnomaliaImgComponent
   ],
   imports: [
     CommonModule,

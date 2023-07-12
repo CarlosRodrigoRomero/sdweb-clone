@@ -346,7 +346,6 @@ export class AnomaliasControlService {
 
   setPopupPosition(coords: Coordinate) {
     const popupCoords = [coords[0] + 20, coords[1] + 20] as Coordinate;
-
     this.map.getOverlayById('popup-anomalia-info').setPosition(popupCoords);
   }
 

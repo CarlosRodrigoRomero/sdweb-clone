@@ -1,0 +1,11 @@
+.mapAnom{
+    width: 150px;
+    height: 150px;
+}
+
+.anomalia-img-wrapper{
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    padding: 10px;
+}
