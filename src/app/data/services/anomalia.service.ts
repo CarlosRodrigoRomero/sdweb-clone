@@ -156,16 +156,16 @@ export class AnomaliaService {
             data.id = doc.payload.doc.id;
             data.tipo = Number(data.tipo);
 
-            if (data.hasOwnProperty('tipoNextYear')) {
+            if (
+              data.hasOwnProperty('tipoNextYear') &&
+              data.tipoNextYear !== undefined &&
+              data.tipoNextYear !== null &&
+              data.tipoNextYear.toString() !== ''
+            ) {
               data.tipoNextYear = Number(data.tipoNextYear);
             } else {
               data.tipoNextYear = data.tipo;
             }
-
-            // DEMO
-            // const tiposDemo = [data.tipo, 12];
-            // const indiceAleatorio = Math.floor(Math.random() * tiposDemo.length);
-            // data.tipoNextYear = tiposDemo[indiceAleatorio];
 
             // Parche para Casas de Don Pedro Jun22 y Alqueva Sep22
             if (Patches.checkId(informeId)) {
@@ -485,7 +485,7 @@ export class AnomaliaService {
                   if (anomalia.gradienteNormalizado >= rangoDT) {
                     criticidad = index;
                   }
-                // para las GRAVES buscamos que sean CCs y superen el rangoDT superior
+                  // para las GRAVES buscamos que sean CCs y superen el rangoDT superior
                 } else if (anomalia.tipo === 8 || anomalia.tipo === 9) {
                   if (anomalia.temperaturaMax >= rangoTMax || anomalia.gradienteNormalizado >= rangoDT) {
                     criticidad = index;

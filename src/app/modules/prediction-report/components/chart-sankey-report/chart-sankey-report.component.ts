@@ -38,7 +38,7 @@ export class ChartSankeyReportComponent implements OnInit {
   };
   chartOptions = {
     width: '100%',
-    height: 400,
+    height: 500,
     interactivity: true,
     sankey: {
       node: {
@@ -77,8 +77,6 @@ export class ChartSankeyReportComponent implements OnInit {
   ngOnInit(): void {
     this.loadData();
 
-    // this.loadFakeData();
-
     this.loadChart();
 
     this.subscriptions.add(
@@ -95,11 +93,6 @@ export class ChartSankeyReportComponent implements OnInit {
   private loadData() {
     const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
     const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
-
-    // DEMO
-    lastReportAnoms.forEach((anom) => {
-      anom.tipoNextYear = this.tipoRandom();
-    });
 
     GLOBAL.sortedAnomsTipos.forEach((tipo, index) => {
       const anomsTipo = lastReportAnoms.filter((anom) => anom.tipo === tipo);
@@ -145,34 +138,6 @@ export class ChartSankeyReportComponent implements OnInit {
     this.unifyColors();
   }
 
-  private loadFakeData() {
-    const data = [
-      ['PID fase temprana', 'PID fase temprana.', 1399],
-      ['Módulo en CA (string)', 'Módulo en CA (string).', 140],
-      ['2x diodo en CA', '2x diodo en CA.', 2],
-      ['1x diodo en CA', '1x diodo en CA.', 62],
-      ['Módulo en CC', 'Módulo en CC.', 1],
-      ['Caja conexiones', 'Caja conexiones.', 6],
-      ['Sombras', 'Sombras.', 37],
-      ['Nuevas', '1x diodo en CA.', 7],
-      ['Nuevas', 'Caja conexiones.', 2],
-      ['Nuevas', 'Módulo en CA (string).', 10],
-      ['Nuevas', 'PID fase temprana.', 50],
-    ];
-
-    data.forEach((row) => {
-      const translateData = [];
-      this.translate.get(row[0] as string).subscribe((res: string) => {
-        translateData.push(res);
-        this.translate.get((row[1] as string).slice(0, -1)).subscribe((res2: string) => {
-          translateData.push(res2 + '.');
-          translateData.push(row[2]);
-          this.chartData.push(translateData);
-        });
-      });
-    });
-  }
-
   private addLeftColor(index: number, tipo: number) {
     const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
     this.colorsLeftNodes.push({
@@ -215,14 +180,5 @@ export class ChartSankeyReportComponent implements OnInit {
     const chart = new GoogleCharts.api.visualization.Sankey(this.sankeyChartElement.nativeElement);
     const dataTable = new GoogleCharts.api.visualization.arrayToDataTable(this.chartData);
     chart.draw(dataTable, this.chartOptions);
-  }
-
-  private tipoRandom(): number {
-    // var numeros = [4, 12, 20, 21];
-    var numeros = GLOBAL.fixableTypes;
-
-    // Genera un número aleatorio entre los elementos del array
-    var indiceAleatorio = Math.floor(Math.random() * numeros.length);
-    return numeros[indiceAleatorio];
   }
 }

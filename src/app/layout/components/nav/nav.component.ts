@@ -56,11 +56,14 @@ export class NavComponent implements OnInit {
         }
 
         // SOLO PARA CLIENTE INTERNACIONAL
-        // if (this.router.url.split('/').includes('eyeSNsK6pKzfNLuacWdn')) {
-        //   this.showPrediction = true;
-        // } else {
-        //   this.showPrediction = false;
-        // }
+        if (
+          this.router.url.split('/').includes('eyeSNsK6pKzfNLuacWdn') ||
+          this.router.url.split('/').includes('bMHQXT5PLZWegm3vC4Z9')
+        ) {
+          this.showPrediction = true;
+        } else {
+          this.showPrediction = false;
+        }
       }
     });
   }
