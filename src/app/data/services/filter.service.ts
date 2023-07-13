@@ -16,7 +16,7 @@ import { Anomalia } from '@core/models/anomalia';
   providedIn: 'root',
 })
 export class FilterService {
-  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'modelo'];
+  private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'modelo', 'status'];
   private noAmosSegsFilters = ['area'];
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
@@ -151,7 +151,6 @@ export class FilterService {
       multFilters = multFilters.filter((filter) => !this.noAmosSegsFilters.includes(filter));
       noMultFilters = noMultFilters.filter((filter) => !this.noAmosSegsFilters.includes(filter));
     }
-
     // comprobamos si hay filtros de tipo 'multiple'
     if (this.filters.filter((fil) => multFilters.includes(fil.type)).length > 0) {
       // separamos los elems por tipo de filtro
@@ -175,7 +174,6 @@ export class FilterService {
         const newFiltrableElements = fil.applyFilter(elements);
         everyFilterFiltrableElements.push(newFiltrableElements);
       });
-
     // calculamos la interseccion de los array de los diferentes tipos
     let finalElements: FilterableElement[];
     if (everyFilterFiltrableElements.length > 0) {
@@ -183,7 +181,6 @@ export class FilterService {
         anterior.filter((elem) => actual.includes(elem))
       );
     }
-
     // para calcular el numero de anomalias por filtro tipo
     // this.excludeTipoFilters();
     return finalElements;
@@ -295,7 +292,7 @@ export class FilterService {
   }
 
   resetService() {
-    this.multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'modelo'];
+    this.multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'modelo', 'status'];
     this.noAmosSegsFilters = ['area'];
     this.otherFilters = ['confianza', 'aspectRatio', 'areaM'];
     this.filters = [];

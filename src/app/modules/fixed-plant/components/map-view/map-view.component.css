@@ -110,6 +110,7 @@ app-download-progress-bar {
   width: fit-content;
   height: calc(100vh - 96px);
   border-radius: 8px 0 0 8px;
+  overflow-y: hidden;
 }
 
 @media (max-width: 420px) {
@@ -169,4 +170,8 @@ app-download-progress-bar {
 
 .titulo {
   margin: 4px 10px 0;
+}
+
+:host ::ng-deep .mat-drawer-inner-container{
+  overflow-y:hidden;
 }

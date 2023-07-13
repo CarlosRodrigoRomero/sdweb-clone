@@ -16,6 +16,8 @@ export class Patches {
       'ighFmQO3ovf5JPoxLdt4', // Pizarro 4/06/2023
       'pBzaUDKSsS0sjOC3YnCO', // Pizarro 15/06/2023
       '5pl2FYGfYcgSUI5TJElc', // Olmedilla 169MW Jun 2023
+      'HT0tA81BfrksKXT7JFFb', // Olmedilla 169MW Jun 2023
+      'xAzfuJJSyuJyVeklz0C0', // Olmedilla 169MW Jun 2023
     ];
     const plantasIds: string[] = [
       'AyKgsY6F3TqGQGYNaOUY', // Logrosan
@@ -158,7 +160,11 @@ export class Patches {
 
   static patchOlmedilla(informeId: string, isAdmin?: boolean) {
     // PARCHE OLMEDILLA 169MW JUN 2023
-    if (informeId === '5pl2FYGfYcgSUI5TJElc') {
+    if (
+      informeId === 'HT0tA81BfrksKXT7JFFb' ||
+      informeId === '5pl2FYGfYcgSUI5TJElc' ||
+      informeId === 'xAzfuJJSyuJyVeklz0C0'
+    ) {
       if (isAdmin) {
         return true;
       } else {

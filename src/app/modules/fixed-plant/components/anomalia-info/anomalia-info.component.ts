@@ -132,7 +132,12 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
 
           if (this.informeSelected !== undefined) {
             // parche Omedilla 169MW 2023
-            if (this.informeSelected.id === '5pl2FYGfYcgSUI5TJElc' && !this.isAdmin) {
+            if (
+              (this.informeSelected.id === '5pl2FYGfYcgSUI5TJElc' ||
+                this.informeSelected.id === 'HT0tA81BfrksKXT7JFFb' ||
+                this.informeSelected.id === 'xAzfuJJSyuJyVeklz0C0') &&
+              !this.isAdmin
+            ) {
               this.showLocation = Patches.patchOlmedilla(this.informeSelected.id, this.isAdmin);
             }
           }

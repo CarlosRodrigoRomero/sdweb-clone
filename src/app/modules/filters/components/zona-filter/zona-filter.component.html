@@ -1,11 +1,11 @@
 <div class="filtro">
   <h5>{{ 'Zona' | translate }}</h5>
-  <button class="zona-select" mat-stroked-button [matMenuTriggerFor]="menu">
+  <button class="zona-select" mat-stroked-button [matMenuTriggerFor]="menuZona">
     <span *ngIf="defaultLabelStatus" class="filter-default">{{ defaultSelectLabel }}</span>
     <span *ngIf="!defaultLabelStatus" class="filter-selected">{{ selectedLabels.toString() }}</span>
     <mat-icon>keyboard_arrow_down</mat-icon>
   </button>
-  <mat-menu class="menu-zona" #menu="matMenu">
+  <mat-menu class="menu-zona" #menuZona="matMenu">
     <div>
       <li mat-menu-item *ngFor="let zona of zonasPcs; index as i" (click)="stopPropagation($event)">
         <mat-checkbox
