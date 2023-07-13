@@ -88,6 +88,8 @@ export class StatusFilterComponent implements OnInit {
                 (anom) => anom.informeId === this.selectedInformeId && 
                           anom.status == GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(statusElem.label)]
               ).length;
+              // Mostramos solo los status presentes en alguna anomalía
+              statusElem.disabled = statusElem.nAllAnomalias === 0;
             });
             return this.filterService.filteredElements$;
           })
