@@ -14,6 +14,7 @@ export class NavbarComponent {
   @Input() tipoComentarios: boolean;
   @Input() isAdmin: boolean;
   @Input() isReport: boolean;
+  @Input() isPortfolio: boolean;
   @Input() isDemo: boolean;
   @Input() isShared: boolean;
   @Input() hasNotifications: boolean;

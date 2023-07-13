@@ -64,6 +64,10 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
       if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
         this.isReport = true;
       }
+
+      if (this.router.url.split('/').includes('plants')) {
+        this.isPortfolio = true;
+      }
     }
 
     this.subscriptions.add(
@@ -172,7 +176,6 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
 
           this.subscriptions.add(
             this.portfolioControlService.initialized$.subscribe((value) => {
-              console.log(value);
               this.loadPortfolioContent = value;
             })
           );

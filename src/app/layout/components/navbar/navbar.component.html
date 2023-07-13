@@ -22,7 +22,7 @@
     <!-- <app-portfolio-recalc *ngIf="isAdmin && !isReport && !isDemo"></app-portfolio-recalc> -->
 
     <!-- NOTIFICACIONES DEL PORTFOLIO -->
-    <app-portfolio-notifications *ngIf="loadPortfolioContent"></app-portfolio-notifications>
+    <app-portfolio-notifications *ngIf="loadPortfolioContent && isPortfolio"></app-portfolio-notifications>
 
     <!-- MENU DERECHA -->
     <app-right-menu-container></app-right-menu-container>
