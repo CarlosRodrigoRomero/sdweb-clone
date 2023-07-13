@@ -218,9 +218,9 @@ export class AnomaliaImgComponent implements OnInit, OnDestroy {
         this.mapThermal = map;
       })
     );
-
+      console.log(this.map.getLayers().getArray())
     // añadimos las capas de anomalías al mapa
-    this.anomaliaLayers.forEach((l) => {this.map.addLayer(l)});
+    // this.anomaliaLayers.forEach((l) => {this.mapThermal.addLayer(l)});
   }
 
 
