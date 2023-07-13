@@ -201,14 +201,14 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       } else {
         this.columnas[2].push(this.translation.t('Seguidor'));
       }
+    }
 
-      if (this.planta.hasOwnProperty('etiquetasLocalXY') || this.planta.hasOwnProperty('posicionModulo')) {
-        this.columnas[2].push(this.translation.t('Nº Módulo'));
-        this.columnasLink = this.columnasLink.map((col) => col - 1);
-      } else {
-        this.columnas[2].push(this.translation.t('Fila'));
-        this.columnas[2].push(this.translation.t('Columna'));
-      }
+    if (this.planta.hasOwnProperty('etiquetasLocalXY') || this.planta.hasOwnProperty('posicionModulo')) {
+      this.columnas[2].push(this.translation.t('Nº Módulo'));
+      this.columnasLink = this.columnasLink.map((col) => col - 1);
+    } else {
+      this.columnas[2].push(this.translation.t('Fila'));
+      this.columnas[2].push(this.translation.t('Columna'));
     }
 
     this.columnas[2].push('Google maps');
@@ -261,19 +261,20 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia, this.anomaliaService.criterioCriticidad);
 
+    // PARCHE OLMEDILLA 2023
     if (this.showLocation) {
       if (this.reportControlService.plantaFija) {
         row.localizacion = this.anomaliaInfoService.getLocalizacionReducLabel(anomalia, this.planta);
       } else {
         row.localizacion = anomalia.nombreSeguidor;
       }
+    }
 
-      if (this.planta.hasOwnProperty('etiquetasLocalXY') || this.planta.hasOwnProperty('posicionModulo')) {
-        row.numeroModulo = this.anomaliaInfoService.getNumeroModulo(anomalia, this.planta);
-      } else {
-        row.localY = this.anomaliaInfoService.getAlturaAnom(anomalia, this.planta);
-        row.localX = this.anomaliaInfoService.getColumnaAnom(anomalia, this.planta);
-      }
+    if (this.planta.hasOwnProperty('etiquetasLocalXY') || this.planta.hasOwnProperty('posicionModulo')) {
+      row.numeroModulo = this.anomaliaInfoService.getNumeroModulo(anomalia, this.planta);
+    } else {
+      row.localY = this.anomaliaInfoService.getAlturaAnom(anomalia, this.planta);
+      row.localX = this.anomaliaInfoService.getColumnaAnom(anomalia, this.planta);
     }
 
     if (this.reportControlService.plantaFija) {
