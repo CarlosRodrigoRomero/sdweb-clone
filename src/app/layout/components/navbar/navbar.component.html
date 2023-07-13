@@ -35,7 +35,7 @@
     </mat-menu>
 
 
-    <app-share-plant-container *ngIf="loadContent"></app-share-plant-container>
+    <app-share-plant-container *ngIf="loadContent && !isShared"></app-share-plant-container>
 
     <!-- MENU DERECHA -->
     <app-right-menu-container></app-right-menu-container>

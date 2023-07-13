@@ -15,46 +15,43 @@
     </button>
   </div>
 
-  <span class="title">{{ 'Usuarios con acceso a la planta' | translate }}</span>
+  <div *ngIf="canAddUsers" id="usuariosAccesoPlanta">
+    <span class="title">{{ 'Usuarios con acceso a la planta' | translate }}</span>
 
 
 
 
-  <div class="tabla-container">
-    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
-      <tr mat-header-row *matHeaderRowDef="displayedColumns, sticky: true"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    <div class="tabla-container">
+      <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+        <tr mat-header-row *matHeaderRowDef="displayedColumns, sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
-      <!-- email Column -->
-      <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
-        <td mat-cell *matCellDef="let element">{{ element.email }}</td>
-      </ng-container>
+        <!-- email Column -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+          <td mat-cell *matCellDef="let element">{{ element.email }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Acciones</th>
-        <td mat-cell *matCellDef="let element">
-          <button mat-button (click)="onRemovePlantaButtonClick(element.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
-    </table>
-    <div id="btn-enviar-div">
-      <!-- <mat-form-field>
-        <mat-label>Buscar</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Usuario" #search />
-      </mat-form-field> -->
-      <button mat-raised-button class="btn-enviar" color="primary" (click)="openAddPlantToUserDialog()">
-        <div class="btn-enviar-content">
-          <mat-icon>person_add</mat-icon>
-          <span>{{ 'Añadir usuario' | translate }}</span>
-        </div>
-      </button>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-button (click)="confirmDeletePlantFromUser(element.id, element.email)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+      </table>
+      <div id="btn-enviar-div">
+        <button mat-raised-button class="btn-enviar" color="primary" (click)="openAddPlantToUserDialog()">
+          <div class="btn-enviar-content">
+            <mat-icon>person_add</mat-icon>
+            <span>{{ 'Añadir usuario' | translate }}</span>
+          </div>
+        </button>
+      </div>
     </div>
+
   </div>
-
-
 
 
 </div>

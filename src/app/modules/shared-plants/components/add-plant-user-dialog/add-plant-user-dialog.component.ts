@@ -3,9 +3,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserInterface } from '@core/models/user';
 import { UserService } from '@data/services/user.service';
 import { ReportControlService } from '@data/services/report-control.service';
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { AuthService } from '@data/services/auth.service';
 import { Observable } from 'rxjs';
+import { AngularFireFunctions } from '@angular/fire/functions';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
+import { PlantaService } from '@data/services/planta.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 
@@ -21,22 +26,43 @@ export class AddPlantUserDialogComponent implements OnInit {
   userId: string;
   email: string;
   randomPassword: string;
-
+  statusMessage: string;
+  nombrePlantaActual: string;
+  canAddUsers: boolean;
+  loggedUser: UserInterface;
 
   constructor(
     private userService: UserService,
     private formBuilder: FormBuilder,
     private reportControlService: ReportControlService,
     private authService: AuthService,
-
+    private functions: AngularFireFunctions,
+    private http: HttpClient,
+    private plantaService: PlantaService,
+    private _snackBar: MatSnackBar
 
   ) { }
 
   ngOnInit(): void {
 
     this.buildForm();
-
+    this.cargarNombreDeLaPlanta(this.reportControlService.plantaId);
   }
+
+  cargarNombreDeLaPlanta(plantaId: string): void {
+    this.plantaService.getPlantaNombreById(plantaId).subscribe(
+      nombre => {
+        this.nombrePlantaActual = nombre;
+        // console.log('Nombre de la planta:', this.nombrePlantaActual); 
+      },
+      error => {
+        console.error('Error al cargar el nombre de la planta:', error);
+      }
+    );
+  }
+
+
+
 
   private buildForm() {
     this.form = this.formBuilder.group({
@@ -44,46 +70,10 @@ export class AddPlantUserDialogComponent implements OnInit {
     });
   }
 
-
-  // onSubmit(event: Event) {
-
-  //   event.preventDefault();
-  //   if (this.form.valid) {
-
-  //     this.user.email = this.form.get('email').value;
-
-  //     this.userService.getUserIdByEmail(this.user.email).pipe(take(1)).subscribe((userIds) => {
-  //       if (userIds && userIds.length > 0) {
-  //         this.userId = userIds[0]; // Asignando el primer ID de la lista a la variable userId
-
-  //         // Llama a addPlantToUser dentro de la suscripción, después de asignar this.userId
-  //         this.addPlantToUser(this.userId, this.reportControlService.plantaId);
-  //       } else {
-  //         console.log('No se encontró un usuario con el email especificado');
-  //       }
-  //     });
-
-  //   }
-  //   else {
-  //     console.log("formulario invalido");
-  //     // Iterar sobre los controles del formulario y mostrar los errores específicos
-  //     Object.keys(this.form.controls).forEach(field => {
-  //       const control = this.form.get(field);
-  //       if (control && control.invalid) {
-  //         console.log("Errores en el campo", field, control.errors);
-  //       }
-  //     });
-  //   }
-
-  // }
-
-
   onSubmit(event: Event) {
 
     event.preventDefault();
     if (this.form.valid) {
-
-      // this.user.email = this.form.get('email').value;
 
       this.user.email = this.form.get('email').value;
 
@@ -91,50 +81,47 @@ export class AddPlantUserDialogComponent implements OnInit {
 
       this.userService.userExists(this.user.email).pipe(take(1)).subscribe(users => {
         if (users.length > 0) {
-          console.log('Usuario encontrado:', users[0]);
+          // console.log('Usuario encontrado:', users[0]);
           this.user = users[0];
 
+          if (this.user.role == 2) {
+            this.checkIfUserContainsPlant(this.user.uid, this.reportControlService.plantaId).subscribe(contains => {
+              if (contains) {
+                // console.log("El usuario ya tiene la planta");
+                this.openSnackBar("No se puede asignar. El usuario ya tiene asignada la planta")
+              } else {
+                // console.log("El usuario no tiene la planta");
+
+                this.sendAddedPlantEmail(this.user.email, this.nombrePlantaActual);
+                this.addPlantToUser(this.user.uid, this.reportControlService.plantaId);
+                this.openSnackBar("Usuario encontrado. Planta asignada al usuario")
+              }
+            });
+          } else {
+            this.openSnackBar("La planta no puede asignarse al usuario porque no es un usuario externo");
+          }
 
 
-          this.checkIfUserContainsPlant(this.user.uid, this.reportControlService.plantaId).subscribe(contains => {
-            if (contains) {
-              console.log("El usuario ya tiene la planta");
-            } else {
-              console.log("El usuario no tiene la planta");
-              this.addPlantToUser(this.user.uid, this.reportControlService.plantaId);
-            }
-          });
 
         } else {
-          console.log('Usuario no encontrado, creando usuario');
+          // console.log('Usuario no encontrado, creando usuario');
           this.createUser(this.user).then(uid => {
-            // Ahora uid debería ser una cadena que representa el uid del usuario creado
+            this.sendWelcomeAddedPlantEmail(this.user.email, this.nombrePlantaActual);
             this.addPlantToUser(uid, this.reportControlService.plantaId);
+            this.openSnackBar("Usuario creado y planta asignada al usuario")
           });
         }
       });
-
-
-
-      // this.userService.getUserIdByEmail(this.user.email).pipe(take(1)).subscribe((userIds) => {
-      //   if (userIds && userIds.length > 0) {
-      //     this.userId = userIds[0]; // Asignando el primer ID de la lista a la variable userId
-
-      //     // Llama a addPlantToUser dentro de la suscripción, después de asignar this.userId
-      //     this.addPlantToUser(this.userId, this.reportControlService.plantaId);
-      //   } else {
-      //     console.log('No se encontró un usuario con el email especificado');
-      //   }
-      // });
-
     }
     else {
-      console.log("formulario invalido");
+      // console.log("formulario invalido");
       // Iterar sobre los controles del formulario y mostrar los errores específicos
       Object.keys(this.form.controls).forEach(field => {
         const control = this.form.get(field);
         if (control && control.invalid) {
           console.log("Errores en el campo", field, control.errors);
+          this.openSnackBar(`Error en el campo ${field}`);
+
         }
       });
     }
@@ -149,49 +136,22 @@ export class AddPlantUserDialogComponent implements OnInit {
   async addPlantToUser(idUser: string, idPlanta: string) {
     this.userService.addPlantToUser(idUser, idPlanta)
       .then(() => {
-        console.log('Planta añadida con éxito');
+        // console.log('Planta añadida con éxito');
       })
       .catch(error => {
         console.error('Error añadiendo la planta: ', error);
       });
   }
 
-
-  // async createUser(user: UserInterface) {
-  //   this.authService.createUser(user.email, this.randomPassword).subscribe(result => {
-  //     console.log("UID New user from user create component: ", result);
-
-  //     // console.table(result);
-  //     this.user.uid = result.uid;
-
-  //     let userUid = result.uid;
-
-  //     this.userService.createUser(this.user);
-
-  //     // this.openSnackBar();
-
-  //     this.authService.forgotPassword(this.user.email);
-
-  //     console.log("UserUid: " + userUid)
-  //     return userUid;
-
-  //   }, error => {
-  //     console.error(error);
-  //   });
-  // }
-
-
   createUser(user: UserInterface): Promise<string> {
     return new Promise((resolve, reject) => {
       this.authService.createUser(user.email, this.randomPassword).subscribe(result => {
-        console.log("UID New user from user create component: ", result);
+        // console.log("UID New user from user create component: ", result);
         this.user.uid = result.uid;
         let userUid = result.uid;
         this.user.role = 2;
         this.userService.createUser(this.user);
-        // this.authService.forgotPassword(this.user.email);
-        // this.sendPasswordResetEmail(user.email);
-        console.log("UserUid: " + userUid)
+        // console.log("UserUid: " + userUid)
         resolve(userUid);
       }, error => {
         console.error(error);
@@ -200,17 +160,70 @@ export class AddPlantUserDialogComponent implements OnInit {
     });
   }
 
-  // sendPasswordResetEmail(email: string) {
-  //   const sendCustomPasswordResetEmail = firebase.functions().httpsCallable('sendCustomPasswordResetEmail');
-    
-  //   sendCustomPasswordResetEmail({ email: email })
-  //     .then((result) => {
-  //       console.log(result); // Handle the response from the function here
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error invoking the Cloud Function:', error);
-  //     });
-  // }
+
+  cloudFunctionUrl = `${environment.firebaseFunctionsUrl}/sendEmail`;
+
+  sendAddedPlantEmail(email: string, nombrePlanta: string) {
+    const payload = {
+      email,
+      template: 'addedPlant',
+      customParameters: { nombrePlanta }
+    };
+
+    this.http
+      .post(this.cloudFunctionUrl, payload)
+      .subscribe(
+        () => {
+          this.statusMessage = 'Correo de bienvenida enviado.';
+        },
+        (error) => {
+          this.statusMessage = 'Error al enviar correo de bienvenida.';
+          console.error(error);
+        }
+      );
+  }
+
+
+  sendResetPasswordEmail(email: string) {
+    const payload = { email, template: 'resetPassword' };
+
+    this.http
+      .post(this.cloudFunctionUrl, payload)
+      .subscribe(
+        () => {
+          this.statusMessage = 'Correo de restablecimiento enviado.';
+        },
+        (error) => {
+          this.statusMessage = 'Error al enviar correo de restablecimiento.';
+          console.error(error);
+        }
+      );
+  }
+
+  sendWelcomeAddedPlantEmail(email: string, nombrePlanta: string) {
+    const payload = {
+      email,
+      template: 'welcomeAddedPlant',
+      customParameters: { nombrePlanta }
+    };
+
+    this.http
+      .post(this.cloudFunctionUrl, payload)
+      .subscribe(
+        () => {
+          this.statusMessage = 'Correo de bienvenida enviado.';
+        },
+        (error) => {
+          this.statusMessage = 'Error al enviar correo de bienvenida.';
+          console.error(error);
+        }
+      );
+  }
+
+  private openSnackBar(message: string) {
+    this._snackBar.open(message, 'OK', { duration: 5000 });
+  }
+
 }
 
 function generateRandomPassword(length) {

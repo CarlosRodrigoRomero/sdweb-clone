@@ -14,6 +14,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Empresa } from '@core/models/empresa';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from 'environments/environment';
 
 
 @Component({
@@ -28,6 +29,8 @@ export class UserCreateComponent implements OnInit {
   randomPassword: string;
   empresas: Empresa[];
   empresaSelected: Empresa;
+  statusMessage: string;
+
 
   constructor(
     private formBuilder: FormBuilder,
@@ -36,6 +39,7 @@ export class UserCreateComponent implements OnInit {
     private userService: UserService,
     private empresaService: EmpresaService,
     private _snackBar: MatSnackBar,
+    private http: HttpClient,
   ) {
   }
 
@@ -76,10 +80,6 @@ export class UserCreateComponent implements OnInit {
 
         this.createUser(this.user);
 
-        // Enviamos un email para que el usuario cambie su contraseña
-        this.authService.forgotPassword(this.user.email);
-
-
       } else {
         console.log("formulario invalido");
         // Iterar sobre los controles del formulario y mostrar los errores específicos
@@ -97,18 +97,18 @@ export class UserCreateComponent implements OnInit {
 
   async createUser(user: UserInterface) {
     this.authService.createUser(user.email, this.randomPassword).subscribe(result => {
-      console.log("UID New user from user create component: ", result);
+      // console.log("UID New user from user create component: ", result);
 
-      // console.table(result);
       this.user.uid = result.uid;
 
       this.userService.createUser(this.user);
 
       this.openSnackBar();
-      console.log('Usuario creado correctamente');
+      // console.log('Usuario creado correctamente');
       this.router.navigate(['./admin/users']);
 
-      this.authService.forgotPassword(this.user.email);
+      //Enviamos el email para resetear la contraseña
+      this.sendWelcomeAndResetPasswordEmail(this.user.email);
 
     }, error => {
       console.error(error);
@@ -150,7 +150,24 @@ export class UserCreateComponent implements OnInit {
     this._snackBar.open('Usuario creado correctamente', 'OK', { duration: 5000 });
   }
 
+  cloudFunctionUrl = `${environment.firebaseFunctionsUrl}/sendEmail`;
 
+
+  sendWelcomeAndResetPasswordEmail(email: string) {
+    const payload = { email, template: 'welcome' };
+
+    this.http
+      .post(this.cloudFunctionUrl, payload)
+      .subscribe(
+        () => {
+          this.statusMessage = 'Correo de restablecimiento enviado.';
+        },
+        (error) => {
+          this.statusMessage = 'Error al enviar correo de restablecimiento.';
+          console.error(error);
+        }
+      );
+  }
 }
 
 function generateRandomPassword(length) {

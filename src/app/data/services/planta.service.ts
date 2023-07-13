@@ -679,4 +679,10 @@ export class PlantaService {
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();
   }
+
+  getPlantaNombreById(plantaId: string): Observable<string> {
+    return this.afs.doc<PlantaInterface>(`plantas/${plantaId}`).valueChanges().pipe(
+      map(planta => planta ? planta.nombre : null)
+    );
+  }
 }
