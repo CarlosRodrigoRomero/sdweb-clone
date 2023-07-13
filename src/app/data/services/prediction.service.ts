@@ -10,6 +10,8 @@ import { GLOBAL } from '@data/constants/global';
   providedIn: 'root',
 })
 export class PredictionService {
+  private porcentajeNuevasAnomalias = 0.1;
+
   constructor(private reportControlService: ReportControlService) {}
 
   getNuevasAnomalias(informeId: string): Anomalia[] {
@@ -19,7 +21,7 @@ export class PredictionService {
       const anomsTipo = anomalias.filter((anom) => anom.tipo === index);
 
       if (anomsTipo.length > 0) {
-        for (let i = 0; i < Math.floor(anomsTipo.length / 10); i++) {
+        for (let i = 0; i < Math.floor(anomsTipo.length * this.porcentajeNuevasAnomalias); i++) {
           const anomalia: Anomalia = {
             tipo: null,
             globalCoords: [''],

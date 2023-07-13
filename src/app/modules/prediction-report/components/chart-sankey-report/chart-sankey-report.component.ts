@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 import { Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 
 import { TranslateService } from '@ngx-translate/core';
 
@@ -8,13 +9,14 @@ import { GoogleCharts } from 'google-charts';
 
 import { ThemeService } from '@data/services/theme.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { PredictionService } from '@data/services/prediction.service';
 
 import { MathOperations } from '@core/classes/math-operations';
 import { Colors } from '@core/classes/colors';
 
 import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
-import { switchMap, take } from 'rxjs/operators';
+import { Anomalia } from '@core/models/anomalia';
 
 @Component({
   selector: 'app-chart-sankey-report',
@@ -64,7 +66,8 @@ export class ChartSankeyReportComponent implements OnInit {
   constructor(
     private themeService: ThemeService,
     private reportControlService: ReportControlService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private predictionService: PredictionService
   ) {}
 
   ngOnInit(): void {
@@ -85,7 +88,9 @@ export class ChartSankeyReportComponent implements OnInit {
 
   private loadData() {
     const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
-    const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
+    const lastReportAnoms = this.predictionService.getNuevasAnomalias(lastReport.id);
+
+    this.addNuevasAnomalias(lastReportAnoms);
 
     GLOBAL.sortedAnomsTipos.forEach((tipo, index) => {
       const anomsTipo = lastReportAnoms.filter((anom) => anom.tipo === tipo);
@@ -94,41 +99,26 @@ export class ChartSankeyReportComponent implements OnInit {
         // checkeamos si el color se ha añadido ya y si no lo añadimos
         this.addLeftColor(index, tipo);
 
-        const uniqueNextTipos = MathOperations.getUniqueElemsArray(anomsTipo.map((anom) => anom.tipoNextYear));
-
-        if (uniqueNextTipos.length > 0) {
-          uniqueNextTipos.forEach((uniqueNextTipo, i) => {
-            const anomsTipoNext = anomsTipo.filter((anom) => anom.tipoNextYear === uniqueNextTipo);
-            const count = anomsTipoNext.length;
-            let from: string;
-
-            this.translate
-              .get(GLOBAL.labels_tipos[tipo])
-              .pipe(
-                take(1),
-                switchMap((res: string) => {
-                  from = res;
-
-                  return this.translate.get(GLOBAL.labels_tipos[uniqueNextTipo]);
-                }),
-                take(1)
-              )
-              .subscribe((res: string) => {
-                // agregamos un espacio porque un diagrama sankey no acepta ir de un un nodo a otro con el mismo nombre
-                const to = res + ' ';
-
-                this.chartData.push([from, to, count]);
-              });
-
-            // checkeamos si el color se ha añadido ya y si no lo añadimos
-            this.addRightColor(index, i, uniqueNextTipo);
-          });
-        }
+        this.addRightData(anomsTipo, tipo, index);
       }
     });
 
     // formamos el array de colores
     this.unifyColors();
+  }
+
+  private addNuevasAnomalias(anomalias: Anomalia[]) {
+    const newAnoms = anomalias.filter((anom) => anom.tipo === null);
+
+    if (newAnoms.length > 0) {
+      // añadimos el color de la columna de la izquierda
+      this.colorsLeftNodes.push({
+        index: GLOBAL.sortedAnomsTipos.length,
+        color: COLOR.gris,
+      });
+
+      this.addRightData(newAnoms, null, GLOBAL.sortedAnomsTipos.length);
+    }
   }
 
   private addLeftColor(index: number, tipo: number) {
@@ -137,6 +127,44 @@ export class ChartSankeyReportComponent implements OnInit {
       index,
       color,
     });
+  }
+
+  private addRightData(anomsTipo: Anomalia[], tipo: number, index: number) {
+    const uniqueNextTipos = MathOperations.getUniqueElemsArray(anomsTipo.map((anom) => anom.tipoNextYear));
+
+    if (uniqueNextTipos.length > 0) {
+      uniqueNextTipos.forEach((uniqueNextTipo, i) => {
+        const anomsTipoNext = anomsTipo.filter((anom) => anom.tipoNextYear === uniqueNextTipo);
+        const count = anomsTipoNext.length;
+        let from: string;
+
+        let label = GLOBAL.labels_tipos[tipo];
+        if (tipo === null) {
+          label = 'Nuevas';
+        }
+
+        this.translate
+          .get(label)
+          .pipe(
+            take(1),
+            switchMap((res: string) => {
+              from = res;
+
+              return this.translate.get(GLOBAL.labels_tipos[uniqueNextTipo]);
+            }),
+            take(1)
+          )
+          .subscribe((res: string) => {
+            // agregamos un espacio porque un diagrama sankey no acepta ir de un un nodo a otro con el mismo nombre
+            const to = res + ' ';
+
+            this.chartData.push([from, to, count]);
+          });
+
+        // checkeamos si el color se ha añadido ya y si no lo añadimos
+        this.addRightColor(index, i, uniqueNextTipo);
+      });
+    }
   }
 
   private addRightColor(indexLeft: number, index: number, tipo: number) {

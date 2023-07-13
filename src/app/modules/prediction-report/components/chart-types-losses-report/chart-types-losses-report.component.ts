@@ -25,13 +25,15 @@ import {
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { ThemeService } from '@data/services/theme.service';
+import { PredictionService } from '@data/services/prediction.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
+
 import { GLOBAL } from '@data/constants/global';
+
 import { Colors } from '@core/classes/colors';
 import { COLOR } from '@data/constants/color';
-import { PredictionService } from '@data/services/prediction.service';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
