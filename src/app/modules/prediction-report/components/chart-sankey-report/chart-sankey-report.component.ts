@@ -29,13 +29,6 @@ export class ChartSankeyReportComponent implements OnInit {
   colorsLeftNodes: any[] = [];
   colorsRightNodes: any[] = [];
   colors_nodes = [];
-  colors = {
-    'Módulo en CA (string)': 'red',
-    '2x diodo en CA': 'yellow',
-    '1x diodo en CA': 'orange',
-    'Módulo en CC': 'blue',
-    'PID regular': 'black',
-  };
   chartOptions = {
     width: '100%',
     height: 500,
