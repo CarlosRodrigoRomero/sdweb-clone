@@ -23,11 +23,13 @@ import {
 
 import { ThemeService } from '@data/services/theme.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { PredictionService } from '@data/services/prediction.service';
+
+import { Anomalia } from '@core/models/anomalia';
+import { InformeInterface } from '@core/models/informe';
 
 import { COLOR } from '@data/constants/color';
 import { GLOBAL } from '@data/constants/global';
-import { Anomalia } from '@core/models/anomalia';
-import { InformeInterface } from '@core/models/informe';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -66,14 +68,15 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private decimalPipe: DecimalPipe,
     private reportControlService: ReportControlService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private predictionService: PredictionService
   ) {}
 
   ngOnInit(): void {
     this.checkTranslate();
 
     const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
-    const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
+    const lastReportAnoms = this.predictionService.getNuevasAnomalias(lastReport.id);
 
     const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
     const maeFixableLastReport = this.getMaeByAnoms(lastReport, fixableLastReportAnoms);
@@ -277,6 +280,9 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
     if (nextYear) {
       types = anoms.map((anom) => anom.tipoNextYear);
     } else {
+      // evitamos las anomalias nuevas
+      anoms = anoms.filter((anom) => anom.tipo !== null);
+
       types = anoms.map((anom) => anom.tipo);
     }
 
