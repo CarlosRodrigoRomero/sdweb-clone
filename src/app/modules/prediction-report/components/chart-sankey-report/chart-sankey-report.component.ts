@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 import { Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 
 import { TranslateService } from '@ngx-translate/core';
 
@@ -8,13 +9,14 @@ import { GoogleCharts } from 'google-charts';
 
 import { ThemeService } from '@data/services/theme.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { PredictionService } from '@data/services/prediction.service';
 
 import { MathOperations } from '@core/classes/math-operations';
 import { Colors } from '@core/classes/colors';
 
 import { GLOBAL } from '@data/constants/global';
 import { COLOR } from '@data/constants/color';
-import { switchMap, take } from 'rxjs/operators';
+import { Anomalia } from '@core/models/anomalia';
 
 @Component({
   selector: 'app-chart-sankey-report',
@@ -26,23 +28,18 @@ export class ChartSankeyReportComponent implements OnInit {
   @ViewChild('sankeyChart', { static: true }) sankeyChartElement: ElementRef;
 
   chartData: any[][] = [['From', 'To', '#']];
+  colorsLeftNodes: any[] = [];
+  colorsRightNodes: any[] = [];
   colors_nodes = [];
-  colors = {
-    'Módulo en CA (string)': 'red',
-    '2x diodo en CA': 'yellow',
-    '1x diodo en CA': 'orange',
-    'Módulo en CC': 'blue',
-    'PID regular': 'black',
-  };
   chartOptions = {
     width: '100%',
-    height: 400,
+    height: 500,
     interactivity: true,
     sankey: {
       node: {
         nodePadding: 16,
         width: 10,
-        colors: [COLOR.dark_orange],
+        colors: this.colors_nodes,
         label: { fontSize: 12, color: '#fff', bold: false, italic: false },
       },
       link: {
@@ -52,7 +49,7 @@ export class ChartSankeyReportComponent implements OnInit {
         //   // stroke: 'black', // Color of the link border.
         //   // strokeWidth: 1, // Thickness of the link border (default 0).
         // },
-        colors: [COLOR.dark_neutral],
+        colors: this.colors_nodes,
         colorMode: 'gradient',
       },
     },
@@ -69,32 +66,19 @@ export class ChartSankeyReportComponent implements OnInit {
   constructor(
     private themeService: ThemeService,
     private reportControlService: ReportControlService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private predictionService: PredictionService
   ) {}
 
   ngOnInit(): void {
-    // this.loadData();
-
-    // this.setChartHeight();
-
-    // this.setColors();
-
-    this.loadFakeData();
+    this.loadData();
 
     this.loadChart();
 
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          let color = COLOR.dark_orange;
-          if (theme === 'dark-theme') {
-            color = COLOR.dark_orange;
-          } else {
-            color = COLOR.light_orange;
-          }
-
           this.chartOptions.sankey.node.label.color = this.themeService.textColor;
-          this.chartOptions.sankey.node.colors = [color];
 
           this.loadChart();
         }
@@ -104,128 +88,108 @@ export class ChartSankeyReportComponent implements OnInit {
 
   private loadData() {
     const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
-    const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
+    const lastReportAnoms = this.predictionService.getNuevasAnomalias(lastReport.id);
 
-    // DEMO
-    // lastReportAnoms.forEach((anom) => {
-    //   anom.tipoNextYear = this.tipoRandom();
-    // });
+    this.addNuevasAnomalias(lastReportAnoms);
 
     GLOBAL.sortedAnomsTipos.forEach((tipo, index) => {
       const anomsTipo = lastReportAnoms.filter((anom) => anom.tipo === tipo);
 
       if (anomsTipo.length > 0) {
-        const uniqueNextTipos = MathOperations.getUniqueElemsArray(anomsTipo.map((anom) => anom.tipoNextYear));
+        // checkeamos si el color se ha añadido ya y si no lo añadimos
+        this.addLeftColor(index, tipo);
 
-        if (uniqueNextTipos.length > 0) {
-          // checkeamos si el color se ha añadido ya y si no lo añadimos
-          // this.addColor(tipo);
-
-          uniqueNextTipos.forEach((uniqueNextTipo) => {
-            const anomsTipoNext = anomsTipo.filter((anom) => anom.tipoNextYear === uniqueNextTipo);
-            const count = anomsTipoNext.length;
-            let from: string;
-
-            this.translate
-              .get(GLOBAL.labels_tipos[tipo])
-              .pipe(
-                take(1),
-                switchMap((res: string) => {
-                  from = res;
-
-                  return this.translate.get(GLOBAL.labels_tipos[uniqueNextTipo]);
-                }),
-                take(1)
-              )
-              .subscribe((res: string) => {
-                const to = res;
-
-                this.chartData.push([from, to, count]);
-              });
-
-            // const from = GLOBAL.labels_tipos[tipo];
-            // const to = GLOBAL.labels_tipos[uniqueNextTipo];
-            // console.log(from, to, count);
-
-            // checkeamos si el color se ha añadido ya y si no lo añadimos
-            // this.addColor(uniqueNextTipo);
-          });
-        }
+        this.addRightData(anomsTipo, tipo, index);
       }
     });
+
+    // formamos el array de colores
+    this.unifyColors();
   }
 
-  private loadFakeData() {
-    const data = [
-      ['PID fase temprana', 'PID fase temprana.', 1399],
-      ['Módulo en CA (string)', 'Módulo en CA (string).', 140],
-      ['2x diodo en CA', '2x diodo en CA.', 2],
-      ['1x diodo en CA', '1x diodo en CA.', 62],
-      ['Módulo en CC', 'Módulo en CC.', 1],
-      ['Caja conexiones', 'Caja conexiones.', 6],
-      ['Sombras', 'Sombras.', 37],
-      ['Nuevas', '1x diodo en CA.', 7],
-      ['Nuevas', 'Caja conexiones.', 2],
-      ['Nuevas', 'Módulo en CA (string).', 10],
-      ['Nuevas', 'PID fase temprana.', 50],
-    ];
+  private addNuevasAnomalias(anomalias: Anomalia[]) {
+    const newAnoms = anomalias.filter((anom) => anom.tipo === null);
 
-    data.forEach((row) => {
-      const translateData = [];
-      this.translate.get(row[0] as string).subscribe((res: string) => {
-        translateData.push(res);
-        this.translate.get((row[1] as string).slice(0, -1)).subscribe((res2: string) => {
-          translateData.push(res2 + '.');
-          translateData.push(row[2]);
-          this.chartData.push(translateData);
-        });
+    if (newAnoms.length > 0) {
+      // añadimos el color de la columna de la izquierda
+      this.colorsLeftNodes.push({
+        index: GLOBAL.sortedAnomsTipos.length,
+        color: COLOR.gris,
       });
-    });
-  }
 
-  private setChartHeight() {
-    const numRows = this.chartData.length - 1;
-    const height = numRows * 16;
-
-    this.chartOptions.height = height;
-  }
-
-  private addColor(tipo: number) {
-    const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
-    if (!this.colors_nodes.includes(color)) {
-      this.colors_nodes.push(color);
+      this.addRightData(newAnoms, null, GLOBAL.sortedAnomsTipos.length);
     }
   }
 
-  private setColors() {
-    const nodes: string[] = [];
-    const colors: any[] = [];
+  private addLeftColor(index: number, tipo: number) {
+    const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
+    this.colorsLeftNodes.push({
+      index,
+      color,
+    });
+  }
 
-    // añadimos primero los nodos de la izquierda
-    this.chartData
-      .filter((_, index) => index > 0)
-      .map((row) => row[0])
-      .forEach((from) => {
-        if (!nodes.includes(from)) {
-          nodes.push(from);
+  private addRightData(anomsTipo: Anomalia[], tipo: number, index: number) {
+    const uniqueNextTipos = MathOperations.getUniqueElemsArray(anomsTipo.map((anom) => anom.tipoNextYear));
+
+    if (uniqueNextTipos.length > 0) {
+      uniqueNextTipos.forEach((uniqueNextTipo, i) => {
+        const anomsTipoNext = anomsTipo.filter((anom) => anom.tipoNextYear === uniqueNextTipo);
+        const count = anomsTipoNext.length;
+        let from: string;
+
+        let label = GLOBAL.labels_tipos[tipo];
+        if (tipo === null) {
+          label = 'Nuevas';
         }
-      });
 
-    // después los de la derecha
-    this.chartData
-      .filter((_, index) => index > 0)
-      .map((row) => row[1])
-      .forEach((from) => {
-        if (!nodes.includes(from)) {
-          nodes.push(from);
-        }
-      });
+        this.translate
+          .get(label)
+          .pipe(
+            take(1),
+            switchMap((res: string) => {
+              from = res;
 
-    // añadimos los colores
-    nodes.forEach((node) => {
-      const tipo = GLOBAL.labels_tipos.indexOf(node);
-      const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
-      this.colors_nodes.push(color);
+              return this.translate.get(GLOBAL.labels_tipos[uniqueNextTipo]);
+            }),
+            take(1)
+          )
+          .subscribe((res: string) => {
+            // agregamos un espacio porque un diagrama sankey no acepta ir de un un nodo a otro con el mismo nombre
+            const to = res + ' ';
+
+            this.chartData.push([from, to, count]);
+          });
+
+        // checkeamos si el color se ha añadido ya y si no lo añadimos
+        this.addRightColor(index, i, uniqueNextTipo);
+      });
+    }
+  }
+
+  private addRightColor(indexLeft: number, index: number, tipo: number) {
+    const color = Colors.rgbaToHex(COLOR.colores_tipos[tipo]);
+
+    if (!this.colorsRightNodes.some((node) => node.color === color)) {
+      this.colorsRightNodes.push({
+        indexLeft,
+        index,
+        color,
+      });
+    }
+  }
+
+  private unifyColors() {
+    this.colorsLeftNodes.forEach((leftNode) => {
+      // Add the color from the left node
+      this.colors_nodes.push(leftNode.color);
+
+      // Find and add the colors from the right nodes with the same indexLeft
+      let rightColors = this.colorsRightNodes
+        .filter((rightNode) => rightNode.indexLeft === leftNode.index)
+        .map((node) => node.color);
+
+      this.colors_nodes.push(...rightColors);
     });
   }
 
@@ -237,14 +201,5 @@ export class ChartSankeyReportComponent implements OnInit {
     const chart = new GoogleCharts.api.visualization.Sankey(this.sankeyChartElement.nativeElement);
     const dataTable = new GoogleCharts.api.visualization.arrayToDataTable(this.chartData);
     chart.draw(dataTable, this.chartOptions);
-  }
-
-  private tipoRandom(): number {
-    // Crea un array con los números 4, 8, 9 y 10
-    var numeros = [4, 12, 20, 21];
-
-    // Genera un número aleatorio entre los elementos del array
-    var indiceAleatorio = Math.floor(Math.random() * numeros.length);
-    return numeros[indiceAleatorio];
   }
 }

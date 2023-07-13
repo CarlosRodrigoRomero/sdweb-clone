@@ -1,0 +1,19 @@
+.btn-notif {
+  margin: 0 1rem;
+}
+
+.row-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left-content {
+  margin-right: 2rem;
+}
+
+@media (max-width: 600px) {
+  .btn-icon {
+    display: none;
+  }
+}

@@ -9,7 +9,6 @@ import { ResetServices } from '@data/services/reset-services.service';
   selector: 'app-reports',
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css'],
-  providers: [PortfolioControlService],
 })
 export class ReportsComponent implements OnInit, OnDestroy {
   numPlantas = 0;

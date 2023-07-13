@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatPaginator } from '@angular/material/paginator';
@@ -52,6 +52,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   sortedColumn = 'fixablePower';
   theme: string;
   private screenWidth: number;
+  btnShowAll = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -64,7 +65,8 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     private _snackBar: MatSnackBar,
     private themeService: ThemeService,
     private overlayContainer: OverlayContainer,
-    private shareReportService: ShareReportService
+    private shareReportService: ShareReportService,
+    private changeDetectorRefs: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -72,31 +74,49 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
     this.plantas = this.portfolioControlService.listaPlantas;
     this.informes = this.portfolioControlService.listaInformes;
-    const plantsData = [];
+    let plantsData = [];
 
-    this.plantas.forEach((planta) => {
-      const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
-      const informeReciente = informesPlanta.reduce((prev, current) => (prev.fecha > current.fecha ? prev : current));
+    this.subscriptions.add(
+      this.portfolioControlService.filteredPlants$.subscribe((plantas) => {
+        plantsData = [];
 
-      let informesAntiguos: InformeInterface[] = [];
-      if (planta.tipo !== 'seguidores' && planta.id !== 'egF0cbpXnnBnjcrusoeR') {
-        informesAntiguos = informesPlanta.filter((informe) => informe.fecha < GLOBAL.newReportsDate);
-      }
+        // checkeamos si se están mostrando todas para activar el boton de mostrarlas
+        if (plantas.length < this.plantas.length) {
+          this.btnShowAll = true;
+        } else {
+          this.btnShowAll = false;
+        }
 
-      plantsData.push({
-        nombre: planta.nombre,
-        potencia: planta.potencia,
-        mae: informeReciente.mae,
-        powerLoss: planta.potencia * informeReciente.mae,
-        fixablePower: informeReciente.fixablePower,
-        ultimaInspeccion: informeReciente.fecha,
-        informesAntiguos,
-        plantaId: planta.id,
-        tipo: planta.tipo,
-        informeReciente,
-        // color: this.portfolioControlService.getColorMae(informeReciente.mae),
-      });
-    });
+        plantas.forEach((planta) => {
+          const informesPlanta = this.informes.filter((informe) => informe.plantaId === planta.id);
+          const informeReciente = informesPlanta.reduce((prev, current) =>
+            prev.fecha > current.fecha ? prev : current
+          );
+
+          let informesAntiguos: InformeInterface[] = [];
+          if (planta.tipo !== 'seguidores' && planta.id !== 'egF0cbpXnnBnjcrusoeR') {
+            informesAntiguos = informesPlanta.filter((informe) => informe.fecha < GLOBAL.newReportsDate);
+          }
+
+          plantsData.push({
+            nombre: planta.nombre,
+            potencia: planta.potencia,
+            mae: informeReciente.mae,
+            powerLoss: planta.potencia * informeReciente.mae,
+            fixablePower: informeReciente.fixablePower,
+            ultimaInspeccion: informeReciente.fecha,
+            informesAntiguos,
+            plantaId: planta.id,
+            tipo: planta.tipo,
+            informeReciente,
+            // color: this.portfolioControlService.getColorMae(informeReciente.mae),
+          });
+        });
+
+        this.dataSource.data = plantsData;
+        this.changeDetectorRefs.detectChanges();
+      })
+    );
 
     this.checkFixableMae(plantsData);
 
@@ -163,6 +183,10 @@ export class PlantListComponent implements OnInit, AfterViewInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  showAll() {
+    this.portfolioControlService.filteredPlants = this.plantas;
   }
 
   stopPropagation(event) {
@@ -273,5 +297,9 @@ export class PlantListComponent implements OnInit, AfterViewInit {
 
   selectSortColumn(column: string) {
     this.sortedColumn = column;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
