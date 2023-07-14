@@ -191,7 +191,7 @@ export class AnomaliaInfoService {
 
   getLocalizacionCompleteTranslateLabel(anomalia: Anomalia, planta: PlantaInterface) {
     let label = '';
-
+    
     const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
 
     globals.forEach((coord, index) => {

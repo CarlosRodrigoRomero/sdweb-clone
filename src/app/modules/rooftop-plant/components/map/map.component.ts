@@ -56,7 +56,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public sharedReport = false;
   noAnomsReport = false;
   public coordsPointer;
-  private popupDirtyAnoms: Overlay;
+  private popupAnomaliaInfo: Overlay;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -247,15 +247,15 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private addPopupOverlay() {
-    const container = document.getElementById('popup-dirty');
+    const container = document.getElementById('popup-anomalia-info');
 
-    this.popupDirtyAnoms = new Overlay({
-      id: 'popup-dirty',
+    this.popupAnomaliaInfo = new Overlay({
+      id: 'popup-anomalia-info',
       element: container,
       position: undefined,
     });
 
-    this.map.addOverlay(this.popupDirtyAnoms);
+    this.map.addOverlay(this.popupAnomaliaInfo);
   }
 
   private transform(extent) {
