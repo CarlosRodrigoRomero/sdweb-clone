@@ -114,23 +114,15 @@ export class AnomaliaService {
     informes: InformeInterface[],
     criterio?: CritCriticidad
   ): Observable<Anomalia[]> {
-    if (this.planta === undefined) {
+    if (!this.planta) {
       this.planta = planta;
     }
 
     this.getLocAreasTipoSeguidor();
 
-    const anomaliaObsList = Array<Observable<Anomalia[]>>();
-    informes.forEach((informe) => {
-      if (criterio !== undefined) {
-        // traemos ambos tipos de anomalias por si hay pcs antiguos
-        anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs', criterio));
-        anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias', criterio));
-      } else {
-        // traemos ambos tipos de anomalias por si hay pcs antiguos
-        anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
-        anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias'));
-      }
+    const anomaliaObsList = informes.map((informe) => {
+      const type = this.planta.tipo === 'seguidores' ? 'pcs' : 'anomalias';
+      return this.getAnomalias$(informe.id, type, criterio);
     });
 
     return combineLatest(anomaliaObsList).pipe(map((arr) => arr.flat()));

@@ -52,6 +52,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   private realAnoms: Anomalia[] = [];
   informeId: string;
   private urlCalcAnomData = 'https://datos-anomalia-rcpywurt6q-ew.a.run.app';
+  private urlConvertAnomToPc = 'https://anomalias-to-pcs-rcpywurt6q-ew.a.run.app/anomalias-to-pcs';
 
   private subscriptions: Subscription = new Subscription();
 
@@ -103,11 +104,15 @@ export class ClassificationComponent implements OnInit, OnDestroy {
     );
   }
 
-  endClassification() {
+  async endClassification() {
     // actualizamos el informe con los datos que le faltan
     this.updateInforme();
     // actualizamos las anomalias con los datos que les faltan
-    this.updateAnomalias();
+    await this.updateAnomalias();
+    // convertimos las anomalias en pcs
+    if (this.planta.tipo === 'seguidores') {
+      this.convertAnomsToPcs();
+    }
   }
 
   private updateInforme() {
@@ -118,41 +123,30 @@ export class ClassificationComponent implements OnInit, OnDestroy {
     this.informeService.updateInforme(this.informe);
   }
 
-  private updateAnomalias() {
+  private async updateAnomalias() {
     this.processing = true;
 
     let count = 0;
     this.progressBarValue = 0;
 
-    this.anomalias.forEach((anom) => {
+    for (const anom of this.anomalias) {
       const params = new HttpParams().set('anomaliaId', anom.id);
 
-      return this.http
-        .get(this.urlCalcAnomData, { responseType: 'text', params })
-        .toPromise()
-        .then((res) => {
-          console.log(res);
+      try {
+        const res = await this.http.get(this.urlCalcAnomData, { responseType: 'text', params }).toPromise();
 
-          count++;
-          this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
-          if (count === this.anomalias.length) {
-            this.anomsProcesed = true;
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
 
-            this.syncAnomsState();
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-
-          count++;
-          this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
-          if (count === this.anomalias.length) {
-            this.anomsProcesed = true;
-
-            this.syncAnomsState();
-          }
-        });
-    });
+      count++;
+      this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
+      if (count === this.anomalias.length) {
+        this.anomsProcesed = true;
+        this.syncAnomsState();
+      }
+    }
   }
 
   updateAnomaliasNoData() {
@@ -194,6 +188,26 @@ export class ClassificationComponent implements OnInit, OnDestroy {
           }
         });
     });
+  }
+
+  convertAnomsToPcs() {
+    this.processing = true;
+
+    const params = new HttpParams().set('informeId', this.informeId);
+
+    return this.http
+      .get(this.urlConvertAnomToPc, { responseType: 'text', params })
+      .toPromise()
+      .then((res) => {
+        console.log(res);
+
+        this.processing = false;
+      })
+      .catch((err) => {
+        console.log(err);
+
+        this.processing = false;
+      });
   }
 
   updateGlobalCoordsAnoms(check: boolean) {
