@@ -221,27 +221,20 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       anomalias = this.anomsNoGlobals;
     }
 
-    anomalias.forEach((anom) => {
-      let coordObj = this.normModules.find((nM) => nM.id === anom.id).centroid_gps;
-      if (coordObj === undefined) {
-        coordObj = this.normModules.find((nM) => nM.id === anom.id).coords.bottomLeft;
-      }
+    anomalias.forEach((anom, index) => {
+      const coordCentroid = this.olMapService.getCentroid(anom.featureCoords);
+      const newGlobalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
 
-      if (coordObj !== undefined) {
-        const coordCentroid = [coordObj.long, coordObj.lat] as Coordinate;
-        const newGlobalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
+      this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGlobalCoords);
 
-        this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGlobalCoords);
+      count++;
+      this.progressBarValue = Math.round((count / anomalias.length) * 100);
 
-        count++;
-        this.progressBarValue = Math.round((count / anomalias.length) * 100);
+      // al terminar...
+      if (count === anomalias.length) {
+        this.processing = false;
 
-        // al terminar...
-        if (count === anomalias.length) {
-          this.processing = false;
-
-          this.syncAnomsState();
-        }
+        this.syncAnomsState();
       }
     });
   }
