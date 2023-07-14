@@ -9,7 +9,8 @@ import {
   ViewChild,
   ElementRef, 
   QueryList, 
-  ViewChildren
+  ViewChildren,
+  OnInit
 } from '@angular/core';
 
 import {animate, state, style, transition, trigger} from '@angular/animations';
@@ -19,9 +20,12 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatRow } from '@angular/material/table';
 
+import { Subscription } from 'rxjs';
+
 import { Anomalia } from '@core/models/anomalia';
 
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
+
 
 interface Page{
     page: number;
@@ -42,7 +46,7 @@ interface Page{
     ]),
   ],
 })
-export class AnomaliaListComponent implements OnChanges {
+export class AnomaliaListComponent implements OnInit, OnChanges {
   @Input() viewSeleccionada: string;
   @Input() dataSource: MatTableDataSource<any>;
   @Input() anomaliaHovered: Anomalia;
@@ -58,10 +62,21 @@ export class AnomaliaListComponent implements OnChanges {
   expandedRow: Anomalia | null;
   selectedRowId: string;
   rowId: string;
+  imageExists: boolean = false;
 
   displayedColumns: string[] = ['colors', 'numAnom', 'tipo', 'temp', 'perdidas', 'gradiente'];
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private anomaliasControlService: AnomaliasControlService) {}
+
+  ngOnInit(): void {
+    this.subscriptions.add(
+      this.anomaliasControlService.thermalImageExist$.subscribe((value) => {
+        this.imageExists = value;
+      })
+    )
+  }
 
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
 

@@ -9,6 +9,7 @@ import { FiltersModule } from '@modules/filters/filters.module';
 import { CommentsModule } from '@modules/comments/comments.module';
 import { AnomaliaPopupComponent } from './components/anomalia-popup/anomalia-popup.component';
 import { AnomaliaImgComponent } from './components/anomalia-img/anomalia-img.component';
+import { AnomaliaMapComponent } from './components/anomalia-map/anomalia-map.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { AnomaliaImgComponent } from './components/anomalia-img/anomalia-img.com
     AnomaliaListComponent,
     AnomaliaListContainer,
     AnomaliaPopupComponent,
-    AnomaliaImgComponent
+    AnomaliaImgComponent,
+    AnomaliaMapComponent
   ],
   imports: [
     CommonModule,

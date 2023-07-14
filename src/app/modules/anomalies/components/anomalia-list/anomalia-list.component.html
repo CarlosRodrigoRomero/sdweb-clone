@@ -65,7 +65,8 @@
               <div class="anomalia-wrapper">
                 <!-- <img src="../../../../../assets/images/thermal_image.png"/>
                 <img src="../../../../../assets/images/visual_image.png"/> -->
-                <app-anomalia-img *ngIf="row == expandedRow" [rowAnomalia]="row.anomalia" ></app-anomalia-img>
+                <app-anomalia-img *ngIf="row == expandedRow && imageExists"></app-anomalia-img>
+                <app-anomalia-map *ngIf="row == expandedRow && !imageExists" [rowAnomalia]="row.anomalia" ></app-anomalia-map>
                 <app-anomalia-info [anomaliaSelect]="anomaliaSelected" [anomaliaHover]="anomaliaHovered"></app-anomalia-info>
               </div>
             </div>

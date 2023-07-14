@@ -408,7 +408,7 @@ export class SeguidoresControlService {
       // Creamos una referencia a la imagen
       const storageRef = this.storage.ref('');
       const imageRef = storageRef.child('informes/' + this.seguidorSelected.informeId + '/' + folder + '/' + imageName);
-
+1
       // Obtenemos la URL y descargamos el archivo capturando los posibles errores
       imageRef
         .getDownloadURL()

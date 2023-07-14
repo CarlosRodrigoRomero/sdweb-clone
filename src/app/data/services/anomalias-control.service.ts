@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 
+import { AngularFireStorage } from '@angular/fire/storage';
+
 import Map from 'ol/Map';
 import { Fill, Stroke, Style, Icon } from 'ol/style';
 import { Feature } from 'ol';
@@ -49,6 +51,14 @@ export class AnomaliasControlService {
   private toggleViewSelected: string;
   private _coordsPointer: Coordinate = undefined;
   public coordsPointer$ = new BehaviorSubject<Coordinate>(this._coordsPointer);
+  private _urlVisualImageAnomalia: string = undefined;
+  public urlVisualImageAnomalia$ = new BehaviorSubject<string>(this._urlVisualImageAnomalia);
+  private _urlThermalImageAnomalia: string = undefined;
+  public urlThermalImageAnomalia$ = new BehaviorSubject<string>(this._urlThermalImageAnomalia);
+  private _thermalImageExist = true;
+  thermalImageExist$ = new BehaviorSubject<boolean>(this._thermalImageExist);
+  private _visualImageExist = true;
+  visualImageExist$ = new BehaviorSubject<boolean>(this._visualImageExist);
   zoomChangeView = 22;
 
   private subscriptions: Subscription = new Subscription();
@@ -58,7 +68,8 @@ export class AnomaliasControlService {
     private filterService: FilterService,
     private reportControlService: ReportControlService,
     private anomaliaService: AnomaliaService,
-    private viewReportService: ViewReportService
+    private viewReportService: ViewReportService,
+    private storage: AngularFireStorage,
   ) {}
 
   initService(): Promise<boolean> {
@@ -349,6 +360,66 @@ export class AnomaliasControlService {
     this.map.getOverlayById('popup-anomalia-info').setPosition(popupCoords);
   }
 
+  getImageAnomalia(folder: string) {
+    if (this.anomaliaSelect !== undefined && this.anomaliaSelect !== null) {
+      // const imageName = this.seguidorSelected.imageName;
+      let imageName = this.anomaliaSelect.archivoPublico;
+
+      // Creamos una referencia a la imagen
+      const storageRef = this.storage.ref('');
+      let a = '9Z8X571Ae64QoEQSvuAp';
+      let b = '9Z8X571Ae64QoEQSvuAp_10.341.jpg';
+
+      const imageRef = storageRef.child('informes/' + a + '/' + folder + '/' + b);
+      // const imageRef = storageRef.child('informes/' + this.anomaliaSelect.informeId + '/' + folder + '/' + imageName);
+
+      // Obtenemos la URL y descargamos el archivo capturando los posibles errores
+      imageRef
+        .getDownloadURL()
+        .toPromise()
+        .then((url) => {
+          if (folder === 'jpg') {
+            // indicamos  que la imagen existe
+            this.thermalImageExist = true;
+
+            this.urlThermalImageAnomalia = url;
+          } else {
+            // indicamos  que la imagen existe
+            this.visualImageExist = true;
+
+            this.urlVisualImageAnomalia = url;
+          }
+        })
+        .catch((error) => {
+          switch (error.code) {
+            case 'storage/object-not-found':
+              if (folder === 'jpg') {
+                // indicamos  que la imagen no existe
+                this.thermalImageExist = false;
+              } else {
+                // indicamos  que la imagen no existe
+                this.visualImageExist = false;
+              }
+
+              console.log("File doesn't exist");
+              break;
+
+            case 'storage/unauthorized':
+              console.log("User doesn't have permission to access the object");
+              break;
+
+            case 'storage/canceled':
+              console.log('User canceled the upload');
+              break;
+
+            case 'storage/unknown':
+              console.log('Unknown error occurred, inspect the server response');
+              break;
+          }
+        });
+    }
+  }
+
   private addSelectInteraction() {
     const select = new Select({
       condition: click,
@@ -586,6 +657,10 @@ export class AnomaliasControlService {
     this.sharedReportNoFilters = false;
     this.toggleViewSelected = undefined;
     this.coordsPointer = undefined;
+    this.urlVisualImageAnomalia = undefined;
+    this.urlThermalImageAnomalia = undefined;
+    this.thermalImageExist = true;
+    this.visualImageExist = true;
 
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();
@@ -627,5 +702,41 @@ export class AnomaliasControlService {
   set anomaliaHover(value: Anomalia) {
     this._anomaliaHover = value;
     this.anomaliaHover$.next(value);
+  }
+
+  get urlVisualImageAnomalia() {
+    return this._urlVisualImageAnomalia;
+  }
+
+  set urlVisualImageAnomalia(value: string) {
+    this._urlVisualImageAnomalia = value;
+    this.urlVisualImageAnomalia$.next(value);
+  }
+
+  get urlThermalImageAnomalia() {
+    return this._urlThermalImageAnomalia;
+  }
+
+  set urlThermalImageAnomalia(value: string) {
+    this._urlThermalImageAnomalia = value;
+    this.urlThermalImageAnomalia$.next(value);
+  }
+
+  get thermalImageExist() {
+    return this._thermalImageExist;
+  }
+
+  set thermalImageExist(value: boolean) {
+    this._thermalImageExist = value;
+    this.thermalImageExist$.next(value);
+  }
+
+  get visualImageExist() {
+    return this._visualImageExist;
+  }
+
+  set visualImageExist(value: boolean) {
+    this._visualImageExist = value;
+    this.visualImageExist$.next(value);
   }
 }

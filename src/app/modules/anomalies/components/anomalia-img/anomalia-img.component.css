@@ -1,11 +1,67 @@
-.mapAnom{
-    width: 150px;
-    height: 150px;
-}
-
-.anomalia-img-wrapper{
+.content {
     display: flex;
     width: 100%;
     justify-content: space-around;
     padding: 10px;
+  }
+  
+  .thermal-canvas {
+    z-index: 2;
+    /* position: absolute; */
+    /* top: 0px; */
+    /* left: 0px; */
+  }
+  
+  .visual-canvas {
+    z-index: 1;
+    /* position: absolute; */
+    /* top: 0px; */
+    /* left: 0px; */
+  }
+  
+  .anomalias-canvas {
+    z-index: 3;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+  }
+  
+  #visual-zoom {
+    border: 2px white solid;
+    z-index: 9;
+  }
+  
+  #visual-zoom:hover {
+    cursor: pointer;
+  }
+  
+  .loading {
+    z-index: 10;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100px;
+    background: white;
+  }
+  
+  app-spinner {
+    position: absolute;
+    top: 50px;
+    left: 275px;
+  }
+
+  .img-canvas{
+    width: 150px;
+    height: 150px;
+}
+
+:host ::ng-deep .canvas-container{
+    width:150px !important;
+    
+}
+
+canvas{
+    width: 150px !important;
+    height: 150px !important;
 }
