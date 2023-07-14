@@ -76,7 +76,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private headersColors = ['FFE5E7E9', 'FFF5B7B1', 'FFD4EFDF', 'FFABD5FF', 'FFE5E7E9'];
   private columnasLink = [10];
   private inicioFilters = 4;
-  private showLocation = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -107,10 +106,6 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     this.allElems = this.reportControlService.allFilterableElements;
 
     this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-      if (informeId !== undefined) {
-        this.showLocation = Patches.patchOlmedilla(informeId);
-      }
-
       this.informeSelected = this.reportControlService.informes.find((informe) => informeId === informe.id);
 
       // filtramos las anomalias del informe seleccionado
@@ -189,18 +184,15 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     this.columnas[1].push('CoA');
     this.columnas[1].push(this.translation.t('Criticidad'));
 
-    // PARCHE OLMEDILLA 2023
-    if (this.showLocation) {
-      if (this.reportControlService.plantaFija) {
-        this.columnas[2].push(
-          this.translation.t('Localización') +
-            ' (' +
-            this.plantaService.getLabelNombreGlobalCoords(this.planta, this.language) +
-            ')'
-        );
-      } else {
-        this.columnas[2].push(this.translation.t('Seguidor'));
-      }
+    if (this.reportControlService.plantaFija) {
+      this.columnas[2].push(
+        this.translation.t('Localización') +
+          ' (' +
+          this.plantaService.getLabelNombreGlobalCoords(this.planta, this.language) +
+          ')'
+      );
+    } else {
+      this.columnas[2].push(this.translation.t('Seguidor'));
     }
 
     if (this.planta.hasOwnProperty('etiquetasLocalXY') || this.planta.hasOwnProperty('posicionModulo')) {
@@ -261,13 +253,10 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia, this.anomaliaService.criterioCriticidad);
 
-    // PARCHE OLMEDILLA 2023
-    if (this.showLocation) {
-      if (this.reportControlService.plantaFija) {
-        row.localizacion = this.anomaliaInfoService.getLocalizacionReducLabel(anomalia, this.planta);
-      } else {
-        row.localizacion = anomalia.nombreSeguidor;
-      }
+    if (this.reportControlService.plantaFija) {
+      row.localizacion = this.anomaliaInfoService.getLocalizacionReducLabel(anomalia, this.planta);
+    } else {
+      row.localizacion = anomalia.nombreSeguidor;
     }
 
     if (this.planta.hasOwnProperty('etiquetasLocalXY') || this.planta.hasOwnProperty('posicionModulo')) {
