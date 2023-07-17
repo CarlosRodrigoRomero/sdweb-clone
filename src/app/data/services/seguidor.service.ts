@@ -42,23 +42,11 @@ export class SeguidorService {
 
   getSeguidoresPlanta$(planta: PlantaInterface, informes: InformeInterface[]): Observable<Seguidor[]> {
     this.planta = planta;
-
     this.getDifferentLocAreas();
 
-    const anomaliaObsList = Array<Observable<Seguidor[]>>();
-    informes.forEach((informe) => {
-      // traemos ambos tipos de anomalias por si hay pcs antiguos
-      anomaliaObsList.push(this.getSeguidores$(informe.id, planta.id, 'pcs'));
-      // solo para Carbonero no traemos anomalias
-      if (planta.id !== 'NJjVdM0e94vhHVfveaPh') {
-        anomaliaObsList.push(this.getSeguidores$(informe.id, planta.id, 'anomalias'));
-      }
-    });
-    return combineLatest(anomaliaObsList).pipe(
-      map((arr) => {
-        return arr.flat();
-      })
-    );
+    const anomaliaObsList = informes.map((informe) => this.getSeguidores$(informe.id, planta.id, 'pcs'));
+
+    return combineLatest(anomaliaObsList).pipe(map((arr) => arr.flat()));
   }
 
   getSeguidores$(informeId: string, plantaId: string, tipo?: 'anomalias' | 'pcs'): Observable<Seguidor[]> {

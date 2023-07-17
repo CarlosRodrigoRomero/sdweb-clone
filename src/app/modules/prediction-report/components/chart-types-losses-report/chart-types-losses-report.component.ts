@@ -25,10 +25,13 @@ import {
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { ThemeService } from '@data/services/theme.service';
+import { PredictionService } from '@data/services/prediction.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
+
 import { GLOBAL } from '@data/constants/global';
+
 import { Colors } from '@core/classes/colors';
 import { COLOR } from '@data/constants/color';
 
@@ -85,7 +88,8 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
   constructor(
     private reportControlService: ReportControlService,
     private themeService: ThemeService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private predictionService: PredictionService
   ) {}
 
   ngOnInit(): void {
@@ -93,18 +97,16 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
 
     this.lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
 
-    const anomaliasLastReport = this.reportControlService.allAnomalias.filter(
-      (anom) => anom.informeId === this.lastReport.id
-    );
+    const anomaliasLastReport = this.predictionService.getNuevasAnomalias(this.lastReport.id);
 
     this.dataPlot = [];
     this.getAllCategorias(anomaliasLastReport);
 
-    this.dataPlot.push(this.calculateFakeDataPlot(anomaliasLastReport));
-    this.dataPlot.push(this.calculateFakeDataPlot(anomaliasLastReport, true));
+    // this.dataPlot.push(this.calculateFakeDataPlot(anomaliasLastReport));
+    // this.dataPlot.push(this.calculateFakeDataPlot(anomaliasLastReport, true));
 
-    // this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport));
-    // this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport, true));
+    this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport));
+    this.dataPlot.push(this.calculateDataPlot(anomaliasLastReport, true));
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => this.initChart(theme.split('-')[0]));
 
@@ -362,7 +364,7 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
   }
 
   private calculateDataPlot(anomalias: Anomalia[], prediction = false): DataPlot {
-    let filtroCategoria: Anomalia[];
+    let anomsTipo: Anomalia[];
     let perdidasCategoria: number;
 
     const numPorCategoria = Array();
@@ -370,16 +372,16 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
 
     this.numsCategoria.forEach((i) => {
       if (prediction) {
-        filtroCategoria = anomalias.filter((anom) => anom.tipoNextYear === i);
+        anomsTipo = anomalias.filter((anom) => anom.tipoNextYear === i);
       } else {
-        filtroCategoria = anomalias.filter((anom) => anom.tipo === i);
+        anomsTipo = anomalias.filter((anom) => anom.tipo === i);
       }
 
-      if (filtroCategoria.length > 0) {
-        perdidasCategoria = this._getMAEAnomalias(filtroCategoria);
+      if (anomsTipo.length > 0) {
+        perdidasCategoria = this.getMAEAnomalias(anomsTipo, i);
 
         perdidasPorCategoria.push(Math.round(perdidasCategoria * 10) / 10);
-        numPorCategoria.push(filtroCategoria.length);
+        numPorCategoria.push(anomsTipo.length);
       } else {
         numPorCategoria.push(0);
         perdidasPorCategoria.push(0);
@@ -395,7 +397,7 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
     };
   }
 
-  private _getMAEAnomalias(anomalias: Anomalia[]): number {
+  private getMAEAnomalias(anomalias: Anomalia[], tipo: number): number {
     return anomalias
       .map((anom) => {
         let numeroModulos: number;
@@ -409,7 +411,7 @@ export class ChartTypesLossesReportComponent implements OnInit, OnDestroy {
           numeroModulos = 1;
         }
 
-        return GLOBAL.pcPerdidas[anom.tipo] * numeroModulos;
+        return GLOBAL.pcPerdidas[tipo] * numeroModulos;
       })
       .reduce((a, b) => a + b, 0);
   }

@@ -189,7 +189,6 @@
     margin: 4px 10px 0;
   }
   
-.mat-drawer-inner-container{
-  overflow-y: hidden;
-  border:solid;
+:host ::ng-deep .mat-drawer-inner-container{
+  overflow-y:hidden;
 }

@@ -335,7 +335,7 @@ export class AnomaliaInfoService {
         localY = planta.filas - localY + 1;
       }
     }
-    return localY;
+    return Number(localY);
   }
 
   getColumnaAnom(anomalia: Anomalia, planta: PlantaInterface): number {
@@ -351,7 +351,7 @@ export class AnomaliaInfoService {
         localX = columnas - localX + 1;
       }
     }
-    return localX;
+    return Number(localX);
   }
 
   getPerdidasColor(perdidas: number): string {

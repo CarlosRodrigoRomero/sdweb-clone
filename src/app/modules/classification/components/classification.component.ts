@@ -52,6 +52,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   private realAnoms: Anomalia[] = [];
   informeId: string;
   private urlCalcAnomData = 'https://datos-anomalia-rcpywurt6q-ew.a.run.app';
+  private urlConvertAnomToPc = 'https://anomalias-to-pcs-rcpywurt6q-ew.a.run.app/anomalias-to-pcs';
 
   private subscriptions: Subscription = new Subscription();
 
@@ -103,11 +104,15 @@ export class ClassificationComponent implements OnInit, OnDestroy {
     );
   }
 
-  endClassification() {
+  async endClassification() {
     // actualizamos el informe con los datos que le faltan
     this.updateInforme();
     // actualizamos las anomalias con los datos que les faltan
-    this.updateAnomalias();
+    await this.updateAnomalias();
+    // convertimos las anomalias en pcs
+    if (this.planta.tipo === 'seguidores') {
+      this.convertAnomsToPcs();
+    }
   }
 
   private updateInforme() {
@@ -118,41 +123,30 @@ export class ClassificationComponent implements OnInit, OnDestroy {
     this.informeService.updateInforme(this.informe);
   }
 
-  private updateAnomalias() {
+  private async updateAnomalias() {
     this.processing = true;
 
     let count = 0;
     this.progressBarValue = 0;
 
-    this.anomalias.forEach((anom) => {
+    for (const anom of this.anomalias) {
       const params = new HttpParams().set('anomaliaId', anom.id);
 
-      return this.http
-        .get(this.urlCalcAnomData, { responseType: 'text', params })
-        .toPromise()
-        .then((res) => {
-          console.log(res);
+      try {
+        const res = await this.http.get(this.urlCalcAnomData, { responseType: 'text', params }).toPromise();
 
-          count++;
-          this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
-          if (count === this.anomalias.length) {
-            this.anomsProcesed = true;
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
 
-            this.syncAnomsState();
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-
-          count++;
-          this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
-          if (count === this.anomalias.length) {
-            this.anomsProcesed = true;
-
-            this.syncAnomsState();
-          }
-        });
-    });
+      count++;
+      this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
+      if (count === this.anomalias.length) {
+        this.anomsProcesed = true;
+        this.syncAnomsState();
+      }
+    }
   }
 
   updateAnomaliasNoData() {
@@ -196,6 +190,26 @@ export class ClassificationComponent implements OnInit, OnDestroy {
     });
   }
 
+  convertAnomsToPcs() {
+    this.processing = true;
+
+    const params = new HttpParams().set('informeId', this.informeId);
+
+    return this.http
+      .get(this.urlConvertAnomToPc, { responseType: 'text', params })
+      .toPromise()
+      .then((res) => {
+        console.log(res);
+
+        this.processing = false;
+      })
+      .catch((err) => {
+        console.log(err);
+
+        this.processing = false;
+      });
+  }
+
   updateGlobalCoordsAnoms(check: boolean) {
     this.processing = true;
 
@@ -207,27 +221,20 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       anomalias = this.anomsNoGlobals;
     }
 
-    anomalias.forEach((anom) => {
-      let coordObj = this.normModules.find((nM) => nM.id === anom.id).centroid_gps;
-      if (coordObj === undefined) {
-        coordObj = this.normModules.find((nM) => nM.id === anom.id).coords.bottomLeft;
-      }
+    anomalias.forEach((anom, index) => {
+      const coordCentroid = this.olMapService.getCentroid(anom.featureCoords);
+      const newGlobalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
 
-      if (coordObj !== undefined) {
-        const coordCentroid = [coordObj.long, coordObj.lat] as Coordinate;
-        const newGlobalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
+      this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGlobalCoords);
 
-        this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGlobalCoords);
+      count++;
+      this.progressBarValue = Math.round((count / anomalias.length) * 100);
 
-        count++;
-        this.progressBarValue = Math.round((count / anomalias.length) * 100);
+      // al terminar...
+      if (count === anomalias.length) {
+        this.processing = false;
 
-        // al terminar...
-        if (count === anomalias.length) {
-          this.processing = false;
-
-          this.syncAnomsState();
-        }
+        this.syncAnomsState();
       }
     });
   }
