@@ -95,18 +95,16 @@ export class AnomaliaListComponent implements OnInit, OnChanges {
           this.dataSource.paginator = this.paginator;
           resolve(true);
         }).then(()=>{
-          // 2. Expandimos la fila de la anomalía seleccionada (expandimos primero ya que es lo que
-          // mejor experiencia ofrece)
-          // let row = this.findRow();
-          // this.expandRow(row);
+          // 2. Hacemos scroll hasta la primera fila de la página (de este modo evitamos el efecto de
+          // que la fila seleccionada no se vea porque se "ha ido hacia arriba" siguiendo el efecto que 
+          // hace mat-table al hacer scroll)
           this.scrollToIndex(firstRowInPage.id, false);
           return new Promise(resolve => {
             setTimeout(()=>resolve(true), 200);
           });
         }).then(()=>{
-          // 3. Hacemos scroll hasta la primera fila de la página (de este modo evitamos el efecto de
-          // que la fila seleccionada no se vea porque se "ha ido hacia arriba" siguiendo el efecto que 
-          // hace mat-table al hacer scroll)
+          // 3. Expandimos la fila de la anomalía seleccionada (expandimos primero ya que es lo que
+          // mejor experiencia ofrece)
           let row = this.findRow();
           this.expandRow(row);
           return new Promise(resolve => {

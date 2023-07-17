@@ -141,6 +141,15 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
   }
 
   initMap() {
+    let center = this.rowAnomalia.featureCoords[0]
+    let coordsCenter = transform(center, 'EPSG:3857', 'EPSG:4326');
+    let delta = 1.5;
+    let extent = [
+      center[0] - delta,
+      center[1] - delta,
+      center[0] + delta,
+      center[1] + delta
+    ]
     const satellite = new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       crossOrigin: '',
@@ -153,6 +162,7 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
     const satelliteLayerThermal = new TileLayer({
       source: satellite,
       preload: Infinity,
+      extent: extent
     })
 
     let aerial;
@@ -173,6 +183,10 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
       this.aerialLayers = [aerialLayer];
     }
 
+    this.thermalLayers.forEach((layer) => {
+      layer.setExtent(extent);
+    });
+
     const layers = [
       satelliteLayer,
       ...this.aerialLayers,
@@ -189,6 +203,7 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
 
     // MAPA
     let view: View;
+    let viewThermal: View;
     if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
       // solo lo aplicamos a la planta DEMO
       view = new View({
@@ -199,12 +214,19 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
         extent: this.transformMyExtent([-7.060903, 38.523993, -7.0556, 38.522264]),
       });
     } else {
-      let coords = transform(this.rowAnomalia.featureCoords[0], 'EPSG:3857', 'EPSG:4326');
       view = new View({
-        center: fromLonLat(coords),
-        zoom: 22,
-        minZoom: 22,
-        maxZoom: 22,
+        center: fromLonLat(coordsCenter),
+        zoom: 0,
+        minZoom: 0,
+        maxZoom: 1,
+        extent: extent
+      });
+      viewThermal = new View({
+        center: fromLonLat(coordsCenter),
+        zoom: 0,
+        minZoom: 0,
+        maxZoom: 1,
+        extent: extent
       });
     }
 
@@ -214,11 +236,11 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
       })
     );
     this.subscriptions.add(
-      this.olMapService.createMap(this.idMapThermal, layersThermal, view, defaultControls({ attribution: false, zoom: false })).subscribe((map) => {
+      this.olMapService.createMap(this.idMapThermal, layersThermal, viewThermal, defaultControls({ attribution: false, zoom: false })).subscribe((map) => {
         this.mapThermal = map;
       })
     );
-      console.log(this.map.getLayers().getArray())
+      // console.log(this.map.getView().calculateExtent(), this.map.getView().getCenter())
     // añadimos las capas de anomalías al mapa
     // this.anomaliaLayers.forEach((l) => {this.mapThermal.addLayer(l)});
   }
@@ -231,8 +253,18 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
-    this.map.setTarget(undefined);
-    this.mapThermal.setTarget(undefined);
+    if (this.map) {
+      while (this.map.getLayers().getLength() > 0) {
+        this.map.removeLayer(this.map.getLayers().item(0));
+      }
+      this.map.setTarget(undefined);
+    }
+    if (this.mapThermal) {
+      while (this.mapThermal.getLayers().getLength() > 0) {
+        this.mapThermal.removeLayer(this.mapThermal.getLayers().item(0));
+      }
+      this.mapThermal.setTarget(undefined);
+    }
   }
 
 }
