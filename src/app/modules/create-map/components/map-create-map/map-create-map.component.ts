@@ -746,7 +746,7 @@ export class MapCreateMapComponent implements OnInit {
       return (feature: Feature<any>) => {
         return new Style({
           fill: new Fill({
-            color: 'black',
+            color: 'red',
           }),
         });
       };
