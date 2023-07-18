@@ -79,7 +79,7 @@
 
   .anom-img-wrapper{
     display: flex;
-    height:170px;
+    height:190px;
     width: 100%;
     justify-content:space-around;
     padding:10px;
@@ -97,4 +97,5 @@
       left: -10px;
     }
   }
+
   

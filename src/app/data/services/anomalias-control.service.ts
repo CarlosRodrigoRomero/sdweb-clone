@@ -221,7 +221,7 @@ export class AnomaliasControlService {
           [anom.featureCoords[0][0] - delta, anom.featureCoords[0][1] + delta],
         ]
         var featurePoint = new Feature({
-          geometry: new Circle(anom.featureCoords[0], 6),
+          geometry: new Point(anom.featureCoords[0]),
           properties: {
             view: l.getProperties().view,
             anomaliaId: anom.id,
@@ -521,19 +521,20 @@ export class AnomaliasControlService {
 
   private getStylePoint(focused: boolean, color: string) {
     return new Style({
-      fill: new Fill({
-        color: focused ? 'white' : color, 
-      }),
-      stroke: new Stroke({
-        color: 'black',
-        width: 1,
-      }),
-      // image: new Icon({
-      //   src: "assets/icons/cuadrado_24x24.png",
-      //   anchor: [0.5, 0.5],
-      //   scale: 0.8,
-      //   color: focused ? 'white' : color,
+      // fill: new Fill({
+      //   color: 'rgba(255,255,255, 0)',
       // }),
+      // stroke: new Stroke({
+      //   color: focused ? 'white' : color,
+      //   width: 4,
+      // }),
+      image: new Icon({
+        src: "assets/icons/circulo_24x24.png",
+        crossOrigin: 'anonymous',
+        anchor: [0.5, 0.5],
+        scale: 0.8,
+        color: focused ? 'white' : color,
+      }),
     });
   }
 
