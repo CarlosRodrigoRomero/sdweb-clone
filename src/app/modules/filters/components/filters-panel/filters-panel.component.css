@@ -24,7 +24,10 @@
 .filters{
   position:relative;
   padding: 5px 0;
-  height: calc(100vh - 168px);
+  /* Cuando el panel de filtros está fijo y a la izquierda (version en produccion de la app o en la versión nueva en seguidores, usamos 168px.
+  Si el panel es desplegable a la derecha, usamos 238px  */
+  /* height: calc(100vh - 168px); */
+  height: calc(100vh - 238px);
   padding-right: 12px;
   overflow-y:scroll;
   z-index:1000;

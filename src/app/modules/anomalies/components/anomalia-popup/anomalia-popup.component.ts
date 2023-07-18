@@ -55,21 +55,23 @@ export class AnomaliaPopupComponent implements OnInit {
   private getLocalizacionLabel(anomalia: Anomalia): string {
     let label = '';
 
-    let globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
+    if (anomalia.hasOwnProperty('globalCoords')) {
+      let globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
 
-    globals.forEach((coord, index) => {
-      if (coord !== undefined && coord !== null && coord !== '') {
-        if (this.reportControlService.nombreGlobalCoords.length > 0) {
-          const nombres = this.reportControlService.nombreGlobalCoords;
-          label += nombres[index] ? `${nombres[index]}: ${coord}` : `${coord}`;
-        } else {
-          label += `${coord}`;
+      globals.forEach((coord, index) => {
+        if (coord !== undefined && coord !== null && coord !== '') {
+          if (this.reportControlService.nombreGlobalCoords.length > 0) {
+            const nombres = this.reportControlService.nombreGlobalCoords;
+            label += nombres[index] ? `${nombres[index]}: ${coord}` : `${coord}`;
+          } else {
+            label += `${coord}`;
+          }
         }
-      }
-      if (index < globals.length - 1) {
-        label += ' / ';
-      }
-    });
+        if (index < globals.length - 1) {
+          label += ' / ';
+        }
+      });
+    }
     return label;
   }
 

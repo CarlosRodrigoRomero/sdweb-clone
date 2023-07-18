@@ -1,7 +1,7 @@
 .map-view{
   display: grid;
-  grid-template-columns: 30% 70%;
-  gap: 0.8rem;
+  grid-template-columns: calc(30% - 8px) calc(70% - 8px);
+  gap: 16px;
 }
 
 .panel-anomalias{
@@ -112,7 +112,7 @@
   }
   
   .btns-info{
-    width: 175px; 
+    width: 220px; 
   }
   
   .btns-export_{
@@ -175,7 +175,7 @@
     margin: 10px 10px 10px;
     padding: 10px;
     border-radius: 8px;
-    width: 80%;
+    width: calc(100% - 20px);
   }
   
   @media (max-width: 1000px) {
@@ -188,3 +188,6 @@
     margin: 4px 10px 0;
   }
   
+  :host ::ng-deep .mat-drawer-inner-container{
+    overflow-y:hidden;
+  }

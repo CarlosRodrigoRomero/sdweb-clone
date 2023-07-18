@@ -29,7 +29,7 @@ import { InformeInterface } from '@core/models/informe';
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css'],
+  styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit, OnDestroy {
   public planta: PlantaInterface;
@@ -57,6 +57,7 @@ export class MapComponent implements OnInit, OnDestroy {
   noAnomsReport = false;
   public coordsPointer;
   private popupAnomaliaInfo: Overlay;
+  private popupAnomaliaDirty: Overlay;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -140,6 +141,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
   }
+
 
   initMap() {
     const satellite = new XYZ({
@@ -247,15 +249,24 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private addPopupOverlay() {
-    const container = document.getElementById('popup-anomalia-info');
+    const container = document.getElementById('popup-anomalia-rooftop');
 
     this.popupAnomaliaInfo = new Overlay({
-      id: 'popup-anomalia-info',
+      id: 'popup-anomalia-rooftop',
       element: container,
       position: undefined,
     });
 
+    const containerDirty = document.getElementById('popup-dirty');
+
+    this.popupAnomaliaDirty = new Overlay({
+      id: 'popup-dirty',
+      element: containerDirty,
+      position: undefined,
+    });
+
     this.map.addOverlay(this.popupAnomaliaInfo);
+    this.map.addOverlay(this.popupAnomaliaDirty);
   }
 
   private transform(extent) {

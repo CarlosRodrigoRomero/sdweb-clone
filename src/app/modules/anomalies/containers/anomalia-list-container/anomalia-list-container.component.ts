@@ -146,8 +146,9 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
     // if (this.anomaliasControlService.anomaliaSelect === undefined) {
       if (row.hovered) {
         this.anomaliasControlService.anomaliaHover = row.anomalia;
-        let coords = row.anomalia.featureCoords[0];
+        let coords = row.anomalia.featureCoords[0]; 
         this.anomaliasControlService.setPopupPosition(coords);
+
       } else {
         this.anomaliasControlService.anomaliaHover = undefined;
       }

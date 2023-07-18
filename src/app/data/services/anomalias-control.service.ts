@@ -8,6 +8,7 @@ import { Feature } from 'ol';
 import VectorLayer from 'ol/layer/Vector';
 import Polygon from 'ol/geom/Polygon';
 import Point from 'ol/geom/Point';
+import Circle from 'ol/geom/Circle';
 import { Draw, Modify, Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
@@ -28,6 +29,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { Colors } from '@core/classes/colors';
 
 import { COLOR } from '@data/constants/color';
+
 
 @Injectable({
   providedIn: 'root',
@@ -211,8 +213,15 @@ export class AnomaliasControlService {
         });
         source.addFeature(feature);
       } else if (anom.featureType === 'Point') {
+        let delta = 4.5;
+        let coords = [
+          [anom.featureCoords[0][0] - delta, anom.featureCoords[0][1] - delta],
+          [anom.featureCoords[0][0] + delta, anom.featureCoords[0][1] - delta],
+          [anom.featureCoords[0][0] + delta, anom.featureCoords[0][1] + delta],
+          [anom.featureCoords[0][0] - delta, anom.featureCoords[0][1] + delta],
+        ]
         var featurePoint = new Feature({
-          geometry: new Point(anom.featureCoords[0]),
+          geometry: new Circle(anom.featureCoords[0], 6),
           properties: {
             view: l.getProperties().view,
             anomaliaId: anom.id,
@@ -312,6 +321,7 @@ export class AnomaliasControlService {
               const coords = anomalia.featureCoords[0];
               this.setPopupPosition(coords);
               
+              
               feature.setStyle(this.getStyleAnomalias(true, feature.getProperties().properties.featureType));
 
               this.anomaliaHover = anomalia;
@@ -346,9 +356,13 @@ export class AnomaliasControlService {
 
   setPopupPosition(coords: Coordinate) {
     const popupCoords = [coords[0] + 20, coords[1] + 20] as Coordinate;
-
-    this.map.getOverlayById('popup-anomalia-info').setPosition(popupCoords);
+    if (document.getElementById('popup-anomalia-info')){
+      this.map.getOverlayById('popup-anomalia-info').setPosition(popupCoords);
+    } else if (document.getElementById('popup-anomalia-rooftop')){
+      this.map.getOverlayById('popup-anomalia-rooftop').setPosition(popupCoords);
+    }  
   }
+
 
   private addSelectInteraction() {
     const select = new Select({
@@ -507,12 +521,19 @@ export class AnomaliasControlService {
 
   private getStylePoint(focused: boolean, color: string) {
     return new Style({
-      image: new Icon({
-        src: "assets/icons/location-pin-hovered.png",
-        anchor: [0.5, 0.5],
-        scale: 0.8,
-        color: focused ? 'white' : color,
+      fill: new Fill({
+        color: focused ? 'white' : color, 
       }),
+      stroke: new Stroke({
+        color: 'black',
+        width: 1,
+      }),
+      // image: new Icon({
+      //   src: "assets/icons/cuadrado_24x24.png",
+      //   anchor: [0.5, 0.5],
+      //   scale: 0.8,
+      //   color: focused ? 'white' : color,
+      // }),
     });
   }
 

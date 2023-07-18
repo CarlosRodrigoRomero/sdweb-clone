@@ -1,21 +1,13 @@
 .map {
   height: calc(100vh - 96px);
   width: 100%;
-  // visibility: hidden;
+  /* // visibility: hidden; */
 }
 
 #popup-dirty{
   position: absolute;
   transform: translate(-50%, -105%);
 }
-// #popup-anomalia-info1 {
-//   position: absolute;
-//   top: 0;
-//   left: 50%;
-//   transform: translate(-50%, 0%);
-//   margin: 10px;
-//   z-index: 999;
-// }
 
 .noAnoms {
   position: absolute;
@@ -38,9 +30,6 @@
 }
 
 .ol-popup {
-  // position: absolute;
-  // transform: translate(-50%, -105%);
-  // display: block;
   // position: relative;
   // margin-left: 1rem;
   // margin-top: 1rem;
@@ -64,14 +53,10 @@
   bottom: 10px;
 }
 
-// ::ng-deep .ol-selectable{
-//   display: block !important;
-// }
-
-// ::ng-deep .ol-control button {
+/* // ::ng-deep .ol-control button {
 //   background-color: white;
 //   color: black;
-// }
+// } */
 
 @media (max-width: 900px) {
   ::ng-deep .ol-zoom {

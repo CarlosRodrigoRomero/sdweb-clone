@@ -38,9 +38,7 @@
           class="right-sidenav"
           position="end"
         >
-          <div class="titulo">
-            <h4>{{ 'filtros' | translate | titlecase }}</h4>
-          </div>
+
           <ng-template appDynamicFilters></ng-template>
         </mat-sidenav>
   
@@ -87,7 +85,7 @@
   
                 <!-- CONTROLES VISUALES -->
                 <div class="visual-control">
-                  <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider>
+                  <!-- <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider> -->
                   <app-zones-selector-container *ngIf="thereAreLargestZones"></app-zones-selector-container>
                   <!-- <app-slider-opacity></app-slider-opacity> -->
                 </div>
@@ -128,6 +126,7 @@
                 matTooltipClass="tooltip-style"
               >
                 <mat-icon>filter_alt</mat-icon>
+                {{'filtros' | translate | titlecase}}
                 <mat-icon *ngIf="!filtersOpened">keyboard_arrow_left</mat-icon>
                 <mat-icon *ngIf="filtersOpened">keyboard_arrow_right</mat-icon>
               </button>

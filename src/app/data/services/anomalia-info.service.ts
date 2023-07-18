@@ -192,21 +192,24 @@ export class AnomaliaInfoService {
   getLocalizacionCompleteTranslateLabel(anomalia: Anomalia, planta: PlantaInterface) {
     let label = '';
     
-    const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
+    if (anomalia.hasOwnProperty('globalCoords')){
+      const globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
 
-    globals.forEach((coord, index) => {
-      if (coord !== undefined && coord !== null && coord !== '') {
-        if (planta.hasOwnProperty('nombreGlobalCoords') && planta.nombreGlobalCoords.length > index) {
-          this.subscriptions.add(
-            this.translate.get(planta.nombreGlobalCoords[index]).subscribe((res: string) => {
-              label += `${res}: ${coord} / `;
-            })
-          );
-        } else {
-          label += `${coord} / `;
+      globals.forEach((coord, index) => {
+        if (coord !== undefined && coord !== null && coord !== '') {
+          if (planta.hasOwnProperty('nombreGlobalCoords') && planta.nombreGlobalCoords.length > index) {
+            this.subscriptions.add(
+              this.translate.get(planta.nombreGlobalCoords[index]).subscribe((res: string) => {
+                label += `${res}: ${coord} / `;
+              })
+            );
+          } else {
+            label += `${coord} / `;
+          }
         }
-      }
-    });
+      });
+    }
+    
 
     const numModulo = this.getNumeroModulo(anomalia, planta);
     if (numModulo !== null) {
