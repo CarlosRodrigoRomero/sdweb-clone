@@ -126,27 +126,32 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   private async updateAnomalias() {
     this.processing = true;
 
-    let count = 0;
-    this.progressBarValue = 0;
+    const batchSize = 1000;
+    const batches = Math.ceil(this.anomalias.length / batchSize);
 
-    for (const anom of this.anomalias) {
-      const params = new HttpParams().set('anomaliaId', anom.id);
+    for (let i = 0; i < batches; i++) {
+      // Crear un array de Promesas para cada lote
+      const promises = this.anomalias.slice(i * batchSize, (i + 1) * batchSize).map((anom) => {
+        const params = new HttpParams().set('anomaliaId', anom.id);
+        return this.http
+          .get(this.urlCalcAnomData, { responseType: 'text', params })
+          .toPromise()
+          .then((res) => {
+            console.log(res);
+            return res;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
 
-      try {
-        const res = await this.http.get(this.urlCalcAnomData, { responseType: 'text', params }).toPromise();
-
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-      }
-
-      count++;
-      this.progressBarValue = Math.round((count / this.anomalias.length) * 100);
-      if (count === this.anomalias.length) {
-        this.anomsProcesed = true;
-        this.syncAnomsState();
-      }
+      // Esperar a que todas las promesas del lote actual se resuelvan
+      await Promise.all(promises);
     }
+
+    this.anomsProcesed = true;
+    this.syncAnomsState();
+    this.processing = false;
   }
 
   updateAnomaliasNoData() {
