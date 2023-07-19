@@ -26,7 +26,6 @@ import { MapAnomComponent } from './components/map-anom/map-anom.component';
     MapComponent,
     MapViewComponent,
     RooftopPlantComponent,
-    
     MapAnomComponent
   ],
   imports: [

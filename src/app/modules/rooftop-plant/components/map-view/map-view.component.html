@@ -101,7 +101,7 @@
               <!-- BOTON DESCARGAS -->
               <app-download-report *ngIf="!sharedReport || completeView"></app-download-report>
             </div>
-            <div class="btn-group btns-info">
+            <div class="btn-group btns-info" *ngIf="!noAnomsReport">
   
               <!-- BOTON SIDENAV STATS -->
               <button
