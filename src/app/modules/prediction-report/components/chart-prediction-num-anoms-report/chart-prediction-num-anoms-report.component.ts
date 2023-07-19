@@ -20,6 +20,7 @@ import {
 
 import { ThemeService } from '@data/services/theme.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { PredictionService } from '@data/services/prediction.service';
 
 import { COLOR } from '@data/constants/color';
 import { GLOBAL } from '@data/constants/global';
@@ -57,30 +58,34 @@ export class ChartPredictionNumAnomsReportComponent implements OnInit, OnDestroy
   constructor(
     private themeService: ThemeService,
     private reportControlService: ReportControlService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private predictionService: PredictionService
   ) {}
 
   ngOnInit(): void {
     this.checkTranslate();
 
-    // const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
-    // const lastReportAnoms = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === lastReport.id);
+    const lastReport = this.reportControlService.informes[this.reportControlService.informes.length - 1];
+    const nextYearReportAnoms = this.predictionService.getNuevasAnomalias(lastReport.id);
+    const lastReportAnoms = nextYearReportAnoms.filter((anom) => anom.tipo !== null);
 
-    // const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+    const fixableLastReportAnoms = lastReportAnoms.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
 
-    // const nextYearFixableLastReportAnoms = lastReportAnoms.filter((anom) =>
-    //   GLOBAL.fixableTypes.includes(anom.tipoNextYear)
-    // );
+    const nextYearFixableLastReportAnoms = nextYearReportAnoms.filter((anom) =>
+      GLOBAL.fixableTypes.includes(anom.tipoNextYear)
+    );
 
-    // const fixableAnomsData = [fixableLastReportAnoms.length, nextYearFixableLastReportAnoms.length];
-    // const unfixableAnomsData = [
-    //   lastReportAnoms.length - fixableLastReportAnoms.length,
-    //   lastReportAnoms.length - nextYearFixableLastReportAnoms.length,
-    // ];
+    const fixableAnomsData = [fixableLastReportAnoms.length, nextYearFixableLastReportAnoms.length];
+    const unfixableAnomsData = [
+      lastReportAnoms.length - fixableLastReportAnoms.length,
+      nextYearReportAnoms.length - nextYearFixableLastReportAnoms.length,
+    ];
 
-    const totalAnomsData = [1586, 1689];
-    const fixableAnomsData = [246, 299];
-    const unfixableAnomsData = [1340, 1390];
+    const totalAnomsData = [fixableAnomsData[0] + unfixableAnomsData[0], fixableAnomsData[1] + unfixableAnomsData[1]];
+
+    // const totalAnomsData = [1586, 1689];
+    // const fixableAnomsData = [246, 299];
+    // const unfixableAnomsData = [1340, 1390];
 
     this.themeService.themeSelected$.pipe(take(1)).subscribe((theme) => {
       this.chartOptions = {

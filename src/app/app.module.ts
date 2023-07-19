@@ -27,6 +27,7 @@ import { AppComponent } from './app.component';
 import { SkeletonComponent } from '@layout/components/skeleton/skeleton.component';
 import { NavbarContainerComponent } from '@layout/containers/navbar-container/navbar-container.component';
 import { NavbarComponent } from '@layout/components/navbar/navbar.component';
+import { NotificationsModule } from '@modules/notifications/notifications.module';
 
 import { WINDOW_PROVIDERS } from './window.providers';
 import { NavComponent } from './layout/components/nav/nav.component';
@@ -81,6 +82,7 @@ export function createTranslateLoader(http: HttpClient) {
         deps: [HttpClient],
       },
     }),
+    NotificationsModule,
   ],
   providers: [
     { provide: SETTINGS, useValue: {} },

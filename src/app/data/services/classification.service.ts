@@ -118,18 +118,18 @@ export class ClassificationService {
   createAnomaliaFromNormModule(feature: Feature<any>, date: number) {
     const id = feature.getProperties().properties.id;
     const normModule: NormalizedModule = feature.getProperties().properties.normMod;
-    const geometry = feature.getGeometry() as SimpleGeometry;
+    const coordinates: Coordinate[] = this.olMapService.coordsDBToCoordinate(normModule.coords);
 
-    let coords: Coordinate;
+    let refCoords: Coordinate;
     // si existe centroId lo usamos, sino usamos un vertice del rectangulo
     if (normModule.hasOwnProperty('centroid_gps')) {
-      coords = [normModule.centroid_gps.long, normModule.centroid_gps.lat] as Coordinate;
+      refCoords = [normModule.centroid_gps.long, normModule.centroid_gps.lat] as Coordinate;
     } else {
-      coords = this.plantaService.getGlobalCoordsFromLocationAreaOl(geometry.getCoordinates()[0][0]);
+      refCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordinates[0]);
     }
 
-    const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coords);
-    const modulo = this.getAnomModule(geometry.getCoordinates()[0][0]);
+    const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(refCoords);
+    const modulo = this.getAnomModule(coordinates[0]);
 
     // TODO - revisar correccionHrt si hay que aplicarla al crear la anomalia
     // const irradiancia = this.anomaliaService.getIrradiancia(date);
@@ -143,8 +143,8 @@ export class ClassificationService {
       gradienteNormalizado: 0,
       temperaturaMax: 0,
       modulo,
-      featureCoords: geometry.getCoordinates()[0],
-      featureType: geometry.getType(),
+      featureCoords: coordinates,
+      featureType: 'Polygon',
       localX: normModule.columna,
       localY: normModule.fila,
       datetime: date,

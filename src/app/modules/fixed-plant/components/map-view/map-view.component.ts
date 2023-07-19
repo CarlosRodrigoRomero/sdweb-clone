@@ -43,7 +43,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
   numInformes = 1;
   viewSelected: string;
   groupPlant = true;
-  showLocation = false;
 
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
@@ -90,10 +89,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       this.reportControlService.selectedInformeId$.subscribe((informeId) => {
-        if (informeId !== undefined) {
-          this.showLocation = Patches.patchOlmedilla(informeId);
-        }
-
         this.selectedInformeId = informeId;
       })
     );

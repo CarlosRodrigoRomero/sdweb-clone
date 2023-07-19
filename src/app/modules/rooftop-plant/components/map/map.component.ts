@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { take } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 import { combineLatest, Subscription } from 'rxjs';
 
 import Map from 'ol/Map';
@@ -20,6 +20,7 @@ import { ShareReportService } from '@data/services/share-report.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { DirtyAnomsService } from '@data/services/dirty-anoms.service';
+import { FilterService } from '@data/services/filter.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
@@ -29,7 +30,7 @@ import { InformeInterface } from '@core/models/informe';
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css'],
+  styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit, OnDestroy {
   public planta: PlantaInterface;
@@ -57,6 +58,8 @@ export class MapComponent implements OnInit, OnDestroy {
   noAnomsReport = false;
   public coordsPointer;
   private popupAnomaliaInfo: Overlay;
+  private popupAnomaliaDirty: Overlay;
+  private filtrableElements: Anomalia[]
 
   private subscriptions: Subscription = new Subscription();
 
@@ -67,7 +70,8 @@ export class MapComponent implements OnInit, OnDestroy {
     private shareReportService: ShareReportService,
     private anomaliasControlService: AnomaliasControlService,
     private reportControlService: ReportControlService,
-    private dirtyAnomsService: DirtyAnomsService
+    private dirtyAnomsService: DirtyAnomsService,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -136,10 +140,22 @@ export class MapComponent implements OnInit, OnDestroy {
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
     );
 
-    this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
+    this.subscriptions.add(
+      this.reportControlService.selectedInformeId$.
+        pipe(
+          switchMap((informeId) => {
+            this.selectedInformeId = informeId;
+            return this.filterService.allFiltrableElements$
+          })
+        ).subscribe((elements) => {
+          elements = elements.filter((x) => x.informeId === this.selectedInformeId);
+          this.noAnomsReport = elements.length === 0;
+        })
+    );
 
-    this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
+    this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
   }
+
 
   initMap() {
     const satellite = new XYZ({
@@ -247,15 +263,24 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private addPopupOverlay() {
-    const container = document.getElementById('popup-anomalia-info');
+    const container = document.getElementById('popup-anomalia-rooftop');
 
     this.popupAnomaliaInfo = new Overlay({
-      id: 'popup-anomalia-info',
+      id: 'popup-anomalia-rooftop',
       element: container,
       position: undefined,
     });
 
+    const containerDirty = document.getElementById('popup-dirty');
+
+    this.popupAnomaliaDirty = new Overlay({
+      id: 'popup-dirty',
+      element: containerDirty,
+      position: undefined,
+    });
+
     this.map.addOverlay(this.popupAnomaliaInfo);
+    this.map.addOverlay(this.popupAnomaliaDirty);
   }
 
   private transform(extent) {

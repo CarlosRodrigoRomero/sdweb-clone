@@ -10,6 +10,8 @@ import { Feature } from 'ol';
 import VectorLayer from 'ol/layer/Vector';
 import Polygon from 'ol/geom/Polygon';
 import Point from 'ol/geom/Point';
+import Circle from 'ol/geom/Circle';
+import { getPointResolution } from 'ol/proj';
 import { Draw, Modify, Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
@@ -30,6 +32,7 @@ import { Anomalia } from '@core/models/anomalia';
 import { Colors } from '@core/classes/colors';
 
 import { COLOR } from '@data/constants/color';
+
 
 @Injectable({
   providedIn: 'root',
@@ -90,6 +93,7 @@ export class AnomaliasControlService {
             this.addOnHoverAction();
             this.addClickOutFeatures();
             this.addMoveEndEvent();
+            this.addZoomEvent();
           }
         })
       );
@@ -222,6 +226,13 @@ export class AnomaliasControlService {
         });
         source.addFeature(feature);
       } else if (anom.featureType === 'Point') {
+        let delta = 4.5;
+        let coords = [
+          [anom.featureCoords[0][0] - delta, anom.featureCoords[0][1] - delta],
+          [anom.featureCoords[0][0] + delta, anom.featureCoords[0][1] - delta],
+          [anom.featureCoords[0][0] + delta, anom.featureCoords[0][1] + delta],
+          [anom.featureCoords[0][0] - delta, anom.featureCoords[0][1] + delta],
+        ]
         var featurePoint = new Feature({
           geometry: new Point(anom.featureCoords[0]),
           properties: {
@@ -239,7 +250,7 @@ export class AnomaliasControlService {
         source.addFeature(featurePoint);
       }
         // source.addFeature(feature);
-      });
+      });     
     });
     // eliminamos la interacciones anteriores si las huviese
     this.removeSelectAnomaliaInteractions();
@@ -322,7 +333,8 @@ export class AnomaliasControlService {
 
               const coords = anomalia.featureCoords[0];
               this.setPopupPosition(coords);
-              
+
+               
               feature.setStyle(this.getStyleAnomalias(true, feature.getProperties().properties.featureType));
 
               this.anomaliaHover = anomalia;
@@ -357,7 +369,11 @@ export class AnomaliasControlService {
 
   setPopupPosition(coords: Coordinate) {
     const popupCoords = [coords[0] + 20, coords[1] + 20] as Coordinate;
-    this.map.getOverlayById('popup-anomalia-info').setPosition(popupCoords);
+    if (document.getElementById('popup-anomalia-info')){
+      this.map.getOverlayById('popup-anomalia-info').setPosition(popupCoords);
+    } else if (document.getElementById('popup-anomalia-rooftop')){
+      this.map.getOverlayById('popup-anomalia-rooftop').setPosition(popupCoords);
+    }  
   }
 
   getImageAnomalia(folder: string) {
@@ -503,6 +519,12 @@ export class AnomaliasControlService {
     });
   }
 
+  private addZoomEvent() {
+    this.map.getView().on('change:resolution', (event) => {
+      this.olMapService.currentZoom = this.map.getView().getZoom();
+    });
+  }
+
   private canModifyPolygon(select: Select) {
     const modify = new Modify({
       features: select.getFeatures(),
@@ -577,8 +599,16 @@ export class AnomaliasControlService {
 
   private getStylePoint(focused: boolean, color: string) {
     return new Style({
+      // fill: new Fill({
+      //   color: 'rgba(255,255,255, 0)',
+      // }),
+      // stroke: new Stroke({
+      //   color: focused ? 'white' : color,
+      //   width: 4,
+      // }),
       image: new Icon({
-        src: "assets/icons/location-pin-hovered.png",
+        src: "assets/icons/circulo_24x24.png",
+        crossOrigin: 'anonymous',
         anchor: [0.5, 0.5],
         scale: 0.8,
         color: focused ? 'white' : color,

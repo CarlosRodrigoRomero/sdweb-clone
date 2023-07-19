@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ComponentFactoryResolver } fro
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { ReportControlService } from '@data/services/report-control.service';
 import { StatsService } from '@data/services/stats.service';
@@ -9,6 +10,7 @@ import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ViewReportService } from '@data/services/view-report.service';
 import { ResetServices } from '@data/services/reset-services.service';
+import { FilterService } from '@data/services/filter.service';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
 import { DynamicAnomaliaListDirective } from '@modules/fixed-plant/directives/dynamic-anomalia-list.directive';
@@ -62,7 +64,8 @@ export class MapViewComponent implements OnInit, OnDestroy {
     private zonesService: ZonesService,
     private viewReportService: ViewReportService,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private resetServices: ResetServices
+    private resetServices: ResetServices,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -87,8 +90,21 @@ export class MapViewComponent implements OnInit, OnDestroy {
       this.downloadReportService.generatingDownload$.subscribe((value) => (this.generatingDownload = value))
     );
 
+    // this.subscriptions.add(
+    //   this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+    // );
+
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
+      this.reportControlService.selectedInformeId$.
+        pipe(
+          switchMap((informeId) => {
+            this.selectedInformeId = informeId;
+            return this.filterService.allFiltrableElements$
+          })
+        ).subscribe((elements) => {
+          elements = elements.filter((x) => x.informeId === this.selectedInformeId);
+          this.noAnomsReport = elements.length === 0;
+        })
     );
 
     this.subscriptions.add(
