@@ -10,6 +10,7 @@ import { ViewCommentsService } from '@data/services/view-comments.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
+import { Router } from '@angular/router';
 
 interface AnomaliaInfo {
   numAnom: number;
@@ -28,6 +29,7 @@ export class AnomaliaInfoComponent implements OnInit, AfterViewInit, OnDestroy {
   localizacion: string;
   seguidorSelected: Seguidor;
   plantaFija: boolean;
+  isMobile = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -36,10 +38,15 @@ export class AnomaliaInfoComponent implements OnInit, AfterViewInit, OnDestroy {
     private anomaliaInfoService: AnomaliaInfoService,
     private reportControlService: ReportControlService,
     private olMapService: OlMapService,
-    private viewCommentsService: ViewCommentsService
+    private viewCommentsService: ViewCommentsService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    if (this.router.url.includes('comments')) {
+      this.isMobile = true;
+    }
+
     this.plantaFija = this.reportControlService.plantaFija;
 
     this.subscriptions.add(

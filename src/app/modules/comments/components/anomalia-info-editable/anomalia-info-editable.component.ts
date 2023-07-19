@@ -9,7 +9,7 @@ import { Anomalia } from '@core/models/anomalia';
 })
 export class AnomaliaInfoEditableComponent implements OnInit {
   @Input() anomaliaSelected: Anomalia;
-  @Input() mobile: boolean;
+  @Input() isMobile: boolean;
 
   constructor() {}
 
