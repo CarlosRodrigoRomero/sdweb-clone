@@ -49,7 +49,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
     label: 'Resultados termografía',
     completed: false,
     elems: [
-      { id: 'resultadosClase', label: 'Resultados por clase (CoA)', completed: true },
+      { id: 'resultadosCriticidad', label: 'Resultados por criticidad', completed: true },
       { id: 'resultadosTipo', label: 'Resultados por tipo de anomalía', completed: true },
     ],
   };
