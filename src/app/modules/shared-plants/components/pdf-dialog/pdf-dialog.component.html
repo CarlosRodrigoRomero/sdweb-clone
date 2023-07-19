@@ -57,6 +57,14 @@
               </mat-panel-title>
             </mat-expansion-panel-header>
 
+            <!-- CONCLUSIONES -->
+            <!-- <mat-checkbox
+              [checked]="conclusiones.completed"
+              (change)="conclusiones.completed = !conclusiones.completed"
+            >
+              <span class="checkbox-titulo">{{ conclusiones.label | translate }}</span>
+            </mat-checkbox> -->
+
             <!-- INTRODUCCION -->
             <div class="step-content">
               <div>
@@ -79,13 +87,13 @@
 
               <!-- ORTOFOTOS -->
               <mat-checkbox
-                *ngIf="elemOrtofotos.elems.length == 1 && !noOrtofotos"
+                *ngIf="elemOrtofotos !== undefined && elemOrtofotos.elems.length == 1 && !noOrtofotos"
                 [checked]="elemOrtofotos.elems[0].completed"
                 (change)="elemOrtofotos.elems[0].completed = !elemOrtofotos.elems[0].completed"
               >
                 <span class="checkbox-titulo">{{ elemOrtofotos.elems[0].label | translate }}</span>
               </mat-checkbox>
-              <div *ngIf="elemOrtofotos.elems.length > 1 && !noOrtofotos">
+              <div *ngIf="elemOrtofotos !== undefined && elemOrtofotos.elems.length > 1 && !noOrtofotos">
                 <mat-checkbox
                   [checked]="allElemsOrtoCompleted"
                   [indeterminate]="someComplete(elemOrtofotos.id)"

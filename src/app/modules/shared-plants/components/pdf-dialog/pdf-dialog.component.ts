@@ -9,6 +9,7 @@ import { ReportControlService } from '@data/services/report-control.service';
 import { FilterService } from '@data/services/filter.service';
 
 import { Patches } from '@core/classes/patches';
+import { OlMapService } from '@data/services/ol-map.service';
 
 export interface DialogData {
   id: string;
@@ -40,12 +41,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   allElemsIntroCompleted = true;
 
   noOrtofotos = false;
-  elemOrtofotos: DialogData = {
-    id: 'ortofotos',
-    label: 'Ortofotos',
-    completed: false,
-    elems: [{ id: 'planoVisual', label: 'Ortofoto RGB', completed: true }],
-  };
+  elemOrtofotos: DialogData;
   allElemsOrtoCompleted = true;
 
   elemResultados: DialogData = {
@@ -55,11 +51,11 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
     elems: [
       { id: 'resultadosClase', label: 'Resultados por clase (CoA)', completed: true },
       { id: 'resultadosTipo', label: 'Resultados por tipo de anomalía', completed: true },
-      { id: 'resultadosPosicion', label: 'Resultados por posición', completed: true },
     ],
   };
   allElemsResultadosCompleted = true;
 
+  // conclusiones = { id: 'conclusiones', label: 'Conclusiones', completed: true };
   anexoLista = { id: 'anexoLista', label: 'Listado de anomalías', completed: true };
   noAptAnoms = false;
   anexoAnomalias: any = undefined;
@@ -84,14 +80,20 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
     private pdfService: PdfService,
     private reportControlService: ReportControlService,
     private formBuilder: FormBuilder,
-    private filterService: FilterService
+    private filterService: FilterService,
+    private olMapService: OlMapService
   ) {}
 
   ngOnInit(): void {
     this.plantaFija = this.reportControlService.plantaFija;
 
+    // si hay más de una fila añadimos este apartado
+    if (this.reportControlService.planta.filas > 1) {
+      this.elemResultados.elems.push({ id: 'resultadosPosicion', label: 'Resultados por posición', completed: true });
+    }
+
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+      this.reportControlService.selectedInformeId$.subscribe(async (informeId) => {
         this.selectedInformeId = informeId;
 
         if (this.pdfService.filteredPdf) {
@@ -121,6 +123,38 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
         // aplicamos parches para algunos informes
         if (Patches.checkId(informe.id)) {
           this.noOrtofotos = true;
+        }
+
+        if (await this.olMapService.checkVisualLayer(informe)) {
+          this.elemOrtofotos = {
+            id: 'ortofotos',
+            label: 'Ortofotos',
+            completed: false,
+            elems: [{ id: 'planoVisual', label: 'Ortofoto RGB', completed: true }],
+          };
+        }
+
+        if (this.reportControlService.plantaFija) {
+          if (this.elemOrtofotos === undefined) {
+            this.elemOrtofotos = {
+              id: 'ortofotos',
+              label: 'Ortofotos',
+              completed: false,
+              elems: [{ id: 'planoTermico', label: 'Ortofoto térmica', completed: true }],
+            };
+          } else {
+            this.elemOrtofotos.elems.push({ id: 'planoTermico', label: 'Ortofoto térmica', completed: true });
+          }
+        } else {
+          this.elemAnexoSeguidores = {
+            id: 'seguidores',
+            label: 'Imágenes seguidores',
+            completed: false,
+            elems: [
+              { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: false },
+              { id: 'anexoSegsNoAnoms', label: 'Seguidores sin anomalías', completed: false },
+            ],
+          };
         }
       })
     );
@@ -172,20 +206,6 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
       this.filterService.filteredElements$.subscribe((filteredElements) => (this.numElems = filteredElements.length))
     );
 
-    if (this.reportControlService.plantaFija) {
-      this.elemOrtofotos.elems.push({ id: 'planoTermico', label: 'Ortofoto térmica', completed: true });
-    } else {
-      this.elemAnexoSeguidores = {
-        id: 'seguidores',
-        label: 'Imágenes seguidores',
-        completed: false,
-        elems: [
-          { id: 'anexoSeguidores', label: 'Seguidores con anomalías', completed: false },
-          { id: 'anexoSegsNoAnoms', label: 'Seguidores sin anomalías', completed: false },
-        ],
-      };
-    }
-
     this.buildForm();
   }
 
@@ -211,7 +231,12 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   }
 
   private setApartadosPDF() {
-    const allSecciones = [...this.elemIntroduccion.elems, ...this.elemResultados.elems, this.anexoLista];
+    const allSecciones = [
+      // this.conclusiones,
+      ...this.elemIntroduccion.elems,
+      ...this.elemResultados.elems,
+      this.anexoLista,
+    ];
     if (!this.noOrtofotos) {
       allSecciones.push(...this.elemOrtofotos.elems);
     }
