@@ -9,6 +9,7 @@ import VectorLayer from 'ol/layer/Vector';
 import Polygon from 'ol/geom/Polygon';
 import Point from 'ol/geom/Point';
 import Circle from 'ol/geom/Circle';
+import { getPointResolution } from 'ol/proj';
 import { Draw, Modify, Select } from 'ol/interaction';
 import { click } from 'ol/events/condition';
 import SimpleGeometry from 'ol/geom/SimpleGeometry';
@@ -81,6 +82,7 @@ export class AnomaliasControlService {
             this.addOnHoverAction();
             this.addClickOutFeatures();
             this.addMoveEndEvent();
+            this.addZoomEvent();
           }
         })
       );
@@ -237,7 +239,7 @@ export class AnomaliasControlService {
         source.addFeature(featurePoint);
       }
         // source.addFeature(feature);
-      });
+      });     
     });
     // eliminamos la interacciones anteriores si las huviese
     this.removeSelectAnomaliaInteractions();
@@ -320,8 +322,8 @@ export class AnomaliasControlService {
 
               const coords = anomalia.featureCoords[0];
               this.setPopupPosition(coords);
-              
-              
+
+               
               feature.setStyle(this.getStyleAnomalias(true, feature.getProperties().properties.featureType));
 
               this.anomaliaHover = anomalia;
@@ -444,6 +446,12 @@ export class AnomaliasControlService {
       // añadimos las acciones por cambio de zoom
       this.olMapService.currentZoom = this.map.getView().getZoom();
       this.olMapService.refreshLayersView(this.selectedInformeId, this.toggleViewSelected);
+    });
+  }
+
+  private addZoomEvent() {
+    this.map.getView().on('change:resolution', (event) => {
+      this.olMapService.currentZoom = this.map.getView().getZoom();
     });
   }
 
