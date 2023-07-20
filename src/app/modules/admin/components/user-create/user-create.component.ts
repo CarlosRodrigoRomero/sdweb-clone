@@ -11,11 +11,9 @@ import { UserInterface } from '@core/models/user';
 import { take } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
-
 import { Empresa } from '@core/models/empresa';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from 'environments/environment';
-
 
 @Component({
   selector: 'app-user-create',
@@ -31,7 +29,6 @@ export class UserCreateComponent implements OnInit {
   empresaSelected: Empresa;
   statusMessage: string;
 
-
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
@@ -39,19 +36,16 @@ export class UserCreateComponent implements OnInit {
     private userService: UserService,
     private empresaService: EmpresaService,
     private _snackBar: MatSnackBar,
-    private http: HttpClient,
-  ) {
-  }
+    private http: HttpClient
+  ) {}
 
   ngOnInit(): void {
-
     this.empresaService
       .getEmpresas()
       .pipe(take(1))
       .subscribe((empresas) => (this.empresas = empresas));
 
     this.buildForm();
-
   }
 
   private buildForm() {
@@ -61,64 +55,52 @@ export class UserCreateComponent implements OnInit {
     });
   }
 
-
-
   onSubmit(event: Event) {
     if (this.empresaSelected !== undefined) {
-
       event.preventDefault();
       if (this.form.valid) {
-
         this.user.email = this.form.get('email').value;
         this.user.role = Number(this.form.get('role').value);
         this.user.empresaNombre = this.empresaSelected.nombre;
         this.user.empresaId = this.empresaSelected.id;
 
-
         this.randomPassword = generateRandomPassword(10);
 
-
         this.createUser(this.user);
-
       } else {
-        console.log("formulario invalido");
+        console.log('formulario invalido');
         // Iterar sobre los controles del formulario y mostrar los errores específicos
-        Object.keys(this.form.controls).forEach(field => {
+        Object.keys(this.form.controls).forEach((field) => {
           const control = this.form.get(field);
           if (control && control.invalid) {
-            console.log("Errores en el campo", field, control.errors);
+            console.log('Errores en el campo', field, control.errors);
           }
         });
       }
     }
   }
 
-
-
   async createUser(user: UserInterface) {
-    this.authService.createUser(user.email, this.randomPassword).subscribe(result => {
-      // console.log("UID New user from user create component: ", result);
+    this.authService.createUser(user.email, this.randomPassword).subscribe(
+      (result) => {
+        // console.log("UID New user from user create component: ", result);
 
-      this.user.uid = result.uid;
+        this.user.uid = result.uid;
 
-      this.userService.createUser(this.user);
+        this.userService.createUser(this.user);
 
-      this.openSnackBar();
-      // console.log('Usuario creado correctamente');
-      this.router.navigate(['./admin/users']);
+        this.openSnackBar();
+        // console.log('Usuario creado correctamente');
+        this.router.navigate(['./admin/users']);
 
-      //Enviamos el email para resetear la contraseña
-      this.sendWelcomeAndResetPasswordEmail(this.user.email);
-
-    }, error => {
-      console.error(error);
-    });
+        //Enviamos el email para resetear la contraseña
+        this.sendWelcomeAndResetPasswordEmail(this.user.email);
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
   }
-
-
-
-
-
 
   private checkIfCompanyExists(user: UserInterface) {
     this.empresaService
@@ -150,34 +132,28 @@ export class UserCreateComponent implements OnInit {
     this._snackBar.open('Usuario creado correctamente', 'OK', { duration: 5000 });
   }
 
-  cloudFunctionUrl = `${environment.firebaseFunctionsUrl}/sendEmail`;
-
+  cloudFunctionUrl = `${this.authService.firebaseFunctionsUrl}/sendEmail`;
 
   sendWelcomeAndResetPasswordEmail(email: string) {
     const payload = { email, template: 'welcome' };
 
-    this.http
-      .post(this.cloudFunctionUrl, payload)
-      .subscribe(
-        () => {
-          this.statusMessage = 'Correo de restablecimiento enviado.';
-        },
-        (error) => {
-          this.statusMessage = 'Error al enviar correo de restablecimiento.';
-          console.error(error);
-        }
-      );
+    this.http.post(this.cloudFunctionUrl, payload).subscribe(
+      () => {
+        this.statusMessage = 'Correo de restablecimiento enviado.';
+      },
+      (error) => {
+        this.statusMessage = 'Error al enviar correo de restablecimiento.';
+        console.error(error);
+      }
+    );
   }
 }
 
 function generateRandomPassword(length) {
-  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
-  let password = "";
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=';
+  let password = '';
   for (let i = 0, n = charset.length; i < length; ++i) {
     password += charset.charAt(Math.floor(Math.random() * n));
   }
   return password;
 }
-
-
-

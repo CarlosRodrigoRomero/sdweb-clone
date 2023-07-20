@@ -20,8 +20,10 @@ import { environment } from 'environments/environment';
 export class AuthService {
   private user: UserInterface = {}; // Guarda los datos de usuario registrado
   user$: Observable<UserInterface>;
+  firebaseFunctionsUrl: 'https://us-central1-sdweb-d33ce.cloudfunctions.net';
 
-  constructor(private afAuth: AngularFireAuth,
+  constructor(
+    private afAuth: AngularFireAuth,
     private afs: AngularFirestore,
     private userService: UserService,
     private http: HttpClient
@@ -37,16 +39,16 @@ export class AuthService {
     );
   }
 
-  async signIn(email: string, password: string = "password") {
+  async signIn(email: string, password: string = 'password') {
     try {
       const firebaseUser = await this.afAuth.signInWithEmailAndPassword(email, password);
 
       // Custom event que se lanza al hacer login para registrarse en Google Analytics
       window['dataLayer'] = window['dataLayer'] || [];
       window['dataLayer'].push({
-        'event': 'login',
-        'userID': firebaseUser.user.uid,
-        'solardroneUser': firebaseUser.user.email.includes('@solardrone.es'),
+        event: 'login',
+        userID: firebaseUser.user.uid,
+        solardroneUser: firebaseUser.user.email.includes('@solardrone.es'),
       });
 
       return this.userService.getUser(firebaseUser.user.uid);
@@ -61,12 +63,12 @@ export class AuthService {
     return this.afAuth.sendPasswordResetEmail(passwordResetEmail);
   }
 
-  signUp(email: string, password: string = "password") {
+  signUp(email: string, password: string = 'password') {
     return this.afAuth.createUserWithEmailAndPassword(email, password);
   }
 
-  createUser(email: string, password: string = "password"): Observable<any> {
-    const functionsUrl = `${environment.firebaseFunctionsUrl}/createUser`;
+  createUser(email: string, password: string = 'password'): Observable<any> {
+    const functionsUrl = `${this.firebaseFunctionsUrl}/createUser`;
     const payload = { email, password };
 
     return this.http.post(functionsUrl, payload);
@@ -100,10 +102,9 @@ export class AuthService {
 
   userCanAddUsers(user: UserInterface) {
     if (user.role === 1 || user.role === 0) {
-      return true
+      return true;
     }
   }
-
 
   private getUser(firebaseUser: User) {
     const user = this.afs.doc<UserInterface>(`users/${firebaseUser.uid}`);
