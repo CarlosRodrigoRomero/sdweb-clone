@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-
+import { HttpClient } from '@angular/common/http';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
+
 import { User } from 'firebase';
 
 import { Observable, of } from 'rxjs';
@@ -10,9 +11,6 @@ import { switchMap } from 'rxjs/operators';
 import { UserService } from './user.service';
 
 import { UserInterface } from '@core/models/user';
-import { HttpClient } from '@angular/common/http';
-
-import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +18,7 @@ import { environment } from 'environments/environment';
 export class AuthService {
   private user: UserInterface = {}; // Guarda los datos de usuario registrado
   user$: Observable<UserInterface>;
-  firebaseFunctionsUrl: 'https://us-central1-sdweb-d33ce.cloudfunctions.net';
+  firebaseFunctionsUrl = 'https://us-central1-sdweb-d33ce.cloudfunctions.net';
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -68,6 +66,7 @@ export class AuthService {
   }
 
   createUser(email: string, password: string = 'password'): Observable<any> {
+    console.log(this.firebaseFunctionsUrl);
     const functionsUrl = `${this.firebaseFunctionsUrl}/createUser`;
     const payload = { email, password };
 
