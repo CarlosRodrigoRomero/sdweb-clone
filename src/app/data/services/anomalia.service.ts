@@ -114,23 +114,15 @@ export class AnomaliaService {
     informes: InformeInterface[],
     criterio?: CritCriticidad
   ): Observable<Anomalia[]> {
-    if (this.planta === undefined) {
+    if (!this.planta) {
       this.planta = planta;
     }
 
     this.getLocAreasTipoSeguidor();
 
-    const anomaliaObsList = Array<Observable<Anomalia[]>>();
-    informes.forEach((informe) => {
-      if (criterio !== undefined) {
-        // traemos ambos tipos de anomalias por si hay pcs antiguos
-        anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs', criterio));
-        anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias', criterio));
-      } else {
-        // traemos ambos tipos de anomalias por si hay pcs antiguos
-        anomaliaObsList.push(this.getAnomalias$(informe.id, 'pcs'));
-        anomaliaObsList.push(this.getAnomalias$(informe.id, 'anomalias'));
-      }
+    const anomaliaObsList = informes.map((informe) => {
+      const type = this.planta.tipo === 'seguidores' ? 'pcs' : 'anomalias';
+      return this.getAnomalias$(informe.id, type, criterio);
     });
 
     return combineLatest(anomaliaObsList).pipe(map((arr) => arr.flat()));
@@ -156,16 +148,16 @@ export class AnomaliaService {
             data.id = doc.payload.doc.id;
             data.tipo = Number(data.tipo);
 
-            if (data.hasOwnProperty('tipoNextYear')) {
+            if (
+              data.hasOwnProperty('tipoNextYear') &&
+              data.tipoNextYear !== undefined &&
+              data.tipoNextYear !== null &&
+              data.tipoNextYear.toString() !== ''
+            ) {
               data.tipoNextYear = Number(data.tipoNextYear);
             } else {
               data.tipoNextYear = data.tipo;
             }
-
-            // DEMO
-            // const tiposDemo = [data.tipo, 12];
-            // const indiceAleatorio = Math.floor(Math.random() * tiposDemo.length);
-            // data.tipoNextYear = tiposDemo[indiceAleatorio];
 
             // Parche para Casas de Don Pedro Jun22 y Alqueva Sep22
             if (Patches.checkId(informeId)) {
@@ -485,7 +477,7 @@ export class AnomaliaService {
                   if (anomalia.gradienteNormalizado >= rangoDT) {
                     criticidad = index;
                   }
-                // para las GRAVES buscamos que sean CCs y superen el rangoDT superior
+                  // para las GRAVES buscamos que sean CCs y superen el rangoDT superior
                 } else if (anomalia.tipo === 8 || anomalia.tipo === 9) {
                   if (anomalia.temperaturaMax >= rangoTMax || anomalia.gradienteNormalizado >= rangoDT) {
                     criticidad = index;

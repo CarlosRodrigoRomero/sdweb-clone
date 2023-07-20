@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
@@ -8,16 +8,13 @@ import { AuthService } from '@data/services/auth.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { FilterService } from '@data/services/filter.service';
 import { ComentariosControlService } from '@data/services/comentarios-control.service';
+import { DemoService } from '@data/services/demo.service';
+import { PortfolioControlService } from '@data/services/portfolio-control.service';
 
 import { UserInterface } from '@core/models/user';
 import { TipoElemFilter } from '@core/models/tipoPcFilter';
 import { GradientFilter } from '@core/models/gradientFilter';
-import { DemoService } from '@data/services/demo.service';
-
-export interface Notification {
-  content: string;
-  filter: string;
-}
+import { Notification } from '@core/models/notification';
 
 @Component({
   selector: 'app-navbar-container',
@@ -30,11 +27,13 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
   private user: UserInterface;
   isAdmin: boolean;
   loadContent = false;
+  loadPortfolioContent = false;
   hasNotifications = false;
   notifications: Notification[] = [];
   isReport = false;
   isDemo = false;
   tipoComentarios = false;
+  isPortfolio = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -46,7 +45,8 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
     private reportControlService: ReportControlService,
     private filterService: FilterService,
     private demoService: DemoService,
-    private comentariosControlService: ComentariosControlService
+    private comentariosControlService: ComentariosControlService,
+    private portfolioControlService: PortfolioControlService
   ) {}
 
   ngOnInit() {
@@ -64,6 +64,10 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
       if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
         this.isReport = true;
       }
+
+      if (this.router.url.split('/').includes('plants')) {
+        this.isPortfolio = true;
+      }
     }
 
     this.subscriptions.add(
@@ -75,6 +79,15 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.subscriptions.add(
+      this.portfolioControlService.initialized$.subscribe((value) => {
+        this.loadPortfolioContent = value;
+      })
+    );
+
+    // controlamos acciones al navegar
+    this.navigationChanges();
 
     // NOTIFICACIONES PROVISIONALES
     // this.subscriptions.add(
@@ -105,35 +118,35 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
     //   })
     // );
 
-    this.subscriptions.add(
-      this.authService.user$.subscribe((user) => {
-        if (user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
-          this.hasNotifications = true;
-          // vaciamos las notificaciones
-          this.notifications = [];
-          // diferenciamos entre el portfolio y el informe
-          if (this.router.url.includes('egF0cbpXnnBnjcrusoeR')) {
-            this.notifications.push({
-              content: 'Hay 17 módulos en circuito abierto (string)',
-              filter: 'CA (string)',
-            });
-          } else {
-            this.notifications.push({
-              content: 'Hay nuevos strings abiertos en la planta Demo',
-              filter: 'CA (string)',
-            });
-            this.notifications.push({
-              content: 'Planta 3 tiene 6 módulos con células calientes con gradiente mayor de 40 ºC',
-              filter: '',
-            });
-            this.notifications.push({
-              content: 'Planta 1 tienen un problema con strings abiertos',
-              filter: '',
-            });
-          }
-        }
-      })
-    );
+    // this.subscriptions.add(
+    //   this.authService.user$.subscribe((user) => {
+    //     if (user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
+    //       this.hasNotifications = true;
+    //       // vaciamos las notificaciones
+    //       this.notifications = [];
+    //       // diferenciamos entre el portfolio y el informe
+    //       if (this.router.url.includes('egF0cbpXnnBnjcrusoeR')) {
+    //         this.notifications.push({
+    //           content: 'Hay 17 módulos en circuito abierto (string)',
+    //           filter: 'CA (string)',
+    //         });
+    //       } else {
+    //         this.notifications.push({
+    //           content: 'Hay nuevos strings abiertos en la planta Demo',
+    //           filter: 'CA (string)',
+    //         });
+    //         this.notifications.push({
+    //           content: 'Planta 3 tiene 6 módulos con células calientes con gradiente mayor de 40 ºC',
+    //           filter: '',
+    //         });
+    //         this.notifications.push({
+    //           content: 'Planta 1 tienen un problema con strings abiertos',
+    //           filter: '',
+    //         });
+    //       }
+    //     }
+    //   })
+    // );
 
     // comprobamos si es la planta demo
     this.isDemo = this.demoService.checkIsDemo();
@@ -141,6 +154,52 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.comentariosControlService.dataLoaded$.subscribe((value) => (this.tipoComentarios = value))
     );
+  }
+
+  private navigationChanges() {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        if (this.router.url.split('/').includes('plants')) {
+          this.isPortfolio = true;
+
+          this.subscriptions.add(
+            this.reportControlService.mapLoaded$.subscribe((value) => {
+              this.loadContent = value;
+
+              if (value) {
+                setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
+              }
+            })
+          );
+        } else {
+          this.isPortfolio = false;
+
+          this.subscriptions.add(
+            this.portfolioControlService.initialized$.subscribe((value) => {
+              this.loadPortfolioContent = value;
+            })
+          );
+        }
+
+        // si el enlace es compartido no requerimos estar loggeado
+        if (this.router.url.includes('shared')) {
+          this.isShared = true;
+        } else {
+          this.isShared = false;
+
+          this.subscriptions.add(this.authService.isAuthenticated().subscribe((isAuth) => (this.userLogged = isAuth)));
+          this.subscriptions.add(
+            this.authService.user$.subscribe((user) => {
+              this.user = user;
+              this.isAdmin = this.authService.userIsAdmin(user);
+            })
+          );
+          if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
+            this.isReport = true;
+          }
+        }
+      }
+    });
   }
 
   navigateHome() {
@@ -174,6 +233,7 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    console.log('destroy');
     this.subscriptions.unsubscribe();
   }
 }

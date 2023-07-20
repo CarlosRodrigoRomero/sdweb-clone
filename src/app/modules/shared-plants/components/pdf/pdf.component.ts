@@ -146,6 +146,14 @@ export class PdfComponent implements OnInit, OnDestroy {
       json['seguidores'] = seguidores;
     }
 
+    let indexLargestZones = 0;
+    // obtenemos el indece de las zonas por las que agruparemos
+    if (this.reportControlService.planta.sizeZonesClusters !== undefined) {
+      indexLargestZones = this.reportControlService.planta.sizeZonesClusters;
+    }
+
+    json['zonas'] = Object.assign({}, this.zonesService.zonesBySize[indexLargestZones]);
+
     return json;
   }
 

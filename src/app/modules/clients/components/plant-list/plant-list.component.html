@@ -3,6 +3,11 @@
     <mat-card-title>{{ 'Listado de plantas' | translate }}</mat-card-title>
   </mat-card-header>
   <mat-card-content>
+    <!-- BOTÓN MOSTRAR TODAS LAS PLANTAS -->
+    <button *ngIf="btnShowAll" mat-stroked-button color="primary" class="btn-show-all" (click)="showAll()">
+      {{ 'Mostrar todas' | translate }}
+    </button>
+
     <div class="filtro">
       <mat-form-field class="buscar-input" appearance="outline">
         <mat-label>{{ 'buscar' | translate | titlecase }}</mat-label>

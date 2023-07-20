@@ -524,43 +524,39 @@ export class StructuresService {
   }
 
   public coordinateToObject(coordinates: Coordinate[][]) {
-    let top = -9000000;
-    let right = -9000000;
+    let sumX = 0,
+      sumY = 0;
+
     coordinates[0].forEach((corner) => {
-      if (corner[1] > top) {
-        top = corner[1];
-      }
-      if (corner[0] > right) {
-        right = corner[0];
-      }
+      sumX += corner[0];
+      sumY += corner[1];
     });
-    let bottom;
-    let left;
+
+    // Compute centroid
+    let centroidX = sumX / coordinates[0].length;
+    let centroidY = sumY / coordinates[0].length;
+
+    // List of corners with their angle and distance
+    let corners = [];
+
+    // Determine the angle and distance for each corner
     coordinates[0].forEach((corner) => {
-      if (corner[1] < top) {
-        bottom = corner[1];
-      }
-      if (corner[0] < right) {
-        left = corner[0];
-      }
+      let dx = corner[0] - centroidX;
+      let dy = corner[1] - centroidY;
+      let angle = Math.atan2(dy, dx);
+      let distance = Math.sqrt(dx * dx + dy * dy);
+
+      corners.push({ angle, distance, corner });
     });
+
+    // Sort corners by angle
+    corners.sort((a, b) => a.angle - b.angle);
+
     const coords = {
-      topLeft: {
-        lat: top,
-        long: left,
-      },
-      topRight: {
-        lat: top,
-        long: right,
-      },
-      bottomRight: {
-        lat: bottom,
-        long: right,
-      },
-      bottomLeft: {
-        lat: bottom,
-        long: left,
-      },
+      topLeft: { lat: corners[0].corner[1], long: corners[0].corner[0] },
+      topRight: { lat: corners[1].corner[1], long: corners[1].corner[0] },
+      bottomRight: { lat: corners[2].corner[1], long: corners[2].corner[0] },
+      bottomLeft: { lat: corners[3].corner[1], long: corners[3].corner[0] },
     };
 
     return coords;

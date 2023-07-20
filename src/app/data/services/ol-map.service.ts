@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 
 import { LatLngLiteral } from '@agm/core';
@@ -366,6 +366,21 @@ export class OlMapService {
             (layer as VectorImageLayer<any>).getSource().changed();
           }
         });
+    }
+  }
+
+  async checkVisualLayer(informe: InformeInterface): Promise<boolean> {
+    const url = this.geoserverService.getGeoserverUrl(informe, 'visual', true);
+
+    try {
+      await this.http.get(url).pipe(take(1)).toPromise();
+      return true;
+    } catch (error) {
+      if (error.status === 0 || error.status === 504 || error.status === 400) {
+        return false;
+      } else {
+        return true;
+      }
     }
   }
 

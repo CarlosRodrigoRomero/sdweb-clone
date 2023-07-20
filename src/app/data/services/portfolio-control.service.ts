@@ -52,6 +52,8 @@ export class PortfolioControlService {
   map: Map;
   isDemo = false;
   newPortfolio = false;
+  private _filteredPlants: PlantaInterface[] = [];
+  filteredPlants$ = new BehaviorSubject<PlantaInterface[]>(this._filteredPlants);
 
   constructor(
     public auth: AuthService,
@@ -203,6 +205,8 @@ export class PortfolioControlService {
               // añadimos el mae reparables del informe mas reciente de cada planta
               this.fixableMaePlantas.push(informeReciente.fixablePower);
             });
+
+            this.filteredPlants = this.listaPlantas;
 
             this.maeMedio = MathOperations.weightedAverage(
               this.maePlantas,
@@ -410,6 +414,7 @@ export class PortfolioControlService {
   }
 
   resetService() {
+    this.initialized = false;
     this.plantaHovered = undefined;
     this.maePlantas = [];
     this.maeMedio = undefined;
@@ -463,5 +468,14 @@ export class PortfolioControlService {
   set initialized(value: boolean) {
     this._initialized = value;
     this.initialized$.next(value);
+  }
+
+  get filteredPlants() {
+    return this._filteredPlants;
+  }
+
+  set filteredPlants(value: PlantaInterface[]) {
+    this._filteredPlants = value;
+    this.filteredPlants$.next(value);
   }
 }

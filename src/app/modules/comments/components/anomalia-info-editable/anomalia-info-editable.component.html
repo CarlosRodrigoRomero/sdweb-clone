@@ -1,8 +1,8 @@
-<app-anom-status-select *ngIf="mobile" [anomaliaSelected]="anomaliaSelected"></app-anom-status-select>
+<app-anom-status-select *ngIf="isMobile" [anomaliaSelected]="anomaliaSelected"></app-anom-status-select>
 
 <app-serial-number-input [anomaliaSelected]="anomaliaSelected"></app-serial-number-input>
 
-<app-module-input *ngIf="mobile" [anomaliaSelected]="anomaliaSelected"></app-module-input>
+<app-module-input *ngIf="isMobile" [anomaliaSelected]="anomaliaSelected"></app-module-input>
 
 <app-comment-input [anomaliaSelected]="anomaliaSelected" [label]="'Comentario'" [type]="'anomalia'"></app-comment-input>
 
