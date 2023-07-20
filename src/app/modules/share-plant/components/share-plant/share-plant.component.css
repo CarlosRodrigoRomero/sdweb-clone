@@ -1,0 +1,12 @@
+.content {
+    display: flex;
+    align-content: center;
+    margin-right: 1rem;
+    margin-left: 1rem;
+    border: 1px solid grey;
+    border-radius: 22px;
+  }
+
+  .mat-icon {
+    margin-right: 5px;
+}

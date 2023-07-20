@@ -5,6 +5,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
+
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreModule, SETTINGS } from '@angular/fire/firestore';
@@ -41,6 +42,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import { ReportContentComponent } from './modules/fixed-plant/components/report-content/report-content.component';
 import { SimpleBackgroundComponent } from './layout/components/simple-background/simple-background.component';
 import { PredictionDialogComponent } from './modules/prediction-report/components/prediction-dialog/prediction-dialog.component';
+import { SharePlantModule } from '@modules/share-plant/share-plant.module';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -76,6 +78,7 @@ export function createTranslateLoader(http: HttpClient) {
     MatIconModule,
     MatListModule,
     RightMenuModule,
+    SharePlantModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -119,4 +122,4 @@ export function createTranslateLoader(http: HttpClient) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

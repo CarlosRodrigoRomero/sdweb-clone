@@ -1,10 +1,29 @@
 {
+  "functions": [
+    {
+      "source": "sd-functions",
+      "codebase": "sd-functions",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ],
   "firestore": {
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
     "public": "dist/sdweb",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
     "rewrites": [
       {
         "source": "**",
