@@ -138,6 +138,7 @@ export class MapComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
 
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
+    this.subscriptions.add(this.olMapService.getMap().subscribe((map) => (console.log(map))));
   }
 
   initMap() {
@@ -263,7 +264,6 @@ export class MapComponent implements OnInit, OnDestroy {
     });
     this.map.addOverlay(this.popupAnomaliaInfo);
     this.map.addOverlay(this.popupDirty);
-    console.log(this.map.getOverlays());
   }
 
   private transform(extent) {

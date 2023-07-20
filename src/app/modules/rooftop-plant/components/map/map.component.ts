@@ -125,6 +125,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
             // añadimos las anomalías de suciedad por separado
             this.dirtyAnomsService.initService();
+            
           }
         });
       });
@@ -154,6 +155,7 @@ export class MapComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
+
   }
 
 
@@ -260,6 +262,8 @@ export class MapComponent implements OnInit, OnDestroy {
         });
       }
     });
+
+    
   }
 
   private addPopupOverlay() {

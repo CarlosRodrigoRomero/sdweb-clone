@@ -105,6 +105,11 @@ export class OlMapAnomaliaInfoService {
     return this.thermalLayers$.asObservable();
   }
 
+  deleteAllThermalLayers() {
+    this.thermalLayers.forEach((layer) => (this._map as Map).removeLayer(layer));
+    this.thermalLayers = [];
+  }
+
   addAnomaliaLayer(layer: VectorImageLayer<any>) {
     this.anomaliaLayers.push(layer);
     this.anomaliaLayers$.next(this.anomaliaLayers);
@@ -190,7 +195,7 @@ export class OlMapAnomaliaInfoService {
     });
   }
 
-  createThermalLayer(thermalLayer: ThermalLayerInterface, informe: InformeInterface, index: number): TileLayer<any> {
+  createThermalLayer(thermalLayer: ThermalLayerInterface, informe: InformeInterface, index: number, extent?: any): TileLayer<any> {
     // Iniciar mapa térmico
     let url: string;
     if (informe.hasOwnProperty('servidorCapas')) {
@@ -214,6 +219,7 @@ export class OlMapAnomaliaInfoService {
     }
 
     const tl = new TileLayer({
+      extent: extent,
       source: new XYZ_mod({
         url,
         crossOrigin: 'anonymous',

@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 
-import { take } from 'rxjs/operators';
-import { combineLatest, Subscription } from 'rxjs';
+import { take, map } from 'rxjs/operators';
+import { combineLatest, Observable, Subscription } from 'rxjs';
+
+import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
 
 import Map from 'ol/Map';
 import { fromLonLat, transform, transformExtent, transformWithProjections } from 'ol/proj.js';
@@ -44,7 +46,8 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
   public anomaliaHover: Anomalia;
   public sliderYear: number;
   public aerialLayers: TileLayer<any>[];
-  private extent1: any;
+  private extent: any;
+  private extentDemo: any;
   public thermalSource;
   private thermalLayersDB: ThermalLayerInterface[];
   private thermalLayers: TileLayer<any>[];
@@ -58,11 +61,14 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
   noAnomsReport = false;
   public coordsPointer;
   idMap: string;
-  idMapThermal: string;
+  idMapThermal: string
+  private center;
+  private deltaExtent: number
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
+    private afs: AngularFirestore,
     public mapControlService: MapControlService,
     private plantaService: PlantaService,
     private olMapService: OlMapAnomaliaInfoService,
@@ -75,6 +81,16 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
     this.idMap = `mapAnom_${this.rowAnomalia.numAnom}`;
     this.idMapThermal = this.idMap + '_thermal';
     this.mousePosition = null;
+    this.center = this.rowAnomalia.featureCoords[0]
+    
+    this.deltaExtent = 1.5;
+    this.extent = [
+      this.center[0] - this.deltaExtent,
+      this.center[1] - this.deltaExtent,
+      this.center[0] + this.deltaExtent,
+      this.center[1] + this.deltaExtent
+    ]
+    this.center = transform(this.center, 'EPSG:3857', 'EPSG:4326');
 
     this.anomaliasControlService.coordsPointer$.subscribe((coords) => (this.coordsPointer = coords));
 
@@ -82,12 +98,13 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
     this.informes = this.reportControlService.informes;
 
     // Para la demo, agregamos un extent a todas las capas:
-    this.extent1 = this.transformMyExtent([-7.0608, 38.523619, -7.056351, 38.522765]);
+    this.extentDemo = this.transformMyExtent([-7.0608, 38.523619, -7.056351, 38.522765]);
 
     this.plantaService
       .getThermalLayers$(this.planta.id)
       .pipe(take(1))
       .subscribe((layers) => {
+        console.log('layers', layers);
         this.thermalLayersDB = layers;
 
         // Para cada informe, hay que crear 2 capas: térmica y vectorial
@@ -95,7 +112,7 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
           const thermalLayerDB = this.thermalLayersDB.find((item) => item.informeId === informe.id);
 
           if (thermalLayerDB !== undefined) {
-            const thermalLayer = this.olMapService.createThermalLayer(thermalLayerDB, informe, index);
+            const thermalLayer = this.olMapService.createThermalLayer(thermalLayerDB, informe, index, this.extent);
 
             thermalLayer.setProperties({
               informeId: informe.id,
@@ -103,7 +120,7 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
 
             // solo lo aplicamos a la planta DEMO
             if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
-              thermalLayer.setExtent(this.extent1);
+              thermalLayer.setExtent(this.extentDemo);
             }
 
             this.olMapService.addThermalLayer(thermalLayer);
@@ -178,14 +195,16 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
         preload: Infinity,
       });
 
-      aerialLayer.setExtent(this.extent1);
+      aerialLayer.setExtent(this.extentDemo);
 
       this.aerialLayers = [aerialLayer];
     }
-
-    this.thermalLayers.forEach((layer) => {
+    this.aerialLayers.forEach((layer) => {
       layer.setExtent(extent);
     });
+    // this.thermalLayers.forEach((layer) => {
+    //   layer.setExtent(extent);
+    // });
 
     const layers = [
       satelliteLayer,
@@ -240,9 +259,6 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
         this.mapThermal = map;
       })
     );
-      // console.log(this.map.getView().calculateExtent(), this.map.getView().getCenter())
-    // añadimos las capas de anomalías al mapa
-    // this.anomaliaLayers.forEach((l) => {this.mapThermal.addLayer(l)});
   }
 
 
@@ -257,12 +273,11 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
       while (this.map.getLayers().getLength() > 0) {
         this.map.removeLayer(this.map.getLayers().item(0));
       }
+      this.olMapService.aerialLayers = []
       this.map.setTarget(undefined);
     }
     if (this.mapThermal) {
-      while (this.mapThermal.getLayers().getLength() > 0) {
-        this.mapThermal.removeLayer(this.mapThermal.getLayers().item(0));
-      }
+      this.olMapService.deleteAllThermalLayers()
       this.mapThermal.setTarget(undefined);
     }
   }

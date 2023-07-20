@@ -81,15 +81,14 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       })
     );
 
-    if (this.zonesService.thereAreZones) {
-      this.subscriptions.add(
-        this.olMapService.currentZoom$.subscribe((zoom) => {
-          this.currentZoom = zoom;
-
+    this.subscriptions.add(
+      this.olMapService.currentZoom$.subscribe((zoom) => {
+        this.currentZoom = zoom;
+        if (this.zonesService.thereAreZones || this.dirtyAnomsLayers.length > 0){
           this.setLayersVisibility(this.selectedInformeId);
-        })
-      );
-    }
+        }
+      })
+    );
 
     // checkbox ver u ocultar zonas
     this.subscriptions.add(
@@ -116,7 +115,6 @@ export class ViewControlComponent implements OnInit, OnDestroy {
     if (this.zonesService.thereAreZones) {
       this.setZonesLayersVisibility(informeId);
     }
-
     if (this.reportControlService.plantaFija !== undefined) {
       if (this.reportControlService.plantaFija) {
         this.setThermalLayersVisibility(informeId);
