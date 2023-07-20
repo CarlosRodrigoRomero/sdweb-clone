@@ -1,4 +1,8 @@
-<button mat-icon-button matTooltip="{{ 'compartir' | translate | titlecase }}" matTooltipClass="tooltip-style"
-    (click)="openDialog.emit()">
-    <mat-icon>share</mat-icon>
-</button>
+<div class="content">
+    <button mat-button  (click)="openDialog.emit()">
+        <mat-icon>share</mat-icon>
+        {{ 'compartir' | translate | titlecase }}
+    </button>
+
+
+</div>

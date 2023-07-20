@@ -4,7 +4,7 @@
   gap: 1rem;
   max-height: calc(90vh - 156px);
   width: calc(65vh - 150px);
-  ;
+  min-width: calc(50vh-150px);
 }
 
 .btn-enviar {
@@ -36,7 +36,7 @@
 
 .tabla-container {
   position: relative;
-  height: calc(60vh - 150px);
+  height: fit-content;
   overflow: auto;
 }
 

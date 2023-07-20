@@ -101,7 +101,6 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    this.search.nativeElement.focus();
   }
 
   applyFilter(event: Event) {

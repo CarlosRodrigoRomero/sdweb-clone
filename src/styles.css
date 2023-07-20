@@ -14,3 +14,7 @@ body {
 .mat-card {
   border-radius: 8px !important;
 }
+
+.mat-dialog-container {
+  border-radius: 8px !important;
+}
