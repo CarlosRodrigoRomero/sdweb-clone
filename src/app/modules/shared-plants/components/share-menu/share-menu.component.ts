@@ -21,21 +21,22 @@ import { User } from 'firebase';
 @Component({
   selector: 'app-share-menu',
   templateUrl: './share-menu.component.html',
-  styleUrls: ['./share-menu.component.css']
+  styleUrls: ['./share-menu.component.css'],
 })
 export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
-
   users: UserInterface[];
   displayedColumns: string[] = ['email', 'actions'];
   dataSource = new MatTableDataSource<any>();
   user: UserInterface;
   canAddUsers: boolean;
+  onlyFiltered = true;
+  versionTecnicos = false;
+  tipos: number[];
 
   private subscriptions = new Subscription();
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('search') search: ElementRef;
-
 
   constructor(
     private clipboardService: ClipboardService,
@@ -52,36 +53,13 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // ngOnInit(): void {
-  //   this.subscriptions.add(
-  //     this.userService.getUsersByRoleAndPlanta(2, this.reportControlService.plantaId).subscribe((users) => {
-  //       this.users = users;
-
-  //       const usersTable: any[] = [];
-  //       users.filter((user) => {
-  //         usersTable.push({ email: user.email, empresa: user.empresaNombre, id: user.uid });
-  //       });
-  //       this.dataSource.data = usersTable;
-  //     })
-  //   );
-
-  //   this.authService.user$
-  //   .pipe(
-  //     take(1),
-  //     switchMap((user) => {
-  //       this.canAddUsers = this.authService.userCanAddUsers(user);
-  //       return null;
-  //     })
-  //   )
-  // }
-
   ngOnInit(): void {
     this.subscriptions.add(
       this.userService.getUsersByRoleAndPlanta(2, this.reportControlService.plantaId).subscribe((users) => {
         this.users = users;
 
         const usersTable: any[] = [];
-        users.forEach((user) => { 
+        users.forEach((user) => {
           usersTable.push({ email: user.email, empresa: user.empresaNombre, id: user.uid });
         });
         this.dataSource.data = usersTable;
@@ -93,11 +71,11 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
         take(1),
         switchMap((user) => {
           this.canAddUsers = this.authService.userCanAddUsers(user);
-          return of(null); 
+          return of(null);
         })
-      ).subscribe(); 
+      )
+      .subscribe();
   }
-
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
@@ -107,18 +85,6 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  }
-
-
-  onlyFiltered = true;
-  versionTecnicos = false;
-
-  tipos: number[];
-
-
 
   copyLink() {
     this.clipboardService.copy(this.getShareLink());
@@ -179,7 +145,6 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   openAddPlantToUserDialog() {
     this.dialog.open(AddPlantUserDialogComponent);
-
   }
 
   openSnackBar() {
@@ -208,14 +173,19 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   deletePlantFromUser(userId: string) {
-    this.userService.removePlantaFromUser(userId, this.reportControlService.plantaId)
+    this.userService
+      .removePlantaFromUser(userId, this.reportControlService.plantaId)
       .then(() => {
         // console.log('Planta eliminada con éxito');
         this.openSnackBarMessage('Planta eliminada con éxito');
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error eliminando la planta: ', error);
         this.openSnackBarMessage('No se puede eliminar la planta');
       });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

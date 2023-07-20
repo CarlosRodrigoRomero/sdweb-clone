@@ -66,7 +66,6 @@ export class AuthService {
   }
 
   createUser(email: string, password: string = 'password'): Observable<any> {
-    console.log(this.firebaseFunctionsUrl);
     const functionsUrl = `${this.firebaseFunctionsUrl}/createUser`;
     const payload = { email, password };
 
