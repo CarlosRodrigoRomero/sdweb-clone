@@ -97,6 +97,7 @@ export class AnomaliaImgComponent implements OnInit, OnDestroy {
           this.imageVisual.src = urlVisual;
 
           this.imageVisual.onload = () => {
+
             this.visualCanvas.setBackgroundImage(
               new fabric.Image(this.imageVisual, {
                 left: 0,
