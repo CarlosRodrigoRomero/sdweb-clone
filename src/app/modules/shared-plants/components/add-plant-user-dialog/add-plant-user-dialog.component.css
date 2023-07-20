@@ -1,9 +1,6 @@
-app-mat-selected-search {
-  margin: 1rem 0;
-  border-bottom: 1px solid grey;
-}
 
-.create-user {
+  
+  .create-user {
     margin: 20px;
   }
   
@@ -30,7 +27,6 @@ app-mat-selected-search {
   }
   mat-card-content {
     display: grid;
+    width: 40vh;
   }
   
-
- 

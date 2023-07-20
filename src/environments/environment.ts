@@ -28,6 +28,7 @@ export const environment = {
     storageBucket: 'sdweb-d33ce.appspot.com',
     messagingSenderId: '229404593483',
   },
+  firebaseFunctionsUrl: 'https://us-central1-sdweb-d33ce.cloudfunctions.net'
 };
 
 /*

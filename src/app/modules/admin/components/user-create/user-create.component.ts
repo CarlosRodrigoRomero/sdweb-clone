@@ -9,6 +9,13 @@ import { EmpresaService } from '@data/services/empresa.service';
 
 import { UserInterface } from '@core/models/user';
 import { take } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+
+
+import { Empresa } from '@core/models/empresa';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from 'environments/environment';
+
 
 @Component({
   selector: 'app-user-create',
@@ -19,58 +26,99 @@ export class UserCreateComponent implements OnInit {
   form: FormGroup;
   user: UserInterface = {};
   selectedRole: number;
+  randomPassword: string;
+  empresas: Empresa[];
+  empresaSelected: Empresa;
+  statusMessage: string;
+
 
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
     private authService: AuthService,
     private userService: UserService,
-    private empresaService: EmpresaService
+    private empresaService: EmpresaService,
+    private _snackBar: MatSnackBar,
+    private http: HttpClient,
   ) {
-    this.buildForm();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+
+    this.empresaService
+      .getEmpresas()
+      .pipe(take(1))
+      .subscribe((empresas) => (this.empresas = empresas));
+
+    this.buildForm();
+
+  }
 
   private buildForm() {
     this.form = this.formBuilder.group({
-      uid: ['', [Validators.required]],
       email: ['', [Validators.required]],
-      empresa: ['', [Validators.required]],
       role: ['', Validators.required],
     });
   }
 
+
+
   onSubmit(event: Event) {
-    event.preventDefault();
-    if (this.form.valid) {
-      this.user.uid = this.form.get('uid').value;
-      this.user.email = this.form.get('email').value;
-      this.user.empresaNombre = this.form.get('empresa').value;
-      this.user.role = Number(this.form.get('role').value);
+    if (this.empresaSelected !== undefined) {
 
-      // Crea el usuario en la DB
-      this.createUser(this.user);
+      event.preventDefault();
+      if (this.form.valid) {
 
-      // Crea la empresa si no existe
-      this.checkIfCompanyExists(this.user);
+        this.user.email = this.form.get('email').value;
+        this.user.role = Number(this.form.get('role').value);
+        this.user.empresaNombre = this.empresaSelected.nombre;
+        this.user.empresaId = this.empresaSelected.id;
 
-      // Enviamos un email para que el usuario cambie su contraseña
-      this.authService.forgotPassword(this.user.email);
+
+        this.randomPassword = generateRandomPassword(10);
+
+
+        this.createUser(this.user);
+
+      } else {
+        console.log("formulario invalido");
+        // Iterar sobre los controles del formulario y mostrar los errores específicos
+        Object.keys(this.form.controls).forEach(field => {
+          const control = this.form.get(field);
+          if (control && control.invalid) {
+            console.log("Errores en el campo", field, control.errors);
+          }
+        });
+      }
     }
   }
 
+
+
   async createUser(user: UserInterface) {
-    return this.userService
-      .createUser(user)
-      .then(() => {
-        console.log('Usuario creado correctamente');
-        this.router.navigate(['./admin/users']);
-      })
-      .catch((err) => {
-        console.error('Error al crear usuario: ', err);
-      });
+    this.authService.createUser(user.email, this.randomPassword).subscribe(result => {
+      // console.log("UID New user from user create component: ", result);
+
+      this.user.uid = result.uid;
+
+      this.userService.createUser(this.user);
+
+      this.openSnackBar();
+      // console.log('Usuario creado correctamente');
+      this.router.navigate(['./admin/users']);
+
+      //Enviamos el email para resetear la contraseña
+      this.sendWelcomeAndResetPasswordEmail(this.user.email);
+
+    }, error => {
+      console.error(error);
+    });
   }
+
+
+
+
+
 
   private checkIfCompanyExists(user: UserInterface) {
     this.empresaService
@@ -93,4 +141,43 @@ export class UserCreateComponent implements OnInit {
   onRoleChange(event: MatSelectChange) {
     this.selectedRole = Number(event.value);
   }
+
+  getElemSelected(element: any) {
+    this.empresaSelected = element;
+  }
+
+  private openSnackBar() {
+    this._snackBar.open('Usuario creado correctamente', 'OK', { duration: 5000 });
+  }
+
+  cloudFunctionUrl = `${environment.firebaseFunctionsUrl}/sendEmail`;
+
+
+  sendWelcomeAndResetPasswordEmail(email: string) {
+    const payload = { email, template: 'welcome' };
+
+    this.http
+      .post(this.cloudFunctionUrl, payload)
+      .subscribe(
+        () => {
+          this.statusMessage = 'Correo de restablecimiento enviado.';
+        },
+        (error) => {
+          this.statusMessage = 'Error al enviar correo de restablecimiento.';
+          console.error(error);
+        }
+      );
+  }
 }
+
+function generateRandomPassword(length) {
+  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+  let password = "";
+  for (let i = 0, n = charset.length; i < length; ++i) {
+    password += charset.charAt(Math.floor(Math.random() * n));
+  }
+  return password;
+}
+
+
+

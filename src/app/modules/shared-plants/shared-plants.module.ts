@@ -22,6 +22,8 @@ import { GroupByZonesViewComponent } from './components/group-by-zones-view/grou
 import { LeyendaContainerComponent } from './containers/leyenda-container/leyenda-container.component';
 import { ZonesSelectorContainerComponent } from './containers/zones-selector-container/zones-selector-container.component';
 import { ShareReportDialogComponent } from './components/share-report-dialog/share-report-dialog.component';
+import { ShareMenuComponent } from './components/share-menu/share-menu.component';
+import { AddPlantUserDialogComponent } from './components/add-plant-user-dialog/add-plant-user-dialog.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +46,8 @@ import { ShareReportDialogComponent } from './components/share-report-dialog/sha
     LeyendaContainerComponent,
     ZonesSelectorContainerComponent,
     ShareReportDialogComponent,
+    ShareMenuComponent,
+    AddPlantUserDialogComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [

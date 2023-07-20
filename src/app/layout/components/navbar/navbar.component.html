@@ -24,6 +24,9 @@
     <!-- NOTIFICACIONES DEL PORTFOLIO -->
     <app-portfolio-notifications *ngIf="loadPortfolioContent && isPortfolio"></app-portfolio-notifications>
 
+
+    <app-share-plant-container *ngIf="loadContent && !isShared"></app-share-plant-container>
+
     <!-- MENU DERECHA -->
     <app-right-menu-container></app-right-menu-container>
   </div>

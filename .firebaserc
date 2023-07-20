@@ -1,7 +1,7 @@
 {
   "projects": {
     "prod": "sdweb-d33ce",
-    "default": "sdweb-dev",
+    "default": "sdweb-d33ce",
     "dev": "sdweb-dev"
   }
 }

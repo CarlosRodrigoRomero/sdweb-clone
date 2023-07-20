@@ -52,7 +52,7 @@ export class SdLogoComponent implements OnInit {
   }
 
   navigateHome() {
-    if (this.user.role === 0 || this.user.role === 1 || this.user.role === 2) {
+    if (this.user.role === 0 || this.user.role === 1 || this.user.role === 2 || this.user.role === 6) {
       this.router.navigate(['/clients']);
     }
   }

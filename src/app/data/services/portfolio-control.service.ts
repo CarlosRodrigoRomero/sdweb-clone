@@ -61,7 +61,7 @@ export class PortfolioControlService {
     private informeService: InformeService,
     private olMapService: OlMapService,
     private demoService: DemoService
-  ) {}
+  ) { }
 
   public initService(): Promise<boolean> {
     return new Promise((initService) => {
@@ -100,7 +100,8 @@ export class PortfolioControlService {
         )
         .pipe(take(1))
         .subscribe(([plantas, plantasEmpresa, informes]) => {
-          const informesExtra = this.informeService.getInformesWithEmpresaId(informes, this.user.uid);
+          //Se buscan los informes de la empresa con la propiedad empresaId y no con el uid del usuario
+          const informesExtra = this.informeService.getInformesWithEmpresaId(informes, this.user.empresaId);
 
           const plantasExtra: PlantaInterface[] = plantas.filter(
             (planta) =>
