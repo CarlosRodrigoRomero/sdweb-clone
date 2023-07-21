@@ -1,7 +1,7 @@
 <div class="map-view">
-  <div class="panel-anomalias" #sidenavLeft>
+  <mat-card class="panel-anomalias" #sidenavLeft>
     <app-anomalia-list-container></app-anomalia-list-container>
-  </div>
+  </mat-card>
 
 <!-- <app-loading *ngIf="!mapLoaded"></app-loading> -->
   <mat-sidenav-container class="stats-container" [hasBackdrop]="true" (backdropClick)="sidenavStats.toggle()">

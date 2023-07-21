@@ -357,7 +357,10 @@ export class AnomaliasControlService {
   }
 
   setPopupPosition(coords: Coordinate) {
-    const popupCoords = [coords[0] + 20, coords[1] + 20] as Coordinate;
+    let zoom  = this.map.getView().getZoom();
+    let delta = Math.abs(zoom - 26) / 2;
+
+    const popupCoords = [coords[0] + delta, coords[1] + delta] as Coordinate;
     if (document.getElementById('popup-anomalia-info')){
       this.map.getOverlayById('popup-anomalia-info').setPosition(popupCoords);
     } else if (document.getElementById('popup-anomalia-rooftop')){
