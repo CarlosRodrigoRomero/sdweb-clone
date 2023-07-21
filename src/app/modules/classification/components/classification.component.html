@@ -21,9 +21,6 @@
         <h5 mat-menu-item>Recalular datos anomalías</h5>
         <button mat-menu-item (click)="updateModuleAnoms(false)">Módulos</button>
         <button mat-menu-item (click)="updateGlobalCoordsAnoms(false)">GlobalsCoords</button>
-        <button *ngIf="planta.tipo === 'seguidores'" mat-menu-item (click)="convertAnomsToPcs()">
-          Convertir Anomalías en Pcs
-        </button>
       </div>
     </mat-menu>
 
