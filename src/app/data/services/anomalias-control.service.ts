@@ -304,7 +304,7 @@ export class AnomaliasControlService {
 
             if (feature !== undefined) {
               // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
-              if (this.anomaliaSelect !== undefined){
+              if (this.anomaliaSelect !== undefined){ 
                 if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
                   if (this.prevFeatureHover.getProperties().properties.anomaliaId !== this.anomaliaSelect.id) {
                     this.prevFeatureHover.setStyle(this.getStyleAnomalias(false, this.prevFeatureHover.featureType));
