@@ -264,7 +264,6 @@ export class MapComponent implements OnInit, OnDestroy {
     });
     this.map.addOverlay(this.popupAnomaliaInfo);
     this.map.addOverlay(this.popupDirty);
-    console.log(this.map.getOverlays());
   }
 
   private transform(extent) {
