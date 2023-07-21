@@ -92,23 +92,6 @@ export class AnomaliaService {
     return this.afs.collection('anomalias').doc(anomalia.id).set(anomaliaObj);
   }
 
-  getAnomalia(anomaliaId: string): Observable<Anomalia> {
-    const anomRef = this.afs.collection('anomalias').doc(anomaliaId);
-
-    return anomRef.snapshotChanges().pipe(
-      map((action) => {
-        if (action.payload.exists) {
-          const anomalia = action.payload.data() as Anomalia;
-          anomalia.id = action.payload.id;
-          anomalia.tipo = Number(anomalia.tipo);
-          return anomalia;
-        } else {
-          return null;
-        }
-      })
-    );
-  }
-
   getAnomaliasPlanta$(
     planta: PlantaInterface,
     informes: InformeInterface[],
@@ -121,7 +104,8 @@ export class AnomaliaService {
     this.getLocAreasTipoSeguidor();
 
     const anomaliaObsList = informes.map((informe) => {
-      const type = this.planta.tipo === 'seguidores' ? 'pcs' : 'anomalias';
+      const type =
+        informe.fecha > GLOBAL.s2eAnomalias ? 'anomalias' : this.planta.tipo === 'seguidores' ? 'pcs' : 'anomalias';
       return this.getAnomalias$(informe.id, type, criterio);
     });
 
@@ -157,6 +141,10 @@ export class AnomaliaService {
               data.tipoNextYear = Number(data.tipoNextYear);
             } else {
               data.tipoNextYear = data.tipo;
+            }
+
+            if (!data.hasOwnProperty('irradiancia')) {
+              data.irradiancia = 1000;
             }
 
             // Parche para Casas de Don Pedro Jun22 y Alqueva Sep22

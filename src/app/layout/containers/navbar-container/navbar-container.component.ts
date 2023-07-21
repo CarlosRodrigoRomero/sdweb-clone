@@ -233,7 +233,6 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('destroy');
     this.subscriptions.unsubscribe();
   }
 }

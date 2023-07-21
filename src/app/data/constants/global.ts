@@ -30,6 +30,7 @@ export let GLOBAL = {
   cc_rangos: [0.02, 0.05],
   newReportsDate: 1619820000, // 1/05/2021
   newVisualLayerDate: 1654473600, // 6/06/2022
+  s2eAnomalias: 1672531200, // 1/01/2023
   anomaliaPorDefecto: 9,
   resolucionCamara: [512, 640],
   globalCoordsEstructura: [0, 1, 2],
