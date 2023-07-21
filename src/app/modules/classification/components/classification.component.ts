@@ -107,11 +107,12 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   async endClassification() {
     // actualizamos el informe con los datos que le faltan
     this.updateInforme();
+
     // actualizamos las anomalias con los datos que les faltan
-    await this.updateAnomalias();
-    // convertimos las anomalias en pcs
     if (this.planta.tipo === 'seguidores') {
-      this.convertAnomsToPcs();
+      this.addPcDataToAnoms();
+    } else {
+      await this.updateAnomalias();
     }
   }
 
@@ -195,7 +196,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
     });
   }
 
-  convertAnomsToPcs() {
+  addPcDataToAnoms() {
     this.processing = true;
 
     const params = new HttpParams().set('informeId', this.informeId);
