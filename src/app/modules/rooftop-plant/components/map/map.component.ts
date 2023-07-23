@@ -213,7 +213,7 @@ export class MapComponent implements OnInit, OnDestroy {
         center: fromLonLat([this.planta.longitud, this.planta.latitud]),
         zoom: this.planta.zoom,
         minZoom: this.planta.zoom - 2,
-        maxZoom: 24,
+        maxZoom: 20,
       });
     }
 

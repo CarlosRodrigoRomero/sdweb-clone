@@ -62,8 +62,7 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
   public coordsPointer;
   idMap: string;
   idMapThermal: string
-  private center;
-  private deltaExtent: number
+  mapLoaded = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -81,16 +80,6 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
     this.idMap = `mapAnom_${this.rowAnomalia.numAnom}`;
     this.idMapThermal = this.idMap + '_thermal';
     this.mousePosition = null;
-    this.center = this.rowAnomalia.featureCoords[0]
-    
-    this.deltaExtent = 1.5;
-    this.extent = [
-      this.center[0] - this.deltaExtent,
-      this.center[1] - this.deltaExtent,
-      this.center[0] + this.deltaExtent,
-      this.center[1] + this.deltaExtent
-    ]
-    this.center = transform(this.center, 'EPSG:3857', 'EPSG:4326');
 
     this.anomaliasControlService.coordsPointer$.subscribe((coords) => (this.coordsPointer = coords));
 
@@ -137,6 +126,7 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
 
           if (index === this.informes.length - 1) {
             this.initMap();
+            console.log(this.map.getLayers().getArray());
           }
         });
       });
@@ -158,14 +148,14 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
   }
 
   initMap() {
-    let center = this.rowAnomalia.featureCoords[0]
+    let center = this.olMapService.getCentroid(this.rowAnomalia.featureCoords)
     let coordsCenter = transform(center, 'EPSG:3857', 'EPSG:4326');
-    let delta = 1.5;
+    let deltaExtent = 1.5;
     let extent = [
-      center[0] - delta,
-      center[1] - delta,
-      center[0] + delta,
-      center[1] + delta
+      center[0] - deltaExtent,
+      center[1] - deltaExtent,
+      center[0] + deltaExtent,
+      center[1] + deltaExtent
     ]
     const satellite = new XYZ({
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -257,8 +247,15 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.olMapService.createMap(this.idMapThermal, layersThermal, viewThermal, defaultControls({ attribution: false, zoom: false })).subscribe((map) => {
         this.mapThermal = map;
+        if (this.mapThermal !== undefined) {
+          this.mapThermal.once('postrender', () => (this.mapLoaded = true));
+        }
       })
     );
+
+    // añadimos las capas de anomalías al mapa
+    // this.anomaliaLayers.forEach((l) => this.map.addLayer(l));
+    this.map.addLayer(this.anomaliaLayers[3]);
   }
 
 

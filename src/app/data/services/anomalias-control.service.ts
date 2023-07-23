@@ -383,7 +383,7 @@ export class AnomaliasControlService {
 
       // Creamos una referencia a la imagen
       const storageRef = this.storage.ref('');
-      let a = '9Z8X571Ae64QoEQSvuAp';
+      let a = '9Z8X571Ae64QoEQSvuAp?';
       let b = '9Z8X571Ae64QoEQSvuAp_10.341.jpg';
 
       const imageRef = storageRef.child('informes/' + a + '/' + folder + '/' + b);

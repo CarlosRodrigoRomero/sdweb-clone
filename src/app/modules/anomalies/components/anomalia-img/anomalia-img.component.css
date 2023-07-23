@@ -48,12 +48,7 @@
     align-items: center;
     /* background: white; */
   }
-  
-  app-spinner {
-    /* position: absolute;
-    top: 50px;
-    left: 275px; */
-  }
+
 
   .img-canvas{
     width: 170px;

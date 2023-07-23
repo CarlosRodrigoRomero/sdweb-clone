@@ -5,10 +5,11 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import Map from 'ol/Map';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style, Icon } from 'ol/style';
 import { Feature, Overlay } from 'ol';
 import Polygon from 'ol/geom/Polygon';
 import Circle from 'ol/geom/Circle';
+import Point from 'ol/geom/Point';
 
 import { OlMapService } from './ol-map.service';
 import { ReportControlService } from './report-control.service';
@@ -86,9 +87,9 @@ export class DirtyAnomsService {
         },
       });
     } else if (anom.featureType === 'Point'){
-      this.zoomChangeView = 19;
+      this.zoomChangeView = 18.5;
       feature = new Feature({
-        geometry: new Circle(anom.featureCoords[0], 4),
+        geometry: new Point(anom.featureCoords[0]),
         properties: {
           id: anom.id,
           name: 'dirtyAnom',
@@ -146,9 +147,26 @@ export class DirtyAnomsService {
     return (feature: Feature<any>) => {       
       if (feature !== undefined) {
         let geometry = feature.getGeometry().getType();
-        if (geometry === 'Circle'){
+        if (geometry === 'Point'){
           width *= 2;
           color = 'grey';
+          return new Style({
+            // stroke: new Stroke({
+            //   width: width,
+            //   color: color,
+            //   lineDash: [5],
+            // }),
+            // fill: new Fill({
+            //   color: `rgba(255, 255, 255, ${opacity})`,
+            // }),
+            image: new Icon({
+              src: "assets/icons/circulo.png",
+              crossOrigin: 'anonymous',
+              anchor: [0.5, 0.5],
+              scale: 1,
+              color: hovered ? `rgba(255, 255, 255, 0)` : 'grey',
+            }),
+          }); 
         }
         return new Style({
           stroke: new Stroke({
