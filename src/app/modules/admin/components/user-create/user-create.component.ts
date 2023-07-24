@@ -3,6 +3,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatSelectChange } from '@angular/material/select';
 
+import { Subscription } from 'rxjs';
+
 import { AuthService } from '@data/services/auth.service';
 import { UserService } from '@data/services/user.service';
 import { EmpresaService } from '@data/services/empresa.service';
@@ -13,7 +15,6 @@ import { HttpClient } from '@angular/common/http';
 
 import { Empresa } from '@core/models/empresa';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-user-create',
@@ -28,6 +29,9 @@ export class UserCreateComponent implements OnInit {
   empresas: Empresa[];
   empresaSelected: Empresa;
   statusMessage: string;
+  cloudFunctionUrl = `${this.authService.firebaseFunctionsUrl}/sendEmail`;
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -64,7 +68,7 @@ export class UserCreateComponent implements OnInit {
         this.user.empresaNombre = this.empresaSelected.nombre;
         this.user.empresaId = this.empresaSelected.id;
 
-        this.randomPassword = generateRandomPassword(10);
+        this.randomPassword = this.generateRandomPassword(10);
 
         this.createUser(this.user);
       } else {
@@ -81,43 +85,27 @@ export class UserCreateComponent implements OnInit {
   }
 
   async createUser(user: UserInterface) {
-    this.authService.createUser(user.email, this.randomPassword).subscribe(
-      (result) => {
-        // console.log("UID New user from user create component: ", result);
+    this.subscriptions.add(
+      this.authService.createUser(user.email, this.randomPassword).subscribe(
+        (result) => {
+          // console.log("UID New user from user create component: ", result);
 
-        this.user.uid = result.uid;
+          this.user.uid = result.uid;
 
-        this.userService.createUser(this.user);
+          this.userService.createUser(this.user);
 
-        this.openSnackBar();
-        // console.log('Usuario creado correctamente');
-        this.router.navigate(['./admin/users']);
+          this.openSnackBar();
+          // console.log('Usuario creado correctamente');
+          this.router.navigate(['./admin/users']);
 
-        //Enviamos el email para resetear la contraseña
-        this.sendWelcomeAndResetPasswordEmail(this.user.email);
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
-  }
-
-  private checkIfCompanyExists(user: UserInterface) {
-    this.empresaService
-      .getEmpresas()
-      .pipe(take(1))
-      .subscribe((empresas) => {
-        const nombresEmpresas = empresas.map((empresa) => empresa.nombre);
-        if (!nombresEmpresas.includes(user.empresaNombre)) {
-          const empresa = {
-            id: user.uid,
-            nombre: user.empresaNombre,
-            labelNombre: user.empresaNombre,
-          };
-
-          this.empresaService.createEmpresa(empresa);
+          //Enviamos el email para resetear la contraseña
+          this.sendWelcomeAndResetPasswordEmail(this.user.email);
+        },
+        (error) => {
+          console.error(error);
         }
-      });
+      )
+    );
   }
 
   onRoleChange(event: MatSelectChange) {
@@ -132,8 +120,6 @@ export class UserCreateComponent implements OnInit {
     this._snackBar.open('Usuario creado correctamente', 'OK', { duration: 5000 });
   }
 
-  cloudFunctionUrl = `${this.authService.firebaseFunctionsUrl}/sendEmail`;
-
   sendWelcomeAndResetPasswordEmail(email: string) {
     const payload = { email, template: 'welcome' };
 
@@ -147,13 +133,17 @@ export class UserCreateComponent implements OnInit {
       }
     );
   }
-}
 
-function generateRandomPassword(length) {
-  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=';
-  let password = '';
-  for (let i = 0, n = charset.length; i < length; ++i) {
-    password += charset.charAt(Math.floor(Math.random() * n));
+  private generateRandomPassword(length) {
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=';
+    let password = '';
+    for (let i = 0, n = charset.length; i < length; ++i) {
+      password += charset.charAt(Math.floor(Math.random() * n));
+    }
+    return password;
   }
-  return password;
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
 }
