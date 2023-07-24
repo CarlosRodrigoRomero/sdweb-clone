@@ -48,7 +48,12 @@ export class PortfolioControlService {
   allFeatures: Feature<any>[] = [];
   user: UserInterface;
   criterioCriticidad: CritCriticidad;
-  usersFakePlants = ['xsx8U7BrLRU20pj9Oa35ZbJIggx2', 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2', 'I3VzW9HJ5UdIuJH0pbuX69TndDn2'];
+  usersFakePlants = [
+    'xsx8U7BrLRU20pj9Oa35ZbJIggx2',
+    'AM2qmC06OWPb3V1gXJXyEpGS3Uz2',
+    'I3VzW9HJ5UdIuJH0pbuX69TndDn2',
+    'iROQFInQmodvAqKqZbnvfjV5cTB2',
+  ];
   map: Map;
   isDemo = false;
   newPortfolio = false;
@@ -61,7 +66,7 @@ export class PortfolioControlService {
     private informeService: InformeService,
     private olMapService: OlMapService,
     private demoService: DemoService
-  ) { }
+  ) {}
 
   public initService(): Promise<boolean> {
     return new Promise((initService) => {
