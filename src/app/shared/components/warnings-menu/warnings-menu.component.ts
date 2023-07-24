@@ -98,7 +98,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       getInformes$ = this.informeService.getInformesDePlanta(this.reportControlService.plantaId);
     }
 
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaFija || this.selectedInforme.fecha > GLOBAL.s2eAnomalias) {
       this.anomaliaService
         .getAnomalias$(this.selectedInforme.id, 'anomalias')
         .pipe(
