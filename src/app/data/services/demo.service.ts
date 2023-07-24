@@ -364,6 +364,16 @@ export class DemoService {
     return plantas;
   }
 
+  changeNameOlmedilla(plantas: PlantaInterface[]): PlantaInterface[] {
+    plantas.forEach((planta) => {
+      if (planta.id === 'qa8Uc1yQ12fm2ndT2VgD') {
+        planta.nombre = 'Planta Demo';
+      }
+    });
+
+    return plantas;
+  }
+
   addFakeWarnings(plantsData: PlantData) {
     const warnings: string[] = [];
     if (plantsData.nombre === 'Planta 1') {

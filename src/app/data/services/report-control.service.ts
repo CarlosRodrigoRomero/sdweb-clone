@@ -105,6 +105,12 @@ export class ReportControlService {
               switchMap((planta) => {
                 this.planta = planta;
 
+                if (this.user.uid === 'iROQFInQmodvAqKqZbnvfjV5cTB2') {
+                  if (this.planta.id === 'qa8Uc1yQ12fm2ndT2VgD') {
+                    this.planta.nombre = 'Planta Demo';
+                  }
+                }
+
                 if (this.planta.hasOwnProperty('nombreGlobalCoords')) {
                   this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
                 }

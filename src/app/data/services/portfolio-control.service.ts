@@ -54,6 +54,7 @@ export class PortfolioControlService {
     'I3VzW9HJ5UdIuJH0pbuX69TndDn2',
     'iROQFInQmodvAqKqZbnvfjV5cTB2',
   ];
+  private usersHiddeData = ['iROQFInQmodvAqKqZbnvfjV5cTB2'];
   map: Map;
   isDemo = false;
   newPortfolio = false;
@@ -120,6 +121,11 @@ export class PortfolioControlService {
             // AÑADIMOS PLANTAS FALSAS SOLO EN LOS USUARIOS DEMO
             if (this.usersFakePlants.includes(this.user.uid)) {
               plantasEmpresa = this.demoService.addPlantasFake(plantasEmpresa);
+            }
+
+            // CAMBIAMOS NOMBRE DE OLMEDILLA PARA QUE PUEDAN MOSTRARLA EN DEMO
+            if (this.usersHiddeData.includes(this.user.uid)) {
+              plantasEmpresa = this.demoService.changeNameOlmedilla(plantasEmpresa);
             }
 
             plantasEmpresa.forEach((planta) => {
