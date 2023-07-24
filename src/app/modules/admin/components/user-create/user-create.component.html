@@ -2,51 +2,47 @@
   <h3>Crear usuario</h3>
 
   <div class="create-user-content">
+    <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
+      <mat-card>
+        <mat-card-content>
+          <!-- Campo email -->
 
-  <form [formGroup]="form" class="example-form" (ngSubmit)="onSubmit($event)">
-    <mat-card>
-      <mat-card-content>
-        <!-- Campo email -->
+          <mat-form-field class="example-full-width">
+            <mat-label>email</mat-label>
+            <input matInput formControlName="email" />
+          </mat-form-field>
 
-        <mat-form-field class="example-full-width">
-          <mat-label>email</mat-label>
-          <input matInput formControlName="email" />
-        </mat-form-field>
+          <!-- Empresa -->
+          <app-mat-selected-search
+            *ngIf="empresas !== undefined"
+            [elements]="empresas"
+            [property]="'nombre'"
+            [title]="'Empresa'"
+            (elemSelected)="getElemSelected($event)"
+          ></app-mat-selected-search>
 
-        <!-- Campo Empresa
+          <!-- Selecctor de tipo de usuario -->
 
-        <mat-form-field class="example-full-width">
-          <mat-label>Empresa</mat-label>
-          <input matInput formControlName="empresa" />
-        </mat-form-field> -->
+          <mat-form-field appearance="fill">
+            <mat-label>Tipo de usuario</mat-label>
+            <mat-select formControlName="role" (selectionChange)="onRoleChange($event)">
+              <mat-option value="0">Usuario (role 0)</mat-option>
+              <mat-option value="1">Administrador (role 1)</mat-option>
+              <mat-option value="2">Externo (role 2)</mat-option>
+              <mat-option value="3">Procesamiento (role 3)</mat-option>
+              <mat-option value="6">Interno (role 6)</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-        <!-- Empresa -->
-        <app-mat-selected-search *ngIf="empresas !== undefined" [elements]="empresas" [property]="'nombre'"
-          [title]="'Empresa'" (elemSelected)="getElemSelected($event)"></app-mat-selected-search>
+          <!-- Selector de plantas -->
 
-
-        <!-- Selecctor de tipo de usuario -->
-
-        <mat-form-field appearance="fill">
-          <mat-label>Tipo de usuario</mat-label>
-          <mat-select formControlName="role" (selectionChange)="onRoleChange($event)">
-            <mat-option value="0">Usuario (role 0)</mat-option>
-            <mat-option value="1">Administrador (role 1)</mat-option>
-            <mat-option value="2">Externo (role 2)</mat-option>
-            <mat-option value="3">Procesamiento (role 3)</mat-option>
-            <mat-option value="6">Interno (role 6)</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Selector de plantas -->
-
-        <app-plantas-table *ngIf="selectedRole === 2" (newPlantasUser)="user.plantas = $event"></app-plantas-table>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button routerLink="../../">Cancelar</button>
-        <button mat-raised-button type="submit">Crear</button>
-      </mat-card-actions>
-    </mat-card>
-  </form>
-</div>
+          <app-plantas-table *ngIf="selectedRole === 2" (newPlantasUser)="user.plantas = $event"></app-plantas-table>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button routerLink="../../">Cancelar</button>
+          <button mat-raised-button type="submit">Crear</button>
+        </mat-card-actions>
+      </mat-card>
+    </form>
+  </div>
 </div>

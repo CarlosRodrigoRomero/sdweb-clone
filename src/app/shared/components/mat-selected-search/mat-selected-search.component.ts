@@ -16,6 +16,8 @@ export class MatSelectedSearchComponent implements OnInit, AfterViewInit, OnDest
   @Input() elementSelected: any;
   @Input() property: string;
   @Input() title: string;
+  @Output() elemSelected = new EventEmitter();
+  @ViewChild('elemSelect', { static: true }) elemSelect: MatSelect;
 
   public elemsFiltered$: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
   // control for the selected element
@@ -24,10 +26,6 @@ export class MatSelectedSearchComponent implements OnInit, AfterViewInit, OnDest
   public elementFilterCtrl: FormControl = new FormControl();
   /** Subject that emits when the component has been destroyed. */
   protected _onDestroy = new Subject<void>();
-
-  @ViewChild('elemSelect', { static: true }) elemSelect: MatSelect;
-
-  @Output() elemSelected = new EventEmitter();
 
   constructor() {}
 

@@ -1,12 +1,14 @@
-<mat-select
-  #elemSelect
-  [formControl]="elementCtrl"
-  placeholder="{{ title }}"
-  [(value)]="elementSelected"
-  (valueChange)="sendOutput()"
->
-  <mat-option>
-    <ngx-mat-select-search [formControl]="elementFilterCtrl"></ngx-mat-select-search>
-  </mat-option>
-  <mat-option *ngFor="let elem of elemsFiltered$ | async" [value]="elem">{{ elem[property] }}</mat-option>
-</mat-select>
+<div class="content">
+  <mat-select
+    #elemSelect
+    [formControl]="elementCtrl"
+    placeholder="{{ title }}"
+    [(value)]="elementSelected"
+    (valueChange)="sendOutput()"
+  >
+    <mat-option>
+      <ngx-mat-select-search [formControl]="elementFilterCtrl"></ngx-mat-select-search>
+    </mat-option>
+    <mat-option *ngFor="let elem of elemsFiltered$ | async" [value]="elem">{{ elem[property] }}</mat-option>
+  </mat-select>
+</div>
