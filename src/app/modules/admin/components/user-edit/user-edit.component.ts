@@ -53,18 +53,21 @@ export class UserEditComponent implements OnInit, OnDestroy {
             this.user = user;
             this.selectedRole = user.role;
             this.form.patchValue({ email: user.email, empresa: user.empresaNombre });
+
+            //Una vez cargado el usuario se setea la empresa de ese usuario a empresaSelected para poder asignar en el submit el id
+            //de la empresa al campo empresaId del usuario
+
+            this.empresaService
+              .getEmpresas()
+              .pipe(take(1))
+              .subscribe((empresas) => {
+                this.empresas = empresas;
+                this.empresaSelected = this.empresas.find(empresa => empresa.nombre === this.user.empresaNombre);
+              });
           }
         });
       })
     );
-
-    this.empresaService
-      .getEmpresas()
-      .pipe(take(1))
-      .subscribe((empresas) => {
-        this.empresas = empresas;
-        this.empresaSelected = this.empresas.find(empresa => empresa.nombre === this.user.empresaNombre);
-      });
   }
 
   private buildForm() {
