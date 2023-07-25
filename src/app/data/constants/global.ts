@@ -77,7 +77,7 @@ export let GLOBAL = {
     'PID regular', // 20
     'PID irregular', // 21
   ],
-  fixableTypes: [6, 7, 11, 14, 15, 17, 18, 19, 20, 21],
+  fixableTypes: [3, 5, 6, 7, 10, 11, 14, 15, 17, 18, 19, 20, 21],
   labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [
     '0', // Para que coincida el indice con el tipo de anomalia
