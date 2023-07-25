@@ -11,17 +11,15 @@ import { COLOR } from '@data/constants/color';
   providedIn: 'root',
 })
 export class ThemeService {
-  private _themeSelected: string = undefined;
+  private _themeSelected: string = 'light-theme';
   themeSelected$ = new BehaviorSubject<string>(this._themeSelected);
   textColor = COLOR.light_on_background;
   surfaceColor = COLOR.light_surface;
 
   constructor(public overlayContainer: OverlayContainer, private localStorageService: LocalStorageService) {
     const themeLocal = this.localStorageService.get('theme');
-    if (themeLocal !== undefined) {
+    if (themeLocal !== undefined && themeLocal !== null) {
       this.themeSelected = themeLocal;
-    } else {
-      this.themeSelected = 'ligth-theme';
     }
   }
 
