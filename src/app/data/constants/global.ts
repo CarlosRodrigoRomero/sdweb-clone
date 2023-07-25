@@ -25,7 +25,7 @@ export let GLOBAL = {
   nombreLocalXFija: 'Columna',
   nombreLocalYFija: 'Altura',
   mae: [1, 2],
-  mae_rangos: [0.0018, 0.0142],
+  mae_rangos: [0.01, 0.02],
   mae_rangos_labels: ['leve', 'moderado', 'grave'],
   cc_rangos: [0.02, 0.05],
   newReportsDate: 1619820000, // 1/05/2021
