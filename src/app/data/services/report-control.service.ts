@@ -105,6 +105,12 @@ export class ReportControlService {
               switchMap((planta) => {
                 this.planta = planta;
 
+                if (this.user.uid === 'iROQFInQmodvAqKqZbnvfjV5cTB2') {
+                  if (this.planta.id === 'qa8Uc1yQ12fm2ndT2VgD') {
+                    this.planta.nombre = 'Planta Demo';
+                  }
+                }
+
                 if (this.planta.hasOwnProperty('nombreGlobalCoords')) {
                   this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
                 }
@@ -168,6 +174,11 @@ export class ReportControlService {
 
                   // filtramos las anomalías reales
                   this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
+
+                  // PARCHE OCTOCAM CAJAS DE CONEXIONES
+                  if (this.planta.id === 'qa8Uc1yQ12fm2ndT2VgD') {
+                    this.allFilterableElements = Patches.anomsOlmedillaPatch(this.allFilterableElements);
+                  }
 
                   if (this.allFilterableElements.length === 0) {
                     this.noAnomsReport = true;
