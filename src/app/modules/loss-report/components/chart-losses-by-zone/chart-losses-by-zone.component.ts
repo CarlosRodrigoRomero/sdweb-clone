@@ -123,14 +123,14 @@ export class ChartLossesByZoneComponent implements OnInit {
 
           this.sortChartData();
 
-          this.initChart(this.theme.split('-')[0]);
+          this.initChart(this.theme);
         })
     );
 
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          let [highlightColor, neutralColor] = this.getColorsByTheme(theme);
+          let [highlightColor, neutralColor] = this.themeService.getColorsByTheme(theme);
 
           this.chartOptions = {
             ...this.chartOptions,
@@ -176,20 +176,6 @@ export class ChartLossesByZoneComponent implements OnInit {
     });
 
     return result;
-  }
-
-  private getColorsByTheme(theme: string) {
-    let highlightColor = COLOR.dark_orange;
-    let neutralColor = COLOR.dark_neutral;
-    if (theme === 'dark-theme') {
-      highlightColor = COLOR.dark_orange;
-      neutralColor = COLOR.dark_neutral;
-    } else {
-      highlightColor = COLOR.light_orange;
-      neutralColor = COLOR.light_neutral;
-    }
-
-    return [highlightColor, neutralColor];
   }
 
   private getMAE(anomalias: Anomalia[]): number {
@@ -252,7 +238,7 @@ export class ChartLossesByZoneComponent implements OnInit {
       return { name: label, data: this.chartData[index] };
     });
 
-    const colors = this.getColorsByTheme(theme);
+    const colors = this.themeService.getColorsByTheme(theme);
 
     // espera a que el dataPlot tenga datos
     if (this.chartData[0] !== undefined) {

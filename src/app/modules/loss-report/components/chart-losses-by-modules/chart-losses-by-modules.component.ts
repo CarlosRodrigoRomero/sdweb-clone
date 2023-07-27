@@ -108,13 +108,13 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
 
           this.sortChartData();
 
-          this.initChart(this.theme.split('-')[0]);
+          this.initChart(this.theme);
         })
     );
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          let [highlightColor, neutralColor] = this.getColorsByTheme(theme);
+          let [highlightColor, neutralColor] = this.themeService.getColorsByTheme(theme);
 
           this.chartOptions = {
             ...this.chartOptions,
@@ -199,26 +199,12 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
       });
   }
 
-  private getColorsByTheme(theme: string) {
-    let highlightColor = COLOR.dark_orange;
-    let neutralColor = COLOR.dark_neutral;
-    if (theme === 'dark-theme') {
-      highlightColor = COLOR.dark_orange;
-      neutralColor = COLOR.dark_neutral;
-    } else {
-      highlightColor = COLOR.light_orange;
-      neutralColor = COLOR.light_neutral;
-    }
-
-    return [highlightColor, neutralColor];
-  }
-
   private initChart(theme: string): void {
     const series = this.seriesLabels.map((dateLabel, index) => {
       return { name: dateLabel, data: this.chartData[index] };
     });
 
-    const colors = this.getColorsByTheme(theme);
+    const colors = this.themeService.getColorsByTheme(theme);
 
     let titleXAxis = 'Fabricante';
     this.translate
