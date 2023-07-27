@@ -44,4 +44,18 @@ export class ThemeService {
     this._themeSelected = value;
     this.themeSelected$.next(value);
   }
+
+  getColorsByTheme(theme: string) {
+    let highlightColor = COLOR.dark_orange;
+    let neutralColor = COLOR.dark_neutral;
+    if (theme === 'dark-theme') {
+      highlightColor = COLOR.dark_orange;
+      neutralColor = COLOR.dark_neutral;
+    } else {
+      highlightColor = COLOR.light_orange;
+      neutralColor = COLOR.light_neutral;
+    }
+
+    return [highlightColor, neutralColor];
+  }
 }

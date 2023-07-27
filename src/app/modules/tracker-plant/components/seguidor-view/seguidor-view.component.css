@@ -91,7 +91,7 @@ app-seguidor-anomalia-info {
   display: grid;
   row-gap: 1rem;
   width: 640px;
-  height: calc(100vh - 684px);
+  height: calc(100vh - 710px);
   overflow: auto;
   overflow-x: hidden;
 }
