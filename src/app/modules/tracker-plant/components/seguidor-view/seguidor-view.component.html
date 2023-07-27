@@ -8,13 +8,16 @@
     </div>
     <div class="right-content">
       <!-- IMAGEN -->
+      <app-seguidor-image-toggle
+        *ngIf="(imagesExist[0] || imagesExist[1]) && seguidorSelected !== null && !hideElems"
+      ></app-seguidor-image-toggle>
+
       <div *ngIf="imagesExist[imageSelected] && seguidorSelected !== null" id="image-content" class="image-content">
         <app-seguidor-images></app-seguidor-images>
         <app-seguidor-view-hide-elems></app-seguidor-view-hide-elems>
 
         <div *ngIf="!hideElems" class="view-elems">
           <app-seguidor-view-toggle *ngIf="numAnomalias > 0"></app-seguidor-view-toggle>
-          <app-seguidor-image-toggle></app-seguidor-image-toggle>
           <app-seguidor-view-leyenda *ngIf="numAnomalias > 0"></app-seguidor-view-leyenda>
           <app-seguidor-image-origin></app-seguidor-image-origin>
           <div *ngIf="reportControlService.informesIdList.length > 1" class="slider-temporal">
