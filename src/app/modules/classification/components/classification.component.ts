@@ -7,10 +7,7 @@ import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressBarMode } from '@angular/material/progress-bar';
 
-import { Coordinate } from 'ol/coordinate';
-
 import { ClassificationService } from '@data/services/classification.service';
-import { ClustersService } from '@data/services/clusters.service';
 import { InformeService } from '@data/services/informe.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { PlantaService } from '@data/services/planta.service';
@@ -58,7 +55,6 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
   constructor(
     private classificationService: ClassificationService,
-    private clustersService: ClustersService,
     private informeService: InformeService,
     private http: HttpClient,
     private anomaliaService: AnomaliaService,
@@ -77,9 +73,6 @@ export class ClassificationComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.classificationService.normModHovered$.subscribe((normMod) => (this.normModHovered = normMod))
     );
-
-    // lo iniciamos para poder acceder a la info de la trayectoria del vuelo
-    this.subscriptions.add(this.clustersService.initService().pipe(take(1)).subscribe());
 
     this.subscriptions.add(
       this.classificationService.normModules$.subscribe((normMods) => (this.normModules = normMods))

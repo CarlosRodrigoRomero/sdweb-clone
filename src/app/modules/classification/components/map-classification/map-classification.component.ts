@@ -287,9 +287,9 @@ export class MapClassificationComponent implements OnInit {
         if (!this.listaAnomalias.map((anom) => anom.id).includes(normMod.id)) {
           this.classificationService.normModSelected = normMod;
 
-          const coords = this.structuresService.coordsDBToCoordinate(feature.getProperties().properties.normMod.coords);
+          // const coords = this.structuresService.coordsDBToCoordinate(feature.getProperties().properties.normMod.coords);
 
-          const date = this.getDatetime(coords);
+          const date = this.getDatetime();
 
           this.classificationService.createAnomaliaFromNormModule(feature, date);
         }
@@ -371,11 +371,12 @@ export class MapClassificationComponent implements OnInit {
     });
   }
 
-  private getDatetime(coords: Coordinate[]) {
+  private getDatetime() {
     let dateString = Patches.applyPatches(this.classificationService.informeId);
 
     if (dateString === undefined) {
-      dateString = this.getClosestPoint(coords);
+      dateString = this.informe.fecha + 50400; // sumamos 14 horas
+      // dateString = this.getClosestPoint(coords);
     }
 
     return this.dateStringToUnix(dateString);
