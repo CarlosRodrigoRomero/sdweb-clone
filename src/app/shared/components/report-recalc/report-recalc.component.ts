@@ -105,6 +105,16 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
       });
   }
 
+  corregirHoraAnomalias() {
+    const anomaliasInforme = this.reportControlService.allAnomalias.filter(
+      (anom) => anom.informeId === this.selectedInforme.id
+    );
+
+    const fecha = this.selectedInforme.fecha + 50400; // sumamos 14 horas
+
+    anomaliasInforme.forEach((anom) => this.anomaliaService.updateAnomaliaField(anom.id, 'datetime', fecha));
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
