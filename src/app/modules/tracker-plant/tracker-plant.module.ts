@@ -29,6 +29,7 @@ import { SeguidorViewLeyendaComponent } from './components/seguidor-view-leyenda
 import { SeguidorImageOriginComponent } from './components/seguidor-image-origin/seguidor-image-origin.component';
 
 import { DynamicSeguidorListDirective } from './directives/dynamic-seguidor-list.directive';
+import { SeguidorViewHideElemsComponent } from './components/seguidor-view-hide-elems/seguidor-view-hide-elems.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { DynamicSeguidorListDirective } from './directives/dynamic-seguidor-list
     SeguidorListComponent,
     DynamicSeguidorListDirective,
     TrackerPlantComponent,
+    SeguidorViewHideElemsComponent,
   ],
   imports: [
     CommonModule,
