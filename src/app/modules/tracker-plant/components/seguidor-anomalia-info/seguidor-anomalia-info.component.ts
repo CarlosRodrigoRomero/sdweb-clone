@@ -95,6 +95,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
     if (!this.reportControlService.plantaFija && date > init2022) {
       return date - 7200;
     }
+    return date;
   }
 
   updateAnomalia(value: any, field: string) {
