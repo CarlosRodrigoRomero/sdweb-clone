@@ -61,7 +61,6 @@
     "jquery": "^3.5.1",
     "karma-coverage": "^2.2.0",
     "moment": "^2.29.1",
-    "ng-apexcharts": "^1.7.4",
     "ng2-charts": "^2.4.2",
     "ngx-clipboard": "^14.0.1",
     "ngx-device-detector": "^2.1.1",
