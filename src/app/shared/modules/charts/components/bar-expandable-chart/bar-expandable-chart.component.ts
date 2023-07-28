@@ -173,7 +173,7 @@ export class BarExpandableChartComponent implements OnInit {
         bar: {
           horizontal: false,
           columnWidth: '55%',
-          endingShape: 'rounded',
+          // endingShape: 'rounded',
           distributed: true,
         },
       },
