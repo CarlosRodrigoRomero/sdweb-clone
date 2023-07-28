@@ -35,6 +35,8 @@ export class SeguidorViewService {
   private _anomsCanvas: any = undefined;
   private _imagesLoaded = false;
   public imagesLoaded$ = new BehaviorSubject<boolean>(this._imagesLoaded);
+  private _hideElems = false;
+  public hideElems$ = new BehaviorSubject<boolean>(this._hideElems);
 
   constructor(
     private seguidoresControlService: SeguidoresControlService,
@@ -197,5 +199,14 @@ export class SeguidorViewService {
   set imagesLoaded(value: boolean) {
     this._imagesLoaded = value;
     this.imagesLoaded$.next(value);
+  }
+
+  get hideElems() {
+    return this._hideElems;
+  }
+
+  set hideElems(value: boolean) {
+    this._hideElems = value;
+    this.hideElems$.next(value);
   }
 }

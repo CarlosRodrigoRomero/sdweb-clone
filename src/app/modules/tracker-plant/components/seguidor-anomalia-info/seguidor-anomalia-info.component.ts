@@ -92,7 +92,8 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
   private fixNewTiffDates(date: number): number {
     // quitamos 2 horas a las plantas de seguidores a partir de 2022 por el cambio de formato a TIFF
     const init2022 = 1640995200;
-    if (!this.reportControlService.plantaFija && date > init2022) {
+    const end2022 = 1672531200;
+    if (!this.reportControlService.plantaFija && date > init2022 && date < end2022) {
       return date - 7200;
     }
     return date;
@@ -112,7 +113,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
     );
 
     // comprobamos si se trata de un nuevo o antiguo informe de S2E
-    if (informeSelected.fecha > GLOBAL.s2eAnomalias) {
+    if (informeSelected.fecha > GLOBAL.dateS2eAnomalias) {
       // actualizamos la anomalias en la DB
       this.anomaliaService.updateAnomalia(this.anomaliaSelected);
     } else {

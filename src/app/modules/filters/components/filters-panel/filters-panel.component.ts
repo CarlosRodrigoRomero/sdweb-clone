@@ -1,6 +1,4 @@
-import { Component, ChangeDetectionStrategy, Input, EventEmitter, Output, OnInit } from '@angular/core';
-import { AnomaliaService } from '@data/services/anomalia.service';
-import { ReportControlService } from '@data/services/report-control.service';
+import { Component, ChangeDetectionStrategy, Input, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-filters-panel',
@@ -8,7 +6,7 @@ import { ReportControlService } from '@data/services/report-control.service';
   styleUrls: ['./filters-panel.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FiltersPanelComponent{
+export class FiltersPanelComponent {
   @Input() filtrosActivos: boolean;
   @Input() showFiltroModelo: boolean;
   @Input() showFiltroZona: boolean;

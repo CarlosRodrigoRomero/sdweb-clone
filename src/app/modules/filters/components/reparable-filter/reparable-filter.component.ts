@@ -18,10 +18,9 @@ interface Reparable {
 @Component({
   selector: 'app-reparable-filter',
   templateUrl: './reparable-filter.component.html',
-  styleUrls: ['./reparable-filter.component.css']
+  styleUrls: ['./reparable-filter.component.css'],
 })
 export class ReparableFilterComponent implements OnInit {
-
   reparableElems: Reparable[] = [];
   allComplete: boolean;
   filtroReparable: ReparableFilter;
@@ -31,10 +30,7 @@ export class ReparableFilterComponent implements OnInit {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(
-    private filterService: FilterService,
-    private filterControlService: FilterControlService,
-  ) {}
+  constructor(private filterService: FilterService, private filterControlService: FilterControlService) {}
 
   ngOnInit(): void {
     this.labels.forEach((label) => {
@@ -61,10 +57,11 @@ export class ReparableFilterComponent implements OnInit {
       // Como es un filtro simple, hacemos uncheck del otro botón
       this.filterControlService.reparableSelected[Math.abs(indexSelected - 1)] = false;
     } else {
-      this.filterService.filters$.pipe(take(1)).subscribe((filters) =>
-        this.filterService.deleteFilter(
-          filters.filter((filter) => filter.type === 'reparable')[0]
-        ));
+      this.filterService.filters$
+        .pipe(take(1))
+        .subscribe((filters) =>
+          this.filterService.deleteFilter(filters.filter((filter) => filter.type === 'reparable')[0])
+        );
       this.filterControlService.reparableSelected[indexSelected] = false;
     }
   }
@@ -72,5 +69,4 @@ export class ReparableFilterComponent implements OnInit {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
-
 }

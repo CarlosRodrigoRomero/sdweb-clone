@@ -86,7 +86,7 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
       .getLocationsArea(this.reportControlService.plantaId)
       .pipe(take(1))
       .subscribe((locAreas) => {
-        const zonas = this.zonesService.getZones(this.reportControlService.planta, locAreas);
+        const zonas = this.zonesService.getRealZones(locAreas);
 
         this.reportControlService.allAnomalias
           .filter((anom) => anom.informeId === this.reportControlService.selectedInformeId)
@@ -94,7 +94,7 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
             const anomCentroid = this.olMapService.getCentroid((anom as Anomalia).featureCoords);
             const newGlobalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(anomCentroid, zonas);
 
-            if (this.reportControlService.plantaFija) {
+            if (this.reportControlService.plantaFija || this.selectedInforme.fecha > GLOBAL.dateS2eAnomalias) {
               if (anom.globalCoords.toString() !== newGlobalCoords.toString()) {
                 this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGlobalCoords);
               }
@@ -103,6 +103,16 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
             }
           });
       });
+  }
+
+  corregirHoraAnomalias() {
+    const anomaliasInforme = this.reportControlService.allAnomalias.filter(
+      (anom) => anom.informeId === this.selectedInforme.id
+    );
+
+    const fecha = this.selectedInforme.fecha + 50400; // sumamos 14 horas
+
+    anomaliasInforme.forEach((anom) => this.anomaliaService.updateAnomaliaField(anom.id, 'datetime', fecha));
   }
 
   ngOnDestroy(): void {

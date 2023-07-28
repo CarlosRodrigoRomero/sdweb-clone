@@ -1,0 +1,4 @@
+<button mat-raised-button class="btn-hide" (click)="switchVisibility()">
+  <mat-icon *ngIf="!hideElems" matTooltip="{{ 'Ocultar controles' | translate }}">visibility_off</mat-icon>
+  <mat-icon *ngIf="hideElems" matTooltip="{{ 'Mostrar controles' | translate }}">visibility</mat-icon>
+</button>
