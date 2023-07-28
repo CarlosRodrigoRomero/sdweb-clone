@@ -151,6 +151,10 @@ export class AnomaliaMapComponent implements OnInit, OnDestroy {
     let center = this.olMapService.getCentroid(this.rowAnomalia.featureCoords)
     let coordsCenter = transform(center, 'EPSG:3857', 'EPSG:4326');
     let deltaExtent = 1.5;
+    // Las plantas de tipo cubierta tienen un extent mayor ya que la capa de satélite no permite visualizar una zona tan pequeña. 
+    // Esta línea de código no debería hacer falta ya que las anomalías de autoconsumo van a llevar imágenes asociadas.
+    if (this.planta.tipo === 'cubierta') { deltaExtent = 10;}
+    
     let extent = [
       center[0] - deltaExtent,
       center[1] - deltaExtent,
