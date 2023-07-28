@@ -47,7 +47,7 @@ export class SeguidorService {
 
     const anomaliaObsList = informes.map((informe) => {
       const type =
-        informe.fecha > GLOBAL.s2eAnomalias ? 'anomalias' : this.planta.tipo === 'seguidores' ? 'pcs' : 'anomalias';
+        informe.fecha > GLOBAL.dateS2eAnomalias ? 'anomalias' : this.planta.tipo === 'seguidores' ? 'pcs' : 'anomalias';
 
       return this.getSeguidores$(informe.id, planta.id, type);
     });
