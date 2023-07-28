@@ -315,7 +315,7 @@ export class AnomaliasControlService {
 
             if (feature !== undefined) {
               // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
-              if (this.anomaliaSelect !== undefined){
+              if (this.anomaliaSelect !== undefined){ 
                 if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
                   if (this.prevFeatureHover.getProperties().properties.anomaliaId !== this.anomaliaSelect.id) {
                     this.prevFeatureHover.setStyle(this.getStyleAnomalias(false, this.prevFeatureHover.featureType));
@@ -368,7 +368,10 @@ export class AnomaliasControlService {
   }
 
   setPopupPosition(coords: Coordinate) {
-    const popupCoords = [coords[0] + 20, coords[1] + 20] as Coordinate;
+    let zoom  = this.map.getView().getZoom();
+    let delta = Math.abs(zoom - 26) / 2;
+
+    const popupCoords = [coords[0] + delta, coords[1] + delta] as Coordinate;
     if (document.getElementById('popup-anomalia-info')){
       this.map.getOverlayById('popup-anomalia-info').setPosition(popupCoords);
     } else if (document.getElementById('popup-anomalia-rooftop')){

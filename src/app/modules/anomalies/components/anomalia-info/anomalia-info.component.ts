@@ -159,6 +159,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
         this.anomaliaSelect,
         this.planta
       );
+
       if (this.informeSelected !== undefined && this.anomaliaSelect !== undefined) {
         setTimeout(() => {
           // obtenemos la info adicional
