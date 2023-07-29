@@ -75,6 +75,7 @@ export class PortfolioControlService {
         .pipe(
           take(1),
           switchMap((user) => {
+            console.log('test');
             // solo para cuentas DEMO por ahora
             if (user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2' || user.uid === 'AM2qmC06OWPb3V1gXJXyEpGS3Uz2') {
               this.isDemo = true;
