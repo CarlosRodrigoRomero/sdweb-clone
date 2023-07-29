@@ -3,8 +3,6 @@ name: Angular CI
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
   build:
@@ -13,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.14]
+        node-version: [12.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -23,15 +21,12 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm install -g gulp-cli @angular/cli firebase-tools
-    - run: firebase use prod
-      env:
-        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
     - run: gulp update-version
     - run: ng build --prod --outputHashing=all
     - name: Deploy to Firebase
       uses: w9jds/firebase-action@master
       with:
-        args: deploy --only hosting
+        args: use prod && deploy --only hosting
       env:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
