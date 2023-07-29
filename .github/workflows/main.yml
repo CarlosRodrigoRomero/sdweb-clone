@@ -22,7 +22,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
-    - run: npm install -g gulp-cli @angular/cli
+    - run: npm install -g gulp-cli @angular/cli firebase-tools
     - run: firebase use prod
       env:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
