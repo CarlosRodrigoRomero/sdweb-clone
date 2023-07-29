@@ -1,24 +1,25 @@
+@use '~@angular/material' as mat;
 @import '~@angular/material/theming';
-@include mat-core();
+@include mat.core();
 
 // Custom background palette for dark theme
 $custom-dark-theme-background: (
   status-bar: black,
-  app-bar: map-get($mat-blue-grey, 900),
-  background: map-get($mat-blue-grey, 900),
+  app-bar: map-get(mat.$blue-grey-palette, 900),
+  background: map-get(mat.$blue-grey-palette, 900),
   hover: rgba(white, 0.04),
   // TODO(kara): check style with Material Design UX
-  card: map-get($mat-blue-grey, 800),
-  dialog: map-get($mat-blue-grey, 800),
+  card: map-get(mat.$blue-grey-palette, 800),
+  dialog: map-get(mat.$blue-grey-palette, 800),
   disabled-button: rgba(white, 0.12),
-  raised-button: map-get($mat-blue-grey, 800),
+  raised-button: map-get(mat.$blue-grey-palette, 800),
   focused-button: $light-focused,
-  selected-button: map-get($mat-blue-grey, 900),
-  selected-disabled-button: map-get($mat-blue-grey, 800),
+  selected-button: map-get(mat.$blue-grey-palette, 900),
+  selected-disabled-button: map-get(mat.$blue-grey-palette, 800),
   disabled-button-toggle: black,
-  unselected-chip: map-get($mat-blue-grey, 700),
+  unselected-chip: map-get(mat.$blue-grey-palette, 700),
   disabled-list-option: black,
-  tooltip: map-get($mat-blue-grey, 700),
+  tooltip: map-get(mat.$blue-grey-palette, 700),
 );
 
 // Custom foreground palette for dark theme
@@ -40,19 +41,19 @@ $custom-dark-theme-foreground: (
   slider-off-active: rgba(white, 0.3),
 );
 
-$app-light-primary: mat-palette($mat-deep-orange, 600);
-$app-light-accent: mat-palette($mat-deep-orange, 900);
-$app-light-warn: mat-palette($mat-red, 900);
-$app-light-neutral: mat-palette($mat-blue-gray, 600);
+$app-light-primary: mat.define-palette(mat.$deep-orange-palette, 600);
+$app-light-accent: mat.define-palette(mat.$deep-orange-palette, 900);
+$app-light-warn: mat.define-palette(mat.$red-palette, 900);
+$app-light-neutral: mat.define-palette(mat.$blue-gray-palette, 600);
 
-$app-light-background: mat-palette($mat-blue-grey, 50);
+$app-light-background: mat.define-palette(mat.$blue-grey-palette, 50);
 
-$app-dark-primary: mat-palette($mat-orange, 200);
-$app-dark-accent: mat-palette($mat-orange, 600);
-$app-dark-warn: mat-palette($mat-deep-orange, 900);
-$app-dark-neutral: mat-palette($mat-blue-gray, 400);
+$app-dark-primary: mat.define-palette(mat.$orange-palette, 200);
+$app-dark-accent: mat.define-palette(mat.$orange-palette, 600);
+$app-dark-warn: mat.define-palette(mat.$deep-orange-palette, 900);
+$app-dark-neutral: mat.define-palette(mat.$blue-gray-palette, 400);
 
-$app-dark-background: mat-palette($mat-blue-grey, 900);
+$app-dark-background: mat.define-palette(mat.$blue-grey-palette, 900);
 
 @function custom-dark-theme($primary, $accent, $warn) {
   @return (
@@ -67,57 +68,57 @@ $app-dark-background: mat-palette($mat-blue-grey, 900);
   );
 }
 
-$app-light-theme: mat-light-theme($app-light-primary, $app-light-accent, $app-light-warn);
+$app-light-theme: mat.define-light-theme($app-light-primary, $app-light-accent, $app-light-warn);
 $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dark-warn);
 
-@include angular-material-theme($app-dark-theme);
+@include mat.all-component-themes($app-dark-theme);
 
 .light-theme {
-  @include angular-material-theme($app-light-theme);
+  @include mat.all-component-themes($app-light-theme);
 
   .sorted-column-header {
     font-size: 14px;
-    color: mat-color($app-light-primary);
+    color: mat.get-color-from-palette($app-light-primary);
   }
 
   .highlight-color {
-    color: mat-color($app-light-primary);
+    color: mat.get-color-from-palette($app-light-primary);
   }
 
   .highlight-background {
-    background-color: mat-color($app-light-primary);
+    background-color: mat.get-color-from-palette($app-light-primary);
   }
 
   .neutral-color {
-    color: mat-color($app-light-neutral);
+    color: mat.get-color-from-palette($app-light-neutral);
   }
 
   .neutral-background {
-    background-color: mat-color($app-light-neutral);
+    background-color: mat.get-color-from-palette($app-light-neutral);
   }
 }
 
 .dark-theme {
-  @include angular-material-theme($app-dark-theme);
+  @include mat.all-component-themes($app-dark-theme);
 
   .sorted-column-header {
     font-size: 14px;
-    color: mat-color($app-dark-primary);
+    color: mat.get-color-from-palette($app-dark-primary);
   }
 
   .highlight-color {
-    color: mat-color($app-dark-primary);
+    color: mat.get-color-from-palette($app-dark-primary);
   }
 
   .highlight-background {
-    background-color: mat-color($app-dark-primary);
+    background-color: mat.get-color-from-palette($app-dark-primary);
   }
 
   .neutral-color {
-    color: mat-color($app-dark-neutral);
+    color: mat.get-color-from-palette($app-dark-neutral);
   }
 
   .neutral-background {
-    background-color: mat-color($app-dark-neutral);
+    background-color: mat.get-color-from-palette($app-dark-neutral);
   }
 }
