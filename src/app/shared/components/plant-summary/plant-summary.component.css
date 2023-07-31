@@ -137,3 +137,7 @@
   align-items: center;
   cursor: unset;
 }
+
+.filtros-activos {
+  margin-left: 1rem;
+}

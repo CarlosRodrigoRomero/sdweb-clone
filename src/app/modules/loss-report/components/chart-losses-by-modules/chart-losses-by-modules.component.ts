@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { switchMap, take } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
@@ -25,9 +25,10 @@ import { ZonesService } from '@data/services/zones.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { GLOBAL } from '@data/constants/global';
-import { COLOR } from '@data/constants/color';
 import { Subscription } from 'rxjs';
 import { InformeInterface } from '@core/models/informe';
+import { FilterService } from '@data/services/filter.service';
+import { Seguidor } from '@core/models/seguidor';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -60,6 +61,7 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
   private theme: string;
   private selectedInforme: InformeInterface;
   private maeLabel: string;
+  private anomaliasInforme: Anomalia[];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -68,7 +70,9 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
     private moduleService: ModuleService,
     private reportControlService: ReportControlService,
     private themeService: ThemeService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private filterService: FilterService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -90,6 +94,25 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
           switchMap((theme) => {
             this.theme = theme;
 
+            this.filterService.filteredElements$.subscribe((elems) => {
+              const elemsInforme = elems.filter((elem) => elem.informeId === this.reportControlService.selectedInformeId);
+        
+              if (this.reportControlService.plantaFija) {
+                this.anomaliasInforme = elemsInforme as Anomalia[];
+
+              } else {
+                var anomalias = [];
+                for (var elem of elemsInforme) {
+                  anomalias.push(...(elem as Seguidor).anomaliasCliente);
+                }
+
+                this.anomaliasInforme = anomalias;
+              }
+        
+              // detectamos cambios porque estamos utilizando la estrategia OnPush
+              this.cdr.detectChanges();
+            });
+
             return this.reportControlService.selectedInformeId$;
           })
         )
@@ -98,12 +121,10 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
 
           this.chartData = [];
 
-          const anomaliasInforme = this.anomalias.filter((anom) => anom.informeId === informeId);
-
-          const fixableAnoms = anomaliasInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+          const fixableAnoms = this.anomaliasInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
           this.chartData.push(this.calculateChartData(fixableAnoms));
 
-          const unfixableAnoms = anomaliasInforme.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipo));
+          const unfixableAnoms = this.anomaliasInforme.filter((anom) => !GLOBAL.fixableTypes.includes(anom.tipo));
           this.chartData.push(this.calculateChartData(unfixableAnoms));
 
           this.sortChartData();

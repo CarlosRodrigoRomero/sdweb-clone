@@ -5,8 +5,12 @@
     <span class="subtitulo">({{ potenciaPlanta | number : '1.0-2' }} MW)</span>
     <span class="fecha">{{ fechaSelectedInforme }}</span>
   </div>
-  <div class="grupo2" [matMenuTriggerFor]="menu" matTooltip="{{ 'Datos del vuelo' | translate }}"
-    matTooltipClass="tooltip-style">
+  <div
+    class="grupo2"
+    [matMenuTriggerFor]="menu"
+    matTooltip="{{ 'Datos del vuelo' | translate }}"
+    matTooltipClass="tooltip-style"
+  >
     <mat-icon>info</mat-icon>
     <mat-icon>expand_more</mat-icon>
     <mat-menu #menu="matMenu" class="menu">
@@ -38,11 +42,15 @@
           <mat-icon color="secondary">air</mat-icon>
           <h5 class="subtitulo">{{ vientoVelocidad }} (Beaufort)</h5>
         </div>
-        <div mat-menu-item *ngIf="
+        <div
+          mat-menu-item
+          *ngIf="
             informe.vientoVelocidad === undefined &&
             informe.vientoDireccion === undefined &&
             informe.viento !== undefined
-          " class="elemento">
+          "
+          class="elemento"
+        >
           <mat-icon color="secondary">air</mat-icon>
           <h5 class="subtitulo">{{ informe.viento }} (Beaufort)</h5>
         </div>
@@ -53,15 +61,18 @@
     <div class="elemento">
       <mat-icon class="help" matTooltip="{{ 'info MAE' | translate }}" matTooltipClass="tooltip-style">help</mat-icon>
       <span class="titulo">{{ 'MAE' | translate }}</span>
-      <span class="valor-mae">{{ informe.mae * 100 | number : '1.0-2' }}%</span>
+      <span class="valor-mae">{{ mae * 100 | number : '1.0-2' }}%</span>
       <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->
     </div>
     <div class="elemento">
-      <mat-icon class="help"
+      <mat-icon
+        class="help"
         matTooltip="{{ 'MAE que solo tiene en cuenta las anomalías que son reparables' | translate }}"
-        matTooltipClass="tooltip-style">help</mat-icon>
+        matTooltipClass="tooltip-style"
+        >help</mat-icon
+      >
       <span class="titulo">{{ 'MAE reparable' | translate }}</span>
-      <span class="valor-mae">{{ informe.fixablePower * 100 | number : '1.0-2' }}%</span>
+      <span class="valor-mae">{{ maeReparable * 100 | number : '1.0-2' }}%</span>
       <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->
     </div>
     <!-- <div class="elemento">
@@ -76,13 +87,15 @@
       <mat-icon *ngIf="informe.cc < 3" class="success">arrow_circle_down</mat-icon>
     </div> -->
     <div class="elemento">
-      <mat-icon class="help" matTooltip="{{ 'info num Anoms' | translate }}"
-        matTooltipClass="tooltip-style">help</mat-icon>
+      <mat-icon class="help" matTooltip="{{ 'info num Anoms' | translate }}" matTooltipClass="tooltip-style"
+        >help</mat-icon
+      >
       <span class="titulo"># {{ 'anomalias' | translate | titlecase }}</span>
       <span class="valor-cc">{{ numAnomsFiltered }} / {{ numAnoms }}</span>
+
+      <mat-icon class="help filtros-activos" *ngIf="filtrosActivos">warning</mat-icon>
+      <span class="titulo" *ngIf="filtrosActivos"> Filtros activos </span>
       <app-right-menu-container></app-right-menu-container>
-    </div>              
-
+    </div>
   </div>
-
 </div>

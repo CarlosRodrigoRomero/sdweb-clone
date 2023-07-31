@@ -12,6 +12,8 @@ import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 import { MathOperations } from '@core/classes/math-operations';
 import { Seguidor } from '@core/models/seguidor';
+import { Anomalia } from '@core/models/anomalia';
+import { GLOBAL } from '@data/constants/global';
 
 @Component({
   selector: 'app-plant-summary',
@@ -31,6 +33,9 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
   private selectedInformeId: string;
   numAnoms = 0;
   numAnomsFiltered = 0;
+  mae: number;
+  maeReparable: number;
+  filtrosActivos: boolean = false;
 
   private subscription: Subscription = new Subscription();
 
@@ -61,6 +66,23 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
                 (informe) => informe.id === this.selectedInformeId
               );
 
+              // Recalculamos MAE cada vez que se entra en el informe
+              const anomaliasInforme = this.reportControlService.allAnomalias.filter(
+                (anom) => anom.informeId === this.selectedInformeId
+              );
+              if (Number.isFinite(this.reportControlService.getMaeInformeFija(anomaliasInforme, this.informe))) {
+                // calculamos MAE
+                this.reportControlService.setMae(anomaliasInforme, this.informe);
+
+                // calculamos MAE reparable
+                const fixableAnoms = anomaliasInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
+                this.reportControlService.setMae(fixableAnoms, this.informe, 'fixablePower');
+              }
+
+
+              this.mae = this.informe.mae;
+              this.maeReparable = this.informe.fixablePower;
+
               this.fechaSelectedInforme = this.informeService.getDateLabelInforme(this.informe);
 
               if (this.informe.vientoVelocidad !== undefined) {
@@ -76,13 +98,34 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
           .subscribe((elems) => {
             const elemsInforme = elems.filter((elem) => elem.informeId === this.selectedInformeId);
 
+            this.filtrosActivos = elemsInforme.length != this.numAnoms;
+
             if (this.reportControlService.plantaFija) {
               this.numAnomsFiltered = elemsInforme.length;
+
+              //Obtener Mae de anomalías filtradas para fijas
+              this.mae = this.reportControlService.getMaeInformeFija(elemsInforme as Anomalia[], this.informe);
+
+              //Obtener Mae Reparable de anomalías filtradas para fijas
+              this.maeReparable = this.reportControlService.getFixedLossReport(
+                elemsInforme as Anomalia[],
+                this.informe
+              );
             } else {
               this.numAnomsFiltered = elemsInforme.reduce(
                 (acc, elem) => acc + (elem as Seguidor).anomaliasCliente.length,
                 0
               );
+              var anomalias = [];
+              for (var elem of elemsInforme) {
+                anomalias.push(...(elem as Seguidor).anomaliasCliente);
+              }
+
+              //Obtener Mae de anomalías filtradas para seguidores
+              this.mae = this.reportControlService.getMaeInformeFija(anomalias, this.informe);
+
+              //Obtener Mae Reparable de anomalías filtradas para seguidres
+              this.maeReparable = this.reportControlService.getFixedLossReport(anomalias, this.informe);
             }
 
             // detectamos cambios porque estamos utilizando la estrategia OnPush
