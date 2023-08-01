@@ -2,8 +2,6 @@ import { NgModule } from '@angular/core';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 
-import { IvyCarouselModule } from 'angular-responsive-carousel';
-
 import { SwiperModule } from 'swiper/angular';
 
 import { PlantaFijaRoutingModule } from './fixed-plant-routing.module';
@@ -43,7 +41,6 @@ import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list
     PlantaFijaRoutingModule,
     NgApexchartsModule,
     FiltersModule,
-    IvyCarouselModule,
     SwiperModule,
     StatsPlantModule,
     SharedPlantsModule,

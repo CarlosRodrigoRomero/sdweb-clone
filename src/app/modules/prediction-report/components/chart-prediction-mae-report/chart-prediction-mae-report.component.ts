@@ -165,7 +165,7 @@ export class ChartPredictionMaeReportComponent implements OnInit, OnDestroy {
         },
         dataLabels: {
           enabled: true,
-          formatter: (value) => this.decimalPipe.transform(value, '1.0-2') + '%',
+          formatter: (value: number) => this.decimalPipe.transform(value, '1.0-2') + '%',
           style: {
             fontSize: '12px',
             // colors: [this.themeService.surfaceColor],

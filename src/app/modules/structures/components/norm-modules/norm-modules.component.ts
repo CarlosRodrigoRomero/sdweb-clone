@@ -256,6 +256,9 @@ export class NormModulesComponent implements OnInit, OnDestroy {
       const polygon = evt.feature.getGeometry() as Polygon;
       const coords = polygon.getCoordinates();
 
+      // quitamos el punto final porque es igual al inicial
+      coords[0].pop();
+
       this.coordsNewNormMod = this.structuresService.coordinateToObject(coords);
 
       const centroid = this.olMapService.getCentroid(coords[0]);

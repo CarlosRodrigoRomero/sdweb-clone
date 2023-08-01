@@ -152,7 +152,7 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
           colors: this.maeColors,
           dataLabels: {
             enabled: true,
-            formatter: (value) => this.decimalPipe.transform(value, '1.0-2') + '%',
+            formatter: (value: number) => this.decimalPipe.transform(value, '1.0-2') + '%',
             style: {
               fontSize: '16px',
             },

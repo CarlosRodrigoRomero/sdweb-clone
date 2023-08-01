@@ -35,6 +35,8 @@ import { MapImage } from '@core/models/mapImages';
 import { MapClipping } from '@core/models/mapClipping';
 import { InformeInterface } from '@core/models/informe';
 
+import { MathOperations } from '@core/classes/math-operations';
+
 @Component({
   selector: 'app-map-create-map',
   templateUrl: './map-create-map.component.html',
@@ -62,6 +64,8 @@ export class MapCreateMapComponent implements OnInit {
   clippingSelected: MapClipping;
   createDivisionMode: boolean;
   clippingsToMerge: MapClipping[] = [];
+  vueloSeleccionado = false;
+  private imagePointSelected: MapImage;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -87,6 +91,7 @@ export class MapCreateMapComponent implements OnInit {
     this.addImagePoints();
     this.addPopupOverlay();
     this.addOnHoverImageAction();
+    this.addSelectImagePointInteraction();
 
     this.createDivisionLayer();
     // this.addOnHoverDivisionsInteraction();
@@ -228,6 +233,16 @@ export class MapCreateMapComponent implements OnInit {
         this.clippingsToMerge = clippings;
       })
     );
+
+    this.subscriptions.add(
+      this.mapImagesService.imagePointSelected$.subscribe((imagePoint) => {
+        this.imagePointSelected = imagePoint;
+
+        if (imagePoint && imagePoint.hasOwnProperty('etiqueta_vuelo')) {
+          this.vueloSeleccionado = true;
+        }
+      })
+    );
   }
 
   /* MAPA */
@@ -364,12 +379,17 @@ export class MapCreateMapComponent implements OnInit {
       coords[0].pop(); // quitamos el ultimo punto que es igual al primero
 
       let division: MapDivision = {
-        coords: Object.values(coords[0]),
+        coords: coords[0],
         type: 'division',
+        etiqueta_vuelo: this.imagePointSelected.etiqueta_vuelo,
       };
 
       // calculamos el numero de imagenes que hay dentro de la division
-      const [imagesRgbIds, imagesThermalIds] = this.getImagesInsideDivision(coords[0]);
+      const [imagesRgbIds, imagesThermalIds] = this.getImagesInsideDivision(division);
+
+      // adaptamos las coords a la DB
+      division.coords = { ...division.coords };
+
       division.imagesRgbIds = imagesRgbIds;
       division.numImagesRgb = imagesRgbIds.length;
       division.imagesThermalIds = imagesThermalIds;
@@ -416,48 +436,11 @@ export class MapCreateMapComponent implements OnInit {
         name: 'division',
         numImagesRgb,
         numImagesThermal,
+        vuelo: division.etiqueta_vuelo,
       },
     });
 
     this.divisionSource.addFeature(feature);
-  }
-
-  private addOnHoverDivisionsInteraction() {
-    let currentFeatureHover: Feature<any>;
-    this.map.on('pointermove', (event) => {
-      let featureExistsUnderCursor = false; // Controla si hay una feature debajo del cursor
-
-      this.map.forEachFeatureAtPixel(event.pixel, (f) => {
-        const feature = f as Feature<any>;
-        if (
-          feature.getProperties().hasOwnProperty('properties') &&
-          feature.getProperties().properties.hasOwnProperty('name') &&
-          feature.getProperties().properties.name === 'division'
-        ) {
-          featureExistsUnderCursor = true;
-
-          if (currentFeatureHover !== undefined) {
-            currentFeatureHover.setStyle(this.getStyleDivision(false));
-          }
-
-          currentFeatureHover = feature;
-          currentFeatureHover.setStyle(this.getStyleDivision(true));
-
-          const divisionId = feature.getProperties().properties.id;
-          const division = this.divisions.find((img) => img.id === divisionId);
-
-          this.mapDivisionControlService.mapDivisionHovered = division;
-        }
-      });
-
-      // Si no hay ninguna feature debajo del cursor, reseteamos el estilo de la feature anterior
-      if (!featureExistsUnderCursor && currentFeatureHover !== undefined) {
-        currentFeatureHover.setStyle(this.getStyleDivision(false));
-        currentFeatureHover = undefined;
-
-        this.mapDivisionControlService.mapDivisionHovered = undefined;
-      }
-    });
   }
 
   private addModifyDivisionsInteraction() {
@@ -471,7 +454,7 @@ export class MapCreateMapComponent implements OnInit {
 
         if (coords !== null) {
           // calculamos el numero de imagenes que hay dentro de la division
-          const [imagesRgbIds, imagesThermalIds] = this.getImagesInsideDivision(coords);
+          const [imagesRgbIds, imagesThermalIds] = this.getImagesInsideDivision(division);
           division.imagesRgbIds = imagesRgbIds;
           division.imagesThermalIds = imagesThermalIds;
 
@@ -531,7 +514,7 @@ export class MapCreateMapComponent implements OnInit {
             color: 'rgba(255, 255, 255, 0.2)',
           }),
           stroke: new Stroke({
-            width: 2,
+            width: 4,
             color: 'white',
           }),
           text: new Text({
@@ -560,11 +543,11 @@ export class MapCreateMapComponent implements OnInit {
 
         return new Style({
           fill: new Fill({
-            color: 'rgba(0, 0, 255, 0.2)',
+            color: 'rgba(0, 0, 0, 0)',
           }),
           stroke: new Stroke({
-            width: 2,
-            color: 'blue',
+            width: 4,
+            color: this.mapImagesService.getVueloColor(feature.getProperties().properties.vuelo),
           }),
           text: new Text({
             text: label,
@@ -594,19 +577,21 @@ export class MapCreateMapComponent implements OnInit {
     }
   }
 
-  private getImagesInsideDivision(divisionCoords: Coordinate[]): string[][] {
-    const imagesRgb = this.images.filter((image) => image.tipo === 'RGB');
+  private getImagesInsideDivision(division: MapDivision): string[][] {
+    const imagesVuelo = this.images.filter((image) => image.etiqueta_vuelo === division.etiqueta_vuelo);
+
+    const imagesRgb = imagesVuelo.filter((image) => image.tipo === 'RGB');
     const imagesRgbIds: string[] = [];
     imagesRgb.forEach((image) => {
-      if (this.isInsideDivision(image.coords, divisionCoords)) {
+      if (this.isInsideDivision(image.coords, division.coords)) {
         imagesRgbIds.push(image.id);
       }
     });
 
-    const imagesThermal = this.images.filter((image) => image.tipo !== 'RGB');
+    const imagesThermal = imagesVuelo.filter((image) => image.tipo !== 'RGB');
     const imagesThermalIds: string[] = [];
     imagesThermal.forEach((image) => {
-      if (this.isInsideDivision(image.coords, divisionCoords)) {
+      if (this.isInsideDivision(image.coords, division.coords)) {
         imagesThermalIds.push(image.id);
       }
     });
@@ -650,6 +635,11 @@ export class MapCreateMapComponent implements OnInit {
         .getMapImages()
         .pipe(take(1))
         .subscribe((images) => {
+          // guardamos los diferentes vuelos que hay
+          this.mapImagesService.vuelos = MathOperations.getUniqueElemsArray(
+            images.map((image) => image.etiqueta_vuelo)
+          );
+
           this.imagePointSource.clear();
 
           this.images = images;
@@ -663,10 +653,11 @@ export class MapCreateMapComponent implements OnInit {
 
   private addImagePoint(image: MapImage) {
     const feature = new Feature({
-      geometry: new Circle(fromLonLat(image.coords), 1),
+      geometry: new Circle(fromLonLat(image.coords), 2),
       properties: {
         id: image.id,
         name: 'imagePoint',
+        vuelo: image.etiqueta_vuelo,
       },
     });
 
@@ -729,6 +720,34 @@ export class MapCreateMapComponent implements OnInit {
     });
   }
 
+  private addSelectImagePointInteraction() {
+    const select = new Select({
+      style: this.getStyleImagePoint(false),
+      condition: click,
+      layers: (l) => {
+        if (l.getProperties().id === 'imagePointLayer') {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    });
+
+    this.map.addInteraction(select);
+
+    select.on('select', (e) => {
+      if (e.selected.length > 0) {
+        const feature = e.selected[0];
+        if (feature.getProperties().properties.name === 'imagePoint') {
+          const imagePointId = feature.getProperties().properties.id;
+          const imagePoint = this.images.find((d) => d.id === imagePointId);
+
+          this.mapImagesService.imagePointSelected = imagePoint;
+        }
+      }
+    });
+  }
+
   private getStyleImagePoint(focused: boolean) {
     if (focused) {
       return (feature: Feature<any>) => {
@@ -746,7 +765,7 @@ export class MapCreateMapComponent implements OnInit {
       return (feature: Feature<any>) => {
         return new Style({
           fill: new Fill({
-            color: 'red',
+            color: this.mapImagesService.getVueloColor(feature.getProperties().properties.vuelo),
           }),
         });
       };

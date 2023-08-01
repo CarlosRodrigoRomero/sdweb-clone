@@ -195,7 +195,7 @@ export class ChartCelsGradComponent implements OnInit, OnDestroy {
         bar: {
           horizontal: false,
           columnWidth: '55%',
-          endingShape: 'rounded',
+          // endingShape: 'rounded',
         },
       },
       dataLabels: {

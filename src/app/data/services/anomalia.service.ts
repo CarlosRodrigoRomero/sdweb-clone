@@ -105,7 +105,7 @@ export class AnomaliaService {
 
     const anomaliaObsList = informes.map((informe) => {
       const type =
-        informe.fecha > GLOBAL.s2eAnomalias ? 'anomalias' : this.planta.tipo === 'seguidores' ? 'pcs' : 'anomalias';
+        informe.fecha > GLOBAL.dateS2eAnomalias ? 'anomalias' : this.planta.tipo === 'seguidores' ? 'pcs' : 'anomalias';
       return this.getAnomalias$(informe.id, type, criterio);
     });
 

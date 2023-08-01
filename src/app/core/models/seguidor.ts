@@ -167,12 +167,15 @@ export class Seguidor implements FilterableElement {
     return moduloLabel;
   }
 
-  private getRealAnomalias(anomalias: Anomalia[]): Anomalia[] {
+  getRealAnomalias(anomalias: Anomalia[]): Anomalia[] {
     // quitamos las anomalias con criticidad null ya que no son anomalias para el cliente
     let realAnomalias = anomalias.filter((anom) => anom.criticidad !== null);
 
     // quitamos las anomalias de tipos en desuso
     realAnomalias = realAnomalias.filter((anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo));
+
+    // quitamos la suciedad como anomalía
+    realAnomalias = realAnomalias.filter((anom) => anom.tipo !== 11);
 
     return realAnomalias;
   }

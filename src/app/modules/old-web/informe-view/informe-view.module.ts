@@ -15,19 +15,18 @@ import { PcListComponent } from './components/pc-list/pc-list.component';
 import { PcDetailsComponent } from './components/pc-details/pc-details.component';
 
 @NgModule({
-  declarations: [
-    InformeOverviewComponent,
-    InformeViewComponent,
-    PcFilterComponent,
-    ExplicacionCoaComponent,
-    PcDetailsDialogComponent,
-    PcListComponent,
-    PcDetailsComponent,
-    PcFilterComponent,
-  ],
-  entryComponents: [ExplicacionCoaComponent, PcDetailsDialogComponent],
-  providers: [],
-  // providers: [{ provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],
-  imports: [SharedModule, InformeViewRoutingModule, ChartModule],
+    declarations: [
+        InformeOverviewComponent,
+        InformeViewComponent,
+        PcFilterComponent,
+        ExplicacionCoaComponent,
+        PcDetailsDialogComponent,
+        PcListComponent,
+        PcDetailsComponent,
+        PcFilterComponent,
+    ],
+    providers: [],
+    // providers: [{ provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],
+    imports: [SharedModule, InformeViewRoutingModule, ChartModule]
 })
 export class InformeViewModule {}
