@@ -24,6 +24,11 @@
     <!-- NOTIFICACIONES DEL PORTFOLIO -->
     <app-portfolio-notifications *ngIf="loadPortfolioContent && isPortfolio"></app-portfolio-notifications>
 
+    <!-- AVISO DE FILTROS ACTIVOS -->
+    <div class="active-filters" *ngIf="activeFilters">
+      <mat-icon class="icon-active-filters" >warning</mat-icon>
+      <button class="active-filters" mat-button color="primary"> {{ 'Filtros activos' | translate }} </button>
+    </div>
 
     <app-share-plant-container *ngIf="loadContent && !isShared"></app-share-plant-container>
 

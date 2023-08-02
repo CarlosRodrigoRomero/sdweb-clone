@@ -92,9 +92,7 @@
       >
       <span class="titulo"># {{ 'anomalias' | translate | titlecase }}</span>
       <span class="valor-cc">{{ numAnomsFiltered }} / {{ numAnoms }}</span>
-
-      <mat-icon class="help filtros-activos" *ngIf="filtrosActivos">warning</mat-icon>
-      <span class="titulo" *ngIf="filtrosActivos"> Filtros activos </span>
+      
       <app-right-menu-container></app-right-menu-container>
     </div>
   </div>

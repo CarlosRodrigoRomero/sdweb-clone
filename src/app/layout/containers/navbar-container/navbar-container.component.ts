@@ -34,6 +34,7 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
   isDemo = false;
   tipoComentarios = false;
   isPortfolio = false;
+  activeFilters = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -83,6 +84,17 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.portfolioControlService.initialized$.subscribe((value) => {
         this.loadPortfolioContent = value;
+      })
+    );
+
+    this.subscriptions.add(
+      this.filterService.filters$.subscribe((filters) => {
+        if (filters.length > 0) {
+          this.activeFilters = true;
+        } else {
+          this.activeFilters = false;
+        }
+        console.log(this.activeFilters);
       })
     );
 

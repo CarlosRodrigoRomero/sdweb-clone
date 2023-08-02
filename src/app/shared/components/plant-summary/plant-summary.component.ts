@@ -35,7 +35,6 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
   numAnomsFiltered = 0;
   mae: number;
   maeReparable: number;
-  filtrosActivos: boolean = false;
 
   private subscription: Subscription = new Subscription();
 
@@ -97,8 +96,6 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
           )
           .subscribe((elems) => {
             const elemsInforme = elems.filter((elem) => elem.informeId === this.selectedInformeId);
-
-            this.filtrosActivos = elemsInforme.length != this.numAnoms;
 
             if (this.reportControlService.plantaFija) {
               this.numAnomsFiltered = elemsInforme.length;

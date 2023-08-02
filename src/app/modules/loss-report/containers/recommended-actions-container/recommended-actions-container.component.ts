@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { Subscription } from 'rxjs';
@@ -26,13 +26,15 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
   fixableLossesPercentage = 0;
   numFixableAnoms = 0;
   numUnfixableAnoms = 0;
+  private anomaliasInforme: Anomalia[];
 
   private subcriptions = new Subscription();
 
   constructor(
     private filterService: FilterService,
     private reportControlService: ReportControlService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -40,13 +42,30 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
       this.reportControlService.selectedInformeId$.subscribe((id) => {
         this.selectedReport = this.reportControlService.informes.find((informe) => informe.id === id);
 
-        const anomaliasReport = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === id);
+        this.filterService.filteredElements$.subscribe((elems) => {
+          const elemsInforme = elems.filter((elem) => elem.informeId === this.reportControlService.selectedInformeId);
+    
+          if (this.reportControlService.plantaFija) {
+            this.anomaliasInforme = elemsInforme as Anomalia[];
+
+          } else {
+            var anomalias = [];
+            for (var elem of elemsInforme) {
+              anomalias.push(...(elem as Seguidor).anomaliasCliente);
+            }
+
+            this.anomaliasInforme = anomalias;
+          }
+    
+          // detectamos cambios porque estamos utilizando la estrategia OnPush
+          this.cdr.detectChanges();
+        });
 
         // obtenemos el numero de anomalias reparables
-        this.numFixableAnoms = this.getNumFixableAnoms(anomaliasReport);
-        this.numUnfixableAnoms = anomaliasReport.length - this.numFixableAnoms;
+        this.numFixableAnoms = this.getNumFixableAnoms(this.anomaliasInforme);
+        this.numUnfixableAnoms = this.anomaliasInforme.length - this.numFixableAnoms;
 
-        this.recomendedActions = this.calculateRecomendedActions(anomaliasReport).sort((a, b) => b.mae - a.mae);
+        this.recomendedActions = this.calculateRecomendedActions(this.anomaliasInforme).sort((a, b) => b.mae - a.mae);
 
         // calculamos el porcentaje de pérdidas que se pueden arreglar
         this.calculateFixableLosses();
