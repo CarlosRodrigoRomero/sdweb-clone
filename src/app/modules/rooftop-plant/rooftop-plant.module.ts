@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 
 import { NgApexchartsModule } from 'ng-apexcharts';
 
-import { IvyCarouselModule } from 'angular-responsive-carousel';
-
 import { SwiperModule } from 'swiper/angular';
 
 import { SharedModule } from '@shared/shared.module';
@@ -19,27 +17,19 @@ import { MapViewComponent } from './components/map-view/map-view.component';
 import { RooftopPlantComponent } from './components/rooftop-plant.component';
 import { MapAnomComponent } from './components/map-anom/map-anom.component';
 
-
-
 @NgModule({
-  declarations: [
-    MapComponent,
-    MapViewComponent,
-    RooftopPlantComponent,
-    MapAnomComponent
-  ],
+  declarations: [MapComponent, MapViewComponent, RooftopPlantComponent, MapAnomComponent],
   imports: [
     CommonModule,
     SharedPlantsModule,
     SharedModule,
     NgApexchartsModule,
     FiltersModule,
-    IvyCarouselModule,
     SwiperModule,
     CubiertaRoutingModule,
     StatsPlantModule,
-    AnomaliesModule
+    AnomaliesModule,
   ],
   exports: [MapViewComponent],
 })
-export class RooftopPlantModule { }
+export class RooftopPlantModule {}

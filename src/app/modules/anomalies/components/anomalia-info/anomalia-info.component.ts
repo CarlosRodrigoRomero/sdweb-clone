@@ -84,6 +84,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   dataSource: Anomalia[];
   perdidas: string;
   localizacion: string;
+  posicion: string;
   pcDescripcion: string[];
   criticidadLabels: string[];
   infoAdicional: InfoAdicional;
@@ -149,6 +150,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
           this.anomaliaHover,
           this.planta
         );
+        this.posicion = this.anomaliaInfoService.getPosicionModuloLabel(this.anomaliaHover, this.planta);
       } else {
         this.dataSource = null;
       }
@@ -158,6 +160,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
         this.anomaliaSelect,
         this.planta
       );
+      this.posicion = this.anomaliaInfoService.getPosicionModuloLabel(this.anomaliaHover, this.planta);
 
       if (this.informeSelected !== undefined && this.anomaliaSelect !== undefined) {
         setTimeout(() => {
@@ -194,8 +197,7 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
     let vientoDireccion;
 
     let datetime = this.anomaliaSelect.datetime;
-    if (this.informeSelected.hasOwnProperty("correcHoraSrt") &&
-        this.informeSelected.correccHoraSrt !== undefined) {
+    if (this.informeSelected.hasOwnProperty('correcHoraSrt') && this.informeSelected.correccHoraSrt !== undefined) {
       datetime += this.informeSelected.correccHoraSrt * 3600;
     }
     if (datetime !== undefined && datetime !== null) {
