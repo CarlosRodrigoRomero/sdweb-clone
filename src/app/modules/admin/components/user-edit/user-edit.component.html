@@ -23,10 +23,12 @@
         <mat-form-field appearance="fill">
           <mat-label>Tipo de usuario</mat-label>
           <mat-select formControlName="role" ngModel="{{ user.role }}" (selectionChange)="onRoleChange($event)">
-            <mat-option value="0">Usuario</mat-option>
+            <mat-option value="0">Usuario (Admin Empresa)</mat-option>
             <mat-option value="1">Administrador</mat-option>
             <mat-option value="2">Externo</mat-option>
             <mat-option value="3">Procesamiento</mat-option>
+            <mat-option value="6">Interno</mat-option>
+
           </mat-select>
         </mat-form-field>
 

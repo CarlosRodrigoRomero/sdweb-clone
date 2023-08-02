@@ -6,6 +6,8 @@ import { Notification } from '@core/models/notification';
 import { InformeInterface } from '@core/models/informe';
 import { PlantaInterface } from '@core/models/planta';
 
+import { GLOBAL } from '@data/constants/global';
+
 @Component({
   selector: 'app-portfolio-notifications',
   templateUrl: './portfolio-notifications.component.html',
@@ -95,7 +97,7 @@ export class PortfolioNotificationsComponent implements OnInit {
   }
 
   private checkMaeGraveNotification(informe: InformeInterface): boolean {
-    if (informe.mae >= 0.01) {
+    if (informe.mae >= GLOBAL.mae_rangos[1]) {
       return true;
     } else {
       return false;
@@ -106,8 +108,8 @@ export class PortfolioNotificationsComponent implements OnInit {
     const maeMasReciente = informes[0].mae;
     const maeMenosReciente = informes[1].mae;
 
-    // si maemasReciente es un 10% mayor que maeMenosReciente
-    if (maeMasReciente >= maeMenosReciente * 1.1) {
+    // si maemasReciente es un 20% mayor que maeMenosReciente
+    if (maeMasReciente >= maeMenosReciente * 1.2) {
       return true;
     } else {
       return false;

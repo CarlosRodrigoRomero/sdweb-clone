@@ -1,8 +1,8 @@
 <div id="map" class="map"></div>
 
 <div class="actions-btns">
-  <button mat-raised-button (click)="switchCreateMode()">
-    <span *ngIf="!createDivisionMode">Activar crear devisiones</span>
+  <button mat-raised-button [disabled]="!vueloSeleccionado" (click)="switchCreateMode()">
+    <span *ngIf="!createDivisionMode">Activar crear divisiones</span>
     <span *ngIf="createDivisionMode">Parar crear divisiones</span>
   </button>
 

@@ -25,11 +25,12 @@ export let GLOBAL = {
   nombreLocalXFija: 'Columna',
   nombreLocalYFija: 'Altura',
   mae: [1, 2],
-  mae_rangos: [0.0018, 0.0142],
+  mae_rangos: [0.01, 0.02],
   mae_rangos_labels: ['leve', 'moderado', 'grave'],
   cc_rangos: [0.02, 0.05],
   newReportsDate: 1619820000, // 1/05/2021
   newVisualLayerDate: 1654473600, // 6/06/2022
+  dateS2eAnomalias: 1672531200, // 1/01/2023
   anomaliaPorDefecto: 9,
   resolucionCamara: [512, 640],
   globalCoordsEstructura: [0, 1, 2],
@@ -76,7 +77,7 @@ export let GLOBAL = {
     'PID regular', // 20
     'PID irregular', // 21
   ],
-  fixableTypes: [6, 7, 11, 14, 15, 17, 18, 19, 20, 21],
+  fixableTypes: [3, 5, 6, 7, 10, 11, 14, 15, 17, 18, 19, 20, 21],
   labels_bloqueadas: [0, 1, 2, 4, 16],
   pcDescripcion: [
     '0', // Para que coincida el indice con el tipo de anomalia

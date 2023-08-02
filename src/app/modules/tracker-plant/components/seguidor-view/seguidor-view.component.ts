@@ -17,6 +17,7 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
   numAnomalias: number;
   imagesExist = [true, true];
   imageSelected = 0;
+  public hideElems: boolean;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -38,6 +39,8 @@ export class SeguidorViewComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     this.subscriptions.add(this.seguidorViewService.imageSelected$.subscribe((image) => (this.imageSelected = image)));
+
+    this.subscriptions.add(this.seguidorViewService.hideElems$.subscribe((hideElems) => (this.hideElems = hideElems)));
   }
 
   ngAfterViewInit(): void {

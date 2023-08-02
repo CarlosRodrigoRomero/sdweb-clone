@@ -205,7 +205,7 @@ export class ChartPctCelsComponent implements OnInit {
       colors: [COLOR.gris],
       dataLabels: {
         enabled: true,
-        formatter: (value) => Math.round(value * 100) / 100 + '%',
+        formatter: (value: number) => Math.round(value * 100) / 100 + '%',
       },
       markers: {
         size: 1,
@@ -250,7 +250,7 @@ export class ChartPctCelsComponent implements OnInit {
       colors: [COLOR.gris],
       dataLabels: {
         enabled: true,
-        formatter: (value) => Math.round(value * 10) / 10 + ' ºC',
+        formatter: (value: number) => Math.round(value * 10) / 10 + ' ºC',
       },
       markers: {
         size: 1,

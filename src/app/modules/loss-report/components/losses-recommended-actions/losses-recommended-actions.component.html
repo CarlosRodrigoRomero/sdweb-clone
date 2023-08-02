@@ -43,7 +43,7 @@
         </div>
       </mat-expansion-panel>
     </mat-accordion>
-    <button
+    <button id="ver_seleccionadas_btn"
       class="btn"
       mat-flat-button
       color="primary"
@@ -55,7 +55,7 @@
         <span>{{ 'Ver seleccionadas en el mapa' | translate }}</span>
       </div>
     </button>
-    <button class="btn" mat-flat-button color="primary" (click)="openDialog()" [disabled]="!anyCheckboxSelected">
+    <button id="compartir_seleccionadas_btn" class="btn" mat-flat-button color="primary" (click)="openDialog()" [disabled]="!anyCheckboxSelected">
       <div class="btn-content">
         <mat-icon>share</mat-icon>
         <span>{{ 'Compartir informe seleccionadas' | translate }}</span>

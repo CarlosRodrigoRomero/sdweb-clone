@@ -53,8 +53,15 @@
 
 app-seguidor-view-toggle {
   position: absolute;
-  right: 280px;
+  right: 232px;
   top: 15px;
+  z-index: 8;
+}
+
+app-seguidor-view-hide-elems {
+  position: absolute;
+  top: 16px;
+  right: 600px;
   z-index: 8;
 }
 
@@ -91,7 +98,7 @@ app-seguidor-anomalia-info {
   display: grid;
   row-gap: 1rem;
   width: 640px;
-  height: calc(100vh - 684px);
+  height: calc(100vh - 710px);
   overflow: auto;
   overflow-x: hidden;
 }

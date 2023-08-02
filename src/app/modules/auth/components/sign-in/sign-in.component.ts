@@ -23,7 +23,7 @@ export class SignInComponent implements OnInit, OnDestroy {
     this.buildForm();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   private buildForm() {
     this.form = this.formBuilder.group({
@@ -37,11 +37,10 @@ export class SignInComponent implements OnInit, OnDestroy {
       const { email, password } = this.form.value;
       try {
         const user$ = await this.authService.signIn(email, password);
-
         user$.pipe(take(1)).subscribe((user) => {
           if (user) {
             // tslint:disable-next-line: triple-equals
-            if (user.role == 0 || user.role == 1 || user.role == 2) {
+            if (user.role == 0 || user.role == 1 || user.role == 2 || user.role == 6) {
               this.router.navigate(['clients']);
             } else {
               this.router.navigate(['clientes']);

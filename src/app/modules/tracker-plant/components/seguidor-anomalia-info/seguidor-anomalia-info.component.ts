@@ -8,6 +8,7 @@ import { PcService } from '@data/services/pc.service';
 import { AuthService } from '@data/services/auth.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
+import { AnomaliaService } from '@data/services/anomalia.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { PcInterface } from '@core/models/pc';
@@ -33,7 +34,8 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private pcService: PcService,
     private reportControlService: ReportControlService,
-    private anomaliaInfoService: AnomaliaInfoService
+    private anomaliaInfoService: AnomaliaInfoService,
+    private anomaliaService: AnomaliaService
   ) {}
 
   ngOnInit(): void {
@@ -90,9 +92,11 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
   private fixNewTiffDates(date: number): number {
     // quitamos 2 horas a las plantas de seguidores a partir de 2022 por el cambio de formato a TIFF
     const init2022 = 1640995200;
-    if (!this.reportControlService.plantaFija && date > init2022) {
+    const end2022 = 1672531200;
+    if (!this.reportControlService.plantaFija && date > init2022 && date < end2022) {
       return date - 7200;
     }
+    return date;
   }
 
   updateAnomalia(value: any, field: string) {
@@ -103,8 +107,19 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
     } else {
       this.anomaliaSelected.localY = Number(value);
     }
-    // actualizamos en la DB
-    this.pcService.updatePc(this.anomaliaSelected as PcInterface);
+
+    const informeSelected = this.reportControlService.informes.find(
+      (inf) => inf.id === this.anomaliaSelected.informeId
+    );
+
+    // comprobamos si se trata de un nuevo o antiguo informe de S2E
+    if (informeSelected.fecha > GLOBAL.dateS2eAnomalias) {
+      // actualizamos la anomalias en la DB
+      this.anomaliaService.updateAnomalia(this.anomaliaSelected);
+    } else {
+      // actualizamos el PC en la DB
+      this.pcService.updatePc(this.anomaliaSelected as PcInterface);
+    }
   }
 
   showHideComments() {

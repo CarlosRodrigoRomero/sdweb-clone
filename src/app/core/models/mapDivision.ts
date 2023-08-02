@@ -9,5 +9,5 @@ export class MapDivision implements MapElement {
   imagesThermalIds?: string[];
   numImagesRgb?: number;
   numImagesThermal?: number;
-  // mapId?: string;
+  etiqueta_vuelo?: string;
 }

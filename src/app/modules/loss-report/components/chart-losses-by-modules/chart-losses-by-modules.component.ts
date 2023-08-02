@@ -108,21 +108,13 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
 
           this.sortChartData();
 
-          this.initChart(this.theme.split('-')[0]);
+          this.initChart(this.theme);
         })
     );
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {
-          let highlightColor = COLOR.dark_orange;
-          let neutralColor = COLOR.dark_neutral;
-          if (theme === 'dark-theme') {
-            highlightColor = COLOR.dark_orange;
-            neutralColor = COLOR.dark_neutral;
-          } else {
-            highlightColor = COLOR.light_orange;
-            neutralColor = COLOR.light_neutral;
-          }
+          let [highlightColor, neutralColor] = this.themeService.getColorsByTheme(theme);
 
           this.chartOptions = {
             ...this.chartOptions,
@@ -212,6 +204,8 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
       return { name: dateLabel, data: this.chartData[index] };
     });
 
+    const colors = this.themeService.getColorsByTheme(theme);
+
     let titleXAxis = 'Fabricante';
     this.translate
       .get(titleXAxis)
@@ -264,7 +258,7 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
             text: titleXAxis,
           },
         },
-        colors: [COLOR.dark_orange, COLOR.dark_neutral],
+        colors,
         yaxis: {
           decimalsInFloat: 2,
           // forceNiceScale: true,

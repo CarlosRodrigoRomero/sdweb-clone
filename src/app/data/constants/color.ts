@@ -45,55 +45,61 @@ export let COLOR = {
     'rgba(0,0,153,1)', // 'PID irregular', // 21
   ],
   clusterColors: [
-    '#FF6633',
-    '#FFB399',
-    '#FF33FF',
-    '#FFFF99',
-    '#00B3E6',
-    '#E6B333',
-    '#3366E6',
-    '#999966',
-    '#99FF99',
-    '#B34D4D',
-    '#80B300',
-    '#809900',
-    '#E6B3B3',
-    '#6680B3',
-    '#66991A',
-    '#FF99E6',
-    '#CCFF1A',
-    '#FF1A66',
-    '#E6331A',
-    '#33FFCC',
-    '#66994D',
-    '#B366CC',
-    '#4D8000',
-    '#B33300',
-    '#CC80CC',
-    '#66664D',
-    '#991AFF',
-    '#E666FF',
-    '#4DB3FF',
-    '#1AB399',
-    '#E666B3',
-    '#33991A',
-    '#CC9999',
-    '#B3B31A',
-    '#00E680',
-    '#4D8066',
-    '#809980',
-    '#E6FF80',
-    '#1AFF33',
-    '#999933',
-    '#FF3380',
-    '#CCCC00',
-    '#66E64D',
-    '#4D80CC',
-    '#9900B3',
-    '#E64D66',
-    '#4DB380',
-    '#FF4D4D',
-    '#99E6E6',
-    '#6666FF',
+    '#FF0000', // Rojo
+    '#FFFF00', // Amarillo
+    '#00FF00', // Verde claro
+    '#00FFFF', // Cian
+    '#0000FF', // Azul
+    '#FF00FF', // Magenta
+    '#FFFFFF', // Blanco
+    '#FFA500', // Naranja
+    '#1E90FF', // Azul Dodger
+    '#FFC0CB', // Rosa
+    '#9370DB', // Morado Medio
+    '#7FFF00', // Chartreuse
+    '#D2691E', // Chocolate
+    '#6495ED', // Azul Pálido
+    '#8B008B', // Morado Oscuro
+    '#556B2F', // Verde Oliva Oscuro
+    '#FFD700', // Oro
+    '#ADFF2F', // Verde Amarillo
+    '#FF69B4', // Rosa Brillante
+    '#CD5C5C', // Rojo Indio
+    '#800000', // Marrón
+    '#808000', // Verde Oliva
+    '#800080', // Púrpura
+    '#008080', // Verde azulado
+    '#000080', // Azul marino
+    '#BC8F8F', // Rosado
+    '#4169E1', // Azul real
+    '#8B4513', // Saddlebrown
+    '#FA8072', // Salmón
+    '#F4A460', // Sandybrown
+    '#2E8B57', // Seagreen
+    '#FFF5EE', // Seashell
+    '#A0522D', // Sienna
+    '#87CEEB', // Skyblue
+    '#6A5ACD', // Slateblue
+    '#708090', // Slategray
+    '#708090', // Slategrey
+    '#FFFAFA', // Snow
+    '#00FF7F', // Springgreen
+    '#4682B4', // Steelblue
+    '#D2B48C', // Tan
+    '#008080', // Teal
+    '#D8BFD8', // Thistle
+    '#FF6347', // Tomato
+    '#40E0D0', // Turquoise
+    '#EE82EE', // Violet
+    '#F5DEB3', // Wheat
+    '#F5F5F5', // Whitesmoke
+    '#FFFFE0', // Lightyellow
+    '#00FA9A', // Mediumspringgreen
+    '#ADD8E6', // Lightblue
+    '#FFA07A', // Lightsalmon
+    '#20B2AA', // Lightseagreen
+    '#B0C4DE', // Lightsteelblue
+    '#B22222', // Firebrick
+    '#FFFAF0', // Floralwhite
   ],
 };

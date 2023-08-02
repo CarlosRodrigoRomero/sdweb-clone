@@ -11,17 +11,15 @@ import { COLOR } from '@data/constants/color';
   providedIn: 'root',
 })
 export class ThemeService {
-  private _themeSelected: string = undefined;
+  private _themeSelected: string = 'light-theme';
   themeSelected$ = new BehaviorSubject<string>(this._themeSelected);
   textColor = COLOR.light_on_background;
   surfaceColor = COLOR.light_surface;
 
   constructor(public overlayContainer: OverlayContainer, private localStorageService: LocalStorageService) {
     const themeLocal = this.localStorageService.get('theme');
-    if (themeLocal !== undefined) {
+    if (themeLocal !== undefined && themeLocal !== null) {
       this.themeSelected = themeLocal;
-    } else {
-      this.themeSelected = 'ligth-theme';
     }
   }
 
@@ -45,5 +43,19 @@ export class ThemeService {
 
     this._themeSelected = value;
     this.themeSelected$.next(value);
+  }
+
+  getColorsByTheme(theme: string) {
+    let highlightColor = COLOR.dark_orange;
+    let neutralColor = COLOR.dark_neutral;
+    if (theme === 'dark-theme') {
+      highlightColor = COLOR.dark_orange;
+      neutralColor = COLOR.dark_neutral;
+    } else {
+      highlightColor = COLOR.light_orange;
+      neutralColor = COLOR.light_neutral;
+    }
+
+    return [highlightColor, neutralColor];
   }
 }

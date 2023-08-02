@@ -8,6 +8,9 @@ import { Subscription } from 'rxjs';
 import { UserService } from '@data/services/user.service';
 
 import { UserInterface } from '@core/models/user';
+import { EmpresaService } from '@data/services/empresa.service';
+import { take } from 'rxjs/operators';
+import { Empresa } from '@core/models/empresa';
 
 @Component({
   selector: 'app-user-edit',
@@ -20,14 +23,17 @@ export class UserEditComponent implements OnInit, OnDestroy {
   id: string;
   user: UserInterface = {};
   selectedRole: number;
-
+  empresas: Empresa[];
+  empresaSelected: Empresa;
+  statusMessage: string;
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private formBuilder: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private empresaService: EmpresaService
   ) {
     this.buildForm();
   }
@@ -47,6 +53,17 @@ export class UserEditComponent implements OnInit, OnDestroy {
             this.user = user;
             this.selectedRole = user.role;
             this.form.patchValue({ email: user.email, empresa: user.empresaNombre });
+
+            //Una vez cargado el usuario se setea la empresa de ese usuario a empresaSelected para poder asignar en el submit el id
+            //de la empresa al campo empresaId del usuario
+
+            this.empresaService
+              .getEmpresas()
+              .pipe(take(1))
+              .subscribe((empresas) => {
+                this.empresas = empresas;
+                this.empresaSelected = this.empresas.find(empresa => empresa.nombre === this.user.empresaNombre);
+              });
           }
         });
       })
@@ -67,6 +84,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
       this.user.email = this.form.get('email').value;
       this.user.empresaNombre = this.form.get('empresa').value;
       this.user.role = Number(this.form.get('role').value);
+      this.empresaSelected = this.empresas.find(empresa => empresa.nombre === this.user.empresaNombre);
+      this.user.empresaId = this.empresaSelected.id;
 
       // Actualiza el usuario en la DB
       this.updateUser(this.user);

@@ -1,4 +1,4 @@
-@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
 html,
 body {
@@ -12,5 +12,9 @@ body {
 
 /* Elementos Material */
 .mat-card {
+  border-radius: 8px !important;
+}
+
+.mat-dialog-container {
   border-radius: 8px !important;
 }

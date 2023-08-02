@@ -266,7 +266,7 @@ export class ChartMaeZonasComponent implements OnInit, OnDestroy {
           bar: {
             horizontal: false,
             columnWidth: '75%',
-            endingShape: 'rounded',
+            // endingShape: 'rounded',
           },
         },
         dataLabels: {

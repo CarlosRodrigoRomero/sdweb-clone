@@ -7,6 +7,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { MapImage } from '@core/models/mapImages';
+import { COLOR } from '@data/constants/color';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +18,9 @@ export class MapImagesService {
   mapImages: MapImage[] = [];
   private _urlImageThumbnail: string = undefined;
   urlImageThumbnail$ = new BehaviorSubject<string>(this._urlImageThumbnail);
+  vuelos: string[] = [];
+  private _imagePointSelected: MapImage = undefined;
+  imagePointSelected$ = new BehaviorSubject<MapImage>(this._imagePointSelected);
 
   constructor(private afs: AngularFirestore, private router: Router, private storage: AngularFireStorage) {
     this.informeId = this.router.url.split('/')[this.router.url.split('/').length - 1];
@@ -26,7 +30,7 @@ export class MapImagesService {
   getMapImages(): Observable<MapImage[]> {
     return this.mapImagesCollection.snapshotChanges().pipe(
       map((actions) =>
-        actions.map((a) => {
+        actions.map((a, index) => {
           const data = a.payload.doc.data() as MapImage;
           const id = a.payload.doc.id;
 
@@ -75,6 +79,12 @@ export class MapImagesService {
     }
   }
 
+  getVueloColor(vuelo: string) {
+    const index = this.vuelos.indexOf(vuelo);
+    const colorIndex = index % COLOR.clusterColors.length;
+    return COLOR.clusterColors[colorIndex];
+  }
+
   get urlImageThumbnail() {
     return this._urlImageThumbnail;
   }
@@ -82,5 +92,14 @@ export class MapImagesService {
   set urlImageThumbnail(value: string) {
     this._urlImageThumbnail = value;
     this.urlImageThumbnail$.next(value);
+  }
+
+  get imagePointSelected() {
+    return this._imagePointSelected;
+  }
+
+  set imagePointSelected(value: MapImage) {
+    this._imagePointSelected = value;
+    this.imagePointSelected$.next(value);
   }
 }

@@ -1,25 +1,28 @@
 .create-user {
-    margin: 20px;
-  }
-  
-  .example-form {
-    min-width: 150px;
-    width: 100%;
-  }
-  
-  mat-card {
-    width: 100%;
-  }
-  
-  .example-full-width {
-    width: 100%;
-  }
-  
-  td {
-    padding-right: 8px;
-  }
-  
-  .mat-form-field {
-    font-size: 14px;
-    width: 100%;
-  }
+  margin: 20px;
+}
+
+.example-form {
+  min-width: 150px;
+  width: 100%;
+}
+
+mat-card {
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+td {
+  padding-right: 8px;
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+mat-card-content {
+  display: grid;
+}

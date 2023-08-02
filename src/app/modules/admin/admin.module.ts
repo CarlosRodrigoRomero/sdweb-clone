@@ -22,6 +22,7 @@ import { ReportsSharedComponent } from './components/reports-shared/reports-shar
 import { EmpresasComponent } from './components/empresas/empresas.component';
 import { CreateEmpresaComponent } from './components/create-empresa/create-empresa.component';
 import { EmpresaEditComponent } from './components/empresa-edit/empresa-edit.component';
+import { FlightUploadComponent } from './components/flight-upload/flight-upload.component';
 
 @NgModule({
   declarations: [
@@ -39,8 +40,10 @@ import { EmpresaEditComponent } from './components/empresa-edit/empresa-edit.com
     PlantEditComponent,
     ReportsSharedComponent,
     EmpresasComponent,
+    FlightUploadComponent,
     CreateEmpresaComponent,
     EmpresaEditComponent,
+    FlightUploadComponent,
   ],
   imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule, LayoutModule],
 })

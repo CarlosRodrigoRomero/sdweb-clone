@@ -64,12 +64,7 @@ export class ZonesService {
 
   getZones(planta: PlantaInterface, locAreas: LocationAreaInterface[]): LocationAreaInterface[] {
     // obtenemos las areas descartando las que no tienen globals, que son las de los modulos
-    let realLocAreas = locAreas.filter(
-      (locArea) =>
-        locArea.globalCoords.toString() !== ',' &&
-        locArea.globalCoords.toString() !== ',,' &&
-        locArea.globalCoords.toString() !== ''
-    );
+    let realLocAreas = this.getRealZones(locAreas);
 
     if (planta.id === 'fjub5AUln6LZER8cQhyw') {
       realLocAreas = this.getZonesByIntersection(realLocAreas);
@@ -94,6 +89,15 @@ export class ZonesService {
     } else {
       return realLocAreas;
     }
+  }
+
+  getRealZones(locAreas: LocationAreaInterface[]): LocationAreaInterface[] {
+    return locAreas.filter(
+      (locArea) =>
+        locArea.globalCoords.toString() !== ',' &&
+        locArea.globalCoords.toString() !== ',,' &&
+        locArea.globalCoords.toString() !== ''
+    );
   }
 
   private getZonesBySize(zones: LocationAreaInterface[]): LocationAreaInterface[][] {

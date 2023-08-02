@@ -21,6 +21,7 @@ import { COLOR } from '@data/constants/color';
 import { TipoSeguidor } from '@core/models/tipoSeguidor';
 import { PcInterface } from '@core/models/pc';
 import { Colors } from '@core/classes/colors';
+import { GLOBAL } from '@data/constants/global';
 
 @Injectable({
   providedIn: 'root',
@@ -44,7 +45,12 @@ export class SeguidorService {
     this.planta = planta;
     this.getDifferentLocAreas();
 
-    const anomaliaObsList = informes.map((informe) => this.getSeguidores$(informe.id, planta.id, 'pcs'));
+    const anomaliaObsList = informes.map((informe) => {
+      const type =
+        informe.fecha > GLOBAL.dateS2eAnomalias ? 'anomalias' : this.planta.tipo === 'seguidores' ? 'pcs' : 'anomalias';
+
+      return this.getSeguidores$(informe.id, planta.id, type);
+    });
 
     return combineLatest(anomaliaObsList).pipe(map((arr) => arr.flat()));
   }

@@ -2,6 +2,7 @@ import { AuthService } from '@data/services/auth.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { InformeInterface } from '@core/models/informe';
+import { FilterableElement } from '@core/models/filterableInterface';
 
 export class Patches {
   constructor(public authService: AuthService) {}
@@ -153,5 +154,11 @@ export class Patches {
     }
 
     return [tempMin, tempMax];
+  }
+
+  static anomsOlmedillaPatch(elems: FilterableElement[]): FilterableElement[] {
+    const anomaliasOlmedilla = elems.filter((anomalia) => anomalia.tipo !== 14 || anomalia.gradienteNormalizado >= 6);
+
+    return anomaliasOlmedilla;
   }
 }

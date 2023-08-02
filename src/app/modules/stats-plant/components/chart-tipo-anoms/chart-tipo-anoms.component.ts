@@ -261,7 +261,7 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
           barHeight: '100%',
           columnWidth: '45%',
           distributed: true,
-          endingShape: 'rounded',
+          // endingShape: 'rounded',
           dataLabels: {
             position: 'top',
           },

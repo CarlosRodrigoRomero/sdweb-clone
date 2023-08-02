@@ -6,4 +6,6 @@ export interface MapImage {
   path: string;
   fecha: number;
   tipo: string;
+  etiqueta_vuelo?: string;
+  altitud?: number;
 }
