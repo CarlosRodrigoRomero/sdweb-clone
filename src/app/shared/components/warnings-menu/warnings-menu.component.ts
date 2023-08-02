@@ -38,7 +38,6 @@ import { NoGlobalCoordsFilter } from '@core/models/noGlobalCoordsFilter';
 })
 export class WarningsMenuComponent implements OnInit, OnDestroy {
   warnings: Warning[] = [];
-  private allAnomalias: Anomalia[] = [];
   private selectedInforme: InformeInterface;
   private anomaliasInforme: Anomalia[] = [];
   private planta: PlantaInterface;
@@ -100,29 +99,21 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     }
 
     if (this.reportControlService.plantaFija || this.selectedInforme.fecha > GLOBAL.dateS2eAnomalias) {
-      this.anomaliaService
-        .getAnomalias$(this.selectedInforme.id, 'anomalias')
-        .pipe(
-          take(1),
-          switchMap((anomalias) => {
-            this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
-
-            return combineLatest([
-              getInformes$,
-              this.plantaService.getPlanta(this.reportControlService.plantaId),
-              this.plantaService.getLocationsArea(this.reportControlService.plantaId),
-              this.warningService.getWarnings(this.selectedInforme.id),
-            ]);
-          }),
-          take(1)
-        )
-        .subscribe(([informes, planta, locAreas, warnings]) => {
+      this.subscriptions.add(
+        combineLatest([
+          getInformes$,
+          this.plantaService.getPlanta(this.reportControlService.plantaId),
+          this.plantaService.getLocationsArea(this.reportControlService.plantaId),
+          this.warningService.getWarnings(this.selectedInforme.id),
+        ]).subscribe(([informes, planta, locAreas, warnings]) => {
           this.informes = informes;
           this.planta = planta;
           this.locAreas = locAreas;
           this.warnings = warnings;
 
-          this.anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === this.selectedInforme.id);
+          this.anomaliasInforme = this.reportControlService.allAnomalias.filter(
+            (anom) => anom.informeId === this.selectedInforme.id
+          );
 
           this.selectedInforme = this.informes.find((informe) => informe.id === this.selectedInforme.id);
 
@@ -138,35 +129,24 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             // detectamos cambios porque estamos utilizando la estrategia OnPush
             this.cdr.detectChanges();
           }
-        });
+        })
+      );
     } else {
-      this.seguidorService
-        .getSeguidores$(this.selectedInforme.id, this.reportControlService.plantaId, 'pcs')
-        .pipe(
-          take(1),
-          switchMap((segs) => {
-            this.allSeguidores = segs;
-
-            // vaciamos primero para que no se acumule
-            this.allAnomalias = [];
-            this.allSeguidores.forEach((seg) => this.allAnomalias.push(...seg.anomaliasCliente));
-
-            return combineLatest([
-              getInformes$,
-              this.plantaService.getPlanta(this.reportControlService.plantaId),
-              this.plantaService.getLocationsArea(this.reportControlService.plantaId),
-              this.warningService.getWarnings(this.selectedInforme.id),
-            ]);
-          }),
-          take(1)
-        )
-        .subscribe(([informes, planta, locAreas, warnings]) => {
+      this.subscriptions.add(
+        combineLatest([
+          getInformes$,
+          this.plantaService.getPlanta(this.reportControlService.plantaId),
+          this.plantaService.getLocationsArea(this.reportControlService.plantaId),
+          this.warningService.getWarnings(this.selectedInforme.id),
+        ]).subscribe(([informes, planta, locAreas, warnings]) => {
           this.informes = informes;
           this.planta = planta;
           this.locAreas = locAreas;
           this.warnings = warnings;
 
-          this.anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === this.selectedInforme.id);
+          this.anomaliasInforme = this.reportControlService.allAnomalias.filter(
+            (anom) => anom.informeId === this.selectedInforme.id
+          );
 
           this.selectedInforme = this.informes.find((informe) => informe.id === this.selectedInforme.id);
 
@@ -187,7 +167,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
             // detectamos cambios porque estamos utilizando la estrategia OnPush
             this.cdr.detectChanges();
           }
-        });
+        })
+      );
     }
   }
 
