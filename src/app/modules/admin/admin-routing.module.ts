@@ -20,6 +20,7 @@ import { ReportsSharedComponent } from './components/reports-shared/reports-shar
 import { EmpresasComponent } from './components/empresas/empresas.component';
 import { CreateEmpresaComponent } from './components/create-empresa/create-empresa.component';
 import { EmpresaEditComponent } from './components/empresa-edit/empresa-edit.component';
+import { FlightUploadComponent } from './components/flight-upload/flight-upload.component';
 
 const routes: Routes = [
   {
@@ -70,6 +71,10 @@ const routes: Routes = [
       {
         path: 'shared',
         component: ReportsSharedComponent,
+      },
+      {
+        path: 'flightUpload',
+        component: FlightUploadComponent,
       },
       {
         path: 'companies',

@@ -1,0 +1,32 @@
+.dropzone {
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mat-form-field-underline {
+    display: none;
+}
+
+button {
+    margin-top: 20px;
+}
+
+#botonesNavegacion {
+    margin-bottom: 50px;
+}
+
+#botonAnterior {
+    margin-right: 30px;
+}
+
+#map {
+    height: 50%;
+    width: 50%;
+}
