@@ -94,7 +94,6 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
         } else {
           this.activeFilters = false;
         }
-        console.log(this.activeFilters);
       })
     );
 
