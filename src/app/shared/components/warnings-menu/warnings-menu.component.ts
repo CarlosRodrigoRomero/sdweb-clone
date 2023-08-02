@@ -29,6 +29,7 @@ import { UserInterface } from '@core/models/user';
 
 import { GLOBAL } from '@data/constants/global';
 import { NoModulesFilter } from '@core/models/noModulesFilter';
+import { NoGlobalCoordsFilter } from '@core/models/noGlobalCoordsFilter';
 
 @Component({
   selector: 'app-warnings-menu',
@@ -241,6 +242,9 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       case 'noGlobalCoordsAnoms':
         this.fixNoGlobalCoordsAnoms();
         break;
+      case 'noGlobalCoordsAnomsFilter':
+        this.filterNoGlobalCoordsAnoms();
+        break;
       case 'nombresZonas':
         window.open(urlPlantaEdit, '_blank');
         break;
@@ -315,6 +319,12 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
         this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', globalCoords);
       }
     });
+  }
+
+  private filterNoGlobalCoordsAnoms() {
+    const noGlobalCoordsFilter = new NoGlobalCoordsFilter('noGlobalCoordsAnoms');
+
+    this.filterService.addFilter(noGlobalCoordsFilter);
   }
 
   private fixModulosAnoms() {

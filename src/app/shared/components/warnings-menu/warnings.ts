@@ -213,6 +213,10 @@ export const warnings: Warning[] = [
     ],
     reportActions: [
       {
+        name: 'noGlobalCoordsAnomsFilter',
+        label: 'Filtrar',
+      },
+      {
         name: 'noGlobalCoordsAnoms',
         label: 'Corregir',
       },
