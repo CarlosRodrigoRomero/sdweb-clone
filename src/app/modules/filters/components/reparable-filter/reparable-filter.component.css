@@ -1,37 +1,27 @@
-.filtro {
-    margin-bottom: 20px;
+:host ::ng-deep {
+  .reparables-group .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+    line-height: 36px;
+    padding: 0 10px;
   }
-  
-  h5 {
-    margin-bottom: 15px;
+
+  .mat-button-toggle {
+    font-size: 15px;
     font-weight: 400;
   }
-  
-  :host ::ng-deep {
-    .reparables-group .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
-      line-height: 36px;
-      padding: 0 10px;
-    }
-  
-    .mat-button-toggle {
-      font-size: 15px;
-      font-weight: 400;
-    }
-  
-    .mat-button-toggle-checked {
-      background-color: #d32f2f;
-      color: white !important;
-      font-weight: 500;
-    }
+
+  .mat-button-toggle-checked {
+    background-color: #d32f2f;
+    color: white !important;
+    font-weight: 500;
   }
-  
-  .reparables-group {
-    left: 50%;
-    transform: translate(-50%, 0%);
-  }
-  
-  .text-label {
-    font-size: 14px;
-    font-weight: 400;
-  }
-  
+}
+
+.reparables-group {
+  left: 50%;
+  transform: translate(-50%, 0%);
+}
+
+.text-label {
+  font-size: 14px;
+  font-weight: 400;
+}

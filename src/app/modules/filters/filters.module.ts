@@ -22,6 +22,7 @@ import { ReparableFilterComponent } from './components/reparable-filter/reparabl
 import { ModeloFilterComponent } from './components/modelo-filter/modelo-filter.component';
 import { DynamicFiltersDirective } from './directives/dynamic-filters.directive';
 import { StatusFilterComponent } from './components/status-filter/status-filter.component';
+import { FiltersComponent } from './components/filters.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { StatusFilterComponent } from './components/status-filter/status-filter.
     ModeloFilterComponent,
     StatusFilterComponent,
     DynamicFiltersDirective,
+    FiltersComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -51,7 +53,8 @@ import { StatusFilterComponent } from './components/status-filter/status-filter.
     ConfianzaFilterComponent,
     AspectRatioFilterComponent,
     AreaModuloBrutoFilterComponent,
-    DynamicFiltersDirective
+    DynamicFiltersDirective,
+    FiltersComponent,
   ],
 })
 export class FiltersModule {}

@@ -1,12 +1,3 @@
-.filtro {
-  margin-bottom: 15px;
-}
-
-h5 {
-  margin-bottom: 15px;
-  font-weight: 400;
-}
-
 .status-select {
   width: 100%;
 }
@@ -32,8 +23,8 @@ h5 {
 
 li {
   list-style-type: none;
-  padding:0;
-  width:100%;
+  padding: 0;
+  width: 100%;
 }
 
 .counts-status {
@@ -46,17 +37,16 @@ li {
   align-items: center;
 }
 
-
-:host ::ng-deep .mat-checkbox-layout, .mat-checkbox{
+:host ::ng-deep .mat-checkbox-layout,
+.mat-checkbox {
   width: 100%;
 }
 
-:host ::ng-deep .mat-checkbox-label{
+:host ::ng-deep .mat-checkbox-label {
   width: 100%;
 }
 
-
-.labelWrapper{
+.labelWrapper {
   width: 100%;
   display: flex;
   justify-content: space-between;

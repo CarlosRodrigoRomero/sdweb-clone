@@ -1,13 +1,17 @@
-<h5>{{ 'área' | translate | titlecase }}</h5>
-<button mat-raised-button (click)="clickButtonDraw()">
-  <div *ngIf="!activeDelete">
-    <mat-icon *ngIf="!activeDraw">format_shapes</mat-icon>
-    <mat-icon class="filter-active" *ngIf="activeDraw">disabled_by_default</mat-icon>
-    <span *ngIf="!activeDraw">{{ 'Dibujar area' | translate }}</span>
-    <span class="filter-active" *ngIf="activeDraw">{{ 'Cancelar dibujo' | translate }}</span>
-  </div>
-  <div *ngIf="activeDelete">
-    <mat-icon class="filter-active">delete</mat-icon>
-    <span class="filter-active">{{ 'Borrar area' | translate }}</span>
-  </div>
-</button>
+<mat-expansion-panel (click)="$event.stopPropagation()">
+  <mat-expansion-panel-header>
+    <mat-panel-title>{{ 'Dibujar área' | translate }}</mat-panel-title>
+  </mat-expansion-panel-header>
+  <button mat-raised-button (click)="clickButtonDraw()">
+    <div *ngIf="!activeDelete">
+      <mat-icon *ngIf="!activeDraw">format_shapes</mat-icon>
+      <mat-icon class="filter-active" *ngIf="activeDraw">disabled_by_default</mat-icon>
+      <span *ngIf="!activeDraw">{{ 'Dibujar area' | translate }}</span>
+      <span class="filter-active" *ngIf="activeDraw">{{ 'Cancelar dibujo' | translate }}</span>
+    </div>
+    <div *ngIf="activeDelete">
+      <mat-icon class="filter-active">delete</mat-icon>
+      <span class="filter-active">{{ 'Borrar area' | translate }}</span>
+    </div>
+  </button>
+</mat-expansion-panel>

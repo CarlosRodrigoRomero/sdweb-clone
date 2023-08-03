@@ -1,8 +1,8 @@
-.share-btn {
+.filters-btn {
   border-radius: 18px;
 }
 
-.share-btn-content {
+.filters-btn-content {
   display: flex;
   align-items: center;
   gap: 0.5rem;

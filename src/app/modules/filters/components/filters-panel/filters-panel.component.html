@@ -1,11 +1,7 @@
-
 <div class="panel">
-  <div class="titulo">
-    <h4>{{ 'filtros' | translate | titlecase }}</h4>
-    <button *ngIf="filtrosActivos" class="clean-filters" mat-button (click)="clickCleanFilters()" color="primary">
-      {{ 'Limpiar filtros' | translate }}
-    </button>
-  </div>
+  <button *ngIf="filtrosActivos" class="clean-filters" mat-button (click)="clickCleanFilters()" color="primary">
+    {{ 'Limpiar filtros' | translate }}
+  </button>
   <div class="filters">
     <app-reparable-filter></app-reparable-filter>
     <app-criticidad-filter></app-criticidad-filter>

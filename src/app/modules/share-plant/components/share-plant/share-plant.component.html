@@ -1,8 +1,6 @@
-<div class="content">
-    <button id="share_btn" mat-button  (click)="openDialog.emit()">
-        <mat-icon>share</mat-icon>
-        {{ 'compartir' | translate | titlecase }}
-    </button>
-
-
-</div>
+<button id="share_btn" class="share-btn" mat-stroked-button (click)="openDialog.emit()">
+  <div class="share-btn-content">
+    <mat-icon>share</mat-icon>
+    <span> {{ 'compartir' | translate | titlecase }}</span>
+  </div>
+</button>
