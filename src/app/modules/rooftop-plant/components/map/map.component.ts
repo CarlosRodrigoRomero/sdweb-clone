@@ -59,7 +59,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public coordsPointer;
   private popupAnomaliaInfo: Overlay;
   private popupAnomaliaDirty: Overlay;
-  private filtrableElements: Anomalia[]
+  private filtrableElements: Anomalia[];
 
   private subscriptions: Subscription = new Subscription();
 
@@ -141,13 +141,14 @@ export class MapComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.reportControlService.selectedInformeId$.
-        pipe(
+      this.reportControlService.selectedInformeId$
+        .pipe(
           switchMap((informeId) => {
             this.selectedInformeId = informeId;
-            return this.filterService.allFiltrableElements$
+            return this.filterService.allFiltrableElements$;
           })
-        ).subscribe((elements) => {
+        )
+        .subscribe((elements) => {
           elements = elements.filter((x) => x.informeId === this.selectedInformeId);
           this.noAnomsReport = elements.length === 0;
         })
@@ -155,7 +156,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
   }
-
 
   initMap() {
     const satellite = new XYZ({
@@ -195,25 +195,12 @@ export class MapComponent implements OnInit, OnDestroy {
     ];
 
     // MAPA
-    let view: View;
-
-    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
-      // solo lo aplicamos a la planta DEMO
-      view = new View({
-        center: fromLonLat([this.planta.longitud, this.planta.latitud]),
-        zoom: 18,
-        minZoom: 16,
-        maxZoom: 24,
-        extent: this.transform([-7.060903, 38.523993, -7.0556, 38.522264]),
-      });
-    } else {
-      view = new View({
-        center: fromLonLat([this.planta.longitud, this.planta.latitud]),
-        zoom: this.planta.zoom,
-        minZoom: this.planta.zoom - 2,
-        maxZoom: 24,
-      });
-    }
+    const view = new View({
+      center: fromLonLat([this.planta.longitud, this.planta.latitud]),
+      zoom: this.planta.zoom,
+      minZoom: this.planta.zoom - 2,
+      maxZoom: 20,
+    });
 
     this.subscriptions.add(
       this.olMapService.createMap('map', layers, view, defaultControls({ attribution: false })).subscribe((map) => {

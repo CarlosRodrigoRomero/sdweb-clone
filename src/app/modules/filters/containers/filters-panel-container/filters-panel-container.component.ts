@@ -19,6 +19,7 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
   showFiltroModelo = false;
   showFiltroZona = false;
   hasCriticidad = false;
+  tipoCubierta = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -30,7 +31,7 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-      this.subscriptions.add(
+    this.subscriptions.add(
       this.filterService.filters$.subscribe((filters) => {
         if (filters.length > 0) {
           this.filtrosActivos = true;
@@ -40,22 +41,23 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
       })
     );
 
+    // comprobamos si es un autoconsumo
+    this.tipoCubierta = this.reportControlService.planta.tipo === 'cubierta';
+
     // Comprobamos si hay anomalías en más de un modelo de módulo, y si sólo hay uno no mostramos el filtro
     const anomalias = this.anomaliaService.getRealAnomalias(this.reportControlService.allAnomalias);
-    const modelos = [...new Set(anomalias.map((anomalia) => this.setModuleLabel(anomalia.modulo)))];
-    if (modelos.length > 1) {
+    const modelosModulos = [...new Set(anomalias.map((anomalia) => this.setModuleLabel(anomalia.modulo)))];
+    if (modelosModulos.length > 1) {
       this.showFiltroModelo = true;
     } else {
       this.showFiltroModelo = false;
     }
-    // Comprobamos si las anomalías tienen zonas asociadas; si no existen zonas, no mostramos el filtro
-    const zonas = [...new Set(anomalias.map((anomalia) => anomalia.globalCoords[0]))];
-    this.showFiltroZona = zonas.length > 1;
-    // if (zonas.length > 1) {
-    //   this.showFiltroZona = true;
-    // } else {
-    //   this.showFiltroZona = false;
-    // }
+
+    if (!this.tipoCubierta) {
+      // Comprobamos si las anomalías tienen zonas asociadas; si no existen zonas, no mostramos el filtro
+      const zonas = [...new Set(anomalias.map((anomalia) => anomalia.globalCoords[0]))];
+      this.showFiltroZona = zonas.length > 1;
+    }
 
     this.subscriptions.add(this.anomaliaService.hasCriticidad$.subscribe((value) => (this.hasCriticidad = value)));
   }
@@ -72,13 +74,13 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  setModuleLabel(module: ModuloInterface): string{
+  setModuleLabel(module: ModuloInterface): string {
     let label: string;
     if (module.marca) {
       label = `${module.marca} (${module.potencia}W)`;
     } else {
       label = `${module.potencia}W`;
     }
-    return label
+    return label;
   }
 }

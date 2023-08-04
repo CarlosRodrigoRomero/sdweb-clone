@@ -87,28 +87,12 @@
   position: relative;
 }
 
-.btns-export {
-  position: absolute;
-  top: 10px;
-  right: 180px;
-  z-index: 99;
-}
-
 .btn-wrapper {
   position: absolute;
   top: 10px;
   right: 10px;
   display: flex;
   gap: 10px;
-}
-
-.btn-group {
-  display: flex;
-  justify-content: space-between;
-}
-
-app-share-report {
-  margin-right: 15px;
 }
 
 app-download-progress-bar {
@@ -126,29 +110,6 @@ app-download-progress-bar {
   left: 9px;
   top: 9px;
   width: 100px;
-}
-
-.left-sidenav {
-  display: flex;
-  padding: 0.5rem;
-  width: fit-content;
-  height: calc(100vh - 96px);
-  border-radius: 8px 0 0 8px;
-  overflow-y: hidden;
-}
-
-@media (max-width: 420px) {
-  .left-sidenav {
-    max-width: -webkit-fill-available;
-  }
-}
-
-.right-sidenav {
-  position: absolute;
-  display: flex;
-  margin: 60px 10px 10px;
-  padding: 10px;
-  border-radius: 8px;
 }
 
 .btn-close {

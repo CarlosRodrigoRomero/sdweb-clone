@@ -13,6 +13,7 @@
 .right-content {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
 @media (max-width: 600px) {
