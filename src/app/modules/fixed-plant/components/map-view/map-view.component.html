@@ -29,7 +29,6 @@
             <mat-icon>tune</mat-icon>
           </button>
 
-          <!-- <app-zones *ngIf="groupPlant && thereAreZones"></app-zones> -->
           <app-view-control></app-view-control>
 
           <div id="map-control" class="map-control">
@@ -48,7 +47,7 @@
         </div>
       </div>
 
-      <div class="btn-wrapper">
+      <div class="btns-wrapper">
         <!-- BOTON DESCARGAS -->
         <app-download-report *ngIf="!sharedReport || completeView"></app-download-report>
 
@@ -56,7 +55,7 @@
         <button
           *ngIf="!sharedReport || completeView"
           mat-raised-button
-          class="btn-right-stats stats"
+          class="stats"
           (click)="loadStats(); sidenavStats.toggle()"
           matTooltip="{{ 'Estadísticas' | translate }}"
           matTooltipClass="tooltip-style"

@@ -20,9 +20,6 @@
 
   <h5 *ngIf="!showComments" class="title">
     {{ 'anomalia' | translate | titlecase }} <b>{{ anomaliaInfo.numAnom }}</b>
-    <span *ngIf="anomaliaInfo.clase !== undefined" [ngStyle]="{ color: anomaliaInfo.claseColor }">
-      ({{ anomaliaInfo.clase }})</span
-    >
   </h5>
 
   <h5 *ngIf="showComments" class="title">O&M</h5>

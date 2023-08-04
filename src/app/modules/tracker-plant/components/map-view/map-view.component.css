@@ -1,5 +1,6 @@
 .seguidor-sidenav {
-  border-radius: 4px 0 0 4px;
+  margin: 10px 10px 10px;
+  border-radius: 8px;
   width: fit-content;
 }
 
@@ -123,28 +124,16 @@ app-share-report {
   border-radius: 8px;
 }
 
-.btn-right {
-  position: absolute;
-  top: 10px;
-  right: 0;
-  left: auto;
-  height: 40px;
-  margin-right: 10px;
-  padding: 0px 0px 0px 4px;
-}
-
-.btn-right-stats {
-  position: absolute;
-  top: 10px;
-  right: 0;
-  left: auto;
-  height: 40px;
-  margin-right: 90px;
-  padding: 0px 0px 0px 4px;
-}
-
 .titulo {
   margin: 4px 10px 0;
+}
+
+.btns-wrapper {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 #sidenavStats {
@@ -192,6 +181,6 @@ app-share-report {
   right: 15px;
 }
 
-:host ::ng-deep .mat-drawer-inner-container{
-  overflow-y:hidden;
+:host ::ng-deep .mat-drawer-inner-container {
+  overflow-y: hidden;
 }
