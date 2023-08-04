@@ -2,13 +2,15 @@
   <mat-expansion-panel-header>
     <mat-panel-title>{{ 'Anomalías reparables' | translate }}</mat-panel-title>
   </mat-expansion-panel-header>
-  <mat-button-toggle
-    class="reparables-toggle"
-    *ngFor="let elem of reparableElems; index as i"
-    [id]="i + 1"
-    [name]="elem.label"
-    [checked]="reparableSelected[i]"
-    (change)="onChangeReparableFilter($event)"
-    >{{ elem.label | translate }}
-  </mat-button-toggle>
+  <mat-button-toggle-group class="reparables-group" #group="matButtonToggleGroup" multiple="false">
+    <mat-button-toggle
+      class="reparables-toggle"
+      *ngFor="let elem of reparableElems; index as i"
+      [id]="i + 1"
+      [name]="elem.label"
+      [checked]="reparableSelected[i]"
+      (change)="onChangeReparableFilter($event)"
+      >{{ elem.label | translate }}
+    </mat-button-toggle>
+  </mat-button-toggle-group>
 </mat-expansion-panel>
