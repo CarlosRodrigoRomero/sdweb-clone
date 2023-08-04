@@ -207,8 +207,12 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private getTempRefMedia(informeId: string) {
-    const anomaliasInformeSinSombras = this.reportControlService.allAnomalias.filter(anom => anom.tipo !== 15).filter((anom) => anom.informeId === informeId);
-    const tempRefMedia = Math.round(MathOperations.average(anomaliasInformeSinSombras.map((anom) => anom.temperaturaRef)));
+    const anomaliasInformeSinSombras = this.reportControlService.allAnomalias
+      .filter((anom) => anom.tipo !== 15)
+      .filter((anom) => anom.informeId === informeId);
+    const tempRefMedia = Math.round(
+      MathOperations.average(anomaliasInformeSinSombras.map((anom) => anom.temperaturaRef))
+    );
     return tempRefMedia;
   }
 

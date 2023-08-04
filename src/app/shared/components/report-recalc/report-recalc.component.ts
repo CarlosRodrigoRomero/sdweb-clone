@@ -46,7 +46,7 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
         this.selectedInforme = this.reportControlService.informes.find((informe) => informe.id === informeId);
 
         // si es una planta de S2E antigua
-        if (!this.reportControlService.plantaFija && this.selectedInforme.fecha <= GLOBAL.dateS2eAnomalias) {
+        if (!this.reportControlService.plantaFija && this.selectedInforme?.fecha <= GLOBAL.dateS2eAnomalias) {
           this.informeS2EAntiguo = true;
         }
       })

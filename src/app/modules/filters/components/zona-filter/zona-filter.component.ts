@@ -9,9 +9,7 @@ import { take, switchMap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
 import { FilterService } from '@data/services/filter.service';
-import { PcService } from '@data/services/pc.service';
 import { ZonesService } from '@data/services/zones.service';
-import { AnomaliaService } from '@data/services/anomalia.service';
 import { FilterControlService } from '@data/services/filter-control.service';
 import { PlantaService } from '@data/services/planta.service';
 import { ReportControlService } from '@data/services/report-control.service';
@@ -54,9 +52,7 @@ export class ZonaFilterComponent implements OnInit {
 
   constructor(
     private filterService: FilterService,
-    private pcService: PcService,
     private zonesService: ZonesService,
-    private anomaliaService: AnomaliaService,
     private filterControlService: FilterControlService,
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
@@ -80,9 +76,9 @@ export class ZonaFilterComponent implements OnInit {
           // Una vez obtenida la planta, usamos el servicio de zonas para obtener las zonas de la planta
           this.zonesService.initService(planta).then((init) => (this.serviceInit = init));
           this.zones = this.zonesService.zonesBySize[0];
-          this.zones = this.zones.sort((a, b) => parseInt(a.globalCoords[0]) - parseInt(b.globalCoords[0]));
+          this.zones = this.zones?.sort((a, b) => parseInt(a.globalCoords[0]) - parseInt(b.globalCoords[0]));
 
-          this.zones.forEach((zone, i) => {
+          this.zones?.forEach((zone, i) => {
             this.zonasPcs.push({ label: this.zoneTaskName(zone), zona: zone.globalCoords[0], idZona: i });
             this.zonasSelected.push(false);
           });
@@ -120,7 +116,7 @@ export class ZonaFilterComponent implements OnInit {
         this.zonasPcs.length,
         Number(event.source.value)
       );
-      
+
       this.filterService.addFilter(this.filtroZona);
       this.filterControlService.zonasSelected[event.source.value] = true;
       // añadimos el modelo seleccionado a la variable
