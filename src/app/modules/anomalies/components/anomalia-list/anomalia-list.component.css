@@ -19,11 +19,9 @@
 
 .tabla-container {
   position: auto;
-  /* height: calc(100vh - 306px); */
-  height: calc(100vh - 200px - 56.5px);
+  height: calc(100vh - 310px);
   overflow: auto;
-  /* height: calc(100% - 56.5px); */
-  margin-top: 56.5px;
+  margin-top: 56px;
 }
 
 .buscar-input {

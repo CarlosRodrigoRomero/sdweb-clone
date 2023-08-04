@@ -1,12 +1,6 @@
 <div class="navbar-content">
   <div class="left-content">
-    <div id="plant-summary" *ngIf="loadContent && !tipoComentarios">
-      <app-plant-summary></app-plant-summary>
-    </div>
-
-    <div *ngIf="tipoComentarios">
-      <app-simple-plant-summary></app-simple-plant-summary>
-    </div>
+    <app-simple-plant-summary></app-simple-plant-summary>
   </div>
 
   <span class="example-spacer"></span>

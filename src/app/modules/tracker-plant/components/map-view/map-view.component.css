@@ -93,14 +93,6 @@ app-share-report {
   margin-right: 15px;
 }
 
-.left-sidenav {
-  display: flex;
-  padding: 0.5rem;
-  width: fit-content;
-  border-radius: 8px 0 0 8px;
-  height: calc(100vh - 96px);
-}
-
 .right-sidenav {
   position: absolute;
   display: flex;

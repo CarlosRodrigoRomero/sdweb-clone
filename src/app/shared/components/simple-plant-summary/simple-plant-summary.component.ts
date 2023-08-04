@@ -17,9 +17,12 @@ export class SimplePlantSummaryComponent implements OnInit {
   constructor(private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    this.planta = this.reportControlService.planta;
-    this.selectedInforme = this.reportControlService.informes.find(
-      (inf) => inf.id === this.reportControlService.selectedInformeId
-    );
+    this.reportControlService.planta$.subscribe((planta) => {
+      this.planta = planta;
+    });
+
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+      this.selectedInforme = this.reportControlService.informes.find((inf) => inf.id === informeId);
+    });
   }
 }

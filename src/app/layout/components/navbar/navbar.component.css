@@ -38,10 +38,6 @@
   flex: 1 1 auto;
 }
 
-#plant-summary {
-  visibility: hidden;
-}
-
 @media (max-width: 950px) {
   .navbar-brand {
     display: none;
