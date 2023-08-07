@@ -40,7 +40,7 @@ export class ChartAlturaComponent implements OnInit, OnDestroy {
   dataLoaded = false;
   private planta: PlantaInterface;
   chartOptions: Partial<ChartOptions>;
-  private filaLabel: string;
+  private filaLabel = 'Fila';
 
   private series2019: ApexAxisChartSeries = [
     {

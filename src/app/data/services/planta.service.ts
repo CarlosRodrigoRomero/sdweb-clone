@@ -231,7 +231,8 @@ export class PlantaService {
 
   getUniqueLargestLocAreas(locAreas: LocationAreaInterface[]): LocationAreaInterface[] {
     return locAreas.filter(
-      (locA, index, locAs) => locAs.map((loc) => loc.globalCoords[0]).indexOf(locA.globalCoords[0]) === index && locA.globalCoords[0]
+      (locA, index, locAs) =>
+        locAs.map((loc) => loc.globalCoords[0]).indexOf(locA.globalCoords[0]) === index && locA.globalCoords[0]
     );
   }
 
@@ -265,13 +266,12 @@ export class PlantaService {
     // else if (user.role === 6) {
     //   query$ = this.afs.collection<PlantaInterface>('plantas', (ref) => ref.where('empresa', '==', user.empresaId));
 
-    // } 
+    // }
     else if (user.empresaId === undefined) {
       //Se buscan las plantas de la empresa con la propiedad empresaId y no con el uid del usuario
       console.log(user.empresaId);
       query$ = this.afs.collection<PlantaInterface>('plantas', (ref) => ref.where('empresa', '==', user.uid));
-    }
-    else {
+    } else {
       console.log(user.empresaId);
       query$ = this.afs.collection<PlantaInterface>('plantas', (ref) => ref.where('empresa', '==', user.empresaId));
     }
@@ -681,8 +681,9 @@ export class PlantaService {
   }
 
   getPlantaNombreById(plantaId: string): Observable<string> {
-    return this.afs.doc<PlantaInterface>(`plantas/${plantaId}`).valueChanges().pipe(
-      map(planta => planta ? planta.nombre : null)
-    );
+    return this.afs
+      .doc<PlantaInterface>(`plantas/${plantaId}`)
+      .valueChanges()
+      .pipe(map((planta) => (planta ? planta.nombre : null)));
   }
 }

@@ -174,9 +174,6 @@ export class Seguidor implements FilterableElement {
     // quitamos las anomalias de tipos en desuso
     realAnomalias = realAnomalias.filter((anom) => !GLOBAL.tipos_no_utilizados.includes(anom.tipo));
 
-    // quitamos la suciedad como anomalía
-    realAnomalias = realAnomalias.filter((anom) => anom.tipo !== 11);
-
     return realAnomalias;
   }
 }
