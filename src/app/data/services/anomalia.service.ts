@@ -28,6 +28,7 @@ import { TipoSeguidor } from '@core/models/tipoSeguidor';
 import { GLOBAL } from '@data/constants/global';
 
 import { Patches } from '@core/classes/patches';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -51,11 +52,11 @@ export class AnomaliaService {
     private olMapService: OlMapService,
     private anomaliaInfoService: AnomaliaInfoService,
     private zonesService: ZonesService,
-    private userService: UserService
-  ) {}
+    private userService: UserService,
+    private authService: AuthService,
+  ) { }
 
   initService(plantaId: string): Promise<void> {
-    // obtenemos el criterio de criticidad de la planta si tuviese
     return new Promise((resolve, reject) => {
       this.subscriptions.add(
         this.plantaService
@@ -291,27 +292,25 @@ export class AnomaliaService {
   getCriterioId(planta: PlantaInterface) {
     let criterioId: string;
 
-    return this.userService.getUser(planta.empresa).pipe(
+
+    return this.authService.user$.pipe(
       take(1),
       map((user) => {
         // comprobamos primero que exista el usuario
         if (user !== undefined && user !== null) {
-          // si la planta no tiene criterio, comprobamos si lo tiene el user
-          if (criterioId === undefined || criterioId === null) {
-            if (user.hasOwnProperty('criterioId')) {
+
+          if (user.hasOwnProperty('criterioId')) {
+
+            if (user.criterioId !== undefined || user.criterioId !== null) {
               this.hasCriticidad = true;
               criterioId = user.criterioId;
             }
           }
-        } else {
-          // aviso para que se cree el usuario que falta
-          console.log('Falta usuario en la DB');
-        }
-
-        // si la planta tiene criterio propio le damos prioridad sobre el de la empresa
-        if (planta.hasOwnProperty('criterioId')) {
-          this.hasCriticidad = true;
-          criterioId = planta.criterioId;
+          // si la planta tiene criterio propio le damos prioridad sobre el de la empresa
+          else if (planta.hasOwnProperty('criterioId')) {
+            this.hasCriticidad = true;
+            criterioId = planta.criterioId;
+          }
         }
 
         if (criterioId === undefined || criterioId === null) {
@@ -323,6 +322,7 @@ export class AnomaliaService {
       })
     );
   }
+
 
   private addNumAnom(anomalias: Anomalia[]): Anomalia[] {
     const realAnomalias = this.getRealAnomalias(anomalias);
