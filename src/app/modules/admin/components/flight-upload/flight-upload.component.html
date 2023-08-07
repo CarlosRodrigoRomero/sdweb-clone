@@ -8,6 +8,33 @@
 <div id="map"></div>
 
 
+<mat-expansion-panel *ngFor="let group of imageGroups; let i = index">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      Grupo {{i + 1}}
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <!-- Añadir este botón que al hacer clic llame a la función goToGroupCenter con el centro del primer imagen del grupo como parámetro -->
+  <button mat-button (click)="goToGroupCenter(group[0].center)">Ir al centro del grupo</button>
+  <!-- Resto de tu código -->
+</mat-expansion-panel>
+
+
+
+<div *ngIf="uploadPercent | async as percent">
+  <progress value="{{percent}}" max="100"></progress>
+</div>
+
+<div *ngIf="uploadSpeed > 0">
+  Velocidad de subida: {{uploadSpeed | number:'1.2-2'}} MB/segundo
+</div>
+
+<button mat-button (click)="uploadFiles()" *ngIf="this.selectedFiles.length > 0">Subir archivos</button>
+
+<!-- <div *ngIf="downloadURL | async as url">
+  <a [href]="url">Download link</a>
+</div> -->
+
 <div *ngIf="imagesData.length > 0">
   <h3>Imagen {{currentIndex + 1}} de {{imagesData.length}}</h3>
   <img [src]="imageThumbnails[currentIndex]" alt="Miniatura de la imagen actual">
