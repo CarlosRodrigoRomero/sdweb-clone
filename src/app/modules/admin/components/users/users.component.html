@@ -6,7 +6,7 @@
 
   <mat-form-field>
     <mat-label>Buscar</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Usuario" #search  />
+    <input matInput (keyup)="applyFilter($event)" placeholder="Usuario" #search />
   </mat-form-field>
 
   <div class="tabla-container">
@@ -36,6 +36,11 @@
         <th mat-header-cell *matHeaderCellDef>Acciones</th>
         <td mat-cell *matCellDef="let element">
           <button mat-button [routerLink]="['../users/edit', element.id]">Editar</button>
+          <button id="share_btn" mat-button (click)="confirmResetUserPassword(element.email)">
+            <!-- <mat-icon>refresh</mat-icon>
+            {{ 'Restablecer contraseña' | translate | titlecase }} -->
+            Restablecer contraseña
+          </button>
         </td>
       </ng-container>
     </table>
