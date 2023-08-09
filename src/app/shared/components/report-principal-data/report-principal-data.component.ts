@@ -10,6 +10,8 @@ export class ReportPrincipalDataComponent implements OnInit {
   @Input() maeReparable: number;
   @Input() numAnoms: number;
   @Input() numAnomsFiltered: number;
+  @Input() numFixableAnoms: number;
+  @Input() numFixableAnomsFiltered: number;
 
   constructor() {}
 

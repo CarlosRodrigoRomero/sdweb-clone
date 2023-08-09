@@ -23,4 +23,12 @@
     <span class="title"># {{ 'anomalias' | translate | titlecase }}</span>
     <span class="value">{{ numAnomsFiltered }} / {{ numAnoms }}</span>
   </div>
+
+  <div class="data-element">
+    <mat-icon class="help" matTooltip="{{ 'info num Anoms' | translate }}" matTooltipClass="tooltip-style"
+      >help</mat-icon
+    >
+    <span class="title"># {{ 'Anomalías reparables' | translate }}</span>
+    <span class="value">{{ numFixableAnomsFiltered }} / {{ numFixableAnoms }}</span>
+  </div>
 </div>

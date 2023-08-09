@@ -10,17 +10,21 @@ import { FilterService } from '@data/services/filter.service';
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
+import { GLOBAL } from '@data/constants/global';
 @Component({
   selector: 'app-report-principal-data-container',
   templateUrl: './report-principal-data-container.component.html',
   styleUrls: ['./report-principal-data-container.component.css'],
 })
 export class ReportPrincipalDataContainerComponent implements OnInit, OnDestroy {
-  numAnoms = 0;
-  numAnomsFiltered = 0;
   mae: number;
   maeReparable: number;
+  numAnoms = 0;
+  numAnomsFiltered = 0;
+  numFixableAnoms = 0;
+  numFixableAnomsFiltered = 0;
   informeSelected: InformeInterface;
+  dataLoaded = false;
 
   private subscription: Subscription = new Subscription();
 
@@ -37,54 +41,75 @@ export class ReportPrincipalDataContainerComponent implements OnInit, OnDestroy 
       this.router.url.includes('tracker') ||
       this.router.url.includes('rooftop')
     ) {
-      this.subscription.add(
-        this.reportControlService.selectedInformeId$
-          .pipe(
-            switchMap((informeId) => {
-              this.informeSelected = this.reportControlService.informes.find((informe) => informe.id === informeId);
+      this.reportControlService.reportDataLoaded$.subscribe((loaded) => {
+        if (loaded) {
+          this.dataLoaded = true;
 
-              this.numAnoms = this.reportControlService.allAnomalias.filter(
-                (anom) => anom.informeId === informeId
-              ).length;
+          this.subscription.add(
+            this.reportControlService.selectedInformeId$
+              .pipe(
+                switchMap((informeId) => {
+                  this.informeSelected = this.reportControlService.informes.find((informe) => informe.id === informeId);
 
-              return this.filterService.filteredElements$;
-            })
-          )
-          .subscribe((elems) => {
-            const elemsInforme = elems.filter((elem) => elem.informeId === this.informeSelected.id);
+                  const anomsInforme = this.reportControlService.allAnomalias.filter(
+                    (anom) => anom.informeId === informeId
+                  );
 
-            if (this.reportControlService.plantaFija) {
-              this.numAnomsFiltered = elemsInforme.length;
+                  this.numAnoms = anomsInforme.length;
 
-              //Obtener Mae de anomalías filtradas para fijas
-              this.mae = this.reportControlService.getMaeInformeFija(elemsInforme as Anomalia[], this.informeSelected);
+                  this.numFixableAnoms = anomsInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo)).length;
 
-              //Obtener Mae Reparable de anomalías filtradas para fijas
-              this.maeReparable = this.reportControlService.getFixedLossReport(
-                elemsInforme as Anomalia[],
-                this.informeSelected
-              );
-            } else {
-              this.numAnomsFiltered = elemsInforme.reduce(
-                (acc, elem) => acc + (elem as Seguidor).anomaliasCliente.length,
-                0
-              );
-              var anomalias = [];
-              for (var elem of elemsInforme) {
-                anomalias.push(...(elem as Seguidor).anomaliasCliente);
-              }
+                  return this.filterService.filteredElements$;
+                })
+              )
+              .subscribe((elems) => {
+                const elemsInforme = elems.filter((elem) => elem.informeId === this.informeSelected.id);
 
-              //Obtener Mae de anomalías filtradas para seguidores
-              this.mae = this.reportControlService.getMaeInformeFija(anomalias, this.informeSelected);
+                if (this.reportControlService.plantaFija) {
+                  this.numAnomsFiltered = elemsInforme.length;
+                  this.numFixableAnomsFiltered = (elemsInforme as Anomalia[]).filter((anom) =>
+                    GLOBAL.fixableTypes.includes(anom.tipo)
+                  ).length;
 
-              //Obtener Mae Reparable de anomalías filtradas para seguidres
-              this.maeReparable = this.reportControlService.getFixedLossReport(anomalias, this.informeSelected);
-            }
+                  //Obtener Mae de anomalías filtradas para fijas
+                  this.mae = this.reportControlService.getMaeInformeFija(
+                    elemsInforme as Anomalia[],
+                    this.informeSelected
+                  );
 
-            // detectamos cambios porque estamos utilizando la estrategia OnPush
-            // this.cdr.detectChanges();
-          })
-      );
+                  //Obtener Mae Reparable de anomalías filtradas para fijas
+                  this.maeReparable = this.reportControlService.getFixedLossReport(
+                    elemsInforme as Anomalia[],
+                    this.informeSelected
+                  );
+                } else {
+                  this.numAnomsFiltered = elemsInforme.reduce(
+                    (acc, elem) => acc + (elem as Seguidor).anomaliasCliente.length,
+                    0
+                  );
+                  this.numFixableAnomsFiltered = elemsInforme.reduce(
+                    (acc, elem) =>
+                      acc +
+                      (elem as Seguidor).anomaliasCliente.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo))
+                        .length,
+                    0
+                  );
+
+                  var anomalias = [];
+                  for (var elem of elemsInforme) {
+                    anomalias.push(...(elem as Seguidor).anomaliasCliente);
+                  }
+
+                  //Obtener Mae de anomalías filtradas para seguidores
+                  this.mae = this.reportControlService.getMaeInformeFija(anomalias, this.informeSelected);
+
+                  //Obtener Mae Reparable de anomalías filtradas para seguidres
+                  this.maeReparable = this.reportControlService.getFixedLossReport(anomalias, this.informeSelected);
+                }
+              })
+          );
+        }
+      });
     }
 
     this.router.events.subscribe((event: Event) => {
