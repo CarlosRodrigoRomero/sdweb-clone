@@ -17,6 +17,7 @@ import { MatDialogConfirmComponent } from '@shared/components/mat-dialog-confirm
 import { switchMap, take } from 'rxjs/operators';
 import { AuthService } from '@data/services/auth.service';
 import { User } from 'firebase';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-share-menu',
@@ -32,6 +33,7 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   onlyFiltered = true;
   versionTecnicos = false;
   tipos: number[];
+  statusMessage: string;
 
   private subscriptions = new Subscription();
 
@@ -46,6 +48,7 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     private userService: UserService,
     public dialog: MatDialog,
     public authService: AuthService,
+    private http: HttpClient,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     if (data) {
@@ -184,6 +187,42 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
         this.openSnackBarMessage('No se puede eliminar la planta');
       });
   }
+
+  confirmResetUserPassword(email: string) {
+    const dialogRef = this.dialog.open(MatDialogConfirmComponent, {
+      data: `Se restablecerá la contraseña del usuario con email "${email}". ¿Desea continuar?`,
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((response: boolean) => {
+        if (response) {
+          this.resetUserPassword(email);
+        }
+      });
+  }
+
+  cloudFunctionUrl = `${this.authService.firebaseFunctionsUrl}/sendEmail`;
+
+  resetUserPassword(email: string) {
+    const payload = {
+      email,
+      template: 'resetPassword',
+    };
+
+    this.http.post(this.cloudFunctionUrl, payload).subscribe(
+      () => {
+        this.statusMessage = 'Contraseña restablecida.';
+        this.openSnackBarMessage("Contraseña del usuario restablecida. El usuario recibirá un email.");
+      },
+      (error) => {
+        this.statusMessage = 'Error al restablecer contraseña.';
+        console.error(error);
+      }
+    );
+  }
+
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
