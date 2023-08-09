@@ -1,19 +1,4 @@
-<div *ngIf="!portfolioControlService.newPortfolio">
-  <div class="barra-titulo" *ngIf="mapLoaded">
-    <!-- <app-portfolio-summary></app-portfolio-summary> -->
-    <!-- <app-download-excel-portfolio></app-download-excel-portfolio> -->
-  </div>
-
-  <div class="content" *ngIf="mapLoaded">
-    <div>
-      <app-plant-list *ngIf="!portfolioControlService.isDemo"></app-plant-list>
-      <app-new-plant-list *ngIf="portfolioControlService.isDemo"></app-new-plant-list>
-    </div>
-
-    <app-map-all-plants></app-map-all-plants>
-  </div>
-</div>
-
-<div *ngIf="portfolioControlService.newPortfolio">
-  <app-dashboard></app-dashboard>
+<div class="content" *ngIf="mapLoaded">
+  <app-plant-list></app-plant-list>
+  <app-map-all-plants></app-map-all-plants>
 </div>

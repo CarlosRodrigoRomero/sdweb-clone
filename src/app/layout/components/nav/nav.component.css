@@ -85,6 +85,12 @@ app-navbar-container {
   border-radius: 8px;
 }
 
+.navbar-top {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+}
+
 @media (max-width: 600px) {
   .navbar {
     padding: 0 1rem;

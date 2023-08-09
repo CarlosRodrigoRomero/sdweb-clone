@@ -16,7 +16,7 @@
 }
 
 #map {
-  height: calc(100vh - 148px - 32px);
+  height: calc(100vh - 128px - 32px - 32px);
   width: 100%;
 }
 
