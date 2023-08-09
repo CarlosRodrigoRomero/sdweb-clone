@@ -59,7 +59,7 @@ const components = [
   PortfolioRecalcComponent,
   ReportPrincipalDataComponent,
   ReportPrincipalDataContainerComponent,
-  PortfolioPrincipalDataContainerComponent,
+  // PortfolioPrincipalDataContainerComponent,
 ];
 
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];

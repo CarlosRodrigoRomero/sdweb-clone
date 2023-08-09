@@ -1,0 +1,66 @@
+.summary {
+  display: flex;
+}
+
+.datos {
+  display: flex;
+  align-items: center;
+}
+
+.datos mat-icon {
+  font-size: 26px;
+  margin: 0 0.5rem 0 1.5rem;
+}
+
+.plantas {
+  display: flex;
+  width: 100%;
+}
+
+.potencia {
+  display: flex;
+  width: 100%;
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+}
+
+.titulo span {
+  font-size: 24px;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.titulo mat-icon {
+  font-size: 26px;
+  margin-right: 0.5rem;
+}
+
+.subtitulo {
+  margin-right: 0.5em;
+  font-size: large;
+  font-weight: 400;
+}
+
+.dato {
+  font-size: large;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .datos {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 1000px) {
+  .titulo {
+    display: none;
+  }
+
+  .subtitulo {
+    margin-left: 0.5rem;
+  }
+}
