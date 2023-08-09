@@ -83,10 +83,11 @@
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
 
-        <app-navbar-container></app-navbar-container>
+        <app-navbar-container *ngIf="!isPortfolio"></app-navbar-container>
       </mat-toolbar-row>
       <mat-toolbar-row class="data-navbar foreground">
-        <app-report-principal-data-container></app-report-principal-data-container>
+        <app-report-principal-data-container *ngIf="!isPortfolio"></app-report-principal-data-container>
+        <app-portfolio-principal-data-container *ngIf="isPortfolio"></app-portfolio-principal-data-container>
       </mat-toolbar-row>
     </mat-toolbar>
 

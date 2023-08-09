@@ -28,5 +28,6 @@ import { NewPlantListComponent } from './components/new-plant-list/new-plant-lis
     NewPlantListComponent,
   ],
   imports: [CommonModule, ClientsRoutingModule, SharedModule, NgApexchartsModule, PortfolioModule],
+  exports: [PortfolioSummaryComponent, DownloadExcelPortfolioComponent],
 })
 export class ClientsModule {}
