@@ -164,23 +164,13 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
       });
   }
 
-  // corregirHoraAnomalias() {
-  //   const anomaliasInforme = this.reportControlService.allAnomalias.filter(
-  //     (anom) => anom.informeId === this.selectedInforme.id
-  //   );
-
-  //   const fecha = this.selectedInforme.fecha + 50400; // sumamos 14 horas
-
-  //   anomaliasInforme.forEach((anom) => this.anomaliaService.updateAnomaliaField(anom.id, 'datetime', fecha));
-  // }
-
   corregirHoraAnomalias() {
     const anomaliasInforme = this.reportControlService.allAnomalias.filter(
       (anom) => anom.informeId === this.selectedInforme.id
     );
 
     // Convertir timestamp a objeto Date de JavaScript
-    const fechaJS = new Date(this.selectedInforme.fecha * 1000); // Suponiendo que es un timestamp en segundos, lo multiplicamos por 1000 para tener milisegundos
+    const fechaJS = new Date(this.selectedInforme.fecha * 1000);
 
     // Configurar la fecha a las 12:00
     fechaJS.setHours(12, 0, 0, 0);
