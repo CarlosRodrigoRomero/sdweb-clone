@@ -21,8 +21,7 @@ export class PlantaStatsComponent implements OnInit, OnDestroy {
   sharedReport = false;
   portfolioLoaded = false;
   completeView = false;
-  thereAreCCs = true;
-  showLocation = false;
+  thereAreCCs = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -70,9 +69,10 @@ export class PlantaStatsComponent implements OnInit, OnDestroy {
       this.subscriptions.add(this.reportControlService.completeView$.subscribe((value) => (this.completeView = value)))
     );
 
-    this.reportControlService.allAnomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length > 0
-      ? (this.thereAreCCs = true)
-      : (this.thereAreCCs = false);
+    // CCs ocultos por el momento
+    // this.reportControlService.allAnomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length > 0
+    //   ? (this.thereAreCCs = true)
+    //   : (this.thereAreCCs = false);
   }
 
   closeSidenav() {

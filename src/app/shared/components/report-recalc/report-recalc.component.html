@@ -11,9 +11,13 @@
       <mat-icon>save</mat-icon>
       <span>Guardar tipos predicción</span>
     </button> -->
-    <button mat-menu-item (click)="recalGlobalCoords()">
+    <button *ngIf="!informeS2EAntiguo" mat-menu-item (click)="recalGlobalCoords()">
       <mat-icon>sync</mat-icon>
       <span>Recalcular Global Coords</span>
+    </button>
+    <button *ngIf="informeS2EAntiguo" mat-menu-item (click)="recalGlobalCoordsS2E()">
+      <mat-icon>sync</mat-icon>
+      <span>Recalcular Global Coords (S2E antiguas)</span>
     </button>
     <button mat-menu-item (click)="corregirHoraAnomalias()">
       <mat-icon>sync</mat-icon>

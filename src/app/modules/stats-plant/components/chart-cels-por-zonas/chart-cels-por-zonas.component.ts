@@ -110,6 +110,30 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
             this.chartData.push(this._calculateChartData(celscalInforme));
           });
 
+          // Calculamos la data del gráfico para todos los informes
+          this.informesIdList.forEach((informeId) => {
+            const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
+
+            // tslint:disable-next-line: triple-equals
+            const celscalInforme = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+            this.chartData.push(this._calculateChartData(celscalInforme));
+          });
+
+          // Ordenamos this.zones según el último informe
+          const lastChartData = this.chartData[this.chartData.length - 1];
+          const zonesWithIndices: any[] = this.zones.map((zone, index) => [index, zone]);
+          zonesWithIndices.sort((a, b) => lastChartData[b[0]] - lastChartData[a[0]]);
+          this.zones = zonesWithIndices.map((pair) => pair[1]);
+
+          // Recalculamos la data del gráfico para todos los informes
+          this.chartData = [];
+          this.informesIdList.forEach((informeId) => {
+            const anomaliasInforme = this.allAnomalias.filter((anom) => anom.informeId === informeId);
+            // tslint:disable-next-line: triple-equals
+            const celscalInforme = anomaliasInforme.filter((anom) => anom.tipo == 8 || anom.tipo == 9);
+            this.chartData.push(this._calculateChartData(celscalInforme));
+          });
+
           this._initChart(theme.split('-')[0]);
         })
     );
@@ -133,15 +157,22 @@ export class ChartCelsPorZonasComponent implements OnInit, OnDestroy {
   }
 
   private _calculateChartData(anomalias: Anomalia[]): number[] {
-    // ordenamos las zonas por nombre
-    this.zones = this.reportControlService.sortLocAreas(this.zones);
-
-    const result = Array<number>();
+    let result: number[] = [];
     this.zones.forEach((zone) => {
-      // tslint:disable-next-line: triple-equals
       const filtered = anomalias.filter((anom) => anom.globalCoords[0] == zone.globalCoords[0]);
       result.push(Math.round(filtered.length));
     });
+
+    // Creamos un array de pares [índice, valor] para result
+    const resultWithIndices = result.map((value, index) => [index, value]);
+
+    // Ordenamos el array de pares de acuerdo con los valores
+    resultWithIndices.sort((a, b) => b[1] - a[1]);
+
+    // Ordenamos this.zones y result de acuerdo con el orden de resultWithIndices
+    this.zones = resultWithIndices.map((pair) => this.zones[pair[0]]);
+    result = resultWithIndices.map((pair) => pair[1]);
+
     return result;
   }
 

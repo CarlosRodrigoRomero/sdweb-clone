@@ -67,7 +67,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.add(
       this.thermalService.sliderMin$.subscribe((value) => {
         const minValue = value[this.indexSelected];
-        if (minValue) {
+        if (minValue !== undefined && minValue !== null && !isNaN(minValue)) {
           this.lowTemp = minValue;
           if (this.thermalLayers.length > 0) {
             this.thermalLayers[this.indexSelected].getSource().changed();
@@ -79,7 +79,7 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.add(
       this.thermalService.sliderMax$.subscribe((value) => {
         const maxValue = value[this.indexSelected];
-        if (maxValue) {
+        if (maxValue !== undefined && maxValue !== null && !isNaN(maxValue)) {
           this.highTemp = maxValue;
           if (this.thermalLayers.length > 0) {
             this.thermalLayers[this.indexSelected].getSource().changed();
@@ -170,7 +170,10 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
     // si estamos en un informe asignamos los valores basados en las temperaturas de referencia
     if (!this.checkIfInformeId()) {
       indexInforme = this.informes.findIndex((informe) => informe.id === informeId);
-      [tempMin, tempMax] = this.getInitialTempsLayer(informeId);
+      const [tMin, tMax] = this.getInitialTempsLayer(informeId);
+      if (tMin !== undefined && tMin !== null && !isNaN(tMin) && tMax !== undefined && tMax !== null && !isNaN(tMax)) {
+        [tempMin, tempMax] = [tMin, tMax];
+      }
     }
 
     if (informeId === this.informeId) {
@@ -207,8 +210,12 @@ export class ThermalSliderComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private getTempRefMedia(informeId: string) {
-    const anomaliasInformeSinSombras = this.reportControlService.allAnomalias.filter(anom => anom.tipo !== 15).filter((anom) => anom.informeId === informeId);
-    const tempRefMedia = Math.round(MathOperations.average(anomaliasInformeSinSombras.map((anom) => anom.temperaturaRef)));
+    const anomaliasInformeSinSombras = this.reportControlService.allAnomalias
+      .filter((anom) => anom.tipo !== 15)
+      .filter((anom) => anom.informeId === informeId);
+    const tempRefMedia = Math.round(
+      MathOperations.average(anomaliasInformeSinSombras.map((anom) => anom.temperaturaRef))
+    );
     return tempRefMedia;
   }
 

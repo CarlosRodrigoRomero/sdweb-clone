@@ -62,7 +62,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
               .pipe(take(1))
               .subscribe((empresas) => {
                 this.empresas = empresas;
-                this.empresaSelected = this.empresas.find(empresa => empresa.nombre === this.user.empresaNombre);
+                this.empresaSelected = this.empresas.find((empresa) => empresa.nombre === this.user.empresaNombre);
               });
           }
         });
@@ -73,7 +73,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   private buildForm() {
     this.form = this.formBuilder.group({
       email: ['', [Validators.required]],
-      empresa: ['', [Validators.required]],
+      empresa: [''],
       role: ['', Validators.required],
     });
   }
@@ -81,11 +81,17 @@ export class UserEditComponent implements OnInit, OnDestroy {
   onSubmit(event: Event) {
     event.preventDefault();
     if (this.form.valid) {
-      this.user.email = this.form.get('email').value;
-      this.user.empresaNombre = this.form.get('empresa').value;
-      this.user.role = Number(this.form.get('role').value);
-      this.empresaSelected = this.empresas.find(empresa => empresa.nombre === this.user.empresaNombre);
-      this.user.empresaId = this.empresaSelected.id;
+      if (this.selectedRole !== 2) {
+        this.user.email = this.form.get('email').value;
+        this.user.empresaNombre = this.form.get('empresa').value;
+        this.user.role = Number(this.form.get('role').value);
+
+        this.empresaSelected = this.empresas.find((empresa) => empresa.nombre === this.user.empresaNombre);
+        this.user.empresaId = this.empresaSelected.id;
+      } else {
+        this.user.email = this.form.get('email').value;
+        this.user.role = Number(this.form.get('role').value);
+      }
 
       // Actualiza el usuario en la DB
       this.updateUser(this.user);

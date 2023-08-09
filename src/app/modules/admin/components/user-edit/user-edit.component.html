@@ -13,7 +13,7 @@
 
         <!-- Campo Empresa -->
 
-        <mat-form-field class="example-full-width">
+        <mat-form-field *ngIf="selectedRole !== 2" class="example-full-width">
           <mat-label>Empresa</mat-label>
           <input matInput formControlName="empresa" />
         </mat-form-field>
@@ -28,7 +28,6 @@
             <mat-option value="2">Externo</mat-option>
             <mat-option value="3">Procesamiento</mat-option>
             <mat-option value="6">Interno</mat-option>
-
           </mat-select>
         </mat-form-field>
 

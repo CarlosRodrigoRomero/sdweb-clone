@@ -19,6 +19,7 @@ export class NavbarComponent {
   @Input() isShared: boolean;
   @Input() hasNotifications: boolean;
   @Input() notifications: Notification[];
+  @Input() activeFilters: boolean;
   @Output() navigateHome = new EventEmitter();
   @Output() signOut = new EventEmitter();
   @Output() applyFilter = new EventEmitter<string>();

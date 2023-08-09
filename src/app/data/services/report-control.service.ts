@@ -683,8 +683,10 @@ export class ReportControlService {
     // comprobamos si el nombre de las zonas es un numero
     if (!isNaN(parseFloat(locAreas[0].globalCoords[index]))) {
       locAreas = locAreas.sort((a, b) => parseFloat(a.globalCoords[index]) - parseFloat(b.globalCoords[0]));
-    } else if (locAreas[0].globalCoords[index].match(/\d+/g) !== null) {
-      // si no es un numero buscamos si tiene alguno incluido para ordenarlo
+    } else if (
+      locAreas.filter((locArea) => locArea.globalCoords[index].match(/\d+/g) !== null).length === locAreas.length
+    ) {
+      // si no es un numero buscamos si todas las zonas tienen alguno incluido para ordenarlos
       locAreas.sort((a, b) => {
         let numsA = '';
         a.globalCoords[index].match(/\d+/g).forEach((element) => {
