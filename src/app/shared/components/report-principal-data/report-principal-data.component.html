@@ -1,0 +1,26 @@
+<div class="data">
+  <div class="data-element">
+    <mat-icon class="help" matTooltip="{{ 'info MAE' | translate }}" matTooltipClass="tooltip-style">help</mat-icon>
+    <span class="title">{{ 'MAE' | translate }}</span>
+    <span class="value">{{ mae * 100 | number : '1.0-2' }}%</span>
+    <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->
+  </div>
+  <div class="data-element">
+    <mat-icon
+      class="help"
+      matTooltip="{{ 'MAE que solo tiene en cuenta las anomalías que son reparables' | translate }}"
+      matTooltipClass="tooltip-style"
+      >help</mat-icon
+    >
+    <span class="title">{{ 'MAE reparable' | translate }}</span>
+    <span class="value">{{ maeReparable * 100 | number : '1.0-2' }}%</span>
+    <!-- <mat-icon *ngIf="informe.mae > 0.1" color="primary">arrow_circle_up</mat-icon> -->
+  </div>
+  <div class="data-element">
+    <mat-icon class="help" matTooltip="{{ 'info num Anoms' | translate }}" matTooltipClass="tooltip-style"
+      >help</mat-icon
+    >
+    <span class="title"># {{ 'anomalias' | translate | titlecase }}</span>
+    <span class="value">{{ numAnomsFiltered }} / {{ numAnoms }}</span>
+  </div>
+</div>
