@@ -105,15 +105,14 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
           this.plantaService.getPlanta(this.reportControlService.plantaId),
           this.plantaService.getLocationsArea(this.reportControlService.plantaId),
           this.warningService.getWarnings(this.selectedInforme.id),
-        ]).subscribe(([informes, planta, locAreas, warnings]) => {
+          this.anomaliaService.getAnomaliasInforme$(this.selectedInforme.id),
+        ]).subscribe(([informes, planta, locAreas, warnings, anomalias]) => {
           this.informes = informes;
           this.planta = planta;
           this.locAreas = locAreas;
           this.warnings = warnings;
 
-          this.anomaliasInforme = this.reportControlService.allAnomalias.filter(
-            (anom) => anom.informeId === this.selectedInforme.id
-          );
+          this.anomaliasInforme = this.anomaliaService.getRealAnomalias(anomalias);
 
           this.selectedInforme = this.informes.find((informe) => informe.id === this.selectedInforme.id);
 
