@@ -54,7 +54,7 @@ export class TotalLossContainerComponent implements OnInit, OnDestroy {
             this.numFixableAnoms = elemsInforme.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo)).length;
 
             //Obtener Mae de anomalías filtradas para fijas
-            this.totalMae = this.reportControlService.getMaeInformeFija(
+            this.totalMae = this.reportControlService.getMaeInforme(
               elemsInforme as Anomalia[],
               this.selectedReport
             );
@@ -78,7 +78,7 @@ export class TotalLossContainerComponent implements OnInit, OnDestroy {
             this.numFixableAnoms = anomalias.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo)).length;
 
             //Obtener Mae de anomalías filtradas para seguidores
-            this.totalMae = this.reportControlService.getMaeInformeFija(anomalias, this.selectedReport);
+            this.totalMae = this.reportControlService.getMaeInforme(anomalias, this.selectedReport);
 
             //Obtener Mae Reparable de anomalías filtradas para seguidres
             this.fixableMae = this.reportControlService.getFixedLossReport(anomalias, this.selectedReport);

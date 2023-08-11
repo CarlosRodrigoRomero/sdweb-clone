@@ -14,6 +14,7 @@ import { WarningService } from '@data/services/warning.service';
 import { SeguidorService } from '@data/services/seguidor.service';
 import { AuthService } from '@data/services/auth.service';
 import { OlMapService } from '@data/services/ol-map.service';
+import { ReportRecalcService } from '@data/services/report-recalc.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -62,7 +63,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private seguidorService: SeguidorService,
     private olMapService: OlMapService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private reportRecalcService: ReportRecalcService
   ) {}
 
   ngOnInit(): void {
@@ -241,15 +243,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   }
 
   private recalMAEyCC() {
-    if (this.reportControlService.plantaFija) {
-      this.reportControlService.setMaeInformeFija(this.anomaliasInforme, this.selectedInforme);
-      this.reportControlService.setCCInformeFija(this.anomaliasInforme, this.selectedInforme);
-    } else {
-      const seguidoresInforme = this.allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
-
-      this.reportControlService.setMaeInformeSeguidores(seguidoresInforme, this.selectedInforme);
-      this.reportControlService.setCCInformeSeguidores(seguidoresInforme, this.selectedInforme);
-    }
+    this.reportRecalcService.recalMAEyCC(this.selectedInforme);
   }
 
   private filterWrongLocAnoms() {

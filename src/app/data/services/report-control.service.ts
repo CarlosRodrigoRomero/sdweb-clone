@@ -234,8 +234,8 @@ export class ReportControlService {
               this.setCountAnomsInformesPlanta(this.allFilterableElements);
 
               // calculamos el MAE y las CC de los informes si no tuviesen
-              this.checkMaeInformes(this.allFilterableElements);
-              this.checkCCInformes(this.allFilterableElements);
+              this.checkMaeInformes(this.allAnomalias);
+              this.checkCCInformes(this.allAnomalias);
 
               // calculamos la Potencia reparable de los informes si no tuviesen
               this.checkFixedPowerLossInformes();
@@ -369,42 +369,21 @@ export class ReportControlService {
     return numGlobalCoords;
   }
 
-  private checkMaeInformes(elems: FilterableElement[]): void {
-    if (elems.length > 0) {
+  private checkMaeInformes(anomalias: Anomalia[]): void {
+    if (anomalias.length > 0) {
       this.informes.forEach((informe) => {
-        if (this.checkIfNumberValueWrong(informe.mae)) {
-          if (elems[0].hasOwnProperty('anomaliasCliente')) {
-            this.setMaeInformeSeguidores(elems as Seguidor[], informe);
-          } else {
-            this.setMaeInformeFija(elems as Anomalia[], informe);
-          }
-        }
+        this.setMaeInforme(anomalias, informe);
       });
     }
   }
 
-  setMaeInformeSeguidores(seguidores: Seguidor[], informe: InformeInterface) {
-    const mae = this.getMaeInformeSeguidores(seguidores, informe);
+  setMaeInforme(anomalias: Anomalia[], informe: InformeInterface) {
+    const mae = this.getMaeInforme(anomalias, informe);
 
     this.informeService.updateInformeField(informe.id, 'mae', mae);
   }
 
-  getMaeInformeSeguidores(seguidores: Seguidor[], informe: InformeInterface): number {
-    const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
-    let mae = 0;
-    seguidoresInforme.forEach((seg) => (mae = mae + seg.mae));
-    mae = mae / seguidoresInforme.length;
-
-    return mae;
-  }
-
-  setMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface) {
-    const mae = this.getMaeInformeFija(anomalias, informe);
-
-    this.informeService.updateInformeField(informe.id, 'mae', mae);
-  }
-
-  getMaeInformeFija(anomalias: Anomalia[], informe: InformeInterface): number {
+  getMaeInforme(anomalias: Anomalia[], informe: InformeInterface): number {
     const anomaliasInforme = anomalias.filter((anom) => anom.informeId === informe.id);
     let mae = 0;
     if (anomaliasInforme.length > 0) {
@@ -475,9 +454,10 @@ export class ReportControlService {
 
   private setNumberOfModules(seguidores: Seguidor[]) {
     this.informes.map((informe) => {
-      const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
-
-      informe.numeroModulos = seguidoresInforme.length * this.planta.filas * this.planta.columnas;
+      if (informe.fecha < GLOBAL.dateS2eAnomalias && informe.numeroModulos <= 1) {
+        const seguidoresInforme = seguidores.filter((seg) => seg.informeId === informe.id);
+        informe.numeroModulos = seguidoresInforme.length * this.planta.filas * this.planta.columnas;
+      }
     });
   }
 
