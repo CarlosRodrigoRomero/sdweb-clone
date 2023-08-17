@@ -115,7 +115,7 @@ export class ClassificationService {
       .subscribe((anoms) => (this.listaAnomalias = anoms));
   }
 
-  createAnomaliaFromNormModule(feature: Feature<any>, date: number) {
+  createAnomaliaFromNormModuleFeature(feature: Feature<any>, date: number) {
     const id = feature.getProperties().properties.id;
     const normModule: NormalizedModule = feature.getProperties().properties.normMod;
     const coordinates: Coordinate[] = this.olMapService.coordsDBToCoordinate(normModule.coords);
@@ -136,6 +136,49 @@ export class ClassificationService {
 
     const anomalia: Anomalia = {
       id,
+      plantaId: this.planta.id,
+      informeId: this.informeId,
+      tipo: 8,
+      globalCoords,
+      gradienteNormalizado: 0,
+      temperaturaMax: 0,
+      modulo,
+      featureCoords: coordinates,
+      featureType: 'Polygon',
+      localX: normModule.columna,
+      localY: normModule.fila,
+      datetime: date,
+    };
+
+    // asignamos la nueva anomalia para acceder a ella y poder modificarla
+    this.anomaliaSelected = anomalia;
+
+    // añadimos a la lista de anomalias
+    this.listaAnomalias = this.listaAnomalias.concat(anomalia);
+
+    // Guardar en la base de datos
+    this.anomaliaService.addAnomalia(anomalia);
+  }
+
+  createAnomaliaFromNormModule(normModule: NormalizedModule, date: number) {
+    const coordinates: Coordinate[] = this.olMapService.coordsDBToCoordinate(normModule.coords);
+
+    let refCoords: Coordinate;
+    // si existe centroId lo usamos, sino usamos un vertice del rectangulo
+    if (normModule.hasOwnProperty('centroid_gps')) {
+      refCoords = [normModule.centroid_gps.long, normModule.centroid_gps.lat] as Coordinate;
+    } else {
+      refCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordinates[0]);
+    }
+
+    const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(refCoords);
+    const modulo = this.getAnomModule(coordinates[0]);
+
+    // TODO - revisar correccionHrt si hay que aplicarla al crear la anomalia
+    // const irradiancia = this.anomaliaService.getIrradiancia(date);
+
+    const anomalia: Anomalia = {
+      id: normModule.id,
       plantaId: this.planta.id,
       informeId: this.informeId,
       tipo: 8,

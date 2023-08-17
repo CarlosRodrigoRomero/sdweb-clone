@@ -1,3 +1,5 @@
+<app-loading *ngIf="!serviceInit"></app-loading>
+
 <div *ngIf="serviceInit">
   <div>
     <app-map-classification></app-map-classification>
