@@ -174,9 +174,6 @@ export class ClassificationService {
     const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(refCoords);
     const modulo = this.getAnomModule(coordinates[0]);
 
-    // TODO - revisar correccionHrt si hay que aplicarla al crear la anomalia
-    // const irradiancia = this.anomaliaService.getIrradiancia(date);
-
     const anomalia: Anomalia = {
       id: normModule.id,
       plantaId: this.planta.id,
@@ -278,15 +275,8 @@ export class ClassificationService {
   }
 
   set anomaliaSelected(value: Anomalia) {
-    // const start1 = performance.now();
     this._anomaliaSelected = value;
-    // const end1 = performance.now();
-    // console.log(end1 - start1);
-
-    // const start2 = performance.now();
     this.anomaliaSelected$.next(value);
-    // const end2 = performance.now();
-    // console.log(end2 - start2);
   }
 
   get normModHovered() {

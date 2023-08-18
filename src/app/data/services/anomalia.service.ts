@@ -89,6 +89,7 @@ export class AnomaliaService {
 
     // Para que Firestore admita "featureCoords", lo transformamos en un objeto
     const anomaliaObj = this._prepararParaDb(anomalia);
+
     return this.afs.collection('anomalias').doc(anomalia.id).set(anomaliaObj);
   }
 
@@ -364,13 +365,18 @@ export class AnomaliaService {
 
     return localId;
   }
-
   private _prepararParaDb(anomalia: Anomalia) {
-    anomalia.featureCoords = { ...anomalia.featureCoords };
-    anomalia.globalCoords = { ...anomalia.globalCoords };
+    // Crea una copia profunda del objeto
+    const anomModified = {
+      ...anomalia,
+      featureCoords: { ...anomalia.featureCoords },
+      globalCoords: { ...anomalia.globalCoords },
+    };
+
     const tipo: any = anomalia.tipo;
-    anomalia.tipo = parseInt(tipo);
-    return Object.assign({}, anomalia);
+    anomModified.tipo = parseInt(tipo);
+
+    return anomModified;
   }
 
   // getTempMaxAll(): number {

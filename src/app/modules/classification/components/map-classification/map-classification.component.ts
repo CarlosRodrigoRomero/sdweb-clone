@@ -79,18 +79,15 @@ export class MapClassificationComponent implements OnInit {
 
     this.informe = this.classificationService.informe;
 
-    // nos conectamos a la lista de anomalias
-    this.classificationService.listaAnomalias$.subscribe((anomalias) => (this.listaAnomalias = anomalias));
-
     // aplicamos estilos cada vez que se modifica una anomalia
     this.classificationService.anomaliaSelected$.subscribe((anomalia) => {
       this.anomaliaSelected = anomalia;
 
-      if (anomalia !== undefined) {
-        if (this.anomsLayer !== undefined) {
-          this.anomsLayer.setStyle(this.getStyleAnoms(false));
-        }
-      }
+      // if (anomalia !== undefined) {
+      //   if (this.anomsLayer !== undefined) {
+      //     this.anomsLayer.setStyle(this.getStyleAnoms(false));
+      //   }
+      // }
     });
 
     this.normModules = this.classificationService.normModules;
@@ -191,10 +188,10 @@ export class MapClassificationComponent implements OnInit {
   }
 
   private addAnoms() {
-    const normModsSource = this.anomsLayer.getSource();
+    const anomsSource = this.anomsLayer.getSource();
 
-    this.classificationService.listaAnomalias$.pipe(take(1)).subscribe((anoms) => {
-      normModsSource.clear();
+    this.classificationService.listaAnomalias$.subscribe((anoms) => {
+      anomsSource.clear();
 
       this.listaAnomalias = anoms;
 
@@ -208,7 +205,7 @@ export class MapClassificationComponent implements OnInit {
           },
         });
 
-        normModsSource.addFeature(feature);
+        anomsSource.addFeature(feature);
       });
     });
   }
@@ -283,9 +280,7 @@ export class MapClassificationComponent implements OnInit {
 
       const normModule = this.getClosestNormModule(coordsClick);
 
-      // no permitimos doble click sobre anomalias ya existentes
-      const feature = this.map.getFeaturesAtPixel(event.pixel)[0] as Feature<any>;
-      if (!feature) {
+      if (normModule !== null) {
         const date = this.getDatetime();
 
         this.classificationService.createAnomaliaFromNormModule(normModule, date);
