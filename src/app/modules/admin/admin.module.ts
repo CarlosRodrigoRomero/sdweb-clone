@@ -23,6 +23,7 @@ import { EmpresasComponent } from './components/empresas/empresas.component';
 import { CreateEmpresaComponent } from './components/create-empresa/create-empresa.component';
 import { EmpresaEditComponent } from './components/empresa-edit/empresa-edit.component';
 import { FlightUploadComponent } from './components/flight-upload/flight-upload.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,6 @@ import { FlightUploadComponent } from './components/flight-upload/flight-upload.
     EmpresaEditComponent,
     FlightUploadComponent,
   ],
-  imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule, LayoutModule],
+  imports: [CommonModule, RouterModule, AdminRoutingModule, SharedModule, LayoutModule, FormsModule],
 })
 export class AdminModule {}

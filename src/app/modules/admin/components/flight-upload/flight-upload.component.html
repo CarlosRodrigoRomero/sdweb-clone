@@ -1,25 +1,47 @@
-<mat-form-field>
+<!-- Input principal para archivos múltiples -->
+<mat-form-field class="wide-input">
   <input type="text" matInput placeholder="Seleccionado" [value]="fileName" multiple readonly>
   <input hidden type="file" #fileInput (change)="handleChange($event)" multiple />
   <button mat-button (click)="fileInput.click()">Seleccionar archivo</button>
 </mat-form-field>
 
 <br />
+
+<!-- Input para subir una foto de portada -->
+<mat-form-field class="wide-input">
+  <input type="text" matInput placeholder="Foto de Portada" [value]="fotoPortadaName ? fotoPortadaName : ''" readonly>
+  <input hidden type="file" #fotoPortadaInput (change)="handleFotoPortadaChange($event)" />
+  <button mat-button (click)="fotoPortadaInput.click()">Seleccionar foto de portada</button>
+</mat-form-field>
+
+<br />
+
+<!-- Input para subir una foto de suciedad -->
+<mat-form-field class="wide-input">
+  <input type="text" matInput placeholder="Foto de Suciedad" [value]="fotoSuciedadName ? fotoSuciedadName : ''"
+    readonly>
+  <input hidden type="file" #fotoSuciedadInput (change)="handleFotoSuciedadChange($event)" />
+  <button mat-button (click)="fotoSuciedadInput.click()">Seleccionar foto de suciedad</button>
+</mat-form-field>
+
+<br />
 <div id="map"></div>
+<br>
+<div *ngIf="this.selectedFiles.length > 0">
+  <input type="checkbox" [(ngModel)]="showV" (change)="toggleLayers('V', showV)"> Mostrar imágenes RGB
+  <input type="checkbox" [(ngModel)]="showT" (change)="toggleLayers('T', showT)"> Mostrar imágenes térmicas
+</div>
 
 
-<mat-expansion-panel *ngFor="let group of imageGroups; let i = index">
-  <mat-expansion-panel-header>
+<mat-panel *ngFor="let group of imageGroups; let i = index">
+  <mat-panel-header>
     <mat-panel-title>
       Grupo {{i + 1}}
     </mat-panel-title>
-  </mat-expansion-panel-header>
-  <!-- Añadir este botón que al hacer clic llame a la función goToGroupCenter con el centro del primer imagen del grupo como parámetro -->
+  </mat-panel-header>
   <button mat-button (click)="goToGroupCenter(group[0].center)">Ir al centro del grupo</button>
   <!-- Resto de tu código -->
-</mat-expansion-panel>
-
-
+</mat-panel>
 
 <div *ngIf="uploadPercent | async as percent">
   <progress value="{{percent}}" max="100"></progress>
@@ -31,11 +53,14 @@
 
 <button mat-button (click)="uploadFiles()" *ngIf="this.selectedFiles.length > 0">Subir archivos</button>
 
+<h3>{{imagesData.length}} imágenes cargadas</h3>
+
+
 <!-- <div *ngIf="downloadURL | async as url">
   <a [href]="url">Download link</a>
 </div> -->
 
-<div *ngIf="imagesData.length > 0">
+<div *ngIf="imagesData.length > 0 && isDataReady">
   <h3>Imagen {{currentIndex + 1}} de {{imagesData.length}}</h3>
   <img [src]="imageThumbnails[currentIndex]" alt="Miniatura de la imagen actual">
 

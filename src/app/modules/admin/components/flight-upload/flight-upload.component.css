@@ -27,6 +27,11 @@ button {
 }
 
 #map {
-    height: 50%;
-    width: 50%;
+    height: 75%;
+    width: 75%;
+    padding-bottom: 30px;
 }
+
+.wide-input {
+    width: 20%; /* Ajusta este valor según tus necesidades */
+  }
