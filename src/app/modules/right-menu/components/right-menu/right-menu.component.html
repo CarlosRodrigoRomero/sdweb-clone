@@ -5,8 +5,10 @@
   <div class="content">
     <button *ngIf="isAdmin" mat-menu-item routerLink="/admin">Admin</button>
     <button *ngIf="isAdmin" mat-menu-item routerLink="/clientes">Web antigua</button>
+    <button *ngIf="isAdmin" mat-menu-item (click)="goGrafana.emit()">Grafana</button>
     <app-select-language></app-select-language>
     <app-select-initial-view></app-select-initial-view>
+    <button mat-menu-item (click)="goHelp.emit()">Ayuda</button>
     <button *ngIf="isAdmin" mat-menu-item (click)="newBug.emit()">Reportar bug o sugerencia</button>
 
     <button mat-menu-item (click)="signOut.emit()" routerLink="../auth">
