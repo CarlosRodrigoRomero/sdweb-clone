@@ -69,7 +69,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
               const anomaliasInforme = this.reportControlService.allAnomalias.filter(
                 (anom) => anom.informeId === this.selectedInformeId
               );
-              if (Number.isFinite(this.reportControlService.getMaeInformeFija(anomaliasInforme, this.informe))) {
+              if (Number.isFinite(this.reportControlService.getMaeInforme(anomaliasInforme, this.informe))) {
                 // calculamos MAE
                 this.reportControlService.setMae(anomaliasInforme, this.informe);
 
@@ -101,7 +101,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
               this.numAnomsFiltered = elemsInforme.length;
 
               //Obtener Mae de anomalías filtradas para fijas
-              this.mae = this.reportControlService.getMaeInformeFija(elemsInforme as Anomalia[], this.informe);
+              this.mae = this.reportControlService.getMaeInforme(elemsInforme as Anomalia[], this.informe);
 
               //Obtener Mae Reparable de anomalías filtradas para fijas
               this.maeReparable = this.reportControlService.getFixedLossReport(
@@ -119,7 +119,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
               }
 
               //Obtener Mae de anomalías filtradas para seguidores
-              this.mae = this.reportControlService.getMaeInformeFija(anomalias, this.informe);
+              this.mae = this.reportControlService.getMaeInforme(anomalias, this.informe);
 
               //Obtener Mae Reparable de anomalías filtradas para seguidres
               this.maeReparable = this.reportControlService.getFixedLossReport(anomalias, this.informe);

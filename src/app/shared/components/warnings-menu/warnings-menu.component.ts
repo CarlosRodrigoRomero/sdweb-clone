@@ -14,6 +14,7 @@ import { WarningService } from '@data/services/warning.service';
 import { SeguidorService } from '@data/services/seguidor.service';
 import { AuthService } from '@data/services/auth.service';
 import { OlMapService } from '@data/services/ol-map.service';
+import { ReportRecalcService } from '@data/services/report-recalc.service';
 
 import { Anomalia } from '@core/models/anomalia';
 import { Seguidor } from '@core/models/seguidor';
@@ -62,7 +63,8 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
     private seguidorService: SeguidorService,
     private olMapService: OlMapService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private reportRecalcService: ReportRecalcService
   ) {}
 
   ngOnInit(): void {
@@ -105,15 +107,14 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
           this.plantaService.getPlanta(this.reportControlService.plantaId),
           this.plantaService.getLocationsArea(this.reportControlService.plantaId),
           this.warningService.getWarnings(this.selectedInforme.id),
-        ]).subscribe(([informes, planta, locAreas, warnings]) => {
+          this.anomaliaService.getAnomaliasInforme$(this.selectedInforme.id),
+        ]).subscribe(([informes, planta, locAreas, warnings, anomalias]) => {
           this.informes = informes;
           this.planta = planta;
           this.locAreas = locAreas;
           this.warnings = warnings;
 
-          this.anomaliasInforme = this.reportControlService.allAnomalias.filter(
-            (anom) => anom.informeId === this.selectedInforme.id
-          );
+          this.anomaliasInforme = this.anomaliaService.getRealAnomalias(anomalias);
 
           this.selectedInforme = this.informes.find((informe) => informe.id === this.selectedInforme.id);
 
@@ -242,15 +243,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
   }
 
   private recalMAEyCC() {
-    if (this.reportControlService.plantaFija) {
-      this.reportControlService.setMaeInformeFija(this.anomaliasInforme, this.selectedInforme);
-      this.reportControlService.setCCInformeFija(this.anomaliasInforme, this.selectedInforme);
-    } else {
-      const seguidoresInforme = this.allSeguidores.filter((seg) => seg.informeId === this.selectedInforme.id);
-
-      this.reportControlService.setMaeInformeSeguidores(seguidoresInforme, this.selectedInforme);
-      this.reportControlService.setCCInformeSeguidores(seguidoresInforme, this.selectedInforme);
-    }
+    this.reportRecalcService.recalMAEyCC(this.selectedInforme);
   }
 
   private filterWrongLocAnoms() {

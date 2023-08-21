@@ -58,36 +58,36 @@ export class ComentariosControlService {
         );
       }
 
-      this.anomaliaSelected = this.anomalias[0];
-
       this.subscriptions.add(
-        this.comentariosService.getComentariosInforme(this.anomaliaSelected.informeId).subscribe((comentarios) => {
-          if (this.reportControlService.plantaFija) {
-            const anomalias = this.anomalias;
-            anomalias.forEach((anom) => {
-              const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
-
-              anom.comentarios = comentariosAnom;
-            });
-            this.anomalias = anomalias;
-          } else {
-            const seguidores = this.seguidores;
-            seguidores.map((seg) => {
-              seg.anomaliasCliente.forEach((anom) => {
+        this.comentariosService
+          .getComentariosInforme(this.reportControlService.selectedInformeId)
+          .subscribe((comentarios) => {
+            if (this.reportControlService.plantaFija) {
+              const anomalias = this.anomalias;
+              anomalias.forEach((anom) => {
                 const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
 
                 anom.comentarios = comentariosAnom;
               });
-            });
-            this.seguidores = seguidores;
+              this.anomalias = anomalias;
+            } else {
+              const seguidores = this.seguidores;
+              seguidores.map((seg) => {
+                seg.anomaliasCliente.forEach((anom) => {
+                  const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
 
-            const anomaliasSeguidores: Anomalia[] = [];
-            this.seguidores.forEach((seg) => anomaliasSeguidores.push(...(seg as Seguidor).anomaliasCliente));
-            this.anomalias = anomaliasSeguidores;
-          }
+                  anom.comentarios = comentariosAnom;
+                });
+              });
+              this.seguidores = seguidores;
 
-          initService();
-        })
+              const anomaliasSeguidores: Anomalia[] = [];
+              this.seguidores.forEach((seg) => anomaliasSeguidores.push(...(seg as Seguidor).anomaliasCliente));
+              this.anomalias = anomaliasSeguidores;
+            }
+
+            initService();
+          })
       );
     });
   }

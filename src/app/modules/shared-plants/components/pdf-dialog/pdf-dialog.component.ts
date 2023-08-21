@@ -237,7 +237,8 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
       ...this.elemResultados.elems,
       this.anexoLista,
     ];
-    if (!this.noOrtofotos) {
+
+    if (!this.noOrtofotos && this.elemOrtofotos !== undefined) {
       allSecciones.push(...this.elemOrtofotos.elems);
     }
 

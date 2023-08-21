@@ -28,6 +28,12 @@ export class RightMenuContainerComponent implements OnInit {
     }
   }
 
+  navigateNewBug() {
+    const urlNewBugForm = 'https://form.asana.com/?k=KN18mefLSYBjN4OStVyFjg&d=1204869738731689';
+
+    window.open(urlNewBugForm, '_blank');
+  }
+
   signOut() {
     this.authService.signOut();
   }

@@ -10,6 +10,7 @@ export class RightMenuComponent implements OnInit {
   @Input() isShared: boolean;
   @Input() isAdmin: boolean;
   @Output() signOut = new EventEmitter();
+  @Output() newBug = new EventEmitter();
 
   constructor() {}
 

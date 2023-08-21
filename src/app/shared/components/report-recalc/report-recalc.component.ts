@@ -11,6 +11,7 @@ import { PlantaService } from '@data/services/planta.service';
 import { OlMapService } from '@data/services/ol-map.service';
 import { ZonesService } from '@data/services/zones.service';
 import { InformeService } from '@data/services/informe.service';
+import { ReportRecalcService } from '@data/services/report-recalc.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
@@ -37,7 +38,8 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
     private plantaService: PlantaService,
     private olMapService: OlMapService,
     private zonesService: ZonesService,
-    private informeService: InformeService
+    private informeService: InformeService,
+    private reportRecalcService: ReportRecalcService
   ) {}
 
   ngOnInit(): void {
@@ -54,17 +56,7 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
   }
 
   recalMAEyCC() {
-    // calculamos MAE
-    const anomaliasInforme = this.reportControlService.allAnomalias.filter(
-      (anom) => anom.informeId === this.selectedInforme.id
-    );
-    this.reportControlService.setMae(anomaliasInforme, this.selectedInforme);
-
-    // calculamos MAE reparable
-    const fixableAnoms = anomaliasInforme.filter((anom) => GLOBAL.fixableTypes.includes(anom.tipo));
-    this.reportControlService.setMae(fixableAnoms, this.selectedInforme, 'fixablePower');
-
-    this.reportControlService.setCC(anomaliasInforme, this.selectedInforme);
+    this.reportRecalcService.recalMAEyCC(this.selectedInforme);
   }
 
   setTipoNextYear() {
@@ -169,9 +161,16 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
       (anom) => anom.informeId === this.selectedInforme.id
     );
 
-    const fecha = this.selectedInforme.fecha + 50400; // sumamos 14 horas
+    // Convertir timestamp a objeto Date de JavaScript
+    const fechaJS = new Date(this.selectedInforme.fecha * 1000);
 
-    anomaliasInforme.forEach((anom) => this.anomaliaService.updateAnomaliaField(anom.id, 'datetime', fecha));
+    // Configurar la fecha a las 12:00
+    fechaJS.setHours(12, 0, 0, 0);
+
+    // Convertir el objeto Date de nuevo a timestamp (en segundos)
+    const fechaCorregida = fechaJS.getTime() / 1000;
+
+    anomaliasInforme.forEach((anom) => this.anomaliaService.updateAnomaliaField(anom.id, 'datetime', fechaCorregida));
   }
 
   ngOnDestroy(): void {

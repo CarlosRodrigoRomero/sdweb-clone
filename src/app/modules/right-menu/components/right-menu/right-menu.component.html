@@ -7,6 +7,8 @@
     <button *ngIf="isAdmin" mat-menu-item routerLink="/clientes">Web antigua</button>
     <app-select-language></app-select-language>
     <app-select-initial-view></app-select-initial-view>
+    <button *ngIf="isAdmin" mat-menu-item (click)="newBug.emit()">Reportar bug o sugerencia</button>
+
     <button mat-menu-item (click)="signOut.emit()" routerLink="../auth">
       <strong> {{ 'Cerrar sesion' | translate }} </strong>
     </button>

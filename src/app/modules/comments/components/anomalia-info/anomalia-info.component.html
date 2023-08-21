@@ -9,13 +9,16 @@
       <span class="subtitulo">{{ anomaliaInfo.localizacion }}</span>
     </div>
 
-    <app-anomalia-info-editable [anomaliaSelected]="anomaliaSelected" [isMobile]="isMobile"></app-anomalia-info-editable>
-
     <div *ngIf="plantaFija" id="pos-map" class="elem-info">
       <span class="titulo">{{ 'Ir al mapa' | translate }}</span>
       <button mat-icon-button (click)="goToAnomMap()">
         <mat-icon>place</mat-icon>
       </button>
     </div>
+
+    <app-anomalia-info-editable
+      [anomaliaSelected]="anomaliaSelected"
+      [isMobile]="isMobile"
+    ></app-anomalia-info-editable>
   </div>
 </div>
