@@ -213,8 +213,8 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.http.post(this.cloudFunctionUrl, payload).subscribe(
       () => {
-        this.statusMessage = 'Contraseña restablecida.';
-        this.openSnackBarMessage("Contraseña del usuario restablecida. El usuario recibirá un email.");
+        this.statusMessage = 'Solicitud enviada.';
+        this.openSnackBarMessage("El usuario recibirá un email para restablecer su contraseña.");
       },
       (error) => {
         this.statusMessage = 'Error al restablecer contraseña.';
