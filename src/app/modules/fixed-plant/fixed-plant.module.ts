@@ -18,7 +18,6 @@ import { FixedPlantComponent } from './components/fixed-plant.component';
 import { MapComponent } from './components/map/map.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { SliderOpacityComponent } from './components/slider-opacity/slider-opacity.component';
-import { LostDashboardComponent } from './components/lost-dashboard/lost-dashboard.component';
 import { MapTestComponent } from './components/map-test/map-test.component';
 
 import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list.directive';
@@ -29,7 +28,6 @@ import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list
     MapComponent,
     SliderOpacityComponent,
     DynamicAnomaliaListDirective,
-    LostDashboardComponent,
     MapTestComponent,
     FixedPlantComponent,
   ],
@@ -42,7 +40,7 @@ import { DynamicAnomaliaListDirective } from './directives/dynamic-anomalia-list
     SharedPlantsModule,
     SharedModule,
     CommentsModule,
-    AnomaliesModule
+    AnomaliesModule,
   ],
   exports: [MapViewComponent],
 })

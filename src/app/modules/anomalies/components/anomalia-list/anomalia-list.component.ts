@@ -78,9 +78,8 @@ export class AnomaliaListComponent implements OnChanges {
           .then(() => {
             // 2. Expandimos la fila de la anomalía seleccionada (expandimos primero ya que es lo que
             // mejor experiencia ofrece)
-            // let row = this.findRow();
-            // this.expandRow(row);
-            this.scrollToIndex(firstRowInPage.id, false);
+            let row = this.findRow();
+            this.expandRow(row);
             return new Promise((resolve) => {
               setTimeout(() => resolve(true), 200);
             });
@@ -89,12 +88,10 @@ export class AnomaliaListComponent implements OnChanges {
             // 3. Hacemos scroll hasta la primera fila de la página (de este modo evitamos el efecto de
             // que la fila seleccionada no se vea porque se "ha ido hacia arriba" siguiendo el efecto que
             // hace mat-table al hacer scroll)
-            let row = this.findRow();
-            this.expandRow(row);
+            this.scrollToIndex(firstRowInPage.id, false);
             return new Promise((resolve) => {
               setTimeout(() => resolve(true), 200);
             });
-            // this.scrollToIndex(firstRowInPage.id, false);
           })
           .then(() => {
             // Hacemos scroll hasta la fila seleccionada
@@ -175,11 +172,15 @@ export class AnomaliaListComponent implements OnChanges {
   }
 
   selectRow(row: any, zoom: boolean) {
+    row.zoom = zoom;
+
     if (this.expandedRow === row) {
       this.expandedRow = null;
+
+      this.rowSelected.emit(undefined);
+    } else {
+      this.rowSelected.emit(row);
     }
-    row.zoom = zoom;
-    this.rowSelected.emit(row);
   }
 
   expandRow(row: any) {

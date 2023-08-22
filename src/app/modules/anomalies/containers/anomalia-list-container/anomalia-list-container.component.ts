@@ -48,7 +48,7 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscriptions.add(this.olMapService.map$.subscribe((map) => (this.map = map)));
-    
+
     this.subscriptions.add(
       this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSeleccionada = view))
     );
@@ -61,7 +61,7 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
               this.selectedInformeId = informeId;
               if (this.selectedInformeId !== undefined) {
                 this.dataInforme = this.allData.filter((data) => data.informeId === this.selectedInformeId);
-                
+
                 this.dataSource = new MatTableDataSource(this.dataInforme);
 
                 this.dataSource.filterPredicate = (data, filter: string): boolean => data.numAnom.toString() === filter;
@@ -144,34 +144,41 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
 
   hoverAnomalia(row: any) {
     // if (this.anomaliasControlService.anomaliaSelect === undefined) {
-      if (row.hovered && this.map) {
-        this.anomaliasControlService.anomaliaHover = row.anomalia;
-        let coords = row.anomalia.featureCoords[0]; 
-        this.anomaliasControlService.setPopupPosition(coords);
-        
-      } else {
-        this.anomaliasControlService.anomaliaHover = undefined;
-      }
-      this.anomaliasControlService.setExternalStyle(row.id, row.hovered, row.anomalia.featureType);
+    if (row.hovered && this.map) {
+      this.anomaliasControlService.anomaliaHover = row.anomalia;
+      let coords = row.anomalia.featureCoords[0];
+      this.anomaliasControlService.setPopupPosition(coords);
+    } else {
+      this.anomaliasControlService.anomaliaHover = undefined;
+    }
+    this.anomaliasControlService.setExternalStyle(row.id, row.hovered, row.anomalia.featureType);
     // }
   }
 
   selectAnomalia(row: any) {
-    // quitamos el hover de la anomalia
-    this.anomaliasControlService.anomaliaHover = undefined;
+    if (row !== undefined) {
+      // quitamos el hover de la anomalia
+      this.anomaliasControlService.anomaliaHover = undefined;
 
-    // reiniciamos el estilo a la anterior anomalia
-    if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
-      this.anomaliasControlService.setExternalStyle(this.anomaliasControlService.prevAnomaliaSelect.id, false, this.anomaliasControlService.prevAnomaliaSelect.featureType);
+      // reiniciamos el estilo a la anterior anomalia
+      if (this.anomaliasControlService.prevAnomaliaSelect !== undefined) {
+        this.anomaliasControlService.setExternalStyle(
+          this.anomaliasControlService.prevAnomaliaSelect.id,
+          false,
+          this.anomaliasControlService.prevAnomaliaSelect.featureType
+        );
+      }
+      this.anomaliasControlService.prevAnomaliaSelect = row.anomalia;
+
+      this.anomaliasControlService.anomaliaSelect = row.anomalia;
+      this.anomaliasControlService.selectionMethod = 'list';
+      this.anomaliasControlService.setExternalStyle(row.id, true, row.anomalia.featureType);
+
+      // centramos la vista al hacer click
+      this.centerView(row.anomalia, row.zoom);
+    } else {
+      this.anomaliasControlService.anomaliaSelect = undefined
     }
-    this.anomaliasControlService.prevAnomaliaSelect = row.anomalia;
-
-    this.anomaliasControlService.anomaliaSelect = row.anomalia;
-    this.anomaliasControlService.selectionMethod = 'list';
-    this.anomaliasControlService.setExternalStyle(row.id, true, row.anomalia.featureType);
-
-    // centramos la vista al hacer click
-    this.centerView(row.anomalia, row.zoom);
   }
 
   private centerView(anomalia: Anomalia, zoom: boolean) {

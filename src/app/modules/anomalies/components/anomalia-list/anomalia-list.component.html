@@ -61,7 +61,7 @@
       <!-- La fila expandida tendrá este contenido (referencia: https://stackblitz.com/angular/eaajjobynjkl?file=src%2Fapp%2Ftable-expandable-rows-example.html) -->
       <ng-container matColumnDef="expandedDetail">
         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
-          <div class="example-element-detail" [@detailExpand]="row == expandedRow ? 'expanded' : 'collapsed'">
+          <div class="example-element-detail" [@detailExpand]="row === expandedRow ? 'expanded' : 'collapsed'">
             <app-anomalia-info
               *ngIf="row.anomalia == anomaliaSelected"
               [anomaliaSelect]="anomaliaSelected"
