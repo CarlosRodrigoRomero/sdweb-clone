@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-
+import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
@@ -20,7 +20,7 @@ import { PlantaInterface } from '@core/models/planta';
 export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   private plantas: PlantaInterface[];
   displayedColumns: string[] = [
-    'warnings',
+    // 'warnings',
     'planta',
     'fecha',
     'tipo',
@@ -36,6 +36,7 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('search') search: ElementRef;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
     private informeService: InformeService,
@@ -87,9 +88,9 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   private getTipoInforme(tipo: string): string {
     if (tipo === 'seguidores') {
       return 'tracker';
-    } else if (tipo === 'cubierta'){
+    } else if (tipo === 'cubierta') {
       return 'rooftop';
-    }else {
+    } else {
       return 'fixed';
     }
   }
@@ -97,11 +98,16 @@ export class ReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.search.nativeElement.focus();
+    this.dataSource.paginator = this.paginator;
   }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   ngOnDestroy(): void {
