@@ -177,9 +177,9 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
             this.reportControlService.mapLoaded$.subscribe((value) => {
               this.loadContent = value;
 
-              if (value) {
-                setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
-              }
+              // if (value) {
+              //   setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
+              // }
             })
           );
         } else {
