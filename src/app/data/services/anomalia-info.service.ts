@@ -162,6 +162,32 @@ export class AnomaliaInfoService {
     return label;
   }
 
+  getLocalizacionTranslateLabel(anomalia: Anomalia, planta: PlantaInterface): string {
+    let label = '';
+
+    if (anomalia.hasOwnProperty('globalCoords')) {
+      let globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
+
+      globals.forEach((coord, index) => {
+        if (coord !== undefined && coord !== null && coord !== '') {
+          if (planta?.nombreGlobalCoords[index]) {
+            this.subscriptions.add(
+              this.translate.get(planta.nombreGlobalCoords[index]).subscribe((res: string) => {
+                label += `${res}: ${coord}`;
+              })
+            );
+          } else {
+            label += `${coord}`;
+          }
+        }
+        if (index < globals.length - 1) {
+          label += ' / ';
+        }
+      });
+    }
+    return label;
+  }
+
   getLocalizacionCompleteElems(anomalia: Anomalia, planta: PlantaInterface): string[] {
     const elems: string[] = [];
 
@@ -197,15 +223,18 @@ export class AnomaliaInfoService {
 
       globals.forEach((coord, index) => {
         if (coord !== undefined && coord !== null && coord !== '') {
-          if (planta.hasOwnProperty('nombreGlobalCoords') && planta.nombreGlobalCoords.length > index) {
+          if (planta?.nombreGlobalCoords[index]) {
             this.subscriptions.add(
               this.translate.get(planta.nombreGlobalCoords[index]).subscribe((res: string) => {
-                label += `${res}: ${coord} / `;
+                label += `${res}: ${coord}`;
               })
             );
           } else {
             label += `${coord} / `;
           }
+        }
+        if (index < globals.length - 1) {
+          label += ' / ';
         }
       });
     }
@@ -270,6 +299,40 @@ export class AnomaliaInfoService {
       const altura = this.getAlturaAnom(anomalia, planta);
       const columna = this.getColumnaAnom(anomalia, planta);
       label += `${this.translation.t('Fila')}: ${altura} / ${this.translation.t('Columna')}: ${columna}`;
+    }
+
+    return label;
+  }
+
+  getPosicionModuloTranslateLabel(anomalia: Anomalia, planta: PlantaInterface) {
+    let label = '';
+
+    const numModulo = this.getNumeroModulo(anomalia, planta);
+    if (numModulo !== null) {
+      this.translate
+        .get('Nº módulo')
+        .pipe(take(1))
+        .subscribe((res: string) => {
+          label += `${res}: ${numModulo.toString()}`;
+        });
+    } else {
+      const altura = this.getAlturaAnom(anomalia, planta);
+      const columna = this.getColumnaAnom(anomalia, planta);
+
+      this.translate
+        .get('Fila')
+        .pipe(
+          take(1),
+          switchMap((res: string) => {
+            label += `${res}: ${altura} / `;
+
+            return this.translate.get('Columna');
+          }),
+          take(1)
+        )
+        .subscribe((res: string) => {
+          label += `${res}: ${columna}`;
+        });
     }
 
     return label;

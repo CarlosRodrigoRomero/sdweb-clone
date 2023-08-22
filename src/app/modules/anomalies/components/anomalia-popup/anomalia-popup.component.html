@@ -1,18 +1,18 @@
 <div class="popup">
-    <mat-card class="popup-hover" *ngIf="showAnomaliaInfo">
-      <mat-card-content class="popup-hover-content">
-        <div class="elemento">
-          <span class="titulo">{{ 'Tipo' | translate }}</span>
-          <span class="subtitulo">{{ tipoLabel }}</span>
-        </div>
-        <div class="elemento">
-          <span class="titulo">{{ 'localizacion' | translate | titlecase }}</span>
-          <span class="subtitulo subtitulo--localizacion">{{ localizacion }}</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-    <!-- <mat-card class="popup-hover" *ngIf="showSuciedadInfo">
-        <span class="popup-label">{{ 'Este módulo tiene suciedad' | translate }}</span>
-      </mat-card> -->
-  </div>
-  
+  <mat-card class="popup-hover" *ngIf="showAnomaliaInfo">
+    <mat-card-content class="popup-hover-content">
+      <div class="elemento">
+        <span class="titulo">{{ 'Tipo' | translate }}</span>
+        <span class="subtitulo">{{ tipoLabel }}</span>
+      </div>
+      <div class="elemento">
+        <span class="titulo">{{ 'localizacion' | translate | titlecase }}</span>
+        <span class="subtitulo">{{ localizacion }}</span>
+      </div>
+      <div class="elemento">
+        <span class="titulo">{{ 'Posición' | translate }}</span>
+        <span class="subtitulo">{{ posicion }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

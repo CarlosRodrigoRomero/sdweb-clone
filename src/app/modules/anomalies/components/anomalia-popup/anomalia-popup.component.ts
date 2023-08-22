@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
+import { AnomaliaInfoService } from '@data/services/anomalia-info.service';
 
 import { Anomalia } from '@core/models/anomalia';
 
@@ -12,13 +13,13 @@ import { GLOBAL } from '@data/constants/global';
 @Component({
   selector: 'app-anomalia-popup',
   templateUrl: './anomalia-popup.component.html',
-  styleUrls: ['./anomalia-popup.component.css']
+  styleUrls: ['./anomalia-popup.component.css'],
 })
 export class AnomaliaPopupComponent implements OnInit {
-
   numAnomalias: number;
   anomaliaHovered: Anomalia;
   localizacion: string;
+  posicion: string;
   tipoLabel: string;
   showAnomaliaInfo = false;
   showSuciedadInfo = false;
@@ -27,7 +28,8 @@ export class AnomaliaPopupComponent implements OnInit {
 
   constructor(
     private anomaliasControlService: AnomaliasControlService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private anomaliaInfoService: AnomaliaInfoService
   ) {}
 
   ngOnInit(): void {
@@ -35,15 +37,17 @@ export class AnomaliaPopupComponent implements OnInit {
       this.anomaliasControlService.anomaliaHover$.subscribe((anomalia) => {
         this.anomaliaHovered = anomalia;
         if (this.anomaliaHovered !== undefined) {
-          if (this.anomaliaHovered.tipo === 11) {
-            this.showAnomaliaInfo = false;
-            this.showSuciedadInfo = true;
-          } else {
-            this.showAnomaliaInfo = true;
-            this.showSuciedadInfo = false;
-            this.tipoLabel = GLOBAL.labels_tipos[this.anomaliaHovered.tipo];
-            this.localizacion = this.getLocalizacionLabel(this.anomaliaHovered);
-          }          
+          this.showAnomaliaInfo = true;
+          this.showSuciedadInfo = false;
+          this.tipoLabel = GLOBAL.labels_tipos[this.anomaliaHovered.tipo];
+          this.localizacion = this.anomaliaInfoService.getLocalizacionTranslateLabel(
+            this.anomaliaHovered,
+            this.reportControlService.planta
+          );
+          this.posicion = this.anomaliaInfoService.getPosicionModuloTranslateLabel(
+            this.anomaliaHovered,
+            this.reportControlService.planta
+          );
         } else {
           this.showAnomaliaInfo = false;
           this.showSuciedadInfo = false;
@@ -52,31 +56,7 @@ export class AnomaliaPopupComponent implements OnInit {
     );
   }
 
-  private getLocalizacionLabel(anomalia: Anomalia): string {
-    let label = '';
-
-    if (anomalia.hasOwnProperty('globalCoords')) {
-      let globals = anomalia.globalCoords.filter((coord) => coord !== undefined && coord !== null && coord !== '');
-
-      globals.forEach((coord, index) => {
-        if (coord !== undefined && coord !== null && coord !== '') {
-          if (this.reportControlService.nombreGlobalCoords.length > 0) {
-            const nombres = this.reportControlService.nombreGlobalCoords;
-            label += nombres[index] ? `${nombres[index]}: ${coord}` : `${coord}`;
-          } else {
-            label += `${coord}`;
-          }
-        }
-        if (index < globals.length - 1) {
-          label += ' / ';
-        }
-      });
-    }
-    return label;
-  }
-
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
-
 }

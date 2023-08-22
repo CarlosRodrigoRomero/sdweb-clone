@@ -140,27 +140,11 @@ export class AnomaliaInfoComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges() {
     this.planta = this.reportControlService.planta;
 
-    // si hay una anomalia seleccionada deja de aparecer el popup en el hover
-    if (this.anomaliaSelect === undefined) {
-      this.infoAdicional = undefined;
-      if (this.anomaliaHover !== undefined) {
-        this.dataSource = [this.anomaliaHover];
-        this.perdidas = this.anomaliaInfoService.getPerdidasLabel(this.anomaliaHover);
-        this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(
-          this.anomaliaHover,
-          this.planta
-        );
-        this.posicion = this.anomaliaInfoService.getPosicionModuloLabel(this.anomaliaHover, this.planta);
-      } else {
-        this.dataSource = null;
-      }
-    } else {
+    if (this.anomaliaSelect) {
       this.dataSource = [this.anomaliaSelect];
-      this.localizacion = this.anomaliaInfoService.getLocalizacionCompleteTranslateLabel(
-        this.anomaliaSelect,
-        this.planta
-      );
-      this.posicion = this.anomaliaInfoService.getPosicionModuloLabel(this.anomaliaHover, this.planta);
+      this.perdidas = this.anomaliaInfoService.getPerdidasLabel(this.anomaliaSelect);
+      this.localizacion = this.anomaliaInfoService.getLocalizacionTranslateLabel(this.anomaliaSelect, this.planta);
+      this.posicion = this.anomaliaInfoService.getPosicionModuloTranslateLabel(this.anomaliaSelect, this.planta);
 
       if (this.informeSelected !== undefined && this.anomaliaSelect !== undefined) {
         setTimeout(() => {

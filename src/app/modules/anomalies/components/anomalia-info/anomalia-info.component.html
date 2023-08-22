@@ -35,10 +35,10 @@
         <span class="info-anom-titulo">{{ 'Pérdidas' | translate }}</span>
         <span class="info-anom-subtitulo">{{ perdidas | translate }}</span>
       </div>
-      <div class="elemento">
+      <!-- <div class="elemento">
         <span class="info-anom-titulo">{{ 'clase' | translate | titlecase }}</span>
         <span class="info-anom-subtitulo">CoA {{ anomaliaSelect.clase }}</span>
-      </div>
+      </div> -->
       <div class="elemento" *ngIf="anomaliaSelect.criticidad !== undefined">
         <span class="info-anom-titulo"
           >{{ 'Criticidad (Criterio' | translate }} {{ anomaliaService.criterioCriticidad.nombre }})</span
@@ -50,7 +50,7 @@
         <span class="info-anom-subtitulo">{{ localizacion }}</span>
       </div>
       <div class="elemento">
-        <span class="info-anom-titulo">{{ 'Posición' | translate | titlecase }}</span>
+        <span class="info-anom-titulo">{{ 'Posición' | translate }}</span>
         <span class="info-anom-subtitulo">{{ posicion }}</span>
       </div>
     </div>
