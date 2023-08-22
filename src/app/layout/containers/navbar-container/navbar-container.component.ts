@@ -72,10 +72,10 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
     }
 
     this.subscriptions.add(
-      this.reportControlService.mapLoaded$.subscribe((value) => {
-        this.loadContent = value;
+      this.reportControlService.reportDataLoaded$.subscribe((loaded) => {
+        this.loadContent = loaded;
 
-        // if (value) {
+        // if (loaded) {
         //   setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
         // }
       })
@@ -174,10 +174,10 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
           this.isPortfolio = true;
 
           this.subscriptions.add(
-            this.reportControlService.mapLoaded$.subscribe((value) => {
-              this.loadContent = value;
+            this.reportControlService.reportDataLoaded$.subscribe((loaded) => {
+              this.loadContent = loaded;
 
-              // if (value) {
+              // if (loaded) {
               //   setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
               // }
             })
