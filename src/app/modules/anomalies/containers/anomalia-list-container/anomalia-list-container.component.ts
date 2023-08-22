@@ -14,6 +14,7 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ViewReportService } from '@data/services/view-report.service';
 
 import { Anomalia } from '@core/models/anomalia';
+import { NumAnomFilter } from '@core/models/numAnomFilter';
 
 import { GLOBAL } from '@data/constants/global';
 
@@ -177,7 +178,17 @@ export class AnomaliaListContainer implements OnInit, OnDestroy {
       // centramos la vista al hacer click
       this.centerView(row.anomalia, row.zoom);
     } else {
-      this.anomaliasControlService.anomaliaSelect = undefined
+      this.anomaliasControlService.anomaliaSelect = undefined;
+    }
+  }
+
+  filterAnoms(filterValue: string) {
+    const filter = new NumAnomFilter('id', 'numAnom', Number(filterValue));
+
+    if (filterValue !== '') {
+      this.filterService.addFilter(filter);
+    } else {
+      this.filterService.deleteFilter(filter);
     }
   }
 

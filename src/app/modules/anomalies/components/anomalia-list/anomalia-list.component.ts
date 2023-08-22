@@ -47,6 +47,7 @@ export class AnomaliaListComponent implements OnChanges {
   @Input() anomaliaSelected: Anomalia;
   @Output() rowHovered = new EventEmitter<any>();
   @Output() rowSelected = new EventEmitter<any>();
+  @Output() filterAnoms = new EventEmitter<string>();
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   // Para permitir a la tabla hacer scroll a la anomalía seleccionada
@@ -160,6 +161,8 @@ export class AnomaliaListComponent implements OnChanges {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    this.filterAnoms.emit(filterValue);
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
