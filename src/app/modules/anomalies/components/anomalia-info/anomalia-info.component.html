@@ -123,7 +123,8 @@
     <mat-expansion-panel-header>
       <mat-panel-title> O&M </mat-panel-title>
     </mat-expansion-panel-header>
-    <!-- <app-comments [anomalia]="anomaliaSelect"></app-comments> -->
-    <app-anomalia-info-editable [anomaliaSelected]="anomaliaSelect"></app-anomalia-info-editable>
+    <div class="tab-content">
+      <app-anomalia-info-editable [anomaliaSelected]="anomaliaSelect"></app-anomalia-info-editable>
+    </div>
   </mat-expansion-panel>
 </mat-accordion>
