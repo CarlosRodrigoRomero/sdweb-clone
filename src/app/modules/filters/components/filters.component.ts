@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 
 import { FiltersPanelContainerComponent } from '../containers/filters-panel-container/filters-panel-container.component';
 
@@ -9,12 +9,10 @@ import { DynamicFiltersDirective } from '../directives/dynamic-filters.directive
   templateUrl: './filters.component.html',
   styleUrls: ['./filters.component.css'],
 })
-export class FiltersComponent implements OnInit {
+export class FiltersComponent {
   @ViewChild(DynamicFiltersDirective) dynamicFilters: DynamicFiltersDirective;
 
   constructor() {}
-
-  ngOnInit(): void {}
 
   loadFilters() {
     this.dynamicFilters.viewContainerRef.clear();

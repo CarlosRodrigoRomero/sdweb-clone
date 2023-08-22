@@ -1,3 +1,5 @@
+<div *ngIf="!dataLoaded" class="loading background"></div>
+
 <app-report-principal-data
   *ngIf="dataLoaded"
   [mae]="mae"
