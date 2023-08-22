@@ -1,18 +1,20 @@
 <div class="summary">
-  <div class="titulo">
-    <!-- <mat-icon color="primary">home</mat-icon> -->
-    <span class="title">{{ 'resumen' | translate | titlecase }}</span>
-  </div>
-  <div class="datos">
+  <div class="summary-elem">
     <mat-icon color="primary">tag</mat-icon>
     <span class="subtitulo">{{ 'Nº plantas' | translate }}</span>
     <span class="dato">{{ numPlantas }}</span>
+  </div>
+  <div class="summary-elem">
     <mat-icon color="primary">bolt</mat-icon>
     <span class="subtitulo">{{ 'Potencia total' | translate }}</span>
     <span class="dato">{{ potenciaTotal | number : '1.0-0' }} MW</span>
+  </div>
+  <div class="summary-elem">
     <mat-icon color="primary">keyboard_double_arrow_down</mat-icon>
     <span class="subtitulo">{{ 'MAE medio' | translate }}</span>
     <span class="dato">{{ maeMedio * 100 | number : '1.0-2' }}%</span>
+  </div>
+  <div class="summary-elem">
     <mat-icon color="primary">keyboard_double_arrow_down</mat-icon>
     <span class="subtitulo">{{ 'MAE reparable medio' | translate }}</span>
     <span class="dato">{{ fixableMaeMedio * 100 | number : '1.0-2' }}%</span>

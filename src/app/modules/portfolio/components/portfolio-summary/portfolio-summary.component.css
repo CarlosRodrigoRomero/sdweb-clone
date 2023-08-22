@@ -1,20 +1,12 @@
 .summary {
   display: flex;
+  gap: 1rem;
 }
 
-.datos {
+.summary-elem {
   display: flex;
   align-items: center;
-}
-
-.datos mat-icon {
-  font-size: 26px;
-  margin: 0 0.5rem 0 1.5rem;
-}
-
-.plantas {
-  display: flex;
-  width: 100%;
+  gap: 0.5rem;
 }
 
 .potencia {

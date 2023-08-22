@@ -1,5 +1,5 @@
 <div class="navbar-content">
-  <div class="left-content">
+  <div *ngIf="isReport && loadContent" class="left-content">
     <app-simple-plant-summary></app-simple-plant-summary>
   </div>
 

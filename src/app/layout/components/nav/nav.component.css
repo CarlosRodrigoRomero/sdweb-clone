@@ -81,8 +81,11 @@ app-navbar-container {
 }
 
 .data-navbar {
-  /* background: red; */
   border-radius: 8px;
+}
+
+app-portfolio-principal-data-container {
+  width: 100%;
 }
 
 .navbar-top {
