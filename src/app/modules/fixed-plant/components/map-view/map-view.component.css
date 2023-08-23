@@ -1,6 +1,6 @@
 .map-view {
   display: grid;
-  grid-template-columns: calc(30% - 8px) calc(70% - 8px);
+  grid-template-columns: auto 1fr;
   gap: 16px;
 }
 

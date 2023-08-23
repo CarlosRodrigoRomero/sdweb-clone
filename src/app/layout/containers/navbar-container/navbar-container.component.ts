@@ -74,10 +74,6 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.reportControlService.reportDataLoaded$.subscribe((loaded) => {
         this.loadContent = loaded;
-
-        // if (loaded) {
-        //   setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
-        // }
       })
     );
 
@@ -176,10 +172,6 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
           this.subscriptions.add(
             this.reportControlService.reportDataLoaded$.subscribe((loaded) => {
               this.loadContent = loaded;
-
-              // if (loaded) {
-              //   setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
-              // }
             })
           );
         } else {
@@ -214,6 +206,9 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
             this.isReport = true;
           } else {
             this.isReport = false;
+
+            // reseteamos la carga de contenido
+            this.reportControlService.reportDataLoaded = false;
           }
         }
       }

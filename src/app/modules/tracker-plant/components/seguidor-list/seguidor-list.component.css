@@ -33,9 +33,8 @@ table {
 
 .tabla-container {
   position: relative;
-  height: calc(100vh - 306px);
+  height: calc(100vh - 254px);
   overflow: auto;
-  min-width: 350px;
 }
 
 .mat-row {
