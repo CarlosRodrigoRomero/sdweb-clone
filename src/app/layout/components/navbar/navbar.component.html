@@ -24,6 +24,9 @@
       <button class="active-filters" mat-button color="primary">{{ 'Filtros activos' | translate }}</button>
     </div>
 
+    <!-- FILTROS -->
+    <app-filters *ngIf="loadContent && !isShared"></app-filters>
+
     <app-share-plant-container *ngIf="loadContent && isReport && !isShared"></app-share-plant-container>
 
     <!-- MENU DERECHA -->
