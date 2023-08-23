@@ -1,5 +1,16 @@
+.map-view {
+  display: grid;
+  grid-template-columns: max-content auto;
+  gap: 16px;
+}
+
+.panel-seguidores {
+  padding: 5px;
+  border-radius: 8px;
+}
+
 .seguidor-sidenav {
-  margin: 10px 10px 10px;
+  margin: 10px;
   border-radius: 8px;
   width: fit-content;
 }
