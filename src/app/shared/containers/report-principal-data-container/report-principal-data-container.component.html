@@ -1,0 +1,11 @@
+<div *ngIf="!dataLoaded" class="loading background"></div>
+
+<app-report-principal-data
+  *ngIf="dataLoaded"
+  [mae]="mae"
+  [maeReparable]="maeReparable"
+  [numAnomsFiltered]="numAnomsFiltered"
+  [numAnoms]="numAnoms"
+  [numFixableAnomsFiltered]="numFixableAnomsFiltered"
+  [numFixableAnoms]="numFixableAnoms"
+></app-report-principal-data>

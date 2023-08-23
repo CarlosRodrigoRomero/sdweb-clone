@@ -48,6 +48,16 @@ export const routes: Routes = [
     loadChildren: () => import('@modules/fixed-plant/fixed-plant.module').then((m) => m.FixedPlantModule),
   },
   {
+    path: 'rooftop-shared',
+    component: NavComponent,
+    loadChildren: () => import('@modules/rooftop-plant/rooftop-plant.module').then((m) => m.RooftopPlantModule),
+  },
+  {
+    path: 'rooftop-filterable-shared',
+    component: NavComponent,
+    loadChildren: () => import('@modules/rooftop-plant/rooftop-plant.module').then((m) => m.RooftopPlantModule),
+  },
+  {
     path: 'tracker-shared',
     component: NavComponent,
     loadChildren: () => import('@modules/tracker-plant/tracker-plant.module').then((m) => m.TrackerPlantModule),

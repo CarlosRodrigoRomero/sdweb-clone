@@ -25,7 +25,7 @@
 
 .tabla-container {
   position: relative;
-  max-height: calc(100vh - 68px - 64px - 32px - 16px - 36px - 64px);
+  max-height: calc(100vh - 292px);
   overflow: auto;
 }
 
@@ -89,7 +89,7 @@ h4 {
   }
 
   .tabla-container {
-    max-height: calc(100vh - 56px - 16px - 32px - 36px - 64px);
+    max-height: calc(100vh - 276px);
   }
 
   .mat-column-color {

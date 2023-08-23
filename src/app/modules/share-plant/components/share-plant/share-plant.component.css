@@ -1,12 +1,9 @@
-.content {
-    display: flex;
-    align-content: center;
-    margin-right: 1rem;
-    margin-left: 1rem;
-    border: 1px solid grey;
-    border-radius: 22px;
-  }
+.share-btn {
+  border-radius: 18px;
+}
 
-  .mat-icon {
-    margin-right: 5px;
+.share-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }

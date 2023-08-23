@@ -10,6 +10,7 @@ export class FiltersPanelComponent {
   @Input() filtrosActivos: boolean;
   @Input() showFiltroModelo: boolean;
   @Input() showFiltroZona: boolean;
+  @Input() tipoCubierta: boolean;
   @Output() cleanFilters = new EventEmitter();
 
   clickCleanFilters() {

@@ -1,25 +1,18 @@
-<div class="filtro">
-  <h5>{{ 'Tipo' | translate }}</h5>
-  <button class="tipo-select" mat-stroked-button [matMenuTriggerFor]="menu">
-    <span *ngIf="defaultLabelStatus" class="filter-default">{{ defaultSelectLabel }}</span>
-    <span *ngIf="!defaultLabelStatus" class="filter-selected">{{ selectedLabels.toString() }}</span>
-    <mat-icon>keyboard_arrow_down</mat-icon>
-  </button>
-  <mat-menu class="menu-tipo" #menu="matMenu">
-    <div>
-      <li mat-menu-item *ngFor="let tipoElem of tiposElem; index as i" (click)="stopPropagation($event)">
-        <mat-checkbox
-          [checked]="tiposSelected[tipoElem.tipo]"
-          [id]="'tipo_' + tipoElem.tipo"
-          [name]="tipoElem.label"
-          [value]="i"
-          (change)="onChangeFiltroTipo($event)"
-        >
-          <span style="font-size: 15px">
-            {{ tipoElem.label | translate }}
-          </span>
-        </mat-checkbox>
-      </li>
-    </div>
-  </mat-menu>
-</div>
+<mat-expansion-panel (click)="$event.stopPropagation()">
+  <mat-expansion-panel-header>
+    <mat-panel-title>{{ 'Tipo' | translate }}</mat-panel-title>
+  </mat-expansion-panel-header>
+  <li mat-menu-item *ngFor="let tipoElem of tiposElem; index as i" (click)="stopPropagation($event)">
+    <mat-checkbox
+      [checked]="tiposSelected[tipoElem.tipo]"
+      [id]="'tipo_' + tipoElem.tipo"
+      [name]="tipoElem.label"
+      [value]="i"
+      (change)="onChangeFiltroTipo($event)"
+    >
+      <span style="font-size: 15px">
+        {{ tipoElem.label | translate }}
+      </span>
+    </mat-checkbox>
+  </li>
+</mat-expansion-panel>

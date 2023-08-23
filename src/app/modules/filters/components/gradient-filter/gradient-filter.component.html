@@ -1,5 +1,7 @@
-<div class="filtro">
-  <h5>&Delta;T ({{ 'normalizado' | translate }})</h5>
+<mat-expansion-panel (click)="$event.stopPropagation()">
+  <mat-expansion-panel-header>
+    <mat-panel-title>&Delta;T ({{ 'normalizado' | translate }})</mat-panel-title>
+  </mat-expansion-panel-header>
   <div id="filter_gradient" class="custom-slider">
     <ngx-slider
       [(value)]="rangoMinGradiente"
@@ -8,4 +10,4 @@
       (userChangeEnd)="onChangeFiltroGradiente(rangoMinGradiente, rangoMaxGradiente)"
     ></ngx-slider>
   </div>
-</div>
+</mat-expansion-panel>

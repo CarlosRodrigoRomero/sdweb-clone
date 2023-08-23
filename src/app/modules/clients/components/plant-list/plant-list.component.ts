@@ -223,7 +223,11 @@ export class PlantListComponent implements OnInit, AfterViewInit {
       this.router.navigate(['clients/tracker/' + row.plantaId + '/' + initialLocalView]);
     } else {
       if (row.ultimaInspeccion > GLOBAL.newReportsDate || row.plantaId === 'egF0cbpXnnBnjcrusoeR') {
-        this.router.navigate(['clients/fixed/' + row.plantaId + '/' + initialLocalView]);
+        if (row.tipo === 'cubierta') {
+          this.router.navigate(['clients/rooftop/' + row.plantaId + '/' + initialLocalView]);
+        } else {
+          this.router.navigate(['clients/fixed/' + row.plantaId + '/' + initialLocalView]);
+        }
       } else {
         this.openSnackBar();
       }

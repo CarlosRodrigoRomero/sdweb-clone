@@ -1,45 +1,34 @@
-.filtro {
-    margin-bottom: 15px;
-  }
-  
-  h5 {
-    margin-bottom: 15px;
-    font-weight: 400;
-  }
-  
-  .modelo-select {
-    width: 100%;
-  }
-  
-  .filter-default {
-    font-weight: 200;
-    /* color: grey; */
-  }
-  
-  .filter-selected {
-    display: inline-block;
-    width: 170px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    font-size: 15px;
-    color: #d32f2f;
-  }
-  
-  :host ::ng-deep .menu-tipo .mat-menu-content:not(:empty) {
-    min-width: 280px;
-  }
-  
-  li {
-    list-style-type: none;
-    margin-left: 10px;
-    margin-right: 10px;
-  }
+.modelo-select {
+  width: 100%;
+}
 
-  
-  .mat-menu-item {
-    height: 30px;
-    display: flex;
-    align-items: center;
-  }
-  
+.filter-default {
+  font-weight: 200;
+  /* color: grey; */
+}
+
+.filter-selected {
+  display: inline-block;
+  width: 170px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  color: #d32f2f;
+}
+
+:host ::ng-deep .menu-tipo .mat-menu-content:not(:empty) {
+  min-width: 280px;
+}
+
+li {
+  list-style-type: none;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.mat-menu-item {
+  height: 30px;
+  display: flex;
+  align-items: center;
+}

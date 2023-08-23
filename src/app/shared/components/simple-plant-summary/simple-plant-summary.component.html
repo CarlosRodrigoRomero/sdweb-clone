@@ -1,4 +1,5 @@
 <div class="navbar">
-  <span class="titulo">{{ planta.nombre }}</span>
-  <span class="fecha">{{ selectedInforme.fecha * 1000 | date: 'dd/MM/yyyy' }}</span>
+  <span class="titulo">{{ planta?.nombre }}</span>
+  <span class="subtitulo">({{ planta?.potencia | number : '1.0-2' }} MW)</span>
+  <span class="fecha">{{ selectedInforme?.fecha * 1000 | date : 'dd/MM/yyyy' }}</span>
 </div>

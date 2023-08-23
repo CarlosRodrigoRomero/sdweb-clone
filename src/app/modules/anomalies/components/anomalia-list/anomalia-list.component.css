@@ -1,0 +1,203 @@
+.lista {
+  margin: 5px;
+  position: relative;
+}
+
+:host ::ng-deep thead {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  top: 73px;
+
+  box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.2), 0px 0px 5px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+
+:host ::ng-deep tbody {
+  margin-top: 70.5px;
+}
+
+.tabla-container {
+  position: auto;
+  height: calc(100vh - 310px);
+  overflow: auto;
+  margin-top: 56px;
+}
+
+.buscar-input {
+  width: 100%;
+}
+
+:host ::ng-deep .buscar-input .mat-form-field-wrapper {
+  padding-bottom: 6px;
+}
+
+:host ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}
+
+:host ::ng-deep .mat-sort-header-content {
+  width: max-content;
+  opacity: 0.7;
+}
+
+:host ::ng-deep td.mat-cell:first-of-type {
+  padding-left: 0px;
+}
+
+:host ::ng-deep th.mat-header-cell:first-of-type,
+th.mat-header-cell:last-of-type {
+  padding: 0;
+}
+
+:host ::ng-deep .mat-header-row {
+  /* width:100%; */
+  display: flex;
+  align-items: center;
+}
+
+th {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+table {
+  width: 100%;
+}
+
+/* ocultamos la barra vertical overscrool */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+.label-tipo {
+  display: inline-flex;
+  margin-top: 0.5rem;
+}
+
+.label-tipo mat-icon {
+  margin-right: 0.5rem;
+}
+
+.mat-row {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.row-data {
+  display: flex;
+  justify-content: center;
+}
+
+.color-row {
+  width: 10px;
+  height: 48px;
+}
+
+.mat-column-colors {
+  width: 5%;
+}
+
+.mat-column-numAnom {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 10% !important;
+  width: 10% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  /* word-break: break-word; */
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-tipo {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 40% !important;
+  width: 40% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  /* word-break: break-word; */
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-perdidas {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 15% !important;
+  width: 15% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  /* word-break: break-word; */
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-temp {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 15% !important;
+  width: 15% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-gradiente {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 15% !important;
+  width: 15% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-row.selected {
+  opacity: 1;
+}
+
+.mat-row.hovered {
+  opacity: 1;
+}
+
+/* Estilos para el desplegable de cada fila */
+.example-element-detail {
+  overflow: hidden;
+  display: flex;
+}
+
+tr.example-detail-row {
+  height: 0;
+}
+
+app-anomalia-info {
+  width: 100%;
+}
+
+td.mat-cell:last-of-type {
+  padding-right: 0;
+}

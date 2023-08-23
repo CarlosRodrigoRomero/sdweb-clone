@@ -72,12 +72,8 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
     }
 
     this.subscriptions.add(
-      this.reportControlService.mapLoaded$.subscribe((value) => {
-        this.loadContent = value;
-
-        if (value) {
-          setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
-        }
+      this.reportControlService.reportDataLoaded$.subscribe((loaded) => {
+        this.loadContent = loaded;
       })
     );
 
@@ -174,12 +170,8 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
           this.isPortfolio = true;
 
           this.subscriptions.add(
-            this.reportControlService.mapLoaded$.subscribe((value) => {
-              this.loadContent = value;
-
-              if (value) {
-                setTimeout(() => (document.getElementById('plant-summary').style.visibility = 'unset'), 1000);
-              }
+            this.reportControlService.reportDataLoaded$.subscribe((loaded) => {
+              this.loadContent = loaded;
             })
           );
         } else {
@@ -205,8 +197,18 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
               this.isAdmin = this.authService.userIsAdmin(user);
             })
           );
-          if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
+
+          if (
+            this.router.url.includes('fixed') ||
+            this.router.url.includes('tracker') ||
+            this.router.url.includes('rooftop')
+          ) {
             this.isReport = true;
+          } else {
+            this.isReport = false;
+
+            // reseteamos la carga de contenido
+            this.reportControlService.reportDataLoaded = false;
           }
         }
       }

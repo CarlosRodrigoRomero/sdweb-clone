@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { Subscription } from 'rxjs';
@@ -11,10 +11,9 @@ import { ViewReportService } from '@data/services/view-report.service';
 import { ResetServices } from '@data/services/reset-services.service';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
-import { DynamicAnomaliaListDirective } from '@modules/fixed-plant/directives/dynamic-anomalia-list.directive';
 
 import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
-import { AnomaliaListContainer } from '@modules/fixed-plant/containers/anomalia-list-container/anomalia-list-container.component';
+import { FiltersPanelContainerComponent } from '@modules/filters/containers/filters-panel-container/filters-panel-container.component';
 
 import { Patches } from '@core/classes/patches';
 
@@ -26,6 +25,7 @@ import { Patches } from '@core/classes/patches';
 export class MapViewComponent implements OnInit, OnDestroy {
   plantaFija = true;
   rightOpened = false;
+  filtersOpened = false;
   // statsOpened: boolean;
   anomaliasLoaded = false;
   sharedReport = false;
@@ -44,9 +44,9 @@ export class MapViewComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
   @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
+  @ViewChild('sidenavFilters') sidenavFilters: MatSidenav;
 
   @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
-  @ViewChild(DynamicAnomaliaListDirective) dynamicAnomList: DynamicAnomaliaListDirective;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -56,7 +56,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
     private downloadReportService: DownloadReportService,
     private zonesService: ZonesService,
     private viewReportService: ViewReportService,
-    private componentFactoryResolver: ComponentFactoryResolver,
     private resetServices: ResetServices
   ) {}
 
@@ -117,18 +116,9 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.statsService.setSidenav(sidenavStats);
   }
 
-  loadAnomList() {
-    const component = this.componentFactoryResolver.resolveComponentFactory(AnomaliaListContainer);
-
-    this.dynamicAnomList.viewContainerRef.clear();
-    this.dynamicAnomList.viewContainerRef.createComponent(component);
-  }
-
   loadStats() {
-    const component = this.componentFactoryResolver.resolveComponentFactory(PlantaStatsComponent);
-
     this.dynamicStats.viewContainerRef.clear();
-    this.dynamicStats.viewContainerRef.createComponent(component);
+    this.dynamicStats.viewContainerRef.createComponent(PlantaStatsComponent);
   }
 
   ngOnDestroy(): void {

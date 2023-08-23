@@ -1,0 +1,130 @@
+<!-- <div class="anom-img-wrapper">
+    <img src="../../../../../assets/images/thermal_image.png"/>
+    <img src="../../../../../assets/images/visual_image.png"/>
+  </div> -->
+<mat-accordion *ngIf="anomaliaSelect" multi>
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title> Información principal </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="tab-content">
+      <!-- <div class="elemento">
+            <span class="titulo-resalt">{{ 'anomalia' | translate | titlecase }} #{{ anomaliaSelect.numAnom }}</span>
+          </div> -->
+      <div class="elemento">
+        <span class="info-anom-titulo">{{ 'Tipo' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] | translate }}</span>
+      </div>
+      <div class="elemento">
+        <span class="info-anom-titulo">{{ 'Temperatura Max' | translate }}</span>
+        <span *ngIf="anomaliaSelect.temperaturaMax !== 0" class="info-anom-subtitulo"
+          >{{ anomaliaSelect.temperaturaMax | number : '1.0-1' }} ºC</span
+        >
+        <span *ngIf="anomaliaSelect.temperaturaMax === 0" class="info-anom-subtitulo">{{
+          'Pronto disponible' | translate
+        }}</span>
+      </div>
+      <div class="elemento">
+        <span class="info-anom-titulo">{{ 'Gradiente Temp. Normalizado' | translate }}</span>
+        <span *ngIf="anomaliaSelect.gradienteNormalizado !== 0" class="info-anom-subtitulo"
+          >{{ anomaliaSelect.gradienteNormalizado | number : '1.0-1' }} ºC</span
+        >
+        <span *ngIf="anomaliaSelect.gradienteNormalizado === 0" class="info-anom-subtitulo">Pronto disponible</span>
+      </div>
+      <div class="elemento">
+        <span class="info-anom-titulo">{{ 'Pérdidas' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ perdidas | translate }}</span>
+      </div>
+      <!-- <div class="elemento">
+        <span class="info-anom-titulo">{{ 'clase' | translate | titlecase }}</span>
+        <span class="info-anom-subtitulo">CoA {{ anomaliaSelect.clase }}</span>
+      </div> -->
+      <div class="elemento" *ngIf="anomaliaSelect.criticidad !== undefined">
+        <span class="info-anom-titulo"
+          >{{ 'Criticidad (Criterio' | translate }} {{ anomaliaService.criterioCriticidad.nombre }})</span
+        >
+        <span class="info-anom-subtitulo">{{ criticidadLabels[anomaliaSelect.criticidad] | translate }}</span>
+      </div>
+      <div class="elemento">
+        <span class="info-anom-titulo">{{ 'localizacion' | translate | titlecase }}</span>
+        <span class="info-anom-subtitulo">{{ localizacion }}</span>
+      </div>
+      <div class="elemento">
+        <span class="info-anom-titulo">{{ 'Posición' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ posicion }}</span>
+      </div>
+    </div>
+  </mat-expansion-panel>
+  <mat-expansion-panel *ngIf="seccionVuelo">
+    <mat-expansion-panel-header>
+      <mat-panel-title> Información sobre el vuelo </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="tab-content">
+      <div class="elemento" *ngIf="infoAdicional.vuelo.fecha">
+        <span class="info-anom-titulo">{{ 'Fecha' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ infoAdicional.vuelo.fecha }}</span>
+      </div>
+      <div class="elemento" *ngIf="infoAdicional.vuelo.hora">
+        <span class="info-anom-titulo">{{ 'Hora' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ infoAdicional.vuelo.hora }}</span>
+      </div>
+      <div class="elemento" *ngIf="infoAdicional.vuelo.irradiancia !== undefined">
+        <span class="info-anom-titulo">{{ 'Irradiancia (calculada)' | translate }}(beta)</span>
+        <span class="info-anom-subtitulo"
+          >{{ infoAdicional.vuelo.irradiancia | number : '1.0-0' }} W/m<sup>2</sup></span
+        >
+      </div>
+      <div class="elemento" *ngIf="infoAdicional.vuelo.emisividad !== undefined">
+        <span class="info-anom-titulo">{{ 'Emisividad' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ infoAdicional.vuelo.emisividad }}</span>
+      </div>
+      <div class="elemento" *ngIf="infoAdicional.vuelo.tempReflejada !== undefined">
+        <span class="info-anom-titulo">{{ 'Temperatura reflejada' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ infoAdicional.vuelo.tempReflejada }} ºC</span>
+      </div>
+      <div class="elemento" *ngIf="infoAdicional.vuelo.tempAire !== undefined">
+        <span class="info-anom-titulo">{{ 'Temperatura aire' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ infoAdicional.vuelo.tempAire | number : '1.0-1' }} ºC</span>
+      </div>
+      <div class="elemento" *ngIf="infoAdicional.vuelo.vientoVelocidad !== undefined">
+        <span class="info-anom-titulo">{{ 'Velocidad viento' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ infoAdicional.vuelo.vientoVelocidad }} (Beaufort)</span>
+      </div>
+      <div class="elemento" *ngIf="infoAdicional.vuelo.vientoDireccion !== undefined">
+        <span class="info-anom-titulo">{{ 'Dirección viento' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ infoAdicional.vuelo.vientoDireccion }}º</span>
+      </div>
+    </div>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel *ngIf="seccionModulo">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{ 'Módulo' | translate }}
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="tab-content">
+      <div class="elemento" *ngIf="infoAdicional.modulo.marcaModulo">
+        <span class="info-anom-titulo">{{ 'Marca módulo' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ infoAdicional.modulo.marcaModulo }}</span>
+      </div>
+      <div class="elemento" *ngIf="infoAdicional.modulo.modeloModulo">
+        <span class="info-anom-titulo">{{ 'Modelo módulo' | translate }}</span>
+        <span class="info-anom-subtitulo">{{ infoAdicional.modulo.modeloModulo }}</span>
+      </div>
+
+      <div class="elemento" *ngIf="infoAdicional.modulo.potencia">
+        <span class="info-anom-titulo">{{ 'potencia' | translate | titlecase }}</span>
+        <span class="info-anom-subtitulo">{{ infoAdicional.modulo.potencia }} W</span>
+      </div>
+    </div>
+  </mat-expansion-panel>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title> O&M </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="tab-content">
+      <app-anomalia-info-editable [anomaliaSelected]="anomaliaSelect"></app-anomalia-info-editable>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>

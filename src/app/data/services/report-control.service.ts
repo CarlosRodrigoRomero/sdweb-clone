@@ -69,6 +69,8 @@ export class ReportControlService {
   private _noAnomsReport = false;
   noAnomsReport$ = new BehaviorSubject<boolean>(this._noAnomsReport);
   user: UserInterface;
+  private _reportDataLoaded = false;
+  reportDataLoaded$ = new BehaviorSubject<boolean>(this._reportDataLoaded);
 
   constructor(
     private router: Router,
@@ -242,6 +244,9 @@ export class ReportControlService {
 
               // iniciamos filter service
               this.filterService.initService(this.allFilterableElements).then((filtersInit) => {
+                // marcamos la data como cargada
+                this.reportDataLoaded = true;
+
                 // enviamos respuesta de servicio iniciado
                 initService(filtersInit);
               });
@@ -298,7 +303,7 @@ export class ReportControlService {
                     switchMap((informe) => {
                       this.informes = [informe];
 
-                      if (this.router.url.includes('fixed')) {
+                      if (this.router.url.includes('fixed') || this.router.url.includes('rooftop')) {
                         this.plantaFija = true;
 
                         return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
@@ -835,5 +840,14 @@ export class ReportControlService {
   set planta(value: PlantaInterface) {
     this._planta = value;
     this.planta$.next(value);
+  }
+
+  get reportDataLoaded() {
+    return this._reportDataLoaded;
+  }
+
+  set reportDataLoaded(value: boolean) {
+    this._reportDataLoaded = value;
+    this.reportDataLoaded$.next(value);
   }
 }

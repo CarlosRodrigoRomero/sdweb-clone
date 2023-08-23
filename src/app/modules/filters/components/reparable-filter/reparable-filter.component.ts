@@ -41,6 +41,11 @@ export class ReparableFilterComponent implements OnInit {
     });
 
     this.subscriptions.add(
+      this.filterService.filteredElements$.subscribe((filters) => {
+      })
+    );
+
+    this.subscriptions.add(
       this.filterControlService.reparableSelected$.subscribe((sel) => (this.reparableSelected = sel))
     );
   }

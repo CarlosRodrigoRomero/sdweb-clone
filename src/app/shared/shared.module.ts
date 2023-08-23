@@ -17,6 +17,8 @@ import { MaterialModule } from '@shared/modules/material/material.module';
 import { ChartsModule } from './modules/charts/charts.module';
 import { OlMapsModule } from './modules/ol-maps/ol-maps.module';
 
+import { ReportPrincipalDataContainerComponent } from './containers/report-principal-data-container/report-principal-data-container.component';
+
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { ThermalSliderComponent } from './components/thermal-slider/thermal-slider.component';
 import { PlantSummaryComponent } from './components/plant-summary/plant-summary.component';
@@ -34,6 +36,7 @@ import { RecommendedActionComponent } from './components/recommended-action/reco
 import { RecommendedActionsComponent } from './components/recommended-actions/recommended-actions.component';
 import { SelectLanguageComponent } from './components/select-language/select-language.component';
 import { PortfolioRecalcComponent } from './components/portfolio-recalc/portfolio-recalc.component';
+import { ReportPrincipalDataComponent } from './components/report-principal-data/report-principal-data.component';
 
 const components = [
   SpinnerComponent,
@@ -53,6 +56,8 @@ const components = [
   RecommendedActionsComponent,
   SelectLanguageComponent,
   PortfolioRecalcComponent,
+  ReportPrincipalDataComponent,
+  ReportPrincipalDataContainerComponent,
 ];
 
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];

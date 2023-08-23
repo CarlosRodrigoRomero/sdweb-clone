@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
 import { ReportControlService } from '@data/services/report-control.service';
 
@@ -14,12 +14,17 @@ export class SimplePlantSummaryComponent implements OnInit {
   planta: PlantaInterface;
   selectedInforme: InformeInterface;
 
-  constructor(private reportControlService: ReportControlService) {}
+  constructor(private reportControlService: ReportControlService, private changeDetectorRefs: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.planta = this.reportControlService.planta;
-    this.selectedInforme = this.reportControlService.informes.find(
-      (inf) => inf.id === this.reportControlService.selectedInformeId
-    );
+    this.reportControlService.planta$.subscribe((planta) => {
+      this.planta = planta;
+    });
+
+    this.reportControlService.selectedInformeId$.subscribe((informeId) => {
+      this.selectedInforme = this.reportControlService.informes.find((inf) => inf.id === informeId);
+
+      this.changeDetectorRefs.detectChanges();
+    });
   }
 }

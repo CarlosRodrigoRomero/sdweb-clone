@@ -44,15 +44,16 @@ $custom-dark-theme-foreground: (
 $app-light-primary: mat.define-palette(mat.$deep-orange-palette, 600);
 $app-light-accent: mat.define-palette(mat.$deep-orange-palette, 900);
 $app-light-warn: mat.define-palette(mat.$red-palette, 900);
-$app-light-neutral: mat.define-palette(mat.$blue-gray-palette, 600);
+$app-light-neutral: mat.define-palette(mat.$blue-grey-palette, 600);
 
 $app-light-background: mat.define-palette(mat.$blue-grey-palette, 50);
 
 $app-dark-primary: mat.define-palette(mat.$orange-palette, 200);
 $app-dark-accent: mat.define-palette(mat.$orange-palette, 600);
 $app-dark-warn: mat.define-palette(mat.$deep-orange-palette, 900);
-$app-dark-neutral: mat.define-palette(mat.$blue-gray-palette, 400);
+$app-dark-neutral: mat.define-palette(mat.$blue-grey-palette, 400);
 
+$app-dark-foreground: mat.define-palette(mat.$blue-grey-palette, 800);
 $app-dark-background: mat.define-palette(mat.$blue-grey-palette, 900);
 
 @function custom-dark-theme($primary, $accent, $warn) {
@@ -96,6 +97,14 @@ $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dar
   .neutral-background {
     background-color: mat.get-color-from-palette($app-light-neutral);
   }
+
+  .foreground {
+    background-color: white;
+  }
+
+  .background {
+    background-color: mat.get-color-from-palette($app-light-background);
+  }
 }
 
 .dark-theme {
@@ -120,5 +129,13 @@ $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dar
 
   .neutral-background {
     background-color: mat.get-color-from-palette($app-dark-neutral);
+  }
+
+  .foreground {
+    background-color: mat.get-color-from-palette($app-dark-foreground);
+  }
+
+  .background {
+    background-color: mat.get-color-from-palette($app-dark-background);
   }
 }

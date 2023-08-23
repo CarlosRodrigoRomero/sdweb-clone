@@ -1,5 +1,7 @@
-<div class="filtro">
-  <h5>{{ 'Pérdidas' | translate }}</h5>
+<mat-expansion-panel (click)="$event.stopPropagation()">
+  <mat-expansion-panel-header>
+    <mat-panel-title>{{ 'Pérdidas' | translate }}</mat-panel-title>
+  </mat-expansion-panel-header>
   <div id="filter_perdidas" class="custom-slider">
     <ngx-slider
       [(value)]="rangoMinPerdidas"
@@ -8,7 +10,4 @@
       (userChangeEnd)="onChangeFiltroPerdidas(rangoMinPerdidas, rangoMaxPerdidas)"
     ></ngx-slider>
   </div>
-  <!-- <div class="new-slider">
-    <app-mat-range-slider [minValue]="15" [maxValue]="85"></app-mat-range-slider>
-  </div> -->
-</div>
+</mat-expansion-panel>

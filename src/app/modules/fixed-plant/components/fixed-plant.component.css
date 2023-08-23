@@ -1,12 +1,12 @@
 .reports-content {
   width: 100%;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 128px);
   padding: 1rem 2rem;
 }
 
 @media (max-width: 600px) {
   .reports-content {
-    height: calc(100vh - 56px);
+    height: calc(100vh - 112px);
     width: 100%;
     padding: 1rem;
   }

@@ -1,3 +1,14 @@
+.map-view {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+}
+
+.panel-anomalias {
+  padding: 5px;
+  border-radius: 8px;
+}
+
 .rel {
   position: relative;
 }
@@ -68,7 +79,7 @@
 }
 
 .stats-container {
-  position: relative;
+  /* position: relative; */
   border-radius: 8px;
 }
 
@@ -76,15 +87,12 @@
   position: relative;
 }
 
-.btns-export {
+.btns-wrapper {
   position: absolute;
   top: 10px;
-  right: 180px;
-  z-index: 99;
-}
-
-app-share-report {
-  margin-right: 15px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 app-download-progress-bar {
@@ -104,29 +112,6 @@ app-download-progress-bar {
   width: 100px;
 }
 
-.left-sidenav {
-  display: flex;
-  padding: 0.5rem;
-  width: fit-content;
-  height: calc(100vh - 96px);
-  border-radius: 8px 0 0 8px;
-  overflow-y: hidden;
-}
-
-@media (max-width: 420px) {
-  .left-sidenav {
-    max-width: -webkit-fill-available;
-  }
-}
-
-.right-sidenav {
-  position: absolute;
-  display: flex;
-  margin: 60px 10px 10px;
-  padding: 10px;
-  border-radius: 8px;
-}
-
 .btn-close {
   position: absolute;
   right: 10px;
@@ -139,7 +124,8 @@ app-download-progress-bar {
   margin: 10px 10px 10px;
   padding: 10px;
   border-radius: 8px;
-  width: 80%;
+  width: 100%;
+  width: calc(100% - 20px);
 }
 
 @media (max-width: 1000px) {
@@ -148,30 +134,10 @@ app-download-progress-bar {
   }
 }
 
-.btn-right {
-  position: absolute;
-  top: 10px;
-  right: 0;
-  left: auto;
-  height: 40px;
-  margin-right: 10px;
-  padding: 0px 0px 0px 4px;
-}
-
-.btn-right-stats {
-  position: absolute;
-  top: 10px;
-  right: 0;
-  left: auto;
-  height: 40px;
-  margin-right: 90px;
-  padding: 0px 0px 0px 4px;
-}
-
 .titulo {
   margin: 4px 10px 0;
 }
 
-:host ::ng-deep .mat-drawer-inner-container{
-  overflow-y:hidden;
+:host ::ng-deep .mat-drawer-inner-container {
+  overflow-y: hidden;
 }

@@ -1,0 +1,18 @@
+<div id="map" class="map"></div>
+<!-- <div *ngIf="anomaliaSelect || anomaliaHover" id="popup">
+  <app-anomalia-info [anomaliaSelect]="anomaliaSelect" [anomaliaHover]="anomaliaHover"></app-anomalia-info>
+</div> -->
+<div id="popup-anomalia-rooftop" class="ol-popup">
+  <app-anomalia-popup></app-anomalia-popup>
+</div>
+<div id="popup-dirty" class="ol-popup">
+  <mat-card class="popup-hover">
+    <span class="popup-label">{{ 'Este módulo tiene suciedad' | translate }}</span>
+  </mat-card>
+</div>
+
+
+<mat-card class="noAnoms" *ngIf="noAnomsReport">
+  <mat-icon>done_outline</mat-icon>
+  <span>Informe sin anomalías</span>
+</mat-card>
