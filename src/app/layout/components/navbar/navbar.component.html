@@ -20,14 +20,14 @@
 
     <!-- AVISO DE FILTROS ACTIVOS -->
     <div class="active-filters" *ngIf="activeFilters">
-      <mat-icon class="icon-active-filters" >warning</mat-icon>
-      <button class="active-filters" mat-button color="primary"> {{ 'Filtros activos' | translate }} </button>
+      <mat-icon class="icon-active-filters">warning</mat-icon>
+      <button class="active-filters" mat-button color="primary">{{ 'Filtros activos' | translate }}</button>
     </div>
 
-    <app-share-plant-container *ngIf="loadContent && !isShared"></app-share-plant-container>
+    <app-share-plant-container *ngIf="loadContent && !isShared && isReport"></app-share-plant-container>
 
     <!-- FILTROS -->
-    <app-filters *ngIf="loadContent && !isShared"></app-filters>
+    <app-filters *ngIf="loadContent && !isShared && isReport"></app-filters>
 
     <!-- MENU DERECHA -->
     <app-right-menu-container></app-right-menu-container>

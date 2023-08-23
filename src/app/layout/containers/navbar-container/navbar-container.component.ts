@@ -205,8 +205,15 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
               this.isAdmin = this.authService.userIsAdmin(user);
             })
           );
-          if (this.router.url.includes('fixed') || this.router.url.includes('tracker')) {
+
+          if (
+            this.router.url.includes('fixed') ||
+            this.router.url.includes('tracker') ||
+            this.router.url.includes('rooftop')
+          ) {
             this.isReport = true;
+          } else {
+            this.isReport = false;
           }
         }
       }
