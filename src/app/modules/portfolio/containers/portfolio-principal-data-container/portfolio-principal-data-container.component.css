@@ -1,3 +1,11 @@
+.loading {
+  position: absolute;
+  top: 64px;
+  left: 32px;
+  width: calc(100vw - 144px);
+  height: 64px;
+}
+
 .portfolio-data {
   display: flex;
   width: 100%;

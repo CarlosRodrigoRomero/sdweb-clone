@@ -18,7 +18,6 @@ import { ChartsModule } from './modules/charts/charts.module';
 import { OlMapsModule } from './modules/ol-maps/ol-maps.module';
 
 import { ReportPrincipalDataContainerComponent } from './containers/report-principal-data-container/report-principal-data-container.component';
-import { PortfolioPrincipalDataContainerComponent } from './containers/portfolio-principal-data-container/portfolio-principal-data-container.component';
 
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { ThermalSliderComponent } from './components/thermal-slider/thermal-slider.component';
@@ -59,7 +58,6 @@ const components = [
   PortfolioRecalcComponent,
   ReportPrincipalDataComponent,
   ReportPrincipalDataContainerComponent,
-  // PortfolioPrincipalDataContainerComponent,
 ];
 
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
