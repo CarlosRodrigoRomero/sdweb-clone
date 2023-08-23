@@ -1,8 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
-
-import { FiltersPanelContainerComponent } from '../containers/filters-panel-container/filters-panel-container.component';
-
-import { DynamicFiltersDirective } from '../directives/dynamic-filters.directive';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-filters',
@@ -10,12 +6,5 @@ import { DynamicFiltersDirective } from '../directives/dynamic-filters.directive
   styleUrls: ['./filters.component.css'],
 })
 export class FiltersComponent {
-  @ViewChild(DynamicFiltersDirective) dynamicFilters: DynamicFiltersDirective;
-
   constructor() {}
-
-  loadFilters() {
-    this.dynamicFilters.viewContainerRef.clear();
-    this.dynamicFilters.viewContainerRef.createComponent(FiltersPanelContainerComponent);
-  }
 }

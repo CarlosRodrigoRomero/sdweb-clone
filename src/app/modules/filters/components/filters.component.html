@@ -1,4 +1,4 @@
-<button mat-stroked-button class="filters-btn" [matMenuTriggerFor]="filters" (click)="loadFilters()">
+<button mat-stroked-button class="filters-btn" [matMenuTriggerFor]="filters">
   <div class="filters-btn-content">
     <mat-icon>filter_alt</mat-icon>
     <span>{{ 'filtros' | translate | titlecase }}</span>
@@ -6,6 +6,6 @@
 </button>
 <mat-menu #filters="matMenu" class="filters">
   <div class="content">
-    <ng-template appDynamicFilters></ng-template>
+    <app-filters-panel></app-filters-panel>
   </div>
 </mat-menu>

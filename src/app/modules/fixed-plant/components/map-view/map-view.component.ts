@@ -11,7 +11,6 @@ import { ViewReportService } from '@data/services/view-report.service';
 import { ResetServices } from '@data/services/reset-services.service';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
-import { DynamicFiltersDirective } from '@modules/filters/directives/dynamic-filters.directive';
 
 import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
 import { FiltersPanelContainerComponent } from '@modules/filters/containers/filters-panel-container/filters-panel-container.component';
@@ -48,7 +47,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
   @ViewChild('sidenavFilters') sidenavFilters: MatSidenav;
 
   @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
-  @ViewChild(DynamicFiltersDirective) dynamicFilters: DynamicFiltersDirective;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -121,11 +119,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
   loadStats() {
     this.dynamicStats.viewContainerRef.clear();
     this.dynamicStats.viewContainerRef.createComponent(PlantaStatsComponent);
-  }
-
-  loadFilters() {
-    this.dynamicFilters.viewContainerRef.clear();
-    this.dynamicFilters.viewContainerRef.createComponent(FiltersPanelContainerComponent);
   }
 
   ngOnDestroy(): void {

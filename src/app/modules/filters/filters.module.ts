@@ -20,7 +20,6 @@ import { AreaFilterContainerComponent } from './containers/area-filter-container
 import { FiltersPanelContainerComponent } from './containers/filters-panel-container/filters-panel-container.component';
 import { ReparableFilterComponent } from './components/reparable-filter/reparable-filter.component';
 import { ModeloFilterComponent } from './components/modelo-filter/modelo-filter.component';
-import { DynamicFiltersDirective } from './directives/dynamic-filters.directive';
 import { StatusFilterComponent } from './components/status-filter/status-filter.component';
 import { FiltersComponent } from './components/filters.component';
 
@@ -44,7 +43,6 @@ import { FiltersComponent } from './components/filters.component';
     ReparableFilterComponent,
     ModeloFilterComponent,
     StatusFilterComponent,
-    DynamicFiltersDirective,
     FiltersComponent,
   ],
   imports: [CommonModule, SharedModule],
@@ -53,7 +51,6 @@ import { FiltersComponent } from './components/filters.component';
     ConfianzaFilterComponent,
     AspectRatioFilterComponent,
     AreaModuloBrutoFilterComponent,
-    DynamicFiltersDirective,
     FiltersComponent,
   ],
 })
