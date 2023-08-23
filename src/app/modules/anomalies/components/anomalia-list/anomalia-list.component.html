@@ -4,7 +4,15 @@
     <input matInput (keyup)="applyFilter($event)" #input autocomplete="off" />
   </mat-form-field>
   <div class="tabla-container mat-elevation-z4" id="table-wrapper">
-    <table mat-table id="table-anomalias" [dataSource]="dataSource" matSort multiTemplateDataRows>
+    <table
+      mat-table
+      id="table-anomalias"
+      [dataSource]="dataSource"
+      matSort
+      matSortActive="numAnom"
+      matSortDirection="asc"
+      multiTemplateDataRows
+    >
       <!-- COLOR -->
       <ng-container matColumnDef="colors" class="col-anomalia">
         <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
