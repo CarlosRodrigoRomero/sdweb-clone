@@ -72,10 +72,7 @@ export class ReportPrincipalDataContainerComponent implements OnInit, OnDestroy 
                   ).length;
 
                   //Obtener Mae de anomalías filtradas para fijas
-                  this.mae = this.reportControlService.getMaeInformeFija(
-                    elemsInforme as Anomalia[],
-                    this.informeSelected
-                  );
+                  this.mae = this.reportControlService.getMaeInforme(elemsInforme as Anomalia[], this.informeSelected);
 
                   //Obtener Mae Reparable de anomalías filtradas para fijas
                   this.maeReparable = this.reportControlService.getFixedLossReport(
@@ -101,7 +98,7 @@ export class ReportPrincipalDataContainerComponent implements OnInit, OnDestroy 
                   }
 
                   //Obtener Mae de anomalías filtradas para seguidores
-                  this.mae = this.reportControlService.getMaeInformeFija(anomalias, this.informeSelected);
+                  this.mae = this.reportControlService.getMaeInforme(anomalias, this.informeSelected);
 
                   //Obtener Mae Reparable de anomalías filtradas para seguidres
                   this.maeReparable = this.reportControlService.getFixedLossReport(anomalias, this.informeSelected);
