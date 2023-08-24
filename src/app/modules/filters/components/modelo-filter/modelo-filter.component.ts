@@ -13,12 +13,13 @@ import { AnomaliaService } from '@data/services/anomalia.service';
 import { FilterControlService } from '@data/services/filter-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { PlantaService } from '@data/services/planta.service';
+import { ModuleService } from '@data/services/module.service';
+import { ZonesService } from '@data/services/zones.service';
 
 import { ModeloFilter } from '@core/models/modeloFilter';
 import { Anomalia } from '@core/models/anomalia';
 import { PlantaInterface } from '@core/models/planta';
 import { ModuloInterface } from '@core/models/modulo';
-
 
 export interface LabelModelo {
   modelo: number;
@@ -30,10 +31,9 @@ export interface LabelModelo {
 @Component({
   selector: 'app-modelo-filter',
   templateUrl: './modelo-filter.component.html',
-  styleUrls: ['./modelo-filter.component.css']
+  styleUrls: ['./modelo-filter.component.css'],
 })
 export class ModeloFilterComponent implements OnInit, OnDestroy {
-
   modelosElem: LabelModelo[] = [];
   filtroModelo: ModeloFilter;
   filterModeloCounts: number[] = [];
@@ -65,7 +65,9 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
     private filterControlService: FilterControlService,
     private reportControlService: ReportControlService,
     private plantaService: PlantaService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private moduleService: ModuleService,
+    private zonesService: ZonesService
   ) {}
 
   ngOnInit(): void {
@@ -89,9 +91,9 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
         .subscribe((anomalias) => {
           // filtramos las anomalias que ya no consideramos anomalias
           this.allAnomalias = this.anomaliaService.getRealAnomalias(anomalias);
-          this.allModelos = [...new Set (this.allAnomalias.map((anomalia) => this.setModuleLabel(anomalia.modulo)))].sort();
-          this.modelosElem = this.allModelos.map((modelo, i) => ({ modelo: i, label: modelo}));
-        })  
+          this.allModelos = this.getModuleLabels();
+          this.modelosElem = this.allModelos.map((modelo, i) => ({ modelo: i, label: modelo }));
+        })
     );
     // nos suscribimos a los modelos seleccionados de filter control
     this.subscriptions.add(
@@ -156,15 +158,24 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
     }
   }
 
+  getModuleLabels(): string[] {
+    const locAreasWithModules = this.zonesService.locAreas.filter(
+      (locArea) => locArea.modulo !== null && locArea.modulo !== undefined
+    );
 
-  setModuleLabel(module: ModuloInterface): string{
+    const modulesLabel = this.moduleService.getModuleBrandLabels(locAreasWithModules);
+
+    return modulesLabel;
+  }
+
+  setModuleLabel(module: ModuloInterface): string {
     let label: string;
     if (module.marca) {
       label = `${module.marca} (${module.potencia}W)`;
     } else {
       label = `${module.potencia}W`;
     }
-    return label
+    return label;
   }
 
   stopPropagation(event) {
@@ -174,5 +185,4 @@ export class ModeloFilterComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
-
 }

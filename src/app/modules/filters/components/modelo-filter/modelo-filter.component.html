@@ -1,6 +1,6 @@
 <mat-expansion-panel (click)="$event.stopPropagation()">
   <mat-expansion-panel-header>
-    <mat-panel-title>{{ 'Módulo' | translate }}</mat-panel-title>
+    <mat-panel-title>{{ 'Por fabricante de módulo' | translate }}</mat-panel-title>
   </mat-expansion-panel-header>
   <li mat-menu-item *ngFor="let modeloElem of modelosElem; index as i" (click)="stopPropagation($event)">
     <mat-checkbox

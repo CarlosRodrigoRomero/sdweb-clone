@@ -6,8 +6,8 @@ import { FilterService } from '@data/services/filter.service';
 import { FilterControlService } from '@data/services/filter-control.service';
 import { AnomaliaService } from '@data/services/anomalia.service';
 import { ReportControlService } from '@data/services/report-control.service';
-
-import { ModuloInterface } from '@core/models/modulo';
+import { ZonesService } from '@data/services/zones.service';
+import { ModuleService } from '@data/services/module.service';
 
 @Component({
   selector: 'app-filters-panel-container',
@@ -27,7 +27,9 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
     private filterService: FilterService,
     private filterControlService: FilterControlService,
     private anomaliaService: AnomaliaService,
-    private reportControlService: ReportControlService
+    private reportControlService: ReportControlService,
+    private zonesService: ZonesService,
+    private moduleService: ModuleService
   ) {}
 
   ngOnInit(): void {
@@ -46,12 +48,8 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
 
     // Comprobamos si hay anomalías en más de un modelo de módulo, y si sólo hay uno no mostramos el filtro
     const anomalias = this.anomaliaService.getRealAnomalias(this.reportControlService.allAnomalias);
-    const modelosModulos = [...new Set(anomalias.map((anomalia) => this.setModuleLabel(anomalia.modulo)))];
-    if (modelosModulos.length > 1) {
-      this.showFiltroModelo = true;
-    } else {
-      this.showFiltroModelo = false;
-    }
+
+    this.showFiltroModelo = this.showModeloFilter();
 
     if (!this.tipoCubierta) {
       // Comprobamos si las anomalías tienen zonas asociadas; si no existen zonas, no mostramos el filtro
@@ -70,17 +68,17 @@ export class FiltersPanelContainerComponent implements OnInit, OnDestroy {
     this.filterControlService.resetFilters();
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
+  showModeloFilter(): boolean {
+    const locAreasWithModules = this.zonesService.locAreas.filter(
+      (locArea) => locArea.modulo !== null && locArea.modulo !== undefined
+    );
+
+    const modulesLabel = this.moduleService.getModuleBrandLabels(locAreasWithModules);
+
+    return modulesLabel.length > 1;
   }
 
-  setModuleLabel(module: ModuloInterface): string {
-    let label: string;
-    if (module.marca) {
-      label = `${module.marca} (${module.potencia}W)`;
-    } else {
-      label = `${module.potencia}W`;
-    }
-    return label;
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
