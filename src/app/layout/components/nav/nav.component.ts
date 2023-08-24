@@ -26,7 +26,7 @@ export class NavComponent implements OnInit {
   showPrediction = true;
   itemSelected = 'list';
   itemColor = COLOR.light_orange;
-  showOnlyDesktop = false;
+  showSecondNavbarRow = false;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
@@ -58,8 +58,10 @@ export class NavComponent implements OnInit {
           this.itemSelected = 'analysis';
         }
 
-        // TAMAÑO DE PANTALLA
-        this.showOnlyDesktop = screenWidth > 600;
+        // PORTFOLIO E INFORMES EN DESKTOP
+        if (this.router.url.split('/').includes('clients') && screenWidth > 600) {
+          this.showSecondNavbarRow = true;
+        }
 
         // SOLO PARA CLIENTE INTERNACIONAL
         if (
