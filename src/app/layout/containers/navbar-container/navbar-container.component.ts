@@ -34,7 +34,6 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
   isDemo = false;
   tipoComentarios = false;
   isPortfolio = false;
-  activeFilters = false;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -83,77 +82,8 @@ export class NavbarContainerComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subscriptions.add(
-      this.filterService.filters$.subscribe((filters) => {
-        if (filters.length > 0) {
-          this.activeFilters = true;
-        } else {
-          this.activeFilters = false;
-        }
-      })
-    );
-
     // controlamos acciones al navegar
     this.navigationChanges();
-
-    // NOTIFICACIONES PROVISIONALES
-    // this.subscriptions.add(
-    //   this.reportControlService.plantaId$.subscribe((plantaId) => {
-    //     if (plantaId !== undefined) {
-    //       if (plantaId === '3JXI01XmcE3G1d4WNMMd' || plantaId === 'buzSMRcLEEeLfhnqfbbG') {
-    //         this.hasNotifications = true;
-    //         if (plantaId === '3JXI01XmcE3G1d4WNMMd') {
-    //           this.notifications.push({
-    //             content: 'Hay 20 módulos en circuito abierto (string)',
-    //             filter: 'CA (string)',
-    //           });
-    //           this.notifications.push({
-    //             content: 'Hay varias anomalías térmicas como consecuencia de suciedad en los módulos',
-    //             filter: 'suciedad',
-    //           });
-    //         }
-    //         if (plantaId === 'buzSMRcLEEeLfhnqfbbG') {
-    //           this.notifications = [
-    //             {
-    //               content: 'Hay 2 células calientes con un gradiente mayor de 40 ºC (Grave)',
-    //               filter: 'cc gradiente 40',
-    //             },
-    //           ];
-    //         }
-    //       }
-    //     }
-    //   })
-    // );
-
-    // this.subscriptions.add(
-    //   this.authService.user$.subscribe((user) => {
-    //     if (user.uid === 'xsx8U7BrLRU20pj9Oa35ZbJIggx2') {
-    //       this.hasNotifications = true;
-    //       // vaciamos las notificaciones
-    //       this.notifications = [];
-    //       // diferenciamos entre el portfolio y el informe
-    //       if (this.router.url.includes('egF0cbpXnnBnjcrusoeR')) {
-    //         this.notifications.push({
-    //           content: 'Hay 17 módulos en circuito abierto (string)',
-    //           filter: 'CA (string)',
-    //         });
-    //       } else {
-    //         this.notifications.push({
-    //           content: 'Hay nuevos strings abiertos en la planta Demo',
-    //           filter: 'CA (string)',
-    //         });
-    //         this.notifications.push({
-    //           content: 'Planta 3 tiene 6 módulos con células calientes con gradiente mayor de 40 ºC',
-    //           filter: '',
-    //         });
-    //         this.notifications.push({
-    //           content: 'Planta 1 tienen un problema con strings abiertos',
-    //           filter: '',
-    //         });
-    //       }
-    //     }
-    //   })
-    // );
 
     // comprobamos si es la planta demo
     this.isDemo = this.demoService.checkIsDemo();

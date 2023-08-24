@@ -1,4 +1,11 @@
-<button mat-stroked-button class="filters-btn" [matMenuTriggerFor]="filters">
+<button
+  mat-stroked-button
+  class="filters-btn"
+  [matMenuTriggerFor]="filters"
+  matBadge="{{ numFiltros }}"
+  matBadgeColor="primary"
+  matBadgeHidden="{{ numFiltros === 0 }}"
+>
   <div class="filters-btn-content">
     <mat-icon>filter_alt</mat-icon>
     <span>{{ 'filtros' | translate | titlecase }}</span>
