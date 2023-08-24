@@ -52,6 +52,29 @@
       <div class="elemento">
         <span class="info-anom-titulo">{{ 'Posición' | translate }}</span>
         <span class="info-anom-subtitulo">{{ posicion }}</span>
+
+        <div class="admin-inputs" *ngIf="isAdmin">
+          <mat-form-field class="input">
+            <mat-label>Fila</mat-label>
+            <input
+              class="input"
+              matInput
+              type="number"
+              [value]="anomaliaSelect.localY"
+              (change)="updateAnomalia($event.target.value, 'localY')"
+            />
+          </mat-form-field>
+          <mat-form-field class="input">
+            <mat-label>Columna</mat-label>
+            <input
+              class="input"
+              matInput
+              type="number"
+              [value]="anomaliaSelect.localX"
+              (change)="updateAnomalia($event.target.value, 'localX')"
+            />
+          </mat-form-field>
+        </div>
       </div>
     </div>
   </mat-expansion-panel>
