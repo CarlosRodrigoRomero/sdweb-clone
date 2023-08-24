@@ -85,7 +85,7 @@
 
         <app-navbar-container></app-navbar-container>
       </mat-toolbar-row>
-      <mat-toolbar-row class="data-navbar foreground">
+      <mat-toolbar-row *ngIf="showOnlyDesktop" class="data-navbar foreground">
         <app-report-principal-data-container *ngIf="!isPortfolio"></app-report-principal-data-container>
         <app-portfolio-principal-data-container *ngIf="isPortfolio"></app-portfolio-principal-data-container>
       </mat-toolbar-row>

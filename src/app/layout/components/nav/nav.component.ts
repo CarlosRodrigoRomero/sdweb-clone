@@ -26,12 +26,15 @@ export class NavComponent implements OnInit {
   showPrediction = true;
   itemSelected = 'list';
   itemColor = COLOR.light_orange;
+  showOnlyDesktop = false;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
     private router: Router,
     private themeService: ThemeService
   ) {
+    const screenWidth = window.innerWidth;
+
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         if (this.router.url.split('/').includes('plants')) {
@@ -54,6 +57,9 @@ export class NavComponent implements OnInit {
         } else if (this.router.url.split('/').includes('analysis')) {
           this.itemSelected = 'analysis';
         }
+
+        // TAMAÑO DE PANTALLA
+        this.showOnlyDesktop = screenWidth > 600;
 
         // SOLO PARA CLIENTE INTERNACIONAL
         if (
