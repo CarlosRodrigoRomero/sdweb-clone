@@ -49,7 +49,8 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   private realAnoms: Anomalia[] = [];
   informeId: string;
   private urlCalcAnomData = 'https://datos-anomalia-rcpywurt6q-ew.a.run.app';
-  private urlConvertAnomToPc = 'https://anomalias-to-pcs-rcpywurt6q-ew.a.run.app/anomalias-to-pcs';
+  private urlAddPcDataToAnoms = 'https://anomalias-to-pcs-rcpywurt6q-ew.a.run.app/anomalias-to-pcs';
+  private urlAddDateToAnoms = 'https://europe-west1-sdweb-d33ce.cloudfunctions.net/fecha-anomalias';
 
   private subscriptions: Subscription = new Subscription();
 
@@ -104,10 +105,13 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
     // actualizamos las anomalias con los datos que les faltan
     if (this.planta.tipo === 'seguidores') {
-      this.addPcDataToAnoms();
+      await this.addPcDataToAnoms();
     } else {
       await this.updateAnomalias();
     }
+
+    // añadimos las fechas correctas a las anomalías
+    this.addDateToAnoms();
   }
 
   private updateInforme() {
@@ -190,24 +194,21 @@ export class ClassificationComponent implements OnInit, OnDestroy {
     });
   }
 
-  addPcDataToAnoms() {
+  async addPcDataToAnoms() {
     this.processing = true;
 
     const params = new HttpParams().set('informeId', this.informeId);
 
-    return this.http
-      .get(this.urlConvertAnomToPc, { responseType: 'text', params })
-      .toPromise()
-      .then((res) => {
-        console.log(res);
+    try {
+      const res = await this.http.get(this.urlAddPcDataToAnoms, { responseType: 'text', params }).toPromise();
+      console.log(res);
 
-        this.processing = false;
-      })
-      .catch((err) => {
-        console.log(err);
+      this.processing = false;
+    } catch (err) {
+      console.log(err);
 
-        this.processing = false;
-      });
+      this.processing = false;
+    }
   }
 
   updateGlobalCoordsAnoms(check: boolean) {
@@ -266,6 +267,26 @@ export class ClassificationComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  addDateToAnoms() {
+    this.processing = true;
+
+    const params = new HttpParams().set('informeId', this.informeId);
+
+    return this.http
+      .get(this.urlAddDateToAnoms, { responseType: 'text', params })
+      .toPromise()
+      .then((res) => {
+        console.log(res);
+
+        this.processing = false;
+      })
+      .catch((err) => {
+        console.log(err);
+
+        this.processing = false;
+      });
   }
 
   async syncAnomsState() {

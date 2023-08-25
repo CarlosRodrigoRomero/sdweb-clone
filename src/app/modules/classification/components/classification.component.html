@@ -20,12 +20,13 @@
     </button>
     <mat-menu #menu="matMenu" class="menu">
       <div class="contenedor-menu">
-        <h5 mat-menu-item>Recalular datos anomalías</h5>
+        <h5 mat-menu-item>Recalcular datos anomalías</h5>
         <button mat-menu-item (click)="updateModuleAnoms(false)">Módulos</button>
         <button mat-menu-item (click)="updateGlobalCoordsAnoms(false)">GlobalsCoords</button>
         <button *ngIf="planta.tipo === 'seguidores'" mat-menu-item (click)="addPcDataToAnoms()">
           Añadir campos de PCs
         </button>
+        <button mat-menu-item (click)="addDateToAnoms()">Fechas</button>
       </div>
     </mat-menu>
 
