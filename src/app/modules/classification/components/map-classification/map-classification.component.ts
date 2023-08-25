@@ -328,6 +328,14 @@ export class MapClassificationComponent implements OnInit {
       this.classificationService.normModAnomaliaSelected.coords = this.structuresService.coordinateToObject(newCoords);
       this.structuresService.updateNormModule(this.classificationService.normModAnomaliaSelected);
 
+      // actualizamos la anomalia en la lista
+      this.classificationService.listaAnomalias = this.classificationService.listaAnomalias.map((anom) => {
+        if (anom.id === this.anomaliaSelected.id) {
+          anom.featureCoords = [...newCoords[0]];
+        }
+        return anom;
+      });
+
       // actualizamos tb la anomalia seleccionada en la DB
       this.anomaliaService.updateAnomaliaField(this.classificationService.normModAnomaliaSelected.id, 'featureCoords', {
         ...newCoords[0],
