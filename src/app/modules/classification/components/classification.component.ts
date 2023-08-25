@@ -29,7 +29,7 @@ import { LocationAreaInterface } from '@core/models/location';
 export class ClassificationComponent implements OnInit, OnDestroy {
   serviceInit = false;
   planta: PlantaInterface;
-  normModHovered: NormalizedModule = undefined;
+  anomaliaHovered: Anomalia = undefined;
   private anomalias: Anomalia[] = [];
   informe: InformeInterface;
   anomaliasNoData: Anomalia[] = [];
@@ -70,8 +70,9 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       this.informeId = this.classificationService.informeId;
     });
     this.subscriptions.add(this.classificationService.planta$.subscribe((planta) => (this.planta = planta)));
+
     this.subscriptions.add(
-      this.classificationService.normModHovered$.subscribe((normMod) => (this.normModHovered = normMod))
+      this.classificationService.anomaliaHovered$.subscribe((anomHov) => (this.anomaliaHovered = anomHov))
     );
 
     this.subscriptions.add(

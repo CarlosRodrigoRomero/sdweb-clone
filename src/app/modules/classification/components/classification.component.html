@@ -69,11 +69,11 @@
   <div class="bottom-bar">
     <div class="bottom-bar__row-top">
       <h4>{{ planta.nombre }}</h4>
-      <div class="bottom-bar__fila-columna" *ngIf="normModHovered">
+      <div class="bottom-bar__fila-columna" *ngIf="anomaliaHovered">
         <span class="title">Fila:</span>
-        <span class="value">{{ normModHovered.fila }}</span>
+        <span class="value">{{ anomaliaHovered.localY }}</span>
         <span class="title">Columna:</span>
-        <span>{{ normModHovered.columna }}</span>
+        <span>{{ anomaliaHovered.localX }}</span>
       </div>
       <span>Eliminar anomalía ( Q )</span>
     </div>

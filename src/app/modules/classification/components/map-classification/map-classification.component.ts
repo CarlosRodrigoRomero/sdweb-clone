@@ -4,12 +4,10 @@ import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
-import XYZ from 'ol/source/XYZ';
 import View from 'ol/View';
 import { fromLonLat } from 'ol/proj';
 import { defaults as defaultControls } from 'ol/control.js';
 import { Feature, Map } from 'ol';
-import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
@@ -255,11 +253,13 @@ export class MapClassificationComponent implements OnInit {
             // aplicamos el efecto resaltado
             feature.setStyle(this.getStyleAnoms(true));
 
-            this.classificationService.normModHovered = feature.getProperties().properties.normMod;
+            const anomalia = this.listaAnomalias.find((anom) => anom.id === feature.getProperties().properties.id);
+
+            this.classificationService.anomaliaHovered = anomalia;
 
             this.prevFeatureHover = feature;
           } else {
-            this.classificationService.normModHovered = undefined;
+            this.classificationService.anomaliaHovered = undefined;
           }
         } else {
           if (currentFeatureHover !== undefined) {
@@ -267,7 +267,7 @@ export class MapClassificationComponent implements OnInit {
             currentFeatureHover.setStyle(this.getStyleAnoms(false));
             currentFeatureHover = undefined;
 
-            this.classificationService.normModHovered = undefined;
+            this.classificationService.anomaliaHovered = undefined;
           }
         }
       }
