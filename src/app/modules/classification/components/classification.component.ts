@@ -144,8 +144,8 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       await Promise.all(promises);
     }
 
+    await this.syncAnomsState();
     this.anomsProcesed = true;
-    this.syncAnomsState();
     this.processing = false;
   }
 
@@ -161,7 +161,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       return this.http
         .get(this.urlCalcAnomData, { responseType: 'text', params })
         .toPromise()
-        .then((res) => {
+        .then(async (res) => {
           console.log(res);
 
           count++;
@@ -169,12 +169,12 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
           // al terminar...
           if (count === this.anomaliasNoData.length) {
-            this.processing = false;
+            await this.syncAnomsState();
 
-            this.syncAnomsState();
+            this.processing = false;
           }
         })
-        .catch((err) => {
+        .catch(async (err) => {
           console.log(err);
 
           count++;
@@ -182,9 +182,9 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
           // al terminar...
           if (count === this.anomaliasNoData.length) {
-            this.processing = false;
+            await this.syncAnomsState();
 
-            this.syncAnomsState();
+            this.processing = false;
           }
         });
     });
@@ -221,7 +221,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       anomalias = this.anomsNoGlobals;
     }
 
-    anomalias.forEach((anom, index) => {
+    anomalias.forEach(async (anom, index) => {
       const coordCentroid = this.olMapService.getCentroid(anom.featureCoords);
       const newGlobalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
 
@@ -232,9 +232,9 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
       // al terminar...
       if (count === anomalias.length) {
-        this.processing = false;
+        await this.syncAnomsState();
 
-        this.syncAnomsState();
+        this.processing = false;
       }
     });
   }
@@ -250,7 +250,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       anomalias = this.anomsNoModule;
     }
 
-    anomalias.forEach((anom) => {
+    anomalias.forEach(async (anom) => {
       const modulo = this.classificationService.getAnomModule(this.olMapService.getCentroid(anom.featureCoords));
       if (modulo !== undefined) {
         this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
@@ -260,17 +260,17 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
         // al terminar...
         if (count === anomalias.length) {
-          this.processing = false;
+          await this.syncAnomsState();
 
-          this.syncAnomsState();
+          this.processing = false;
         }
       }
     });
   }
 
-  syncAnomsState() {
+  async syncAnomsState() {
     // actualizamos las anomalias por si ha habido cambios
-    this.classificationService.getAnomalias();
+    await this.classificationService.getAnomalias();
 
     const anomalias = this.classificationService.listaAnomalias;
 

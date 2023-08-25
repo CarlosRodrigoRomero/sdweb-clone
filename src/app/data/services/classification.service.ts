@@ -110,11 +110,8 @@ export class ClassificationService {
     });
   }
 
-  getAnomalias() {
-    this.anomaliaService
-      .getAnomaliasInforme$(this.informeId)
-      .pipe(take(1))
-      .subscribe((anoms) => (this.listaAnomalias = anoms));
+  async getAnomalias() {
+    this.listaAnomalias = await this.anomaliaService.getAnomaliasInforme$(this.informeId).pipe(take(1)).toPromise();
   }
 
   createAnomaliaFromNormModuleFeature(feature: Feature<any>, date: number) {
