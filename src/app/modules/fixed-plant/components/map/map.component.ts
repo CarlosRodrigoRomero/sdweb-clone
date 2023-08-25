@@ -151,6 +151,10 @@ export class MapComponent implements OnInit, OnDestroy {
       preload: Infinity,
     });
 
+    const osmLayer = new TileLayer({
+      source: new OSM(),
+    });
+
     let aerial;
     // solo lo aplicamos a la planta DEMO
     if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
@@ -170,7 +174,8 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     const layers = [
-      satelliteLayer,
+      // satelliteLayer,
+      osmLayer,
       ...this.aerialLayers,
       ...this.thermalLayers,
       // new TileLayer({

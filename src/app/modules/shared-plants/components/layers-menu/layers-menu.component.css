@@ -1,0 +1,6 @@
+.layers-btn-content {
+  display: flex;
+  align-items: center;
+  width: 150px;
+  justify-content: space-between;
+}

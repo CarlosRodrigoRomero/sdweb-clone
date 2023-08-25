@@ -24,6 +24,8 @@ import { ZonesSelectorContainerComponent } from './containers/zones-selector-con
 import { ShareReportDialogComponent } from './components/share-report-dialog/share-report-dialog.component';
 import { ShareMenuComponent } from './components/share-menu/share-menu.component';
 import { AddPlantUserDialogComponent } from './components/add-plant-user-dialog/add-plant-user-dialog.component';
+import { LayersMenuComponent } from './components/layers-menu/layers-menu.component';
+import { LayersPanelComponent } from './components/layers-panel/layers-panel.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +50,8 @@ import { AddPlantUserDialogComponent } from './components/add-plant-user-dialog/
     ShareReportDialogComponent,
     ShareMenuComponent,
     AddPlantUserDialogComponent,
+    LayersMenuComponent,
+    LayersPanelComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -62,6 +66,7 @@ import { AddPlantUserDialogComponent } from './components/add-plant-user-dialog/
     ViewToggleComponent,
     GroupByZonesViewComponent,
     LeyendaContainerComponent,
+    LayersMenuComponent,
   ],
 })
 export class SharedPlantsModule {}

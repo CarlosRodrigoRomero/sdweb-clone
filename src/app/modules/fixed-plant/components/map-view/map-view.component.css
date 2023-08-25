@@ -13,6 +13,12 @@
   position: relative;
 }
 
+app-layers-menu {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
 .map-control {
   position: absolute;
   bottom: 0.5rem;

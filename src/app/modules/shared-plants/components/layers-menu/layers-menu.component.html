@@ -1,0 +1,11 @@
+<button mat-raised-button class="filters-btn" [matMenuTriggerFor]="layers">
+  <div class="layers-btn-content">
+    <span>{{ 'Capas' | translate }}</span>
+    <mat-icon>layers</mat-icon>
+  </div>
+</button>
+<mat-menu #layers="matMenu" class="layers">
+  <div class="content" (click)="$event.stopPropagation()">
+    <app-layers-panel></app-layers-panel>
+  </div>
+</mat-menu>
