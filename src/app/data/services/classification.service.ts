@@ -39,6 +39,8 @@ export class ClassificationService {
   normModHovered$ = new BehaviorSubject<NormalizedModule>(this._normModHovered);
   private _normModAnomaliaSelected: NormalizedModule = undefined;
   normModAnomaliaSelected$ = new BehaviorSubject<NormalizedModule>(this._normModAnomaliaSelected);
+  private _anomaliaHovered: Anomalia = undefined;
+  anomaliaHovered$ = new BehaviorSubject<Anomalia>(this._anomaliaHovered);
   private _anomaliaSelected: Anomalia = undefined;
   anomaliaSelected$ = new BehaviorSubject<Anomalia>(this._anomaliaSelected);
   private _listaAnomalias: Anomalia[] = undefined;
@@ -108,14 +110,11 @@ export class ClassificationService {
     });
   }
 
-  getAnomalias() {
-    this.anomaliaService
-      .getAnomaliasInforme$(this.informeId)
-      .pipe(take(1))
-      .subscribe((anoms) => (this.listaAnomalias = anoms));
+  async getAnomalias() {
+    this.listaAnomalias = await this.anomaliaService.getAnomaliasInforme$(this.informeId).pipe(take(1)).toPromise();
   }
 
-  createAnomaliaFromNormModule(feature: Feature<any>, date: number) {
+  createAnomaliaFromNormModuleFeature(feature: Feature<any>, date: number) {
     const id = feature.getProperties().properties.id;
     const normModule: NormalizedModule = feature.getProperties().properties.normMod;
     const coordinates: Coordinate[] = this.olMapService.coordsDBToCoordinate(normModule.coords);
@@ -136,6 +135,46 @@ export class ClassificationService {
 
     const anomalia: Anomalia = {
       id,
+      plantaId: this.planta.id,
+      informeId: this.informeId,
+      tipo: 8,
+      globalCoords,
+      gradienteNormalizado: 0,
+      temperaturaMax: 0,
+      modulo,
+      featureCoords: coordinates,
+      featureType: 'Polygon',
+      localX: normModule.columna,
+      localY: normModule.fila,
+      datetime: date,
+    };
+
+    // asignamos la nueva anomalia para acceder a ella y poder modificarla
+    this.anomaliaSelected = anomalia;
+
+    // añadimos a la lista de anomalias
+    this.listaAnomalias = this.listaAnomalias.concat(anomalia);
+
+    // Guardar en la base de datos
+    this.anomaliaService.addAnomalia(anomalia);
+  }
+
+  createAnomaliaFromNormModule(normModule: NormalizedModule, date: number) {
+    const coordinates: Coordinate[] = this.olMapService.coordsDBToCoordinate(normModule.coords);
+
+    let refCoords: Coordinate;
+    // si existe centroId lo usamos, sino usamos un vertice del rectangulo
+    if (normModule.hasOwnProperty('centroid_gps')) {
+      refCoords = [normModule.centroid_gps.long, normModule.centroid_gps.lat] as Coordinate;
+    } else {
+      refCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordinates[0]);
+    }
+
+    const globalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(refCoords);
+    const modulo = this.getAnomModule(coordinates[0]);
+
+    const anomalia: Anomalia = {
+      id: normModule.id,
       plantaId: this.planta.id,
       informeId: this.informeId,
       tipo: 8,
@@ -230,20 +269,22 @@ export class ClassificationService {
     this.normModSelected$.next(value);
   }
 
+  get anomaliaHovered() {
+    return this._anomaliaHovered;
+  }
+
+  set anomaliaHovered(value: Anomalia) {
+    this._anomaliaHovered = value;
+    this.anomaliaHovered$.next(value);
+  }
+
   get anomaliaSelected() {
     return this._anomaliaSelected;
   }
 
   set anomaliaSelected(value: Anomalia) {
-    // const start1 = performance.now();
     this._anomaliaSelected = value;
-    // const end1 = performance.now();
-    // console.log(end1 - start1);
-
-    // const start2 = performance.now();
     this.anomaliaSelected$.next(value);
-    // const end2 = performance.now();
-    // console.log(end2 - start2);
   }
 
   get normModHovered() {

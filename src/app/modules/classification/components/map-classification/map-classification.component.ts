@@ -4,12 +4,10 @@ import { take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 import TileLayer from 'ol/layer/Tile';
-import XYZ from 'ol/source/XYZ';
 import View from 'ol/View';
 import { fromLonLat } from 'ol/proj';
 import { defaults as defaultControls } from 'ol/control.js';
 import { Feature, Map } from 'ol';
-import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style } from 'ol/style';
 import Polygon from 'ol/geom/Polygon';
@@ -54,7 +52,7 @@ export class MapClassificationComponent implements OnInit {
   private thermalLayers: TileLayer<any>[];
   private normModules: NormalizedModule[];
   private listaAnomalias: Anomalia[] = [];
-  private normModLayer: VectorImageLayer<any> = undefined;
+  private anomsLayer: VectorImageLayer<any> = undefined;
   private prevFeatureHover: Feature<any>;
   thermalLayerVisibility = true;
   private palette = PALETTE.ironPalette;
@@ -79,19 +77,18 @@ export class MapClassificationComponent implements OnInit {
 
     this.informe = this.classificationService.informe;
 
-    // nos conectamos a la lista de anomalias
-    this.classificationService.listaAnomalias$.subscribe((anomalias) => (this.listaAnomalias = anomalias));
-
     // aplicamos estilos cada vez que se modifica una anomalia
     this.classificationService.anomaliaSelected$.subscribe((anomalia) => {
       this.anomaliaSelected = anomalia;
 
-      if (anomalia !== undefined) {
-        if (this.normModLayer !== undefined) {
-          this.normModLayer.setStyle(this.getStyleNormMod(false));
-        }
-      }
+      // if (anomalia !== undefined) {
+      //   if (this.anomsLayer !== undefined) {
+      //     this.anomsLayer.setStyle(this.getStyleAnoms(false));
+      //   }
+      // }
     });
+
+    this.normModules = this.classificationService.normModules;
 
     this.classificationService.normModSelected$.subscribe((normMod) => (this.normModSelected = normMod));
 
@@ -131,8 +128,8 @@ export class MapClassificationComponent implements OnInit {
 
           this.initMap();
 
-          this.createNormModLayer();
-          this.addNormModules();
+          this.createAnomsLayer();
+          this.addAnoms();
 
           this.addPointerOnHover();
           this.addOnHoverAction();
@@ -175,40 +172,38 @@ export class MapClassificationComponent implements OnInit {
       });
   }
 
-  private createNormModLayer() {
-    this.normModLayer = new VectorImageLayer({
+  private createAnomsLayer() {
+    this.anomsLayer = new VectorImageLayer({
       source: new VectorSource({ wrapX: false }),
-      style: this.getStyleNormMod(false),
+      style: this.getStyleAnoms(false),
     });
 
-    this.normModLayer.setProperties({
-      id: 'normModLayer',
+    this.anomsLayer.setProperties({
+      id: 'anomsLayer',
     });
 
-    this.map.addLayer(this.normModLayer);
+    this.map.addLayer(this.anomsLayer);
   }
 
-  private addNormModules() {
-    const normModsSource = this.normModLayer.getSource();
+  private addAnoms() {
+    const anomsSource = this.anomsLayer.getSource();
 
-    this.classificationService.normModules$.pipe(take(1)).subscribe((normModules) => {
-      normModsSource.clear();
+    this.classificationService.listaAnomalias$.subscribe((anoms) => {
+      anomsSource.clear();
 
-      this.normModules = normModules;
+      this.listaAnomalias = anoms;
 
-      this.normModules.forEach((normMod) => {
-        const coords = this.structuresService.coordsDBToCoordinate(normMod.coords);
-
+      this.listaAnomalias.forEach((anom) => {
         const feature = new Feature({
-          geometry: new Polygon([coords]),
+          geometry: new Polygon([anom.featureCoords]),
           properties: {
-            id: normMod.id,
-            name: 'normMod',
-            normMod,
+            id: anom.id,
+            name: 'anom',
+            tipo: anom.tipo,
           },
         });
 
-        normModsSource.addFeature(feature);
+        anomsSource.addFeature(feature);
       });
     });
   }
@@ -219,7 +214,7 @@ export class MapClassificationComponent implements OnInit {
         let feature = this.map
           .getFeaturesAtPixel(event.pixel)
           .filter((item) => item.getProperties().properties !== undefined);
-        feature = feature.filter((item) => item.getProperties().properties.name === 'normMod');
+        feature = feature.filter((item) => item.getProperties().properties.name === 'anom');
 
         if (feature.length > 0) {
           // cambia el puntero por el de seleccionar
@@ -244,33 +239,35 @@ export class MapClassificationComponent implements OnInit {
           const feature: Feature<any> = this.map
             .getFeaturesAtPixel(event.pixel)
             .filter((item) => item.getProperties().properties !== undefined)
-            .filter((item) => item.getProperties().properties.name === 'normMod')[0] as Feature<any>;
+            .filter((item) => item.getProperties().properties.name === 'anom')[0] as Feature<any>;
 
           if (feature !== undefined) {
             // cuando pasamos de un modulo a otro directamente sin pasar por vacio
             if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
               // quitamos el efecto resaltado
-              this.prevFeatureHover.setStyle(this.getStyleNormMod(false));
+              this.prevFeatureHover.setStyle(this.getStyleAnoms(false));
               this.prevFeatureHover = undefined;
             }
             currentFeatureHover = feature;
 
             // aplicamos el efecto resaltado
-            feature.setStyle(this.getStyleNormMod(true));
+            feature.setStyle(this.getStyleAnoms(true));
 
-            this.classificationService.normModHovered = feature.getProperties().properties.normMod;
+            const anomalia = this.listaAnomalias.find((anom) => anom.id === feature.getProperties().properties.id);
+
+            this.classificationService.anomaliaHovered = anomalia;
 
             this.prevFeatureHover = feature;
           } else {
-            this.classificationService.normModHovered = undefined;
+            this.classificationService.anomaliaHovered = undefined;
           }
         } else {
           if (currentFeatureHover !== undefined) {
             // quitamos el efecto resaltado
-            currentFeatureHover.setStyle(this.getStyleNormMod(false));
+            currentFeatureHover.setStyle(this.getStyleAnoms(false));
             currentFeatureHover = undefined;
 
-            this.classificationService.normModHovered = undefined;
+            this.classificationService.anomaliaHovered = undefined;
           }
         }
       }
@@ -279,42 +276,25 @@ export class MapClassificationComponent implements OnInit {
 
   private addOnDoubleClickInteraction() {
     this.map.on('dblclick', (event) => {
-      const feature = this.map.getFeaturesAtPixel(event.pixel)[0] as Feature<any>;
-      if (feature) {
-        const normMod: NormalizedModule = feature.getProperties().properties.normMod;
+      const coordsClick = this.map.getCoordinateFromPixel(event.pixel);
 
-        // no permitimos doble click sobre anomalias
-        if (!this.listaAnomalias.map((anom) => anom.id).includes(normMod.id)) {
-          this.classificationService.normModSelected = normMod;
+      const normModule = this.getClosestNormModule(coordsClick);
 
-          // const coords = this.structuresService.coordsDBToCoordinate(feature.getProperties().properties.normMod.coords);
+      if (normModule !== null) {
+        const date = this.getDatetime();
 
-          const date = this.getDatetime();
-
-          this.classificationService.createAnomaliaFromNormModule(feature, date);
-        }
+        this.classificationService.createAnomaliaFromNormModule(normModule, date);
       }
     });
   }
 
   private addSelectInteraction() {
     const select = new Select({
-      style: this.getStyleNormMod(true),
+      style: this.getStyleAnoms(true),
       condition: click,
       layers: (l) => {
-        if (l.getProperties().id === 'normModLayer') {
+        if (l.getProperties().id === 'anomsLayer') {
           return true;
-        } else {
-          return false;
-        }
-      },
-      filter: (f) => {
-        if (this.listaAnomalias !== undefined && this.listaAnomalias.length > 0) {
-          if (this.listaAnomalias.map((anom) => anom.id).includes(f.getProperties().properties.id)) {
-            return true;
-          } else {
-            return false;
-          }
         } else {
           return false;
         }
@@ -398,42 +378,51 @@ export class MapClassificationComponent implements OnInit {
     return closestPoint.date;
   }
 
+  private getClosestNormModule(coordsClick: Coordinate): NormalizedModule {
+    return this.classificationService.normModules.reduce((closestModule, currentModule) => {
+      const centroidNormMod = [currentModule.centroid_gps.long, currentModule.centroid_gps.lat] as Coordinate;
+      const currentDistance = this.calculateDistance(coordsClick, centroidNormMod);
+
+      if (!closestModule) return currentModule;
+
+      const closestCentroid = [closestModule.centroid_gps.long, closestModule.centroid_gps.lat] as Coordinate;
+      const closestDistance = this.calculateDistance(coordsClick, closestCentroid);
+
+      return currentDistance < closestDistance ? currentModule : closestModule;
+    }, null as NormalizedModule | null);
+  }
+
+  private calculateDistance(coord1: Coordinate, coord2: Coordinate): number {
+    const dx = coord1[0] - coord2[0];
+    const dy = coord1[1] - coord2[1];
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
   private dateStringToUnix(date: string) {
     const unix = moment(date, 'DD/MM/YYYY hh:mm:ss').unix();
 
     return unix;
   }
 
-  private getStyleNormMod(hovered: boolean) {
+  private getStyleAnoms(hovered: boolean) {
     return (feature) => {
-      if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
-        if (
-          this.listaAnomalias !== undefined &&
-          this.listaAnomalias.map((anom) => anom.id).includes(feature.getProperties().properties.id)
-        ) {
-          const anomalia = this.listaAnomalias.find((anom) => anom.id === feature.getProperties().properties.id);
+      const TRANSPARENT_COLOR = 'rgba(0,0,0,0)';
+      const DEFAULT_WIDTH = 2;
+      const HOVER_WIDTH = 4;
 
-          return new Style({
-            stroke: new Stroke({
-              color: COLOR.colores_tipos[anomalia.tipo],
-              width: hovered ? 4 : 2,
-            }),
-            fill: new Fill({
-              color: 'rgba(0,0,0,0)',
-            }),
-          });
-        } else {
-          return new Style({
-            stroke: new Stroke({
-              color: hovered ? 'white' : 'rgba(0,0,0,0)',
-              width: 2,
-            }),
-            fill: new Fill({
-              color: 'rgba(0,0,0,0)',
-            }),
-          });
-        }
-      }
+      // Comprobar si la característica tiene propiedades válidas
+      const featureProps = feature?.getProperties()?.properties;
+      if (!featureProps) return;
+
+      return new Style({
+        stroke: new Stroke({
+          color: COLOR.colores_tipos[featureProps.tipo],
+          width: hovered ? HOVER_WIDTH : DEFAULT_WIDTH,
+        }),
+        fill: new Fill({
+          color: TRANSPARENT_COLOR,
+        }),
+      });
     };
   }
 

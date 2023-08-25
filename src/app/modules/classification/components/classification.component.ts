@@ -29,7 +29,7 @@ import { LocationAreaInterface } from '@core/models/location';
 export class ClassificationComponent implements OnInit, OnDestroy {
   serviceInit = false;
   planta: PlantaInterface;
-  normModHovered: NormalizedModule = undefined;
+  anomaliaHovered: Anomalia = undefined;
   private anomalias: Anomalia[] = [];
   informe: InformeInterface;
   anomaliasNoData: Anomalia[] = [];
@@ -49,7 +49,8 @@ export class ClassificationComponent implements OnInit, OnDestroy {
   private realAnoms: Anomalia[] = [];
   informeId: string;
   private urlCalcAnomData = 'https://datos-anomalia-rcpywurt6q-ew.a.run.app';
-  private urlConvertAnomToPc = 'https://anomalias-to-pcs-rcpywurt6q-ew.a.run.app/anomalias-to-pcs';
+  private urlAddPcDataToAnoms = 'https://anomalias-to-pcs-rcpywurt6q-ew.a.run.app/anomalias-to-pcs';
+  private urlAddDateToAnoms = 'https://europe-west1-sdweb-d33ce.cloudfunctions.net/fecha-anomalias';
 
   private subscriptions: Subscription = new Subscription();
 
@@ -70,8 +71,9 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       this.informeId = this.classificationService.informeId;
     });
     this.subscriptions.add(this.classificationService.planta$.subscribe((planta) => (this.planta = planta)));
+
     this.subscriptions.add(
-      this.classificationService.normModHovered$.subscribe((normMod) => (this.normModHovered = normMod))
+      this.classificationService.anomaliaHovered$.subscribe((anomHov) => (this.anomaliaHovered = anomHov))
     );
 
     this.subscriptions.add(
@@ -103,10 +105,13 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
     // actualizamos las anomalias con los datos que les faltan
     if (this.planta.tipo === 'seguidores') {
-      this.addPcDataToAnoms();
+      await this.addPcDataToAnoms();
     } else {
       await this.updateAnomalias();
     }
+
+    // añadimos las fechas correctas a las anomalías
+    this.addDateToAnoms();
   }
 
   private updateInforme() {
@@ -143,8 +148,8 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       await Promise.all(promises);
     }
 
+    await this.syncAnomsState();
     this.anomsProcesed = true;
-    this.syncAnomsState();
     this.processing = false;
   }
 
@@ -160,7 +165,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       return this.http
         .get(this.urlCalcAnomData, { responseType: 'text', params })
         .toPromise()
-        .then((res) => {
+        .then(async (res) => {
           console.log(res);
 
           count++;
@@ -168,12 +173,12 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
           // al terminar...
           if (count === this.anomaliasNoData.length) {
-            this.processing = false;
+            await this.syncAnomsState();
 
-            this.syncAnomsState();
+            this.processing = false;
           }
         })
-        .catch((err) => {
+        .catch(async (err) => {
           console.log(err);
 
           count++;
@@ -181,32 +186,29 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
           // al terminar...
           if (count === this.anomaliasNoData.length) {
-            this.processing = false;
+            await this.syncAnomsState();
 
-            this.syncAnomsState();
+            this.processing = false;
           }
         });
     });
   }
 
-  addPcDataToAnoms() {
+  async addPcDataToAnoms() {
     this.processing = true;
 
     const params = new HttpParams().set('informeId', this.informeId);
 
-    return this.http
-      .get(this.urlConvertAnomToPc, { responseType: 'text', params })
-      .toPromise()
-      .then((res) => {
-        console.log(res);
+    try {
+      const res = await this.http.get(this.urlAddPcDataToAnoms, { responseType: 'text', params }).toPromise();
+      console.log(res);
 
-        this.processing = false;
-      })
-      .catch((err) => {
-        console.log(err);
+      this.processing = false;
+    } catch (err) {
+      console.log(err);
 
-        this.processing = false;
-      });
+      this.processing = false;
+    }
   }
 
   updateGlobalCoordsAnoms(check: boolean) {
@@ -220,7 +222,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       anomalias = this.anomsNoGlobals;
     }
 
-    anomalias.forEach((anom, index) => {
+    anomalias.forEach(async (anom, index) => {
       const coordCentroid = this.olMapService.getCentroid(anom.featureCoords);
       const newGlobalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(coordCentroid);
 
@@ -231,9 +233,9 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
       // al terminar...
       if (count === anomalias.length) {
-        this.processing = false;
+        await this.syncAnomsState();
 
-        this.syncAnomsState();
+        this.processing = false;
       }
     });
   }
@@ -249,7 +251,7 @@ export class ClassificationComponent implements OnInit, OnDestroy {
       anomalias = this.anomsNoModule;
     }
 
-    anomalias.forEach((anom) => {
+    anomalias.forEach(async (anom) => {
       const modulo = this.classificationService.getAnomModule(this.olMapService.getCentroid(anom.featureCoords));
       if (modulo !== undefined) {
         this.anomaliaService.updateAnomaliaField(anom.id, 'modulo', modulo);
@@ -259,17 +261,37 @@ export class ClassificationComponent implements OnInit, OnDestroy {
 
         // al terminar...
         if (count === anomalias.length) {
-          this.processing = false;
+          await this.syncAnomsState();
 
-          this.syncAnomsState();
+          this.processing = false;
         }
       }
     });
   }
 
-  syncAnomsState() {
+  addDateToAnoms() {
+    this.processing = true;
+
+    const params = new HttpParams().set('informeId', this.informeId);
+
+    return this.http
+      .get(this.urlAddDateToAnoms, { responseType: 'text', params })
+      .toPromise()
+      .then((res) => {
+        console.log(res);
+
+        this.processing = false;
+      })
+      .catch((err) => {
+        console.log(err);
+
+        this.processing = false;
+      });
+  }
+
+  async syncAnomsState() {
     // actualizamos las anomalias por si ha habido cambios
-    this.classificationService.getAnomalias();
+    await this.classificationService.getAnomalias();
 
     const anomalias = this.classificationService.listaAnomalias;
 

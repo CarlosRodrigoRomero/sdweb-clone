@@ -36,6 +36,13 @@ export class AnomTipoLegendComponent implements OnInit, OnDestroy {
       const anomalia = this.anomaliaSelected;
       anomalia.tipo = tipo;
 
+      this.classificationService.listaAnomalias = this.classificationService.listaAnomalias.map((anom) => {
+        if (anom.id === this.anomaliaSelected.id) {
+          anom.tipo = tipo;
+        }
+        return anom;
+      });
+
       // actualizamos el tipo en la DB
       this.anomaliaService.updateAnomaliaField(anomalia.id, 'tipo', tipo);
 
