@@ -278,7 +278,7 @@ export class MapClassificationComponent implements OnInit {
     this.map.on('dblclick', (event) => {
       const coordsClick = this.map.getCoordinateFromPixel(event.pixel);
 
-      const normModule = this.getClosestNormModule(coordsClick);
+      const normModule = this.getNormModuleFromClick(coordsClick);
 
       if (normModule !== null) {
         const date = this.getDatetime();
@@ -398,6 +398,16 @@ export class MapClassificationComponent implements OnInit {
 
       return currentDistance < closestDistance ? currentModule : closestModule;
     }, null as NormalizedModule | null);
+  }
+
+  private getNormModuleFromClick(coordsClick: Coordinate): NormalizedModule | null {
+    return (
+      this.classificationService.normModules.find((normMod) => {
+        const coords = this.structuresService.coordsDBToCoordinate(normMod.coords);
+        const polygon = new Polygon([coords]);
+        return polygon.intersectsCoordinate(coordsClick);
+      }) || null
+    );
   }
 
   private calculateDistance(coord1: Coordinate, coord2: Coordinate): number {
