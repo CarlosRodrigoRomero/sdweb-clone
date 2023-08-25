@@ -5,12 +5,14 @@ import { AngularFirestore } from '@angular/fire/firestore';
 
 import { User } from 'firebase';
 
-import { Observable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 
 import { UserService } from './user.service';
 
 import { UserInterface } from '@core/models/user';
+
+declare var heap: any;
 
 @Injectable({
   providedIn: 'root',
@@ -40,6 +42,7 @@ export class AuthService {
   async signIn(email: string, password: string = 'password') {
     try {
       const firebaseUser = await this.afAuth.signInWithEmailAndPassword(email, password);
+      var user = this.userService.getUser(firebaseUser.user.uid);
 
       // Custom event que se lanza al hacer login para registrarse en Google Analytics
       window['dataLayer'] = window['dataLayer'] || [];
@@ -49,8 +52,21 @@ export class AuthService {
         solardroneUser: firebaseUser.user.email.includes('@solardrone.es'),
       });
 
-      return this.userService.getUser(firebaseUser.user.uid);
+      // Identificación de usuarios en heap y propiedades de usuario
+      heap.identify(firebaseUser.user.email);
 
+      user
+      .pipe(
+        catchError((error: any) => {
+          console.error('Error obteniendo datos del usuario:', error);
+          return throwError(error);
+        })
+      )
+      .subscribe((element) => {
+        heap.addUserProperties({'Nombre': firebaseUser.user.displayName, 'UID': firebaseUser.user.uid, 'Empresa': element.empresaNombre,});
+      });
+
+      return user;
       // return this.user;
     } catch (error) {
       return error;
