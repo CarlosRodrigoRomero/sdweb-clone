@@ -27,6 +27,7 @@ import { AddPlantUserDialogComponent } from './components/add-plant-user-dialog/
 import { LayersMenuComponent } from './components/layers-menu/layers-menu.component';
 import { LayersPanelComponent } from './components/layers-panel/layers-panel.component';
 import { SatelliteSelectorComponent } from './components/satellite-selector/satellite-selector.component';
+import { ViewSelectorComponent } from './components/view-selector/view-selector.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,7 @@ import { SatelliteSelectorComponent } from './components/satellite-selector/sate
     LayersMenuComponent,
     LayersPanelComponent,
     SatelliteSelectorComponent,
+    ViewSelectorComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [

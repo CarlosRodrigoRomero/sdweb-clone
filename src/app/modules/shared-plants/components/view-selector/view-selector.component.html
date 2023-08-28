@@ -1,0 +1,11 @@
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title> Vistas </mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <mat-radio-group (change)="onSelectionChange()" class="view-radio-group" [(ngModel)]="viewSelected">
+    <mat-radio-button class="example-radio-button" *ngFor="let view of views" [value]="view.view">
+      {{ view.label }}
+    </mat-radio-button>
+  </mat-radio-group>
+</mat-expansion-panel>

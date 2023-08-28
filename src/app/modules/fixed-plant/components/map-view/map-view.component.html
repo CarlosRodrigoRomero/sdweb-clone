@@ -17,10 +17,7 @@
         <app-map></app-map>
 
         <div>
-          <div class="views-area">
-            <!-- TOGGLE MAPAS -->
-            <app-view-toggle></app-view-toggle>
-
+          <div class="leyenda">
             <!-- LEYENDA -->
             <app-leyenda-container class="leyenda-tipo" *ngIf="viewSelected === 'tipo'"></app-leyenda-container>
             <app-leyenda-container class="leyenda-no-tipo" *ngIf="viewSelected !== 'tipo'"></app-leyenda-container>
@@ -39,15 +36,6 @@
             <!-- CONTROL TEMPORAL -->
             <div class="temporal-control">
               <app-slider-temporal *ngIf="numInformes > 1 && showFilters"></app-slider-temporal>
-            </div>
-
-            <!-- CONTROLES VISUALES -->
-            <div class="visual-control">
-              <!-- <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider>
-                
-              <app-zones-selector-container *ngIf="thereAreLargestZones"></app-zones-selector-container>
-              
-              <app-slider-opacity></app-slider-opacity> -->
             </div>
           </div>
         </div>
