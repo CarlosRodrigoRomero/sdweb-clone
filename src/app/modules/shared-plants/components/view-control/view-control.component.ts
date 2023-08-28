@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { skip, take } from 'rxjs/operators';
 
 import TileLayer from 'ol/layer/Tile';
 import VectorImageLayer from 'ol/layer/VectorImage';
@@ -29,6 +29,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private reportViewSelected: string;
   private currentZoom: number;
   private viewZones: boolean;
+  private thermalLayerVisible: boolean;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -45,10 +46,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
 
     if (this.reportControlService.plantaFija) {
-      this.olMapService
-        .getThermalLayers()
-        .pipe(take(1))
-        .subscribe((layers) => (this.thermalLayers = layers));
+      this.subscriptions.add(this.olMapService.thermalLayers$.subscribe((layers) => (this.thermalLayers = layers)));
 
       this.subscriptions.add(
         this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers))
@@ -108,6 +106,15 @@ export class ViewControlComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    /* CAPA TÉRMICA */
+    this.subscriptions.add(
+      this.viewReportService.thermalLayerVisible$.pipe(skip(1)).subscribe((visible) => {
+        this.thermalLayerVisible = visible;
+
+        this.setLayersVisibility(this.selectedInformeId);
+      })
+    );
   }
 
   private setLayersVisibility(informeId: string) {
@@ -159,7 +166,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   private setThermalLayersVisibility(informeId: string) {
     this.thermalLayers.forEach((layer) => {
       if (layer.getProperties().informeId === informeId) {
-        layer.setVisible(true);
+        layer.setVisible(this.thermalLayerVisible);
       } else {
         layer.setVisible(false);
       }

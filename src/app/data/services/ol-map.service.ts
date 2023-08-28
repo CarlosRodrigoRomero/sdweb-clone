@@ -45,8 +45,8 @@ export class OlMapService {
   private _draw: Draw = undefined;
   public draw$ = new BehaviorSubject<Draw>(this._draw);
   private drawLayers: VectorLayer<any>[] = [];
-  private thermalLayers: TileLayer<any>[] = [];
-  private thermalLayers$ = new BehaviorSubject<TileLayer<any>[]>(this.thermalLayers);
+  private _thermalLayers: TileLayer<any>[] = [];
+  thermalLayers$ = new BehaviorSubject<TileLayer<any>[]>(this._thermalLayers);
   private anomaliaLayers: VectorImageLayer<any>[] = [];
   private anomaliaLayers$ = new BehaviorSubject<VectorImageLayer<any>[]>(this.anomaliaLayers);
   private seguidorLayers: VectorImageLayer<any>[] = [];
@@ -101,8 +101,7 @@ export class OlMapService {
   }
 
   addThermalLayer(layer: TileLayer<any>) {
-    this.thermalLayers.push(layer);
-    this.thermalLayers$.next(this.thermalLayers);
+    this.thermalLayers = [...this.thermalLayers, layer];
   }
 
   getThermalLayers() {
@@ -232,6 +231,7 @@ export class OlMapService {
         },
       }),
       preload: Infinity,
+      visible: false,
     });
 
     return tl;
@@ -469,6 +469,15 @@ export class OlMapService {
   set aerialLayers(value: TileLayer<any>[]) {
     this._aerialLayers = value;
     this.aerialLayers$.next(value);
+  }
+
+  get thermalLayers(): TileLayer<any>[] {
+    return this._thermalLayers;
+  }
+
+  set thermalLayers(value: TileLayer<any>[]) {
+    this._thermalLayers = value;
+    this.thermalLayers$.next(value);
   }
 
   get satelliteLayer(): TileLayer<any> {

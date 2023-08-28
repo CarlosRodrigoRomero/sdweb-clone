@@ -15,6 +15,9 @@ export class ViewReportService {
   private _groupByZonesView = false;
   groupByZonesView$ = new BehaviorSubject<boolean>(this._groupByZonesView);
 
+  private _thermalLayerVisible = false;
+  thermalLayerVisible$ = new BehaviorSubject<boolean>(this._thermalLayerVisible);
+
   constructor() {}
 
   resetService() {
@@ -46,5 +49,13 @@ export class ViewReportService {
   set groupByZonesView(value: boolean) {
     this._groupByZonesView = value;
     this.groupByZonesView$.next(value);
+  }
+
+  get thermalLayerVisible() {
+    return this._thermalLayerVisible;
+  }
+  set thermalLayerVisible(value: boolean) {
+    this._thermalLayerVisible = value;
+    this.thermalLayerVisible$.next(value);
   }
 }
