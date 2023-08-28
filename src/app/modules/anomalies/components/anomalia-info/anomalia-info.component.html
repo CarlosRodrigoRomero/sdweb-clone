@@ -1,16 +1,9 @@
-<!-- <div class="anom-img-wrapper">
-    <img src="../../../../../assets/images/thermal_image.png"/>
-    <img src="../../../../../assets/images/visual_image.png"/>
-  </div> -->
 <mat-accordion *ngIf="anomaliaSelect" multi>
-  <mat-expansion-panel [expanded]="true">
+  <mat-expansion-panel class="background" [expanded]="true">
     <mat-expansion-panel-header>
       <mat-panel-title> Información principal </mat-panel-title>
     </mat-expansion-panel-header>
     <div class="tab-content">
-      <!-- <div class="elemento">
-            <span class="titulo-resalt">{{ 'anomalia' | translate | titlecase }} #{{ anomaliaSelect.numAnom }}</span>
-          </div> -->
       <div class="elemento">
         <span class="info-anom-titulo">{{ 'Tipo' | translate }}</span>
         <span class="info-anom-subtitulo">{{ pcDescripcion[anomaliaSelect.tipo] | translate }}</span>
@@ -78,7 +71,7 @@
       </div>
     </div>
   </mat-expansion-panel>
-  <mat-expansion-panel *ngIf="seccionVuelo">
+  <mat-expansion-panel class="background" *ngIf="seccionVuelo">
     <mat-expansion-panel-header>
       <mat-panel-title> Información sobre el vuelo </mat-panel-title>
     </mat-expansion-panel-header>
@@ -120,7 +113,7 @@
     </div>
   </mat-expansion-panel>
 
-  <mat-expansion-panel *ngIf="seccionModulo">
+  <mat-expansion-panel class="background" *ngIf="seccionModulo">
     <mat-expansion-panel-header>
       <mat-panel-title>
         {{ 'Módulo' | translate }}
@@ -142,7 +135,7 @@
       </div>
     </div>
   </mat-expansion-panel>
-  <mat-expansion-panel>
+  <mat-expansion-panel class="background">
     <mat-expansion-panel-header>
       <mat-panel-title> O&M </mat-panel-title>
     </mat-expansion-panel-header>

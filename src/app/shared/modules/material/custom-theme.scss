@@ -74,6 +74,10 @@ $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dar
 
 @include mat.all-component-themes($app-dark-theme);
 
+:root {
+  --background: #{mat.get-color-from-palette($app-dark-background)};
+}
+
 .light-theme {
   @include mat.all-component-themes($app-light-theme);
 
@@ -105,6 +109,8 @@ $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dar
   .background {
     background-color: mat.get-color-from-palette($app-light-background);
   }
+
+  --background: #{mat.get-color-from-palette($app-light-background)};
 }
 
 .dark-theme {
@@ -138,4 +144,6 @@ $app-dark-theme: custom-dark-theme($app-dark-primary, $app-dark-accent, $app-dar
   .background {
     background-color: mat.get-color-from-palette($app-dark-background);
   }
+
+  --background: #{mat.get-color-from-palette($app-dark-background)};
 }
