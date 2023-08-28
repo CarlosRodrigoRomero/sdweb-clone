@@ -1,32 +1,5 @@
-.card-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.global-areas-card {
-  display: flex;
-  justify-content: center;
-  min-width: 250px;
-  box-shadow: none !important;
-  min-height: 64px;
-  height: 64px;
-}
-
-.areas-section {
-  margin: 5px 15px 0 15px;
-}
-
 li {
   list-style-type: none;
-}
-
-.label-popup {
-  border-radius: 4px;
-  background-color: rgb(78, 78, 78);
-  color: white;
-  padding: 0px 6px;
-  font-size: 12px;
 }
 
 .mat-menu-item {

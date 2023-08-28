@@ -1,6 +1,6 @@
-<mat-card class="global-areas-card">
-  <mat-card-content class="card-content">
-    <span class="example-list-section">
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title>
       <mat-checkbox
         class="checkbox"
         [checked]="allComplete"
@@ -9,28 +9,12 @@
       >
         {{ task.name | translate }}
       </mat-checkbox>
-    </span>
-    <div *ngIf="numAreas > 1">
-      <button class="btn-menu" mat-icon-button [matMenuTriggerFor]="zoneMenu">
-        <mat-icon>keyboard_arrow_down</mat-icon>
-      </button>
-      <mat-menu class="menu-tipo" #zoneMenu="matMenu">
-        <section class="areas-section">
-          <span>
-            <li mat-menu-item *ngFor="let subtask of task.subtasks; index as i" (click)="stopPropagation($event)">
-              <mat-checkbox
-                class="checkbox"
-                [(ngModel)]="subtask.completed"
-                (ngModelChange)="setVisibilityLayer.emit(i)"
-              >
-                {{ subtask.name | translate }}
-              </mat-checkbox>
-            </li>
-          </span>
-        </section>
-      </mat-menu>
-    </div>
-  </mat-card-content>
-</mat-card>
+    </mat-panel-title>
+  </mat-expansion-panel-header>
 
-<div id="popup" class="label-popup"></div>
+  <li mat-menu-item *ngFor="let subtask of task.subtasks; index as i" (click)="stopPropagation($event)">
+    <mat-checkbox class="checkbox" [(ngModel)]="subtask.completed" (ngModelChange)="setVisibilityLayer.emit(i)">
+      {{ subtask.name | translate }}
+    </mat-checkbox>
+  </li>
+</mat-expansion-panel>
