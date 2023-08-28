@@ -32,6 +32,7 @@ import { GEO } from '@data/constants/geo';
 import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 import ImageTileCubiertasMod from '@shared/modules/ol-maps/ImageTileCubiertasMod.js';
+import { OSM } from 'ol/source';
 
 @Injectable({
   providedIn: 'root',
@@ -57,6 +58,10 @@ export class OlMapService {
   private _aerialLayers: TileLayer<any>[] = [];
   aerialLayers$ = new BehaviorSubject<TileLayer<any>[]>(this._aerialLayers);
   mapMoving = false;
+  private _satelliteLayer: TileLayer<any> = undefined;
+  satelliteLayer$ = new BehaviorSubject<TileLayer<any>>(this._satelliteLayer);
+  private _osmLayer: TileLayer<any> = undefined;
+  osmLayer$ = new BehaviorSubject<TileLayer<any>>(this._osmLayer);
 
   constructor(
     private http: HttpClient,
@@ -256,6 +261,28 @@ export class OlMapService {
     return tl;
   }
 
+  addSatelliteLayer() {
+    const satelliteSource = new XYZ({
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      crossOrigin: '',
+      maxZoom: 20,
+    });
+
+    // la añadimos oculta por defecto
+    this.satelliteLayer = new TileLayer({
+      source: satelliteSource,
+      preload: Infinity,
+      visible: false,
+    });
+  }
+
+  addOSMLayer() {
+    this.osmLayer = new TileLayer({
+      source: new OSM(),
+      preload: Infinity,
+    });
+  }
+
   latLonLiteralToLonLat(path: LatLngLiteral[]) {
     const coordsList: Coordinate[] = [];
 
@@ -442,5 +469,23 @@ export class OlMapService {
   set aerialLayers(value: TileLayer<any>[]) {
     this._aerialLayers = value;
     this.aerialLayers$.next(value);
+  }
+
+  get satelliteLayer(): TileLayer<any> {
+    return this._satelliteLayer;
+  }
+
+  set satelliteLayer(value: TileLayer<any>) {
+    this._satelliteLayer = value;
+    this.satelliteLayer$.next(value);
+  }
+
+  get osmLayer(): TileLayer<any> {
+    return this._osmLayer;
+  }
+
+  set osmLayer(value: TileLayer<any>) {
+    this._osmLayer = value;
+    this.osmLayer$.next(value);
   }
 }

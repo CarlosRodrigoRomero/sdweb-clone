@@ -44,6 +44,8 @@ export class MapComponent implements OnInit, OnDestroy {
   public sliderYear: number;
   public aerialLayers: TileLayer<any>[];
   private extent1: any;
+  private osmLayer: TileLayer<any>;
+  private satelliteLayer: TileLayer<any>;
   public thermalSource;
   private thermalLayersDB: ThermalLayerInterface[];
   private thermalLayers: TileLayer<any>[];
@@ -139,22 +141,17 @@ export class MapComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
 
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
+
+    /* SATELITE */
+    this.olMapService.addOSMLayer();
+    this.subscriptions.add(this.olMapService.osmLayer$.subscribe((layer) => (this.osmLayer = layer)));
+
+    /* SATELITE */
+    this.olMapService.addSatelliteLayer();
+    this.subscriptions.add(this.olMapService.satelliteLayer$.subscribe((layer) => (this.satelliteLayer = layer)));
   }
 
   initMap() {
-    const satellite = new XYZ({
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      crossOrigin: '',
-    });
-    const satelliteLayer = new TileLayer({
-      source: satellite,
-      preload: Infinity,
-    });
-
-    const osmLayer = new TileLayer({
-      source: new OSM(),
-    });
-
     let aerial;
     // solo lo aplicamos a la planta DEMO
     if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
@@ -174,8 +171,8 @@ export class MapComponent implements OnInit, OnDestroy {
     }
 
     const layers = [
-      // satelliteLayer,
-      osmLayer,
+      this.osmLayer,
+      this.satelliteLayer,
       ...this.aerialLayers,
       ...this.thermalLayers,
       // new TileLayer({
