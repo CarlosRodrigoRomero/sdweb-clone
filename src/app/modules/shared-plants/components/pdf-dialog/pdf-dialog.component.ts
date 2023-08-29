@@ -117,7 +117,10 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
           if (informe.id === 'q915Koqc7kzUQ0GvwwWs') {
             this.noOrtofotos = true;
           }
-          this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Imágenes anomalías', completed: false };
+
+          if (this.numAnoms > 0) {
+            this.anexoAnomalias = { id: 'anexoAnomalias', label: 'Imágenes anomalías', completed: false };
+          }
         }
 
         // aplicamos parches para algunos informes
