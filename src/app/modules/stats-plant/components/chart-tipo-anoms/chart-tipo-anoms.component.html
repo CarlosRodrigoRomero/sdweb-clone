@@ -6,9 +6,8 @@
     }}</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-    <div class="mae-tipo">
+    <div *ngIf="chartLoaded">
       <apx-chart
-        *ngIf="chartLoaded"
         [title]="chartOptions1.title"
         [series]="chartOptions1.series"
         [chart]="chartOptions1.chart"
@@ -24,7 +23,6 @@
       ></apx-chart>
 
       <apx-chart
-        *ngIf="chartLoaded"
         [title]="chartOptions2.title"
         [series]="chartOptions2.series"
         [chart]="chartOptions2.chart"

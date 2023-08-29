@@ -366,7 +366,9 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
         },
       };
 
-      this.chartLoaded = true;
+      setTimeout(() => {
+        this.chartLoaded = true;
+      }, 0);
     }
   }
 
