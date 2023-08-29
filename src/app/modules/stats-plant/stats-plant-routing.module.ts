@@ -5,7 +5,7 @@ import { PlantaStatsComponent } from './components/planta-stats.component';
 
 const routes: Routes = [
   {
-    path: 'stats',
+    path: '',
     component: PlantaStatsComponent,
   },
 ];

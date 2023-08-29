@@ -27,6 +27,7 @@ export class NavComponent implements OnInit {
   itemSelected = 'list';
   itemColor = COLOR.light_orange;
   showSecondNavbarRow = false;
+  reportSections = ['analysis', 'map', 'charts', 'prediction'];
 
   constructor(
     private breakpointObserver: BreakpointObserver,
@@ -50,13 +51,11 @@ export class NavComponent implements OnInit {
           this.isShared = false;
         }
 
-        if (this.router.url.split('/').includes('map')) {
-          this.itemSelected = 'map';
-        } else if (this.router.url.split('/').includes('prediction')) {
-          this.itemSelected = 'prediction';
-        } else if (this.router.url.split('/').includes('analysis')) {
-          this.itemSelected = 'analysis';
-        }
+        this.reportSections.forEach((section) => {
+          if (this.router.url.split('/').includes(section)) {
+            this.itemSelected = section;
+          }
+        });
 
         // PORTFOLIO E INFORMES EN DESKTOP
         if (this.router.url.split('/').includes('clients') && screenWidth > 600) {

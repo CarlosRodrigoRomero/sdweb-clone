@@ -12,6 +12,19 @@
     </mat-toolbar>
     <mat-nav-list class="list-items">
       <div class="top-items">
+        <!-- PORTFOLIO -->
+        <a *ngIf="isPortfolio" mat-list-item>
+          <div *ngIf="itemSelected === 'list'" class="item-content" [ngStyle]="{ color: itemColor }">
+            <mat-icon>view_list</mat-icon>
+            <span>{{ 'listado' | translate | titlecase }}</span>
+          </div>
+          <div *ngIf="itemSelected !== 'list'" class="item-content">
+            <mat-icon>map</mat-icon>
+            <span>{{ 'listado' | translate | titlecase }}</span>
+          </div>
+        </a>
+
+        <!-- INFORMES -->
         <a *ngIf="!isShared && !isPortfolio" mat-list-item (click)="navigateTo('analysis')">
           <div *ngIf="itemSelected === 'analysis'" class="item-content" [ngStyle]="{ color: itemColor }">
             <mat-icon>query_stats</mat-icon>
@@ -32,26 +45,16 @@
             <span>{{ 'mapa' | translate | titlecase }}</span>
           </div>
         </a>
-        <a *ngIf="isPortfolio" mat-list-item>
-          <div *ngIf="itemSelected === 'list'" class="item-content" [ngStyle]="{ color: itemColor }">
-            <mat-icon>view_list</mat-icon>
-            <span>{{ 'listado' | translate | titlecase }}</span>
-          </div>
-          <div *ngIf="itemSelected !== 'list'" class="item-content">
-            <mat-icon>map</mat-icon>
-            <span>{{ 'listado' | translate | titlecase }}</span>
-          </div>
-        </a>
-        <!-- <a *ngIf="isPortfolio" mat-list-item (click)="navigateTo('charts')">
+        <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('charts')">
           <div *ngIf="itemSelected === 'charts'" class="item-content" [ngStyle]="{ color: itemColor }">
-            <mat-icon>insights</mat-icon>
+            <mat-icon>bar_chart</mat-icon>
             <span>{{ 'graficos' | translate | titlecase }}</span>
           </div>
           <div *ngIf="itemSelected !== 'charts'" class="item-content">
-            <mat-icon>insights</mat-icon>
+            <mat-icon>bar_chart</mat-icon>
             <span>{{ 'graficos' | translate | titlecase }}</span>
           </div>
-        </a> -->
+        </a>
         <a *ngIf="!isPortfolio && showPrediction" mat-list-item (click)="navigateTo('prediction')">
           <!-- <a *ngIf="!isPortfolio" mat-list-item (click)="navigateTo('prediction')"> -->
           <div *ngIf="itemSelected === 'prediction'" class="item-content" [ngStyle]="{ color: itemColor }">
