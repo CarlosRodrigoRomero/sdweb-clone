@@ -218,6 +218,7 @@ export class ChartMaeGlobalComponent implements OnInit, OnDestroy {
             },
           },
         };
+
         this.loadChart = true;
 
         // detectamos cambios porque estamos utilizando la estrategia OnPush

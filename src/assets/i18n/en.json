@@ -327,5 +327,7 @@
   "Dibujar área": "Draw area",
   "Filtros activos": "Active filters",
   "Posición": "Position",
-  "Por fabricante de módulo": "By module manufacturer"
+  "Por fabricante de módulo": "By module manufacturer",
+  "Desde el punto de vista del MAE": "From the point of view of the ESM",
+  "Desde el punto de vista de las células calientes": "From the point of view of the heated cells"
 }

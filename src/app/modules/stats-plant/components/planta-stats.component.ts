@@ -70,9 +70,9 @@ export class PlantaStatsComponent implements OnInit, OnDestroy {
     );
 
     // CCs ocultos por el momento
-    // this.reportControlService.allAnomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length > 0
-    //   ? (this.thereAreCCs = true)
-    //   : (this.thereAreCCs = false);
+    this.reportControlService.allAnomalias.filter((anom) => anom.tipo == 8 || anom.tipo == 9).length > 0
+      ? (this.thereAreCCs = true)
+      : (this.thereAreCCs = false);
   }
 
   closeSidenav() {

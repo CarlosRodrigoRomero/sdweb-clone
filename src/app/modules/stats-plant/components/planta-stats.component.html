@@ -1,12 +1,8 @@
-<!-- boton para cerrar el sidenav -->
-<button mat-icon-button class="btn-close-sidenav-stats close-stats" (click)="closeSidenav()">
-  <mat-icon class="close-stats">close</mat-icon>
-</button>
-
-<mat-tab-group>
-  <mat-tab label="{{ 'MAE' | translate }}">
+<div class="stats-content">
+  <div>
+    <h5 class="chart-titulo">{{ 'Desde el punto de vista del MAE' | translate }}</h5>
     <div class="mae-grid">
-      <div class="mae-content-izq">
+      <div class="mae-grid-top-row">
         <!-- MAE GLOBAL -->
         <app-chart-mae-global *ngIf="(!sharedReport && portfolioLoaded) || completeView"></app-chart-mae-global>
 
@@ -15,29 +11,26 @@
           *ngIf="(thereAreZones && reportControlService.nombreGlobalCoords.length > 0) || completeView"
         ></app-chart-mae-zonas>
       </div>
-      <div>
-        <!-- MAE TIPO ANOMALIA -->
-        <app-chart-tipo-anoms></app-chart-tipo-anoms>
-      </div>
-    </div>
-  </mat-tab>
 
-  <mat-tab *ngIf="thereAreCCs" class="mat-tab-stats" label="{{ 'Células calientes' | translate }}">
+      <!-- MAE TIPO ANOMALIA -->
+      <app-chart-tipo-anoms></app-chart-tipo-anoms>
+    </div>
+  </div>
+
+  <div *ngIf="thereAreCCs">
+    <h5 class="chart-titulo">{{ 'Desde el punto de vista de las Células calientes' | translate }}</h5>
     <div class="cc-grid">
-      <div class="cc-content-izq">
-        <!-- MODULOS CON CC -->
-        <app-chart-pct-cels *ngIf="loadCCyGradChart"></app-chart-pct-cels>
+      <!-- MODULOS CON CC -->
+      <app-chart-pct-cels *ngIf="loadCCyGradChart"></app-chart-pct-cels>
 
-        <!-- CC POR ALTURA -->
-        <app-chart-altura></app-chart-altura>
-      </div>
-      <div class="cc-content-drcha">
-        <!-- MODULOS CON CC POR GRADIENTE -->
-        <app-chart-cels-grad></app-chart-cels-grad>
+      <!-- MODULOS CON CC POR GRADIENTE -->
+      <app-chart-cels-grad></app-chart-cels-grad>
 
-        <!-- CC POR ZONAS -->
-        <app-chart-cels-por-zonas *ngIf="thereAreZones"></app-chart-cels-por-zonas>
-      </div>
+      <!-- CC POR ZONAS -->
+      <app-chart-cels-por-zonas *ngIf="thereAreZones"></app-chart-cels-por-zonas>
+
+      <!-- CC POR ALTURA -->
+      <app-chart-altura></app-chart-altura>
     </div>
-  </mat-tab>
-</mat-tab-group>
+  </div>
+</div>
