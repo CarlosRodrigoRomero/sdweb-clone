@@ -21,6 +21,7 @@ import { finalize } from 'rxjs/operators';
 import LineString from 'ol/geom/LineString';
 import geolib from 'geolib';
 import { getDistance } from 'geolib';
+import VectorImageLayer from 'ol/layer/VectorImage';
 
 export interface ImageData {
   key: string;
@@ -38,6 +39,8 @@ export interface ImageData {
 
   SerialNumber: string;
   suffix: string;
+
+  isHeightCorrect: boolean;
 }
 
 @Component({
@@ -51,7 +54,7 @@ export class FlightUploadComponent implements OnInit {
   defaultLat = 40;
   defaultZoom = 5.5;
   map: Map;
-
+  segments = [];
 
   uploadPercent: Observable<number>;
   downloadURL: Observable<string>;
@@ -72,6 +75,11 @@ export class FlightUploadComponent implements OnInit {
 
   public showV: boolean = true;
   public showT: boolean = true;
+
+
+  VENTANA_DESPEGUE = 10; // Número de imágenes iniciales a analizar
+  UMBRAL_DESPEGUE = 30; // Diferencia de altitud acumulada que indica un posible despegue
+  UMBRAL_DIFERENCIA = 5; // Diferencia de altitud entre imágenes consecutivas
 
   ngOnInit(): void {
     this.initMap();
@@ -106,9 +114,6 @@ export class FlightUploadComponent implements OnInit {
   currentIndex = 0;
   fileName: string = "";
 
-  imageThumbnails: SafeUrl[] = [];
-
-  //Pruebas para clasificar en grupos
   currentGroup = 0;
 
   isDataReady: boolean;
@@ -133,7 +138,8 @@ export class FlightUploadComponent implements OnInit {
         continue;
       }
 
-      const output: ImageData = await exifr.parse(file);
+      const output: ImageData = await exifr.parse(file, ['GPSAltitude', 'GPSLatitude', 'GPSLongitude']);
+      // const output: ImageData = await exifr.parse(file);
 
       if (!output || !output.GPSLatitude || !output.GPSLongitude) {
         alert(`El archivo ${file.name} no contiene información de GPS. Este archivo se ignorará.`);
@@ -141,13 +147,13 @@ export class FlightUploadComponent implements OnInit {
         output.name = file.name;
         output.GPSLatitude = this.dmsToDecimal(output.GPSLatitude[0], output.GPSLatitude[1], output.GPSLatitude[2]);
         output.GPSLongitude = this.dmsToDecimal(output.GPSLongitude[0], output.GPSLongitude[1], output.GPSLongitude[2]);
-        const thumbnail = await exifr.thumbnail(file);
+        //const thumbnail = await exifr.thumbnail(file);
         this.imagesData.push(output);
-        this.imageThumbnails.push(this.getSanitizedUrl(thumbnail));
+        //this.imageThumbnails.push(this.getSanitizedUrl(thumbnail));
 
         let assigned = false;
         let currentSuffix = this.getSuffix(output.name);
-        console.log("Current suffix: " + currentSuffix);
+        // console.log("Current suffix: " + currentSuffix);
         output.suffix = currentSuffix;
         if (currentSuffix == "V") {
           this.numeroImagenesRGB++;
@@ -186,7 +192,7 @@ export class FlightUploadComponent implements OnInit {
       }
     }
 
-    console.log(this.imageGroups);
+    // console.log(this.imageGroups);
 
 
     this.imageGroups.forEach(group => {
@@ -194,9 +200,12 @@ export class FlightUploadComponent implements OnInit {
         const dateA = new Date(this.extractDateTimeFromName(a.name)).getTime();
         const dateB = new Date(this.extractDateTimeFromName(b.name)).getTime();
 
-        if (dateA === dateB) {
+
+
+        if (dateA == dateB) {
           const numA = this.extractNumberFromName(a.name);
           const numB = this.extractNumberFromName(b.name);
+          // console.log("date a: " + dateA + ", date b: " + dateB + ", num A: " + numA + ", numB: " + numB);
           return numA - numB;
         }
 
@@ -206,21 +215,37 @@ export class FlightUploadComponent implements OnInit {
 
 
 
-    console.log(this.imageGroups);
+    // console.log(this.imageGroups);
     this.addImageMarkersAndPolygon();
 
+    this.segments = [];
+
+    // console.log("image groups length: " + this.imageGroups.length)
     for (let i = 0; i < this.imageGroups.length; i++) {
-      this.verificarAltitud(this.imageGroups[i]);
+      // this.verificarAltitud(this.imageGroups[i]);
       let distanciaModaGrupo = this.distanciaModa(this.imageGroups[i]);
       this.drawRouteLines(this.imageGroups[i], distanciaModaGrupo, i);
     }
 
-    if(this.numeroImagenesRGB != this.numeroImagenesTermicas){
+    let intersectionsCounts = [];
+
+    this.segments.forEach(segment => {
+      const numIntersections = this.getNumIntersections(segment, this.segments);
+      intersectionsCounts.push(numIntersections);
+      // console.log(`Segment starting at ${segment[0]} and ending at ${segment[segment.length - 1]} intersects with ${numIntersections} other segments.`);
+    });
+
+
+    if (this.numeroImagenesRGB != this.numeroImagenesTermicas) {
       alert(`El número de imágenes RGB y térmicas NO COINCIDE. Imágenes RGB: ${this.numeroImagenesRGB}, Imágenes térmicas ${this.numeroImagenesTermicas}.`)
-    }else{
+    } else {
       alert(`El número de imágenes RGB y térmicas SÍ COINCIDE. Imágenes RGB: ${this.numeroImagenesRGB}, Imágenes térmicas ${this.numeroImagenesTermicas}.`)
 
     }
+
+
+    console.log("Velocidad media: " + this.velocidadMediaTotal() + " m/s");
+    console.log("Velocidad moda: " + this.velocidadModaTotal() + " m/s");
 
     this.isDataReady = true;
 
@@ -313,7 +338,7 @@ export class FlightUploadComponent implements OnInit {
 
   addImageMarkersAndPolygon() {
     this.map.getLayers().forEach(layer => {
-      if (layer instanceof VectorLayer) {
+      if (layer instanceof VectorImageLayer) {
         this.map.removeLayer(layer);
       }
     });
@@ -332,11 +357,15 @@ export class FlightUploadComponent implements OnInit {
       let minLon = Number.POSITIVE_INFINITY;
       let maxLon = Number.NEGATIVE_INFINITY;
 
+
+      this.checkImageHeights(group);
+
       group.forEach((image) => {
+
         const lat = image.GPSLatitude;
         const lon = image.GPSLongitude;
 
-        console.log(image.GPSLatitude + " " + image.GPSLongitude)
+        // console.log(image.GPSLatitude + " " + image.GPSLongitude)
         minLat = Math.min(minLat, lat);
         maxLat = Math.max(maxLat, lat);
         minLon = Math.min(minLon, lon);
@@ -348,23 +377,35 @@ export class FlightUploadComponent implements OnInit {
         });
 
         let iconStyle;
-        if (group[0].suffix == "V") {
+
+        if (image.isHeightCorrect) {
+          if (group[0].suffix == "V") {
+            iconStyle = new Style({
+              image: new Icon({
+                src: '../../../../../assets/icons/location-pin-dark-unhover.png',
+                scale: 0.2
+              }),
+            });
+          }
+
+          else if (group[0].suffix == "T") {
+            iconStyle = new Style({
+              image: new Icon({
+                src: '../../../../../assets/icons/location-pin-light-hover.png',
+                scale: 0.2,
+              }),
+            });
+          }
+        } else {
+          // console.log(image.name);
           iconStyle = new Style({
             image: new Icon({
-              src: '../../../../../assets/icons/location-pin-dark-unhover.png',
-              scale: 0.35,
+              src: '../../../../../assets/icons/location-pin-hovered.png',
+              scale: 0.2,
             }),
           });
         }
 
-        else if (group[0].suffix == "T") {
-          iconStyle = new Style({
-            image: new Icon({
-              src: '../../../../../assets/icons/location-pin-light-hover.png',
-              scale: 0.35,
-            }),
-          });
-        }
 
 
 
@@ -410,7 +451,7 @@ export class FlightUploadComponent implements OnInit {
       polygonFeature.setStyle(polygonStyle);
       vectorSource.addFeature(polygonFeature);
 
-      const vectorLayer = new VectorLayer({
+      const vectorLayer = new VectorImageLayer({
         source: vectorSource,
       });
 
@@ -469,58 +510,115 @@ export class FlightUploadComponent implements OnInit {
   }
 
 
+
   drawRouteLines(group: ImageData[], distanciaModa: number, groupIndex) {
-    // console.log("entered on drawRouteLines");
     const topeModa = distanciaModa * 2;
+    this.segments = [];
+    let currentSegment = [];
 
-    for (let i = 1; i < group.length; i++) {
-      const coordinates = []; // Inicializar un nuevo arreglo para cada línea
-      const coord1 = [-group[i - 1].GPSLongitude, group[i - 1].GPSLatitude];
-      const coord2 = [-group[i].GPSLongitude, group[i].GPSLatitude];
-      const distancia = this.calculateDistance(coord1[1], coord1[0], coord2[1], coord2[0]) * 1000;
 
-      let color;
+    for (let i = 0; i < group.length; i++) {
+      if (group[i] && group[i].GPSLongitude && group[i].GPSLatitude) {
 
-      if (distancia <= topeModa) {
-        color = 'green';
-      } else if (topeModa < distancia && distancia <= distanciaModa * 3) {
-        const factorTransicion = (distancia - topeModa) / (distanciaModa);
-        const colorVerde = Math.floor((1 - factorTransicion) * 255);
-        const colorRojo = Math.floor(factorTransicion * 255);
-        color = `rgb(${colorRojo}, ${colorVerde}, 0)`;
-      } else {
-        color = 'red';
-      }
+        currentSegment.push([-group[i].GPSLongitude, group[i].GPSLatitude]);
 
-      coordinates.push(fromLonLat(coord1));
-      coordinates.push(fromLonLat(coord2));
+        if (currentSegment.length >= 3) {
+          const lastIdx = currentSegment.length - 1;
 
-      const lineString = new LineString(coordinates);
-      const feature = new Feature({ geometry: lineString });
-      const lineStyle = new Style({
-        stroke: new Stroke({
-          color: color,
-          width: 6,
-        }),
-      });
-      feature.setStyle(lineStyle);
+          const angle = this.calculateAngle(
+            currentSegment[lastIdx - 2],
+            currentSegment[lastIdx - 1],
+            currentSegment[lastIdx]
+          );
 
-      // console.table(this.map.getLayers());
-      // Assuming vectorSource is the Vector source for the group
-      const layer = this.map.getLayers().item(groupIndex + 1);
-      // console.log('layer:', layer);
 
-      if (layer instanceof VectorLayer || layer instanceof TileLayer) {
-        const vectorSource = layer.getSource();
-        // console.log("Vector source: " + vectorSource);
-        // console.table(vectorSource);
-        vectorSource.addFeature(feature);
+          if (angle > 10) {
 
-        // console.log("Added feature to vectorSource: ")
-        // console.table(feature);
+            this.segments.push([...currentSegment]);
+            currentSegment = [currentSegment[lastIdx]];
+          }
+        } else {
+        }
       }
     }
+
+
+    if (currentSegment.length > 0) {
+      this.segments.push(currentSegment);
+    }
+
+    let flagsCrossMoreThanMode = [];
+
+    let intersectionsForMode = [];
+
+
+
+    this.segments.forEach(segment => {
+      const numIntersections = this.getNumIntersections(segment, this.segments);
+      intersectionsForMode.push(numIntersections);
+    });
+
+
+    const mode = this.calcularModa(intersectionsForMode);
+    console.log("mode: " + mode)
+
+
+
+    this.segments.forEach(segment => {
+      const numIntersections = this.getNumIntersections(segment, this.segments);
+      flagsCrossMoreThanMode.push(Math.abs(numIntersections) > (mode + 3));
+      console.log("Num intersections: " + numIntersections);
+    });
+
+    this.segments.forEach((segment, index) => {
+      let color;
+      for (let i = 1; i < segment.length; i++) {
+        const coordinates = []; // Inicializar un nuevo arreglo para cada línea
+        const coord1 = segment[i - 1];
+        const coord2 = segment[i];
+        const distancia = this.calculateDistance(coord1[1], coord1[0], coord2[1], coord2[0]) * 1000;
+
+
+        if (flagsCrossMoreThanMode[index]) {
+          color = 'blue';
+        } else {
+          if (distancia <= topeModa) {
+            color = 'green';
+          } else if (topeModa < distancia && distancia <= distanciaModa * 3) {
+            const factorTransicion = (distancia - topeModa) / (distanciaModa);
+            const colorVerde = Math.floor((1 - factorTransicion) * 255);
+            const colorRojo = Math.floor(factorTransicion * 255);
+            color = `rgb(${colorRojo}, ${colorVerde}, 0)`;
+          } else {
+            color = 'red';
+          }
+        }
+
+        coordinates.push(fromLonLat(coord1));
+        coordinates.push(fromLonLat(coord2));
+
+        const lineString = new LineString(coordinates);
+        const feature = new Feature({ geometry: lineString });
+        const lineStyle = new Style({
+          stroke: new Stroke({
+            color: color,
+            width: 6,
+          }),
+        });
+        feature.setStyle(lineStyle);
+        const layer = this.map.getLayers().item(groupIndex + 1);
+
+        if (layer instanceof VectorImageLayer || layer instanceof TileLayer) {
+          const vectorSource = layer.getSource();
+
+          vectorSource.addFeature(feature);
+
+
+        }
+      }
+    });
   }
+
 
   handleFotoPortadaChange(event) {
     const input = event.target as HTMLInputElement;
@@ -542,7 +640,7 @@ export class FlightUploadComponent implements OnInit {
     const match = name.match(/^DJI_(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})_/);
     if (match) {
       const year = parseInt(match[1], 10);
-      const month = parseInt(match[2], 10) - 1;  // Meses en JavaScript son 0-indexados
+      const month = parseInt(match[2], 10) - 1;
       const day = parseInt(match[3], 10);
       const hour = parseInt(match[4], 10);
       const minute = parseInt(match[5], 10);
@@ -554,7 +652,6 @@ export class FlightUploadComponent implements OnInit {
 
 
   getSuffix(name) {
-    // La expresión regular busca un guion bajo seguido de una 'V' o 'T', justo antes de la extensión del archivo (e.g. .jpg)
     const regex = /_([VT])\.\w+$/;
     const match = name.match(regex);
     return match ? match[1] : null;
@@ -562,18 +659,17 @@ export class FlightUploadComponent implements OnInit {
 
   toggleLayers(suffix: string, isVisible: boolean) {
     this.map.getLayers().forEach(layer => {
-      if (layer instanceof VectorLayer && layer.get("suffix") === suffix) {
+      if (layer instanceof VectorImageLayer && layer.get("suffix") === suffix) {
         layer.setVisible(isVisible);
       }
     });
   }
 
-  extractNumberFromName(name: string): number {
-    const match = name.match(/_(\d+)_/);
-    if (match) {
-      return parseInt(match[1], 10);
-    }
-    return -1;  // Retorna un valor por defecto en caso de no encontrar el número.
+  extractNumberFromName(str) {
+    const regex = /.*?_.*?_(\d+)_/;
+    const match = str.match(regex);
+
+    return match ? match[1] : null;
   }
 
   calcularModa(valores) {
@@ -600,17 +696,256 @@ export class FlightUploadComponent implements OnInit {
         return parseFloat(dato.GPSAltitude.toFixed(1));
       } else {
         console.error(`El dato con el nombre ${dato.name} no tiene un valor de GPSAltitude definido.`);
-        return null;  // Puedes devolver null o algún valor predeterminado.
+        return null;
       }
-    }).filter(altitud => altitud !== null);  // Filtra cualquier altitud que sea null.
+    }).filter(altitud => altitud !== null);
 
-    const modaAltitud = this.calcularModa(altitudes);
+  }
 
-    datos.forEach((dato) => {
-      if (dato.GPSAltitude && Math.abs(dato.GPSAltitude - modaAltitud) > 10) {
-        alert(`¡Atención! La imagen con nombre ${dato.name} tiene una altitud que varía en más de 10 metros respecto a la moda.`);
+
+  async checkImageHeights(images: ImageData[]): Promise<void> {
+    const WINDOW_SIZE = 10; // Número de imágenes iniciales para calcular la moda agrupada
+    const MARGIN = 10; // Margen para agrupar valores cercanos
+    const SAMPLE_SIZE = 5; // Número total de imágenes (incluyendo la actual) para tomar como muestra al comprobar altitudes posteriores
+
+    if (images.length === 0) return;
+
+    // Recoge las altitudes de las primeras imágenes
+    const initialAltitudes: number[] = [];
+    for (let i = 0; i < Math.min(WINDOW_SIZE, images.length); i++) {
+      initialAltitudes.push(images[i].GPSAltitude);
+    }
+
+    const [initialLowerBound, initialUpperBound] = this.calculateGroupedModa(initialAltitudes, MARGIN);
+
+    for (let i = 0; i < Math.min(WINDOW_SIZE, images.length); i++) {
+      images[i].isHeightCorrect = images[i].GPSAltitude >= initialLowerBound && images[i].GPSAltitude <= initialUpperBound;
+
+
+      if (!images[i].isHeightCorrect) {
+      }
+    }
+
+    // Para las imágenes restantes
+    for (let i = WINDOW_SIZE; i < images.length; i++) {
+      // Recoge las altitudes de las SAMPLE_SIZE / 2 imágenes anteriores, la imagen actual y las SAMPLE_SIZE / 2 imágenes siguientes
+      const sampleAltitudes: number[] = [];
+      for (let j = i - Math.floor(SAMPLE_SIZE / 2); j <= i + Math.floor(SAMPLE_SIZE / 2) && j < images.length; j++) {
+        if (j >= 0) { // Asegurarse de que no estamos obteniendo índices negativos
+          sampleAltitudes.push(images[j].GPSAltitude);
+        }
+      }
+
+      const [sampleLowerBound, sampleUpperBound] = this.calculateGroupedModa(sampleAltitudes, MARGIN);
+
+      // Verifica si la altitud de la imagen actual está dentro del rango de la moda agrupada de la muestra
+      images[i].isHeightCorrect = images[i].GPSAltitude >= sampleLowerBound && images[i].GPSAltitude <= sampleUpperBound;
+
+      if (!images[i].isHeightCorrect) {
+        console.log("image name: " + images[i].name + ", sampleLowerBound: " + sampleLowerBound + ", sampleUpperBound: " + sampleUpperBound + ", image altitude: " + images[i].GPSAltitude);
+      }
+
+    }
+  }
+
+
+
+
+
+
+
+
+  calculateGroupedModa(altitudes: number[], margin: number): [number, number] {
+    const groupedFrequencies: { [key: string]: { count: number, total: number } } = {};
+
+    // Asigna cada altitud a un grupo y actualiza el recuento y la suma total para ese grupo
+    for (let altitude of altitudes) {
+      const groupKey = Math.round(altitude / margin).toString();
+      if (!groupedFrequencies[groupKey]) {
+        groupedFrequencies[groupKey] = { count: 0, total: 0 };
+      }
+      groupedFrequencies[groupKey].count++;
+      groupedFrequencies[groupKey].total += altitude;
+    }
+
+    // Identifica el grupo con mayor frecuencia
+    let maxFrequency = 0;
+    let groupKeyWithMaxFrequency = Object.keys(groupedFrequencies)[0];
+
+    for (let key in groupedFrequencies) {
+      if (groupedFrequencies[key].count > maxFrequency) {
+        maxFrequency = groupedFrequencies[key].count;
+        groupKeyWithMaxFrequency = key;
+      }
+    }
+
+    // Calcula el promedio de altitud para el grupo con la mayor frecuencia
+    const averageAltitude = groupedFrequencies[groupKeyWithMaxFrequency].total / groupedFrequencies[groupKeyWithMaxFrequency].count;
+
+    return [averageAltitude - margin, averageAltitude + margin];
+  }
+
+
+  private calculateAngle(A: [number, number], B: [number, number], C: [number, number]): number {
+    if (!A || !B || !C) return 0;  // Añade esta comprobación al inicio
+
+    const AB = [B[0] - A[0], B[1] - A[1]];
+    const BC = [C[0] - B[0], C[1] - B[1]];
+
+
+    const dotProduct = AB[0] * BC[0] + AB[1] * BC[1];
+    const magnitudeAB = Math.sqrt(AB[0] ** 2 + AB[1] ** 2);
+    const magnitudeBC = Math.sqrt(BC[0] ** 2 + BC[1] ** 2);
+
+    // Calcula el ángulo en grados
+    const angleRad = Math.acos(dotProduct / (magnitudeAB * magnitudeBC));
+    const angleDeg = angleRad * (180 / Math.PI);
+
+    return angleDeg;
+  }
+
+
+
+
+  doIntersect(p1, q1, p2, q2) {
+    // Define una función de utilidad para determinar la orientación
+    function orientation(p, q, r) {
+      const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
+      if (val === 0) return 0;  // colinear
+      return (val > 0) ? 1 : 2; // clock or counterclock wise
+    }
+
+    const o1 = orientation(p1, q1, p2);
+    const o2 = orientation(p1, q1, q2);
+    const o3 = orientation(p2, q2, p1);
+    const o4 = orientation(p2, q2, q1);
+
+    if (o1 !== o2 && o3 !== o4) {
+      return true;
+    }
+
+    return false;
+  }
+
+
+  getNumIntersections(segment, allSegments) {
+    let count = 0;
+    const start = segment[0];
+    const end = segment[segment.length - 1];
+
+    allSegments.forEach(s => {
+      const sStart = s[0];
+      const sEnd = s[s.length - 1];
+      if (this.doIntersect(start, end, sStart, sEnd)) {
+        count++;
       }
     });
+
+    return count - 1; // Resta 1 para excluir la intersección consigo mismo.
+  }
+
+
+  calcularVelocidades(grupo: ImageData[]): number[] {
+    const velocidades: number[] = [];
+    for (let i = 1; i < grupo.length; i++) {
+      const coord1 = [grupo[i - 1].GPSLatitude, grupo[i - 1].GPSLongitude];
+      const coord2 = [grupo[i].GPSLatitude, grupo[i].GPSLongitude];
+      const distancia = this.calculateDistance(coord1[0], coord1[1], coord2[0], coord2[1]); // en km
+
+      const tiempo1 = this.extractDateTimeFromName(grupo[i - 1].name);
+      const tiempo2 = this.extractDateTimeFromName(grupo[i].name);
+      if (!tiempo1 || !tiempo2) continue;
+
+      const tiempo = (tiempo2.getTime() - tiempo1.getTime()) / 1000; // en segundos
+      const distancia_m = distancia * 1000;
+      if (distancia > 50) continue;
+      if (tiempo === 0) continue;
+
+      const velocidad = distancia_m / tiempo; // velocidad en m/s
+      velocidades.push(velocidad);
+    }
+    return velocidades;
+  }
+
+  velocidadMedia(grupo: ImageData[]): number {
+    const velocidades = this.calcularVelocidades(grupo);
+    const velocidadesFiltradas = velocidades.filter(v => v > 0.1);
+    const total = velocidadesFiltradas.reduce((acc, v) => acc + v, 0);
+    return total / velocidadesFiltradas.length;
+  }
+
+  velocidadModa(grupo: ImageData[]): number | null {
+    const velocidades = this.calcularVelocidades(grupo);
+    const velocidadesFiltradas = velocidades
+      .filter(v => v > 0.1)
+      .map(v => parseFloat(v.toFixed(1)));
+
+    const freqMap: { [key: number]: number } = {};
+    let maxFreq = 0;
+    let moda: number | null = null;
+
+    for (let v of velocidadesFiltradas) {
+      if (!freqMap[v]) freqMap[v] = 0;
+      freqMap[v]++;
+      if (freqMap[v] > maxFreq) {
+        maxFreq = freqMap[v];
+        moda = v;
+      }
+    }
+    return moda;
+  }
+
+
+  calcularVelocidadesTodasImagenes(): number[] {
+    // Combinar todos los grupos de imágenes en un solo array
+    const allImages = this.imageGroups.flat();
+    const velocidades: number[] = [];
+    for (let i = 1; i < allImages.length; i++) {
+      const coord1 = [allImages[i - 1].GPSLatitude, allImages[i - 1].GPSLongitude];
+      const coord2 = [allImages[i].GPSLatitude, allImages[i].GPSLongitude];
+      const distancia = this.calculateDistance(coord1[0], coord1[1], coord2[0], coord2[1]); // en km
+
+      const tiempo1 = this.extractDateTimeFromName(allImages[i - 1].name);
+      const tiempo2 = this.extractDateTimeFromName(allImages[i].name);
+      if (!tiempo1 || !tiempo2) continue;
+
+      const tiempo = (tiempo2.getTime() - tiempo1.getTime()) / 1000; // en segundos
+      const distancia_m = distancia * 1000;
+      if (distancia > 50) continue;
+      if (tiempo === 0) continue;
+
+      const velocidad = distancia_m / tiempo; // velocidad en m/s
+      velocidades.push(velocidad);
+    }
+    return velocidades;
+  }
+
+  velocidadMediaTotal(): number {
+    const velocidades = this.calcularVelocidadesTodasImagenes();
+    const velocidadesFiltradas = velocidades.filter(v => v > 0.1);
+    const total = velocidadesFiltradas.reduce((acc, v) => acc + v, 0);
+    return total / velocidadesFiltradas.length;
+  }
+
+  velocidadModaTotal(): number | null {
+    const velocidades = this.calcularVelocidadesTodasImagenes();
+    const velocidadesFiltradas = velocidades
+      .filter(v => v > 0.1)
+      .map(v => parseFloat(v.toFixed(1)));
+
+    const freqMap: { [key: number]: number } = {};
+    let maxFreq = 0;
+    let moda: number | null = null;
+
+    for (let v of velocidadesFiltradas) {
+      if (!freqMap[v]) freqMap[v] = 0;
+      freqMap[v]++;
+      if (freqMap[v] > maxFreq) {
+        maxFreq = freqMap[v];
+        moda = v;
+      }
+    }
+    return moda;
   }
 
 

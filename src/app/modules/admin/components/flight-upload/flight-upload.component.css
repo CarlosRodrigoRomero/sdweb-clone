@@ -35,3 +35,12 @@ button {
 .wide-input {
     width: 20%; /* Ajusta este valor según tus necesidades */
   }
+
+
+  input[type="file"] {
+    border: 2px dashed #aaa;
+    padding: 20px;
+    display: block;
+    width: 300px;
+    cursor: pointer;
+}

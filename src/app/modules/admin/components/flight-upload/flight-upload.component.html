@@ -1,7 +1,7 @@
 <!-- Input principal para archivos múltiples -->
 <mat-form-field class="wide-input">
   <input type="text" matInput placeholder="Seleccionado" [value]="fileName" multiple readonly>
-  <input hidden type="file" #fileInput (change)="handleChange($event)" multiple />
+  <input  type="file" #fileInput (change)="handleChange($event)" webkitdirectory multiple />
   <button mat-button (click)="fileInput.click()">Seleccionar archivo</button>
 </mat-form-field>
 
@@ -31,6 +31,8 @@
   <input type="checkbox" [(ngModel)]="showV" (change)="toggleLayers('V', showV)"> Mostrar imágenes RGB
   <input type="checkbox" [(ngModel)]="showT" (change)="toggleLayers('T', showT)"> Mostrar imágenes térmicas
 </div>
+
+<!-- <button (click)="resetImageGroups()">Reiniciar Grupos de Imágenes</button> -->
 
 
 <mat-panel *ngFor="let group of imageGroups; let i = index">
@@ -62,7 +64,7 @@
 
 <div *ngIf="imagesData.length > 0 && isDataReady">
   <h3>Imagen {{currentIndex + 1}} de {{imagesData.length}}</h3>
-  <img [src]="imageThumbnails[currentIndex]" alt="Miniatura de la imagen actual">
+  <!-- <img [src]="imageThumbnails[currentIndex]" alt="Miniatura de la imagen actual"> -->
 
   <table style="width: 500px;">
     <thead>
@@ -97,7 +99,7 @@
       </mat-expansion-panel-header>
       <div *ngFor="let imageData of group; let j = index">
         <h3>Imagen {{j + 1}} de {{group.length}}</h3>
-        <img [src]="imageThumbnails[imagesData.indexOf(imageData)]" alt="Miniatura de la imagen actual">
+        <!-- <img [src]="imageThumbnails[imagesData.indexOf(imageData)]" alt="Miniatura de la imagen actual"> -->
         <table style="width: 500px;">
           <thead>
             <tr>
