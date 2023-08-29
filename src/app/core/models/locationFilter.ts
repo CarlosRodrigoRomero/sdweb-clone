@@ -17,7 +17,14 @@ export class LocationFilter implements FilterInterface {
     if (this.type === 'locationTipo0') {
       return elems.filter((elem) => elem.localY === 0 || elem.localX === 0);
     } else {
-      return elems.filter((elem) => elem.localY > this.filasPlanta || elem.localX > this.columnasPlanta);
+      if (elems[0] instanceof Seguidor) {
+        // si hay una anomalías con fila y columna mal, mostramos tadas las del seguidor
+        return elems.filter(({ anomaliasCliente }: Seguidor) =>
+          anomaliasCliente.some((anom) => anom.localY > this.filasPlanta || anom.localX > this.columnasPlanta)
+        );
+      } else {
+        return elems.filter((elem) => elem.localY > this.filasPlanta || elem.localX > this.columnasPlanta);
+      }
     }
   }
 
