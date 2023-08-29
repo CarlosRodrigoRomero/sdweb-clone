@@ -1,8 +1,11 @@
 .btn-download {
-  height: 40px;
-  padding: 0;
-  width: 40px;
-  min-width: unset !important;
+  border-radius: 18px;
+}
+
+.download-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .mat-menu-item.title {

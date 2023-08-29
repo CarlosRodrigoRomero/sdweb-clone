@@ -25,6 +25,7 @@ import { NotificationsModule } from '@modules/notifications/notifications.module
 import { SharePlantModule } from '@modules/share-plant/share-plant.module';
 import { FiltersModule } from '@modules/filters/filters.module';
 import { PortfolioModule } from '@modules/portfolio/portfolio.module';
+import { SharedPlantsModule } from '@modules/shared-plants/shared-plants.module';
 
 import { environment } from '../environments/environment';
 
@@ -70,6 +71,7 @@ export function createTranslateLoader(http: HttpClient) {
     NotificationsModule,
     FiltersModule,
     PortfolioModule,
+    SharedPlantsModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

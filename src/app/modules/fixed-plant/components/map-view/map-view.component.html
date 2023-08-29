@@ -32,14 +32,4 @@
       </div>
     </div>
   </div>
-
-  <div class="btns-wrapper">
-    <!-- BOTON DESCARGAS -->
-    <app-download-report *ngIf="!sharedReport || completeView"></app-download-report>
-  </div>
-
-  <!-- PROGRESS BAR DESCARGAS -->
-  <app-download-progress-bar class="progress-bar" *ngIf="generatingDownload"></app-download-progress-bar>
-
-  <div class="dark-trasp-background" *ngIf="generatingDownload"></div>
 </div>

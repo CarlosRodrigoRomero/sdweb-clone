@@ -16,6 +16,11 @@
   gap: 1rem;
 }
 
+.navbar-menus {
+  display: flex;
+  gap: 1rem;
+}
+
 @media (max-width: 600px) {
   .left-content {
     display: none;
@@ -48,42 +53,3 @@
     padding-right: 1.2rem;
   }
 }
-
-.btn-notif {
-  margin-right: 1rem;
-}
-
-.btn-content {
-  display: flex;
-  align-items: center;
-}
-
-.btn-icon {
-  color: #b90009;
-}
-
-.btn-label {
-  font-size: 16px;
-}
-
-
-.active-filters {
-  display: flex;
-  align-items: center;
-}
-
-.active-filters mat-icon {
-  font-size: 24px;
-  height: 24px;
-  width: 16px;
-  margin-left: 16px;
-}
-
-.active-filters button {
-  font-size: 18px;
-  background: none;
-  border: none;
-  box-shadow: none;
-  pointer-events: none;
-}
-

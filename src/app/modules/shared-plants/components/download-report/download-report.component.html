@@ -1,13 +1,10 @@
-<button
-  mat-raised-button
-  class="btn-download"
-  [matMenuTriggerFor]="menu"
-  matTooltip="{{ 'descargas' | translate | titlecase }}"
-  matTooltipClass="tooltip-style"
->
-  <mat-icon>download</mat-icon>
+<button mat-stroked-button class="btn-download" [matMenuTriggerFor]="descargar">
+  <div class="download-btn-content">
+    <mat-icon>download</mat-icon>
+    <span>{{ 'Descargar' | translate }}</span>
+  </div>
 </button>
-<mat-menu #menu="matMenu" class="menu">
+<mat-menu #descargar="matMenu" class="menu">
   <div class="contenedor-menu">
     <div mat-menu-item (click)="$event.stopPropagation()">
       <span class="title">{{ 'descargas' | translate | titlecase }}</span>

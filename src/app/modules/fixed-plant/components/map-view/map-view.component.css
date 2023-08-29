@@ -12,7 +12,7 @@
 .map-area {
   position: relative;
   border-radius: 8px;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 app-layers-menu {
@@ -40,27 +40,6 @@ app-layers-menu {
   display: none;
 }
 
-.tooltip-style {
-  font-size: 14px;
-}
-
-.progress-bar {
-  position: absolute;
-  top: 100px;
-  z-index: 100;
-  left: 50%;
-  transform: translate(-50%, 0);
-}
-
-.dark-trasp-background {
-  position: absolute;
-  top: 70px;
-  z-index: 1;
-  width: 100vw;
-  height: calc(100vh - 70px);
-  background-color: rgba(0, 0, 0, 0.6);
-}
-
 @media (max-width: 900px) {
   .map-control {
     display: none;
@@ -72,35 +51,10 @@ app-layers-menu {
   }
 }
 
-.btns-wrapper {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 10px;
-}
-
-app-download-progress-bar {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translate(-50%, 0%);
-}
-
 .leyenda {
   position: absolute;
   display: flex;
   left: 10px;
   top: 10px;
   width: 100px;
-}
-
-.btn-close {
-  position: absolute;
-  right: 10px;
-  z-index: 999;
-}
-
-.titulo {
-  margin: 4px 10px 0;
 }

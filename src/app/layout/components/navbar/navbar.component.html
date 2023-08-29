@@ -18,10 +18,16 @@
     <!-- NOTIFICACIONES DEL PORTFOLIO -->
     <app-portfolio-notifications *ngIf="loadPortfolioContent && isPortfolio"></app-portfolio-notifications>
 
-    <!-- FILTROS -->
-    <app-filters *ngIf="loadContent && !isShared"></app-filters>
+    <div class="navbar-menus" *ngIf="loadContent && isReport && !isShared">
+      <!-- FILTROS -->
+      <app-filters></app-filters>
 
-    <app-share-plant-container *ngIf="loadContent && isReport && !isShared"></app-share-plant-container>
+      <!-- COMPARTIR -->
+      <app-share-plant-container></app-share-plant-container>
+
+      <!-- DESCARGAR -->
+      <app-download-report></app-download-report>
+    </div>
 
     <!-- MENU DERECHA -->
     <app-right-menu-container></app-right-menu-container>
