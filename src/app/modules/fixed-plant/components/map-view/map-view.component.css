@@ -1,4 +1,4 @@
-.map-view {
+.map-view-content {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 16px;
@@ -9,8 +9,10 @@
   border-radius: 8px;
 }
 
-.rel {
+.map-area {
   position: relative;
+  border-radius: 8px;
+  overflow: hidden; 
 }
 
 app-layers-menu {
@@ -70,15 +72,6 @@ app-layers-menu {
   }
 }
 
-.stats-container {
-  /* position: relative; */
-  border-radius: 8px;
-}
-
-.main-container {
-  position: relative;
-}
-
 .btns-wrapper {
   position: absolute;
   top: 10px;
@@ -108,26 +101,6 @@ app-download-progress-bar {
   z-index: 999;
 }
 
-.stats-sidenav {
-  position: absolute;
-  display: flex;
-  margin: 10px 10px 10px;
-  padding: 10px;
-  border-radius: 8px;
-  width: 100%;
-  width: calc(100% - 20px);
-}
-
-@media (max-width: 1000px) {
-  .stats-sidenav {
-    width: calc(100vw - 20px);
-  }
-}
-
 .titulo {
   margin: 4px 10px 0;
-}
-
-:host ::ng-deep .mat-drawer-inner-container {
-  overflow-y: hidden;
 }

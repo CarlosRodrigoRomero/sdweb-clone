@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { Subscription } from 'rxjs';
@@ -9,11 +9,6 @@ import { DownloadReportService } from '@data/services/download-report.service';
 import { ZonesService } from '@data/services/zones.service';
 import { ViewReportService } from '@data/services/view-report.service';
 import { ResetServices } from '@data/services/reset-services.service';
-
-import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
-
-import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
-import { FiltersPanelContainerComponent } from '@modules/filters/containers/filters-panel-container/filters-panel-container.component';
 
 import { Patches } from '@core/classes/patches';
 
@@ -40,13 +35,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
   numInformes = 1;
   viewSelected: string;
   groupPlant = true;
-
-  @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
-  @ViewChild('sidenavRight') sidenavRight: MatSidenav;
-  @ViewChild('sidenavStats') sidenavStats: MatSidenav;
-  @ViewChild('sidenavFilters') sidenavFilters: MatSidenav;
-
-  @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -94,10 +82,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.reportControlService.mapLoaded$.subscribe((value) => {
         this.mapLoaded = value;
-
-        if (this.mapLoaded) {
-          this.statsService.setSidenav(this.sidenavStats);
-        }
       })
     );
 
@@ -114,11 +98,6 @@ export class MapViewComponent implements OnInit, OnDestroy {
 
   setSidenavStats(sidenavStats: MatSidenav) {
     this.statsService.setSidenav(sidenavStats);
-  }
-
-  loadStats() {
-    this.dynamicStats.viewContainerRef.clear();
-    this.dynamicStats.viewContainerRef.createComponent(PlantaStatsComponent);
   }
 
   ngOnDestroy(): void {
