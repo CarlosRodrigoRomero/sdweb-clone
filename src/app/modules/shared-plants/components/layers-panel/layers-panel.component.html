@@ -1,7 +1,7 @@
 <div class="layers-panel-content">
   <app-satellite-selector></app-satellite-selector>
 
-  <app-thermal-layer-selector></app-thermal-layer-selector>
+  <app-thermal-layer-selector *ngIf="showThermalLayer"></app-thermal-layer-selector>
 
   <app-zones-selector-container *ngIf="thereAreLargestZones"></app-zones-selector-container>
 
