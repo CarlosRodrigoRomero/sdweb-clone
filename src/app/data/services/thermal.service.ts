@@ -1,11 +1,16 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subscription, of } from 'rxjs';
+import { map, switchMap, take } from 'rxjs/operators';
 
 import { AngularFirestore } from '@angular/fire/firestore';
 
 import { ThermalLayerInterface } from '@core/models/thermalLayer';
+import { Anomalia } from '@core/models/anomalia';
+
+import { Patches } from '@core/classes/patches';
+import { MathOperations } from '@core/classes/math-operations';
+import { THERMAL } from '@data/constants/thermal';
 
 @Injectable({
   providedIn: 'root',
@@ -100,6 +105,59 @@ export class ThermalService {
     );
 
     return this.thermalLayersDB$;
+  }
+
+  getThermalLayerValues(informeId: string, anomalias: Anomalia[]): Promise<number[]> {
+    // Utilizamos el operador switchMap para manejar el observable resultante
+    return this.getReportThermalLayerDB(informeId)
+      .pipe(
+        take(1),
+        switchMap((layersDBs) => {
+          return of(this.getInitialTempsLayer(informeId, anomalias, layersDBs.flat()[0]));
+        })
+      )
+      .toPromise();
+  }
+
+  private getInitialTempsLayer(informeId: string, anoms: Anomalia[], thermalLayerDB: ThermalLayerInterface): number[] {
+    const anomsInforme = anoms.filter((anom) => anom.informeId === informeId);
+    const tempRefMedia = this.getTempRefMedia(anomsInforme);
+
+    let tempMin = tempRefMedia - THERMAL.rangeMin;
+    let tempMax = this.getTempMax(tempRefMedia, informeId, anoms);
+    // let tempMax = tempRefMedia + THERMAL.rangeMax;
+    if (this.thermalLayersDB) {
+      // asignamos los valores de forma automatica
+      if (tempMin < thermalLayerDB.rangeTempMin) {
+        tempMin = thermalLayerDB.rangeTempMin;
+      }
+
+      if (tempMax > thermalLayerDB.rangeTempMax) {
+        tempMax = thermalLayerDB.rangeTempMax;
+      }
+    }
+
+    // aplicamos parches para ciertas plantas
+    [tempMin, tempMax] = Patches.thermalTempsPatchs(informeId, tempMin, tempMax);
+
+    return [tempMin, tempMax];
+  }
+
+  private getTempRefMedia(anomsInforme: Anomalia[]) {
+    const tempRefMedia = Math.round(MathOperations.average(anomsInforme.map((anom) => anom.temperaturaRef)));
+    return tempRefMedia;
+  }
+
+  private getTempMax(tempRefMedia: number, informeId: string, anoms: Anomalia[]) {
+    const tempMax = tempRefMedia + THERMAL.rangeMax;
+    const tempMaxAnom = anoms.reduce((maxTemp, anom) => {
+      if (anom.informeId === informeId) {
+        return Math.max(maxTemp, anom.temperaturaMax);
+      }
+      return maxTemp;
+    }, Number.NEGATIVE_INFINITY);
+
+    return Math.max(tempMax, tempMaxAnom);
   }
 
   resetService() {

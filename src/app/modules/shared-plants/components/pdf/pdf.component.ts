@@ -49,9 +49,9 @@ export class PdfComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.pdfService.filteredPdf$.subscribe((filtered) => (this.filteredPdf = filtered)));
 
     this.subscriptions.add(
-      this.pdfService.generatePdf$.subscribe((gen) => {
+      this.pdfService.generatePdf$.subscribe(async (gen) => {
         if (gen) {
-          this.download();
+          await this.download();
 
           this.pdfService.generatePdf = false;
         }
@@ -69,13 +69,13 @@ export class PdfComponent implements OnInit, OnDestroy {
     this.pdfService.generatePdf = false;
   }
 
-  download() {
-    const json = this.generateJson();
+  async download() {
+    const json = await this.generateJson();
 
     this.saveJson(json);
   }
 
-  generateJson(): any {
+  async generateJson(): Promise<any> {
     const json = { idioma: 'es' };
     if (this.downloadReportService.englishLang) {
       json.idioma = 'en';
@@ -102,8 +102,13 @@ export class PdfComponent implements OnInit, OnDestroy {
     }
     json['locAreas'] = Object.assign({}, zonas);
 
-    json['sliderMin'] = this.thermalService.sliderMin[indexInforme];
-    json['sliderMax'] = this.thermalService.sliderMax[indexInforme];
+    const [tMin, tMax] = await this.thermalService.getThermalLayerValues(
+      informe.id,
+      this.reportControlService.allAnomalias
+    );
+
+    json['sliderMin'] = tMin;
+    json['sliderMax'] = tMax;
 
     json['email'] = this.emailSelected;
     json['totalAnoms'] = this.reportControlService.allAnomalias.length;
