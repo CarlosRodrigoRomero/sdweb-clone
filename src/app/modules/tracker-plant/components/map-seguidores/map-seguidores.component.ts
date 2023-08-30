@@ -41,6 +41,8 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
   public locAreasVectorSource: VectorSource<any>;
   public listaSeguidores: Seguidor[];
   public sliderYear: number;
+  private osmLayer: TileLayer<any>;
+  private satelliteLayer: TileLayer<any>;
   public aerialLayers: TileLayer<any>[];
   public thermalSource;
   private seguidorLayers: VectorImageLayer<any>[];
@@ -99,22 +101,22 @@ export class MapSeguidoresComponent implements OnInit, OnDestroy {
       this.reportControlService.selectedInformeId$.subscribe((informeId) => (this.selectedInformeId = informeId))
     );
 
+    /* OSM */
+    this.olMapService.addOSMLayer();
+    this.subscriptions.add(this.olMapService.osmLayer$.subscribe((layer) => (this.osmLayer = layer)));
+
+    /* SATELITE */
+    this.olMapService.addSatelliteLayer();
+    this.subscriptions.add(this.olMapService.satelliteLayer$.subscribe((layer) => (this.satelliteLayer = layer)));
+
     // asignamos los IDs necesarios para compartir
     this.shareReportService.setPlantaId(this.planta.id);
   }
 
   initMap() {
-    const satellite = new XYZ({
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      crossOrigin: '',
-    });
-    const satelliteLayer = new TileLayer({
-      source: satellite,
-    });
-    satelliteLayer.setProperties({ type: 'satellite' });
-
     const layers = [
-      satelliteLayer,
+      this.osmLayer,
+      this.satelliteLayer,
       ...this.aerialLayers,
       // new TileLayer({
       //   source: new TileDebug(),

@@ -142,7 +142,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(this.reportControlService.noAnomsReport$.subscribe((value) => (this.noAnomsReport = value)));
 
-    /* SATELITE */
+    /* OSM */
     this.olMapService.addOSMLayer();
     this.subscriptions.add(this.olMapService.osmLayer$.subscribe((layer) => (this.osmLayer = layer)));
 
