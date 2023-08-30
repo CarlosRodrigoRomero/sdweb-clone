@@ -1,3 +1,5 @@
+<app-loading *ngIf="!serviceInit"></app-loading>
+
 <div *ngIf="serviceInit">
   <div>
     <app-map-classification></app-map-classification>
@@ -18,12 +20,13 @@
     </button>
     <mat-menu #menu="matMenu" class="menu">
       <div class="contenedor-menu">
-        <h5 mat-menu-item>Recalular datos anomalías</h5>
+        <h5 mat-menu-item>Recalcular datos anomalías</h5>
         <button mat-menu-item (click)="updateModuleAnoms(false)">Módulos</button>
         <button mat-menu-item (click)="updateGlobalCoordsAnoms(false)">GlobalsCoords</button>
         <button *ngIf="planta.tipo === 'seguidores'" mat-menu-item (click)="addPcDataToAnoms()">
           Añadir campos de PCs
         </button>
+        <button mat-menu-item (click)="addDateToAnoms()">Fechas</button>
       </div>
     </mat-menu>
 
@@ -67,11 +70,11 @@
   <div class="bottom-bar">
     <div class="bottom-bar__row-top">
       <h4>{{ planta.nombre }}</h4>
-      <div class="bottom-bar__fila-columna" *ngIf="normModHovered">
+      <div class="bottom-bar__fila-columna" *ngIf="anomaliaHovered">
         <span class="title">Fila:</span>
-        <span class="value">{{ normModHovered.fila }}</span>
+        <span class="value">{{ anomaliaHovered.localY }}</span>
         <span class="title">Columna:</span>
-        <span>{{ normModHovered.columna }}</span>
+        <span>{{ anomaliaHovered.localX }}</span>
       </div>
       <span>Eliminar anomalía ( Q )</span>
     </div>

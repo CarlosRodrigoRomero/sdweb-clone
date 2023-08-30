@@ -101,14 +101,26 @@ export class ZonesService {
   }
 
   private getZonesBySize(zones: LocationAreaInterface[]): LocationAreaInterface[][] {
+    // Obtener el índice máximo donde hay coordenadas no nulas.
     const indexNotNull = this.getIndexNotNull(zones);
-    const zonesBySize = new Array<LocationAreaInterface[]>(indexNotNull + 1);
+
+    // Inicializar el array resultante y un mapa para rastrear zonas ya categorizadas.
+    const zonesBySize: LocationAreaInterface[][] = new Array(indexNotNull + 1).fill([]);
+    const categorizedZones: Set<LocationAreaInterface> = new Set();
+
+    // Iterar en orden inverso, comenzando desde el índice más alto.
     for (let index = indexNotNull; index >= 0; index--) {
-      let indexZones = zones.filter((zone) => zone.globalCoords[index]);
-      if (zonesBySize[index + 1] !== undefined) {
-        indexZones = indexZones.filter((zone) => !zonesBySize[index + 1].includes(zone));
+      const currentZones: LocationAreaInterface[] = [];
+
+      for (const zone of zones) {
+        // Si la zona tiene una coordenada en el índice actual y aún no ha sido categorizada.
+        if (zone.globalCoords[index] && !categorizedZones.has(zone)) {
+          currentZones.push(zone);
+          categorizedZones.add(zone); // Marcar la zona como categorizada.
+        }
       }
-      zonesBySize[index] = indexZones;
+
+      zonesBySize[index] = currentZones;
     }
 
     return zonesBySize;

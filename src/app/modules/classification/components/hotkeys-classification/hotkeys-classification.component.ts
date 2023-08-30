@@ -31,13 +31,7 @@ export class HotkeysClassificationComponent implements OnInit {
           '1',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 8;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 8);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(8);
             }
             return false; // Prevent bubbling
           },
@@ -51,13 +45,7 @@ export class HotkeysClassificationComponent implements OnInit {
           'shift+1',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 0;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 0);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(0);
             }
             return false; // Prevent bubbling
           },
@@ -71,13 +59,7 @@ export class HotkeysClassificationComponent implements OnInit {
           'ctrl+1',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 13;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 13);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(13);
             }
             return false; // Prevent bubbling
           },
@@ -91,13 +73,7 @@ export class HotkeysClassificationComponent implements OnInit {
           '2',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 9;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 9);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(9);
             }
             return false; // Prevent bubbling
           },
@@ -111,13 +87,7 @@ export class HotkeysClassificationComponent implements OnInit {
           '3',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 3;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 3);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(3);
             }
             return false; // Prevent bubbling
           },
@@ -130,13 +100,7 @@ export class HotkeysClassificationComponent implements OnInit {
           'ctrl+3',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 10;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 10);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(10);
             }
             return false; // Prevent bubbling
           },
@@ -149,13 +113,7 @@ export class HotkeysClassificationComponent implements OnInit {
           'shift+3',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 6;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 6);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(6);
             }
             return false; // Prevent bubbling
           },
@@ -168,13 +126,7 @@ export class HotkeysClassificationComponent implements OnInit {
           '4',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 17;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 17);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(17);
             }
             return false; // Prevent bubbling
           },
@@ -188,13 +140,7 @@ export class HotkeysClassificationComponent implements OnInit {
           '5',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 5;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 5);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(5);
             }
             return false; // Prevent bubbling
           },
@@ -208,13 +154,7 @@ export class HotkeysClassificationComponent implements OnInit {
           '7',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 7;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 7);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(7);
             }
             return false; // Prevent bubbling
           },
@@ -228,13 +168,7 @@ export class HotkeysClassificationComponent implements OnInit {
           '8',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 18;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 18);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(18);
             }
             return false; // Prevent bubbling
           },
@@ -248,13 +182,7 @@ export class HotkeysClassificationComponent implements OnInit {
           'ctrl+8',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 20;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 20);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(20);
             }
             return false; // Prevent bubbling
           },
@@ -268,13 +196,7 @@ export class HotkeysClassificationComponent implements OnInit {
           'shift+8',
           (event: KeyboardEvent): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 21;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 21);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(21);
             }
             return false; // Prevent bubbling
           },
@@ -288,18 +210,26 @@ export class HotkeysClassificationComponent implements OnInit {
           'd',
           (): boolean => {
             if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 11;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 11);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
+              this.updateAnomaliaTipo(11);
             }
             return false; // Prevent bubbling
           },
           undefined,
           'D: Suciedad'
+        )
+      );
+
+      this.hotkeysService.add(
+        new Hotkey(
+          's',
+          (): boolean => {
+            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
+              this.updateAnomaliaTipo(15);
+            }
+            return false; // Prevent bubbling
+          },
+          undefined,
+          'S: Módulo con sombras'
         )
       );
 
@@ -325,26 +255,23 @@ export class HotkeysClassificationComponent implements OnInit {
           'q: eliminar anomalia'
         )
       );
-
-      this.hotkeysService.add(
-        new Hotkey(
-          's',
-          (): boolean => {
-            if (this.anomaliaSelected !== undefined && this.anomaliaSelected !== null) {
-              this.classificationService.anomaliaSelected.tipo = 15;
-
-              // actualizamos el tipo en la DB
-              this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', 15);
-
-              // reseteamos lo seleccionado
-              this.classificationService.resetElemsSelected();
-            }
-            return false; // Prevent bubbling
-          },
-          undefined,
-          'S: Módulo con sombras'
-        )
-      );
     }
+  }
+
+  private updateAnomaliaTipo(tipo: number): void {
+    this.classificationService.anomaliaSelected.tipo = tipo;
+
+    this.classificationService.listaAnomalias = this.classificationService.listaAnomalias.map((anom) => {
+      if (anom.id === this.anomaliaSelected.id) {
+        anom.tipo = tipo;
+      }
+      return anom;
+    });
+
+    // actualizamos el tipo en la DB
+    this.anomaliaService.updateAnomaliaField(this.classificationService.anomaliaSelected.id, 'tipo', tipo);
+
+    // reseteamos lo seleccionado
+    this.classificationService.resetElemsSelected();
   }
 }
