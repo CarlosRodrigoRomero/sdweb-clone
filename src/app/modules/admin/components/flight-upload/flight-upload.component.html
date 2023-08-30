@@ -2,7 +2,7 @@
 <mat-form-field class="wide-input">
   <input type="text" matInput placeholder="Seleccionado" [value]="fileName" multiple readonly>
   <input  type="file" #fileInput (change)="handleChange($event)" webkitdirectory multiple />
-  <button mat-button (click)="fileInput.click()">Seleccionar archivo</button>
+  <!-- <button mat-button (click)="fileInput.click()">Seleccionar archivo</button> -->
 </mat-form-field>
 
 <br />

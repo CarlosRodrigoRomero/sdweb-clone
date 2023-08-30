@@ -22,6 +22,7 @@ import LineString from 'ol/geom/LineString';
 import geolib from 'geolib';
 import { getDistance } from 'geolib';
 import VectorImageLayer from 'ol/layer/VectorImage';
+import { L } from '@angular/cdk/keycodes';
 
 export interface ImageData {
   key: string;
@@ -128,6 +129,7 @@ export class FlightUploadComponent implements OnInit {
   ) { }
 
   async handleChange(event) {
+    this.map.renderSync();
     this.selectedFiles = Array.from(event.target.files);
 
     for (let i = 0; i < event.target.files.length; i++) {
@@ -157,8 +159,10 @@ export class FlightUploadComponent implements OnInit {
         output.suffix = currentSuffix;
         if (currentSuffix == "V") {
           this.numeroImagenesRGB++;
+          output.suffix = "V";
         } else if (currentSuffix == "T") {
           this.numeroImagenesTermicas++;
+          output.suffix = "T";
         }
         for (let group of this.imageGroups) {
           // Verificar si el número de serie de la imagen es el mismo del grupo
@@ -227,13 +231,6 @@ export class FlightUploadComponent implements OnInit {
       this.drawRouteLines(this.imageGroups[i], distanciaModaGrupo, i);
     }
 
-    let intersectionsCounts = [];
-
-    this.segments.forEach(segment => {
-      const numIntersections = this.getNumIntersections(segment, this.segments);
-      intersectionsCounts.push(numIntersections);
-      // console.log(`Segment starting at ${segment[0]} and ending at ${segment[segment.length - 1]} intersects with ${numIntersections} other segments.`);
-    });
 
 
     if (this.numeroImagenesRGB != this.numeroImagenesTermicas) {
@@ -244,11 +241,13 @@ export class FlightUploadComponent implements OnInit {
     }
 
 
-    console.log("Velocidad media: " + this.velocidadMediaTotal() + " m/s");
-    console.log("Velocidad moda: " + this.velocidadModaTotal() + " m/s");
-
+    console.log("Velocidad media: " + this.velocidadMediaTotal() + " m/s, Velocidad moda: " + this.velocidadModaTotal() + " m/s");
     this.isDataReady = true;
-
+    this.map.once('postrender', function (event) {
+      document.getElementById('map').style.visibility = 'visible';
+      document.getElementById('loading').style.display = 'none';
+    });
+    this.map.changed();
   }
 
 
@@ -337,11 +336,38 @@ export class FlightUploadComponent implements OnInit {
 
 
   addImageMarkersAndPolygon() {
+    let iconStyleV = new Style({
+      image: new Icon({
+        src: '../../../../../assets/icons/location-pin-dark-unhover.png',
+        scale: 0.2
+      }),
+    });
+
+
+    let iconStyleT = new Style({
+      image: new Icon({
+        src: '../../../../../assets/icons/location-pin-light-hover.png',
+        scale: 0.2,
+      }),
+    });
+
+    let iconStyleH = new Style({
+      image: new Icon({
+        src: '../../../../../assets/icons/location-pin-hovered.png',
+        scale: 0.2,
+      }),
+    });;
     this.map.getLayers().forEach(layer => {
       if (layer instanceof VectorImageLayer) {
         this.map.removeLayer(layer);
       }
     });
+
+    let minLat = Number.POSITIVE_INFINITY;
+    let maxLat = Number.NEGATIVE_INFINITY;
+    let minLon = Number.POSITIVE_INFINITY;
+    let maxLon = Number.NEGATIVE_INFINITY;
+
 
     const vectorLayers = [];
 
@@ -352,13 +378,12 @@ export class FlightUploadComponent implements OnInit {
 
 
 
-      let minLat = Number.POSITIVE_INFINITY;
-      let maxLat = Number.NEGATIVE_INFINITY;
-      let minLon = Number.POSITIVE_INFINITY;
-      let maxLon = Number.NEGATIVE_INFINITY;
+
 
 
       this.checkImageHeights(group);
+
+
 
       group.forEach((image) => {
 
@@ -380,30 +405,15 @@ export class FlightUploadComponent implements OnInit {
 
         if (image.isHeightCorrect) {
           if (group[0].suffix == "V") {
-            iconStyle = new Style({
-              image: new Icon({
-                src: '../../../../../assets/icons/location-pin-dark-unhover.png',
-                scale: 0.2
-              }),
-            });
+            iconStyle = iconStyleV;
           }
 
           else if (group[0].suffix == "T") {
-            iconStyle = new Style({
-              image: new Icon({
-                src: '../../../../../assets/icons/location-pin-light-hover.png',
-                scale: 0.2,
-              }),
-            });
+            iconStyle = iconStyleT;
           }
         } else {
           // console.log(image.name);
-          iconStyle = new Style({
-            image: new Icon({
-              src: '../../../../../assets/icons/location-pin-hovered.png',
-              scale: 0.2,
-            }),
-          });
+          iconStyle = iconStyleH;
         }
 
 
@@ -483,6 +493,7 @@ export class FlightUploadComponent implements OnInit {
 
 
   distanciaModa(datos) {
+    console.log("distanciaModa");
     const distancias = [];
     for (let i = 1; i < datos.length; i++) {
       const distancia = getDistance(
@@ -512,6 +523,7 @@ export class FlightUploadComponent implements OnInit {
 
 
   drawRouteLines(group: ImageData[], distanciaModa: number, groupIndex) {
+    console.log("drawRouteLines");
     const topeModa = distanciaModa * 2;
     this.segments = [];
     let currentSegment = [];
@@ -637,6 +649,7 @@ export class FlightUploadComponent implements OnInit {
 
 
   extractDateTimeFromName(name) {
+    console.log("extractDateTimeFromName");
     const match = name.match(/^DJI_(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})_/);
     if (match) {
       const year = parseInt(match[1], 10);
@@ -652,12 +665,14 @@ export class FlightUploadComponent implements OnInit {
 
 
   getSuffix(name) {
+    console.log("getSuffix");
     const regex = /_([VT])\.\w+$/;
     const match = name.match(regex);
     return match ? match[1] : null;
   }
 
   toggleLayers(suffix: string, isVisible: boolean) {
+    console.log("toggleLayers");
     this.map.getLayers().forEach(layer => {
       if (layer instanceof VectorImageLayer && layer.get("suffix") === suffix) {
         layer.setVisible(isVisible);
@@ -666,6 +681,7 @@ export class FlightUploadComponent implements OnInit {
   }
 
   extractNumberFromName(str) {
+    console.log("extractNumberFromName");
     const regex = /.*?_.*?_(\d+)_/;
     const match = str.match(regex);
 
@@ -673,6 +689,7 @@ export class FlightUploadComponent implements OnInit {
   }
 
   calcularModa(valores) {
+    console.log("calcularModa");
     const counts = {};
     valores.forEach((valor) => {
       counts[valor] = (counts[valor] || 0) + 1;
@@ -691,6 +708,7 @@ export class FlightUploadComponent implements OnInit {
 
 
   verificarAltitud(datos) {
+    console.log("verificarAltitud");
     const altitudes = datos.map(dato => {
       if (dato.GPSAltitude !== null && dato.GPSAltitude !== undefined) {
         return parseFloat(dato.GPSAltitude.toFixed(1));
@@ -703,48 +721,25 @@ export class FlightUploadComponent implements OnInit {
   }
 
 
-  async checkImageHeights(images: ImageData[]): Promise<void> {
-    const WINDOW_SIZE = 10; // Número de imágenes iniciales para calcular la moda agrupada
-    const MARGIN = 10; // Margen para agrupar valores cercanos
-    const SAMPLE_SIZE = 5; // Número total de imágenes (incluyendo la actual) para tomar como muestra al comprobar altitudes posteriores
+  async checkImageHeights(images) {
+    console.log("Checkimageheights");
+    const WINDOW_SIZE = 10;
+    const MARGIN = 10;
+    const SAMPLE_SIZE = 5;
 
     if (images.length === 0) return;
 
-    // Recoge las altitudes de las primeras imágenes
-    const initialAltitudes: number[] = [];
-    for (let i = 0; i < Math.min(WINDOW_SIZE, images.length); i++) {
-      initialAltitudes.push(images[i].GPSAltitude);
-    }
-
+    const initialAltitudes = images.slice(0, WINDOW_SIZE).map(img => img.GPSAltitude);
     const [initialLowerBound, initialUpperBound] = this.calculateGroupedModa(initialAltitudes, MARGIN);
 
-    for (let i = 0; i < Math.min(WINDOW_SIZE, images.length); i++) {
-      images[i].isHeightCorrect = images[i].GPSAltitude >= initialLowerBound && images[i].GPSAltitude <= initialUpperBound;
+    images.slice(0, WINDOW_SIZE).forEach(img => {
+      img.isHeightCorrect = img.GPSAltitude >= initialLowerBound && img.GPSAltitude <= initialUpperBound;
+    });
 
-
-      if (!images[i].isHeightCorrect) {
-      }
-    }
-
-    // Para las imágenes restantes
     for (let i = WINDOW_SIZE; i < images.length; i++) {
-      // Recoge las altitudes de las SAMPLE_SIZE / 2 imágenes anteriores, la imagen actual y las SAMPLE_SIZE / 2 imágenes siguientes
-      const sampleAltitudes: number[] = [];
-      for (let j = i - Math.floor(SAMPLE_SIZE / 2); j <= i + Math.floor(SAMPLE_SIZE / 2) && j < images.length; j++) {
-        if (j >= 0) { // Asegurarse de que no estamos obteniendo índices negativos
-          sampleAltitudes.push(images[j].GPSAltitude);
-        }
-      }
-
+      const sampleAltitudes = images.slice(i - Math.floor(SAMPLE_SIZE / 2), i + Math.ceil(SAMPLE_SIZE / 2)).map(img => img.GPSAltitude);
       const [sampleLowerBound, sampleUpperBound] = this.calculateGroupedModa(sampleAltitudes, MARGIN);
-
-      // Verifica si la altitud de la imagen actual está dentro del rango de la moda agrupada de la muestra
       images[i].isHeightCorrect = images[i].GPSAltitude >= sampleLowerBound && images[i].GPSAltitude <= sampleUpperBound;
-
-      if (!images[i].isHeightCorrect) {
-        console.log("image name: " + images[i].name + ", sampleLowerBound: " + sampleLowerBound + ", sampleUpperBound: " + sampleUpperBound + ", image altitude: " + images[i].GPSAltitude);
-      }
-
     }
   }
 
@@ -752,10 +747,9 @@ export class FlightUploadComponent implements OnInit {
 
 
 
-
-
-
   calculateGroupedModa(altitudes: number[], margin: number): [number, number] {
+    console.log("calculateGroupedModa");
+
     const groupedFrequencies: { [key: string]: { count: number, total: number } } = {};
 
     // Asigna cada altitud a un grupo y actualiza el recuento y la suma total para ese grupo
@@ -787,6 +781,8 @@ export class FlightUploadComponent implements OnInit {
 
 
   private calculateAngle(A: [number, number], B: [number, number], C: [number, number]): number {
+    console.log("calculateAngle");
+
     if (!A || !B || !C) return 0;  // Añade esta comprobación al inicio
 
     const AB = [B[0] - A[0], B[1] - A[1]];
@@ -808,6 +804,8 @@ export class FlightUploadComponent implements OnInit {
 
 
   doIntersect(p1, q1, p2, q2) {
+    console.log("doIntersect");
+
     // Define una función de utilidad para determinar la orientación
     function orientation(p, q, r) {
       const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
@@ -829,6 +827,8 @@ export class FlightUploadComponent implements OnInit {
 
 
   getNumIntersections(segment, allSegments) {
+    console.log("getNumIntersections");
+
     let count = 0;
     const start = segment[0];
     const end = segment[segment.length - 1];
@@ -846,6 +846,8 @@ export class FlightUploadComponent implements OnInit {
 
 
   calcularVelocidades(grupo: ImageData[]): number[] {
+    console.log("calcularVelocidades");
+
     const velocidades: number[] = [];
     for (let i = 1; i < grupo.length; i++) {
       const coord1 = [grupo[i - 1].GPSLatitude, grupo[i - 1].GPSLongitude];
@@ -868,6 +870,8 @@ export class FlightUploadComponent implements OnInit {
   }
 
   velocidadMedia(grupo: ImageData[]): number {
+    console.log("velocidadMedia");
+
     const velocidades = this.calcularVelocidades(grupo);
     const velocidadesFiltradas = velocidades.filter(v => v > 0.1);
     const total = velocidadesFiltradas.reduce((acc, v) => acc + v, 0);
@@ -875,6 +879,8 @@ export class FlightUploadComponent implements OnInit {
   }
 
   velocidadModa(grupo: ImageData[]): number | null {
+    console.log("velocidadModa");
+
     const velocidades = this.calcularVelocidades(grupo);
     const velocidadesFiltradas = velocidades
       .filter(v => v > 0.1)
@@ -897,6 +903,8 @@ export class FlightUploadComponent implements OnInit {
 
 
   calcularVelocidadesTodasImagenes(): number[] {
+    console.log("calcularVelocidadesTodasImagenes");
+
     // Combinar todos los grupos de imágenes en un solo array
     const allImages = this.imageGroups.flat();
     const velocidades: number[] = [];
@@ -921,6 +929,8 @@ export class FlightUploadComponent implements OnInit {
   }
 
   velocidadMediaTotal(): number {
+    console.log("velocidadMediaTotal");
+
     const velocidades = this.calcularVelocidadesTodasImagenes();
     const velocidadesFiltradas = velocidades.filter(v => v > 0.1);
     const total = velocidadesFiltradas.reduce((acc, v) => acc + v, 0);
@@ -928,6 +938,8 @@ export class FlightUploadComponent implements OnInit {
   }
 
   velocidadModaTotal(): number | null {
+    console.log("velocidadModaTotal");
+
     const velocidades = this.calcularVelocidadesTodasImagenes();
     const velocidadesFiltradas = velocidades
       .filter(v => v > 0.1)
@@ -948,6 +960,24 @@ export class FlightUploadComponent implements OnInit {
     return moda;
   }
 
+
+  getWebGLPointStyle(feature) {
+    const isHeightCorrect = feature.get('isHeightCorrect');
+    const suffix = feature.get('suffix');
+
+    const color = isHeightCorrect
+      ? (suffix === 'V' ? [0, 0, 255, 1] : [255, 0, 0, 1])
+      : [0, 255, 0, 1]; // Este es un color de ejemplo para cuando isHeightCorrect es falso
+
+    return {
+      symbol: {
+        symbolType: 'circle',
+        size: 10,  // tamaño del círculo, puedes ajustarlo
+        color: color,
+        // Aquí puedes añadir más propiedades según necesites
+      }
+    };
+  }
 
 }
 
