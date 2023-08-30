@@ -3,7 +3,7 @@
     <mat-panel-title>{{ 'Zona' | translate }}</mat-panel-title>
   </mat-expansion-panel-header>
   <li mat-menu-item *ngFor="let zona of zonasPcs; index as i" (click)="stopPropagation($event)">
-    <mat-checkbox
+    <mat-checkbox class="filtro_zonas"
       [checked]="zonasSelected[zona.idZona]"
       [id]="zona.zona"
       [name]="zona.label"
