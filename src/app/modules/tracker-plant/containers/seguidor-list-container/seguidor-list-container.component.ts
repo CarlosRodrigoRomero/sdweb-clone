@@ -55,13 +55,13 @@ export class SeguidorListContainer implements OnInit, OnDestroy {
         // cambiammos la ultima columna con la vista seleccionada
         switch (this.viewSeleccionada) {
           case 'mae':
-            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'mae', 'comentarios'];
+            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'mae' /* 'comentarios' */];
             break;
           case 'cc':
-            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'celsCalientes', 'comentarios'];
+            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'celsCalientes' /* 'comentarios' */];
             break;
           case 'grad':
-            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'gradiente', 'comentarios'];
+            this.displayedColumns = ['colors', 'nombre', 'numAnomalias', 'modulo', 'gradiente' /* 'comentarios' */];
             break;
         }
       })
@@ -114,15 +114,15 @@ export class SeguidorListContainer implements OnInit, OnDestroy {
       this.reportControlService.allFilterableElements.forEach((elem) => {
         const seguidor = elem as Seguidor;
 
-        let numComentarios = null;
-        if (seguidor.anomaliasCliente.length > 0) {
-          const anomWithComs = seguidor.anomaliasCliente.filter(
-            (anom) => anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0
-          );
-          if (anomWithComs.length > 0) {
-            numComentarios = anomWithComs.reduce((acc, anom) => acc + anom.comentarios.length, 0);
-          }
-        }
+        // let numComentarios = null;
+        // if (seguidor.anomaliasCliente.length > 0) {
+        //   const anomWithComs = seguidor.anomaliasCliente.filter(
+        //     (anom) => anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0
+        //   );
+        //   if (anomWithComs.length > 0) {
+        //     numComentarios = anomWithComs.reduce((acc, anom) => acc + anom.comentarios.length, 0);
+        //   }
+        // }
 
         data.push({
           id: seguidor.id,
@@ -135,7 +135,7 @@ export class SeguidorListContainer implements OnInit, OnDestroy {
           gradiente: seguidor.gradienteNormalizado,
           colors: this.getColorsViewSeguidor(seguidor),
           seguidor,
-          numComentarios,
+          // numComentarios,
           hovered: false,
           selected: false,
         });

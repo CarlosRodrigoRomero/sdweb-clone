@@ -26,12 +26,15 @@ export class NavComponent implements OnInit {
   showPrediction = true;
   itemSelected = 'list';
   itemColor = COLOR.light_orange;
+  showSecondNavbarRow = false;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
     private router: Router,
     private themeService: ThemeService
   ) {
+    const screenWidth = window.innerWidth;
+
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         if (this.router.url.split('/').includes('plants')) {
@@ -53,6 +56,11 @@ export class NavComponent implements OnInit {
           this.itemSelected = 'prediction';
         } else if (this.router.url.split('/').includes('analysis')) {
           this.itemSelected = 'analysis';
+        }
+
+        // PORTFOLIO E INFORMES EN DESKTOP
+        if (this.router.url.split('/').includes('clients') && screenWidth > 600) {
+          this.showSecondNavbarRow = true;
         }
 
         // SOLO PARA CLIENTE INTERNACIONAL

@@ -39,15 +39,19 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subcriptions.add(
-      this.reportControlService.selectedInformeId$.subscribe((id) => {
-        this.selectedReport = this.reportControlService.informes.find((informe) => informe.id === id);
+      this.reportControlService.selectedInformeId$
+        .pipe(
+          switchMap((id) => {
+            this.selectedReport = this.reportControlService.informes.find((informe) => informe.id === id);
 
-        this.filterService.filteredElements$.subscribe((elems) => {
+            return this.filterService.filteredElements$;
+          })
+        )
+        .subscribe((elems) => {
           const elemsInforme = elems.filter((elem) => elem.informeId === this.reportControlService.selectedInformeId);
-    
+
           if (this.reportControlService.plantaFija) {
             this.anomaliasInforme = elemsInforme as Anomalia[];
-
           } else {
             var anomalias = [];
             for (var elem of elemsInforme) {
@@ -56,22 +60,21 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
 
             this.anomaliasInforme = anomalias;
           }
-    
+
           // detectamos cambios porque estamos utilizando la estrategia OnPush
           this.cdr.detectChanges();
-        });
 
-        // obtenemos el numero de anomalias reparables
-        this.numFixableAnoms = this.getNumFixableAnoms(this.anomaliasInforme);
-        this.numUnfixableAnoms = this.anomaliasInforme.length - this.numFixableAnoms;
+          // obtenemos el numero de anomalias reparables
+          this.numFixableAnoms = this.getNumFixableAnoms(this.anomaliasInforme);
+          this.numUnfixableAnoms = this.anomaliasInforme.length - this.numFixableAnoms;
 
-        this.recomendedActions = this.calculateRecomendedActions(this.anomaliasInforme).sort((a, b) => b.mae - a.mae);
+          this.recomendedActions = this.calculateRecomendedActions(this.anomaliasInforme).sort((a, b) => b.mae - a.mae);
 
-        // calculamos el porcentaje de pérdidas que se pueden arreglar
-        this.calculateFixableLosses();
+          // calculamos el porcentaje de pérdidas que se pueden arreglar
+          this.calculateFixableLosses();
 
-        return this.filterService.filteredElements$;
-      })
+          return this.filterService.filteredElements$;
+        })
     );
   }
 

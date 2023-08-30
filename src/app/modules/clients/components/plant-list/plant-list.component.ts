@@ -51,7 +51,6 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   private informes: InformeInterface[];
   sortedColumn = 'fixablePower';
   theme: string;
-  private screenWidth: number;
   btnShowAll = false;
 
   private subscriptions: Subscription = new Subscription();
@@ -70,8 +69,6 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.screenWidth = window.innerWidth;
-
     this.plantas = this.portfolioControlService.listaPlantas;
     this.informes = this.portfolioControlService.listaInformes;
     let plantsData = [];
@@ -194,7 +191,7 @@ export class PlantListComponent implements OnInit, AfterViewInit {
   }
 
   async onClick(row: any) {
-    if (this.screenWidth <= 600) {
+    if (window.innerWidth <= 600) {
       await this.setMobileReportId(row);
 
       const id = this.shareReportService.getParamsDbId();
@@ -223,7 +220,11 @@ export class PlantListComponent implements OnInit, AfterViewInit {
       this.router.navigate(['clients/tracker/' + row.plantaId + '/' + initialLocalView]);
     } else {
       if (row.ultimaInspeccion > GLOBAL.newReportsDate || row.plantaId === 'egF0cbpXnnBnjcrusoeR') {
-        this.router.navigate(['clients/fixed/' + row.plantaId + '/' + initialLocalView]);
+        if (row.tipo === 'cubierta') {
+          this.router.navigate(['clients/rooftop/' + row.plantaId + '/' + initialLocalView]);
+        } else {
+          this.router.navigate(['clients/fixed/' + row.plantaId + '/' + initialLocalView]);
+        }
       } else {
         this.openSnackBar();
       }

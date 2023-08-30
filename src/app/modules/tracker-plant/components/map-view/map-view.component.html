@@ -1,129 +1,77 @@
-<mat-sidenav-container class="seguidor-container" (backdropClick)="resetSeguidorView()">
-  <!-- SIDENAV SEGUIDOR VIEW -->
-  <mat-sidenav #sidenavSeguidorView [(opened)]="seguidorViewOpened" class="seguidor-sidenav" position="end">
-    <!-- VISTA SEGUIDOR -->
-    <app-seguidor-view></app-seguidor-view>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <mat-sidenav-container class="stats-container">
-      <!-- SIDENAV STATS -->
-      <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end" [disableClose]="true">
-        <!-- cargamos el modulo Stats -->
-        <ng-template appDynamicStats></ng-template>
-      </mat-sidenav>
+<div class="map-view">
+  <mat-card class="panel-seguidores">
+    <!-- LISTADO SEGUIDORES -->
+    <app-seguidor-list-container></app-seguidor-list-container>
+  </mat-card>
 
-      <mat-sidenav-content>
-        <mat-sidenav-container class="main-container" [hasBackdrop]="false" (backdropClick)="sidenavStats.toggle()">
-          <!-- SIDENAV FILTROS -->
-          <mat-sidenav
-            *ngIf="showFilters"
-            #sidenavLeft
-            opened
-            mode="side"
-            [fixedInViewport]="true"
-            class="left-sidenav"
-            [fixedTopGap]="80"
-            position="start"
-          >
-            <app-filters-panel-container></app-filters-panel-container>
-          </mat-sidenav>
+  <mat-sidenav-container class="seguidor-container" (backdropClick)="resetSeguidorView()">
+    <!-- SIDENAV SEGUIDOR VIEW -->
+    <mat-sidenav #sidenavSeguidorView [(opened)]="seguidorViewOpened" class="seguidor-sidenav" position="end">
+      <!-- VISTA SEGUIDOR -->
+      <app-seguidor-view></app-seguidor-view>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <mat-sidenav-container class="stats-container">
+        <!-- SIDENAV STATS -->
+        <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end" [disableClose]="true">
+          <!-- cargamos el modulo Stats -->
+          <ng-template appDynamicStats></ng-template>
+        </mat-sidenav>
 
-          <!-- SIDENAV LISTA SEGUIDORES -->
-          <mat-sidenav
-            #sidenavRight
-            [(opened)]="rightOpened"
-            class="right-sidenav"
-            [fixedInViewport]="true"
-            position="end"
-          >
-            <div class="titulo">
-              <h4>{{ 'Listado de seguidores' | translate }}</h4>
-            </div>
+        <mat-sidenav-content>
+          <div class="rel">
+            <!-- MAPA -->
+            <app-map-seguidores></app-map-seguidores>
 
-            <ng-template appDynamicSeguidorList></ng-template>
+            <div>
+              <div class="views-area">
+                <!-- TOGGLE MAPAS -->
+                <app-view-toggle></app-view-toggle>
 
-            <!-- <app-seguidor-list-container></app-seguidor-list-container> -->
-          </mat-sidenav>
+                <!-- LEYENDA -->
+                <app-leyenda-container></app-leyenda-container>
+              </div>
 
-          <mat-sidenav-content>
-            <div class="rel">
-              <!-- MAPA -->
-              <app-map-seguidores></app-map-seguidores>
+              <app-view-control></app-view-control>
 
-              <div>
-                <div class="views-area">
-                  <!-- TOGGLE MAPAS -->
-                  <app-view-toggle></app-view-toggle>
-
-                  <!-- MOSTRAR / OCULTAR VISTA ZONAS -->
-                  <!-- <app-group-by-zones-view *ngIf="viewSelected !== 'tipo' && thereAreZones"></app-group-by-zones-view> -->
-
-                  <!-- LEYENDA -->
-                  <app-leyenda-container></app-leyenda-container>
+              <div class="map-control">
+                <!-- CONTROL TEMPORAL -->
+                <div class="temporal-control">
+                  <app-slider-temporal *ngIf="numInformes > 1 && showFilters"></app-slider-temporal>
                 </div>
 
-                <div class="btns-export">
-                  <!-- BOTON COMPARTIR -->
-                  <!-- <app-share-report *ngIf="notSharedReport || completeView"></app-share-report> -->
-
-                  <!-- BOTON DESCARGAS -->
-                  <app-download-report *ngIf="notSharedReport || completeView"></app-download-report>
-                </div>
-
-                <!-- <app-zones *ngIf="thereAreZones"></app-zones> -->
-                <app-view-control></app-view-control>
-
-                <div class="map-control">
-                  <!-- CONTROL TEMPORAL -->
-                  <div class="temporal-control">
-                    <app-slider-temporal *ngIf="numInformes > 1 && showFilters"></app-slider-temporal>
-                  </div>
-
-                  <!-- CONTROLES VISUALES -->
-                  <div class="visual-control">
-                    <app-zones-selector-container *ngIf="thereAreLargestZones"></app-zones-selector-container>
-                  </div>
+                <!-- CONTROLES VISUALES -->
+                <div class="visual-control">
+                  <app-zones-selector-container *ngIf="thereAreLargestZones"></app-zones-selector-container>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- BOTON SIDENAV FILTROS -->
-            <div>
-              <!-- BOTON SIDENAV LISTA SEGUIDORES -->
-              <button
-                mat-raised-button
-                class="btn-right"
-                (click)="loadSegList(); sidenavRight.toggle()"
-                matTooltip="{{ 'Lista seguidores' | translate }}"
-                matTooltipClass="tooltip-style"
-              >
-                <mat-icon>list_alt</mat-icon>
-                <mat-icon *ngIf="!rightOpened">keyboard_arrow_left</mat-icon>
-                <mat-icon *ngIf="rightOpened">keyboard_arrow_right</mat-icon>
-              </button>
+          <div class="btns-wrapper">
+            <!-- BOTON DESCARGAS -->
+            <app-download-report *ngIf="notSharedReport || completeView"></app-download-report>
 
-              <!-- BOTON SIDENAV STATS -->
-              <button
-                *ngIf="notSharedReport || completeView"
-                mat-raised-button
-                class="btn-right-stats"
-                (click)="loadStats(); sidenavStats.toggle()"
-                matTooltip="{{ 'Estadísticas' | translate }}"
-                matTooltipClass="tooltip-style"
-                [disabled]="noAnomsReport"
-              >
-                <mat-icon>query_stats</mat-icon>
-                <mat-icon>keyboard_arrow_left</mat-icon>
-              </button>
-            </div>
-          </mat-sidenav-content>
-        </mat-sidenav-container>
-      </mat-sidenav-content>
-    </mat-sidenav-container>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+            <!-- BOTON SIDENAV STATS -->
+            <button
+              *ngIf="notSharedReport || completeView"
+              mat-raised-button
+              (click)="loadStats(); sidenavStats.toggle()"
+              matTooltip="{{ 'Estadísticas' | translate }}"
+              matTooltipClass="tooltip-style"
+              [disabled]="noAnomsReport"
+            >
+              <mat-icon>query_stats</mat-icon>
+              <mat-icon>keyboard_arrow_left</mat-icon>
+            </button>
+          </div>
+        </mat-sidenav-content>
+      </mat-sidenav-container>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 
-<!-- PROGRESS BAR DESCARGAS -->
-<app-download-progress-bar class="progress-bar" *ngIf="generatingDownload"></app-download-progress-bar>
+  <!-- PROGRESS BAR DESCARGAS -->
+  <app-download-progress-bar class="progress-bar" *ngIf="generatingDownload"></app-download-progress-bar>
 
-<div class="dark-trasp-background" *ngIf="generatingDownload"></div>
+  <div class="dark-trasp-background" *ngIf="generatingDownload"></div>
+</div>

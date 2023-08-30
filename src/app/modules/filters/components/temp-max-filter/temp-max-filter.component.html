@@ -1,5 +1,7 @@
-<div class="filtro">
-  <h5>{{ 'Temperatura maxima' | translate }}</h5>
+<mat-expansion-panel (click)="$event.stopPropagation()">
+  <mat-expansion-panel-header>
+    <mat-panel-title>{{ 'Temperatura maxima' | translate }}</mat-panel-title>
+  </mat-expansion-panel-header>
   <div id="filter_temp_max" class="custom-slider">
     <ngx-slider
       [(value)]="minTemp"
@@ -8,4 +10,4 @@
       (userChangeEnd)="onChangeFiltroTempMax(minTemp, maxTemp)"
     ></ngx-slider>
   </div>
-</div>
+</mat-expansion-panel>

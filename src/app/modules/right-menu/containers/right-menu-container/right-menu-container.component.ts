@@ -13,6 +13,11 @@ import { AuthService } from '@data/services/auth.service';
 export class RightMenuContainerComponent implements OnInit {
   isShared = false;
   isAdmin = false;
+  urls = {
+    grafana: 'https://monitor.solardrone.app/',
+    newBug: 'https://form.asana.com/?k=KN18mefLSYBjN4OStVyFjg&d=1204869738731689',
+    help: 'https://solardrone.notion.site/Ayuda-tutoriales-y-documentaci-n-9b5c508747994fe88f4cbe12a1f6f3b0?pvs=4',
+  };
 
   private subscriptions: Subscription = new Subscription();
 
@@ -28,10 +33,8 @@ export class RightMenuContainerComponent implements OnInit {
     }
   }
 
-  navigateNewBug() {
-    const urlNewBugForm = 'https://form.asana.com/?k=KN18mefLSYBjN4OStVyFjg&d=1204869738731689';
-
-    window.open(urlNewBugForm, '_blank');
+  navigateTo(url: string) {
+    window.open(url, '_blank');
   }
 
   signOut() {

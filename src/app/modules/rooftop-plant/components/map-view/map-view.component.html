@@ -1,0 +1,75 @@
+<div class="map-view">
+  <mat-card class="panel-anomalias">
+    <app-anomalia-list-container></app-anomalia-list-container>
+  </mat-card>
+
+  <mat-sidenav-container class="stats-container" [hasBackdrop]="true" (backdropClick)="sidenavStats.toggle()">
+    <!-- SIDENAV STATS -->
+    <mat-sidenav #sidenavStats class="stats-sidenav" position="end">
+      <!-- cargamos el modulo Stats -->
+      <ng-template appDynamicStats></ng-template>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      <div class="rel">
+        <!-- MAPA -->
+        <app-map></app-map>
+
+        <div>
+          <div class="views-area">
+            <!-- TOGGLE MAPAS -->
+            <app-view-toggle></app-view-toggle>
+
+            <!-- LEYENDA -->
+            <app-leyenda-container class="leyenda-tipo" *ngIf="viewSelected === 'tipo'"></app-leyenda-container>
+            <app-leyenda-container class="leyenda-no-tipo" *ngIf="viewSelected !== 'tipo'"></app-leyenda-container>
+          </div>
+
+          <button mat-raised-button class="btn-open-controls" (click)="showControls()">
+            <mat-icon>tune</mat-icon>
+          </button>
+
+          <app-view-control></app-view-control>
+
+          <div id="map-control" class="map-control">
+            <!-- CONTROL TEMPORAL -->
+            <div class="temporal-control">
+              <app-slider-temporal *ngIf="numInformes > 1 && showFilters"></app-slider-temporal>
+            </div>
+
+            <!-- CONTROLES VISUALES -->
+            <div class="visual-control">
+              <!-- <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider> -->
+              <app-zones-selector-container *ngIf="thereAreLargestZones"></app-zones-selector-container>
+              <!-- <app-slider-opacity></app-slider-opacity> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- BOTON SIDENAV LISTA ANOMALIAS -->
+      <div class="btn-wrapper">
+        <!-- BOTON DESCARGAS -->
+        <app-download-report *ngIf="!sharedReport || completeView"></app-download-report>
+
+        <!-- BOTON SIDENAV STATS -->
+        <button
+          *ngIf="!sharedReport || completeView"
+          mat-raised-button
+          class="btn-right-stats stats"
+          (click)="loadStats(); sidenavStats.toggle()"
+          matTooltip="{{ 'Estadísticas' | translate }}"
+          matTooltipClass="tooltip-style"
+          [disabled]="noAnomsReport"
+        >
+          <mat-icon class="stats">query_stats</mat-icon>
+          <mat-icon class="stats">keyboard_arrow_left</mat-icon>
+        </button>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+
+  <!-- PROGRESS BAR DESCARGAS -->
+  <app-download-progress-bar class="progress-bar" *ngIf="generatingDownload"></app-download-progress-bar>
+
+  <div class="dark-trasp-background" *ngIf="generatingDownload"></div>
+</div>

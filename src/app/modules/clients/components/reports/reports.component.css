@@ -1,60 +1,12 @@
-.barra-titulo {
-  display: flex;
-  padding: 1rem 2rem;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .content {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  padding: 0 2rem;
+  padding: 1rem 2rem;
   gap: 1rem;
-}
-
-/* .row_1 {
-  display: grid;
-  grid-template-columns: 100%;
-} */
-
-.row_2 {
-  display: grid;
-  grid-template-columns: 100%;
-  gap: 1rem;
-}
-
-/* @media (min-width: 900px) {
-  .row_1 {
-    grid-template-columns: 60% 40%;
-  }
-} */
-
-@media (min-width: 900px) {
-  .row_2 {
-    grid-template-columns: 60% auto;
-    gap: 1rem;
-  }
 }
 
 @media (max-width: 600px) {
-  .row_1 {
-    display: none;
-  }
-
-  .row_2 {
-    gap: 0;
-    position: fixed;
-  }
-
   app-map-all-plants {
-    display: none;
-  }
-
-  app-download-excel-portfolio {
-    display: none;
-  }
-
-  .barra-titulo {
     display: none;
   }
 
@@ -69,16 +21,6 @@
 @media (max-width: 1000px) {
   .content {
     display: grid;
-    padding: 0 1rem 1rem;
-  }
-
-  .barra-titulo {
     padding: 1rem;
-    max-height: 60px;
   }
-
-  /* app-download-excel-portfolio {
-    display: flex;
-    justify-content: flex-end;
-  } */
 }

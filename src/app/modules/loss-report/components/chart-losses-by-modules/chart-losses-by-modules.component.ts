@@ -94,24 +94,24 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
           switchMap((theme) => {
             this.theme = theme;
 
-            this.filterService.filteredElements$.subscribe((elems) => {
-              const elemsInforme = elems.filter((elem) => elem.informeId === this.reportControlService.selectedInformeId);
-        
-              if (this.reportControlService.plantaFija) {
-                this.anomaliasInforme = elemsInforme as Anomalia[];
+            return this.filterService.filteredElements$;
+          }),
+          switchMap((elems) => {
+            const elemsInforme = elems.filter((elem) => elem.informeId === this.reportControlService.selectedInformeId);
 
-              } else {
-                var anomalias = [];
-                for (var elem of elemsInforme) {
-                  anomalias.push(...(elem as Seguidor).anomaliasCliente);
-                }
-
-                this.anomaliasInforme = anomalias;
+            if (this.reportControlService.plantaFija) {
+              this.anomaliasInforme = elemsInforme as Anomalia[];
+            } else {
+              var anomalias = [];
+              for (var elem of elemsInforme) {
+                anomalias.push(...(elem as Seguidor).anomaliasCliente);
               }
-        
-              // detectamos cambios porque estamos utilizando la estrategia OnPush
-              this.cdr.detectChanges();
-            });
+
+              this.anomaliasInforme = anomalias;
+            }
+
+            // detectamos cambios porque estamos utilizando la estrategia OnPush
+            this.cdr.detectChanges();
 
             return this.reportControlService.selectedInformeId$;
           })
@@ -130,8 +130,12 @@ export class ChartLossesByModulesComponent implements OnInit, OnDestroy {
           this.sortChartData();
 
           this.initChart(this.theme);
+
+          // detectamos cambios porque estamos utilizando la estrategia OnPush
+          this.cdr.detectChanges();
         })
     );
+
     this.subscriptions.add(
       this.themeService.themeSelected$.subscribe((theme) => {
         if (this.chartOptions) {

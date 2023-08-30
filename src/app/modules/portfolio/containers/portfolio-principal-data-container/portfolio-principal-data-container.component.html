@@ -1,0 +1,6 @@
+<div class="loading background" *ngIf="!dataLoaded"></div>
+
+<div class="portfolio-data" *ngIf="dataLoaded">
+  <app-portfolio-summary></app-portfolio-summary>
+  <app-download-excel-portfolio></app-download-excel-portfolio>
+</div>

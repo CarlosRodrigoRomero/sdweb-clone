@@ -56,7 +56,8 @@ export class MapComponent implements OnInit, OnDestroy {
   public sharedReport = false;
   noAnomsReport = false;
   public coordsPointer;
-  private popupDirtyAnoms: Overlay;
+  private popupDirty: Overlay;
+  private popupAnomaliaInfo: Overlay;
 
   private subscriptions: Subscription = new Subscription();
 
@@ -118,7 +119,6 @@ export class MapComponent implements OnInit, OnDestroy {
             this.initMap();
 
             this.addPopupOverlay();
-
             // añadimos las anomalías de suciedad por separado
             this.dirtyAnomsService.initService();
           }
@@ -247,15 +247,23 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private addPopupOverlay() {
-    const container = document.getElementById('popup-dirty');
+    const containerInfo = document.getElementById('popup-anomalia-info');
 
-    this.popupDirtyAnoms = new Overlay({
-      id: 'popup-dirty',
-      element: container,
+    this.popupAnomaliaInfo = new Overlay({
+      id: 'popup-anomalia-info',
+      element: containerInfo,
       position: undefined,
     });
 
-    this.map.addOverlay(this.popupDirtyAnoms);
+    const containerDirty = document.getElementById('popup-dirty');
+
+    this.popupDirty = new Overlay({
+      id: 'popup-dirty',
+      element: containerDirty,
+      position: undefined,
+    });
+    this.map.addOverlay(this.popupAnomaliaInfo);
+    this.map.addOverlay(this.popupDirty);
   }
 
   private transform(extent) {

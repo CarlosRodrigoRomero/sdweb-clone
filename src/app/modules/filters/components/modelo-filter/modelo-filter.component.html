@@ -1,25 +1,18 @@
-<div class="filtro">
-    <h5>{{ 'Módulo' | translate }}</h5>
-    <button class="modelo-select" mat-stroked-button [matMenuTriggerFor]="menu">
-      <span *ngIf="defaultLabelStatus" class="filter-default">{{ defaultSelectLabel }}</span>
-      <span *ngIf="!defaultLabelStatus" class="filter-selected">{{ selectedLabels.toString() }}</span>
-      <mat-icon>keyboard_arrow_down</mat-icon>
-    </button>
-    <mat-menu class="menu-modelo" #menu="matMenu">
-      <div>
-        <li mat-menu-item *ngFor="let modeloElem of modelosElem; index as i" (click)="stopPropagation($event)">
-          <mat-checkbox
-            [checked]="modelosSelected[modeloElem.modelo]"
-            [id]="'modelo_' + modeloElem.modelo"
-            [name]="modeloElem.label"
-            [value]="i"
-            (change)="onChangeFiltroTipo($event)"
-          >
-            <span style="font-size: 15px">
-              {{ modeloElem.label | translate }}
-            </span>
-          </mat-checkbox>
-        </li>
-      </div>
-    </mat-menu>
-  </div>
+<mat-expansion-panel (click)="$event.stopPropagation()">
+  <mat-expansion-panel-header>
+    <mat-panel-title>{{ 'Por fabricante de módulo' | translate }}</mat-panel-title>
+  </mat-expansion-panel-header>
+  <li mat-menu-item *ngFor="let modeloElem of modelosElem; index as i" (click)="stopPropagation($event)">
+    <mat-checkbox class="filtro_modelo"
+      [checked]="modelosSelected[modeloElem.modelo]"
+      [id]="'modelo_' + modeloElem.modelo"
+      [name]="modeloElem.label"
+      [value]="i"
+      (change)="onChangeFiltroModelo($event)"
+    >
+      <span style="font-size: 15px">
+        {{ modeloElem.label | translate }}
+      </span>
+    </mat-checkbox>
+  </li>
+</mat-expansion-panel>

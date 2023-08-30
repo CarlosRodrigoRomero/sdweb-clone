@@ -5,18 +5,18 @@
 }
 
 .titulo {
-  font-size: 20px;
+  font-size: 16px;
   margin-right: 0.6rem;
 }
 
 .subtitulo {
-  font-size: 20px;
+  font-size: 16px;
   margin-right: 1em;
   font-weight: 400;
 }
 
 .fecha {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 300;
 }
 

@@ -25,7 +25,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 128px);
   padding: 2rem 0;
   overflow: hidden;
 }
@@ -78,6 +78,20 @@ app-navbar-container {
 
 .bottom-bar {
   display: none;
+}
+
+.data-navbar {
+  border-radius: 8px;
+}
+
+app-portfolio-principal-data-container {
+  width: 100%;
+}
+
+.navbar-top {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
 }
 
 @media (max-width: 600px) {

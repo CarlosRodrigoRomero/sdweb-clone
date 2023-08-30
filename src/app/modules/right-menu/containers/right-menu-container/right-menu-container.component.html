@@ -2,5 +2,7 @@
   [isAdmin]="isAdmin"
   [isShared]="isShared"
   (signOut)="signOut()"
-  (newBug)="navigateNewBug()"
+  (newBug)="navigateTo(urls.newBug)"
+  (goGrafana)="navigateTo(urls.grafana)"
+  (goHelp)="navigateTo(urls.help)"
 ></app-right-menu>

@@ -1,0 +1,26 @@
+.data {
+  display: flex;
+  gap: 2rem;
+}
+
+.data-element {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.title {
+  font-size: 16px;
+}
+
+.value {
+  font-size: 20px;
+  font-weight: 300;
+}
+
+.help {
+  cursor: pointer;
+  color: darkgrey;
+  font-size: 16px;
+  margin-top: 7px;
+}

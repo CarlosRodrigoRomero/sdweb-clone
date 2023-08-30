@@ -226,7 +226,9 @@ export class FilterControlService {
     combineLatest([this.olMapService.map$, this.olMapService.draw$])
       .pipe(take(1))
       .subscribe(([map, draw]) => {
-        map.removeInteraction(draw);
+        if (map) {
+          map.removeInteraction(draw);
+        }
       });
   }
 
@@ -451,8 +453,8 @@ export class FilterControlService {
     this.criticidadSelected$.next(value);
   }
 
-   /* ANOMALÍAS REPARABLES */
-   get reparableSelected() {
+  /* ANOMALÍAS REPARABLES */
+  get reparableSelected() {
     return this._reparableSelected;
   }
 

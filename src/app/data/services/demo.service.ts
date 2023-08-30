@@ -1,8 +1,26 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { InformeInterface } from '@core/models/informe';
 
-import { PlantData } from '@modules/portfolio/components/plants-list/plants-list.component';
 import { PlantaInterface } from '@core/models/planta';
+
+export interface PlantData {
+  nombre: string;
+  potencia: number;
+  mae: number;
+  variacionMae: number;
+  gravedadMae: string;
+  perdidas: number;
+  variacionPerdidas: number;
+  ultimaInspeccion: number;
+  cc: number;
+  variacionCC: number;
+  gravedadCC: string;
+  informesAntiguos?: InformeInterface[];
+  plantaId?: string;
+  tipo?: string;
+  warnings?: string[];
+}
 
 @Injectable({
   providedIn: 'root',

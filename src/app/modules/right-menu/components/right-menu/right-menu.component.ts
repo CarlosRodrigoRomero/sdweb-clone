@@ -11,6 +11,8 @@ export class RightMenuComponent implements OnInit {
   @Input() isAdmin: boolean;
   @Output() signOut = new EventEmitter();
   @Output() newBug = new EventEmitter();
+  @Output() goGrafana = new EventEmitter();
+  @Output() goHelp = new EventEmitter();
 
   constructor() {}
 

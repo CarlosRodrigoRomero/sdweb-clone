@@ -1,0 +1,9 @@
+.filters-btn {
+  border-radius: 18px;
+}
+
+.filters-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

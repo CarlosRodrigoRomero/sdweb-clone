@@ -4,7 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-
+import { LayoutModule } from '@angular/cdk/layout';
 
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
@@ -14,35 +14,28 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 import { HotkeyModule } from 'angular2-hotkeys';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { WINDOW_PROVIDERS } from './window.providers';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from '@shared/shared.module';
 import { CoreModule } from '@core/core.module';
-
 import { AuthService } from '@data/services/auth.service';
 import { RightMenuModule } from '@modules/right-menu/right-menu.module';
+import { NotificationsModule } from '@modules/notifications/notifications.module';
+import { SharePlantModule } from '@modules/share-plant/share-plant.module';
+import { FiltersModule } from '@modules/filters/filters.module';
+import { PortfolioModule } from '@modules/portfolio/portfolio.module';
 
 import { environment } from '../environments/environment';
 
-import { AppComponent } from './app.component';
 import { SkeletonComponent } from '@layout/components/skeleton/skeleton.component';
 import { NavbarContainerComponent } from '@layout/containers/navbar-container/navbar-container.component';
 import { NavbarComponent } from '@layout/components/navbar/navbar.component';
-import { NotificationsModule } from '@modules/notifications/notifications.module';
-
-import { WINDOW_PROVIDERS } from './window.providers';
+import { AppComponent } from './app.component';
 import { NavComponent } from './layout/components/nav/nav.component';
-import { LayoutModule } from '@angular/cdk/layout';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatTreeModule } from '@angular/material/tree';
 import { ReportContentComponent } from './modules/fixed-plant/components/report-content/report-content.component';
 import { SimpleBackgroundComponent } from './layout/components/simple-background/simple-background.component';
 import { PredictionDialogComponent } from './modules/prediction-report/components/prediction-dialog/prediction-dialog.component';
-import { SharePlantModule } from '@modules/share-plant/share-plant.module';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -72,13 +65,11 @@ export function createTranslateLoader(http: HttpClient) {
     HotkeyModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     LayoutModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatListModule,
     RightMenuModule,
     SharePlantModule,
+    NotificationsModule,
+    FiltersModule,
+    PortfolioModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -86,7 +77,6 @@ export function createTranslateLoader(http: HttpClient) {
         deps: [HttpClient],
       },
     }),
-    NotificationsModule,
   ],
   providers: [
     { provide: SETTINGS, useValue: {} },
@@ -122,4 +112,4 @@ export function createTranslateLoader(http: HttpClient) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

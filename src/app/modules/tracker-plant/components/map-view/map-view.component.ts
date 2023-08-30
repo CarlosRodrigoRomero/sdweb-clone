@@ -15,10 +15,8 @@ import { ResetServices } from '@data/services/reset-services.service';
 import { ViewReportService } from '@data/services/view-report.service';
 
 import { DynamicStatsDirective } from '@modules/stats-plant/directives/dynamic-stats.directive';
-import { DynamicSeguidorListDirective } from '@modules/tracker-plant/directives/dynamic-seguidor-list.directive';
 
 import { PlantaStatsComponent } from '@modules/stats-plant/components/planta-stats.component';
-import { SeguidorListContainer } from '@modules/tracker-plant/containers/seguidor-list-container/seguidor-list-container.component';
 
 @Component({
   selector: 'app-map-view',
@@ -42,13 +40,10 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  @ViewChild('sidenavLeft') sidenavLeft: MatSidenav;
-  @ViewChild('sidenavRight') sidenavRight: MatSidenav;
   @ViewChild('sidenavStats') sidenavStats: MatSidenav;
   @ViewChild('sidenavSeguidorView') sidenavSeguidorView: MatSidenav;
 
   @ViewChild(DynamicStatsDirective) dynamicStats: DynamicStatsDirective;
-  @ViewChild(DynamicSeguidorListDirective) dynamicSegList: DynamicSeguidorListDirective;
 
   constructor(
     private reportControlService: ReportControlService,
@@ -114,13 +109,6 @@ export class MapViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.seguidorViewService.sidenav = this.sidenavSeguidorView;
-  }
-
-  loadSegList() {
-    const component = this.componentFactoryResolver.resolveComponentFactory(SeguidorListContainer);
-
-    this.dynamicSegList.viewContainerRef.clear();
-    this.dynamicSegList.viewContainerRef.createComponent(component);
   }
 
   loadStats() {

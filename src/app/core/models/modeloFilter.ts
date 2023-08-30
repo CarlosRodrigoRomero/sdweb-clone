@@ -24,14 +24,13 @@ export class ModeloFilter implements FilterInterface {
     return null;
   }
 
-  setModuleLabel(module: ModuloInterface): string{
-    // Si el módulo tiene marca, se muestra la marca y la potencia
+  setModuleLabel(module: ModuloInterface): string {
     let label: string;
-    if (module.marca) {
-      label = `${module.marca} (${module.potencia}W)`;
-    } else {
-      label = `${module.potencia}W`;
+    if (module !== null && module !== undefined) {
+      if (module?.marca) {
+        label = `${module.marca}`;
+      }
     }
-    return label
+    return label;
   }
 }

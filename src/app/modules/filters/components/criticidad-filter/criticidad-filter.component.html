@@ -1,5 +1,7 @@
-<div class="filtro">
-  <h5>{{ 'criticidad' | translate | titlecase }}</h5>
+<mat-expansion-panel (click)="$event.stopPropagation()">
+  <mat-expansion-panel-header>
+    <mat-panel-title>{{ 'criticidad' | translate | titlecase }}</mat-panel-title>
+  </mat-expansion-panel-header>
   <mat-button-toggle-group class="criticidad-group" #group="matButtonToggleGroup" multiple="true">
     <mat-button-toggle
       class="criticidad-toggle"
@@ -11,4 +13,4 @@
       >{{ elem.label | translate }}
     </mat-button-toggle>
   </mat-button-toggle-group>
-</div>
+</mat-expansion-panel>

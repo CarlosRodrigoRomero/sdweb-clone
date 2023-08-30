@@ -17,7 +17,7 @@ import { Anomalia } from '@core/models/anomalia';
 })
 export class FilterService {
   private multipleFilters = ['area', 'tipo', 'clase', 'modulo', 'zona', 'criticidad', 'location', 'modelo', 'status'];
-  private noAmosSegsFilters = ['area'];
+  private noAmosSegsFilters = ['area', 'location']; // filtran los seguidores, no las anomalías
   private otherFilters = ['confianza', 'aspectRatio', 'areaM'];
   public filters: FilterInterface[] = [];
   public filters$ = new BehaviorSubject<FilterInterface[]>(this.filters);
@@ -264,7 +264,6 @@ export class FilterService {
       // reseteamos parametros para compartir
       this.shareReportService.resetParams(filter);
     }
-
     this.processFilters();
   }
 

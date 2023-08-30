@@ -321,5 +321,8 @@
   "Reparada": "Réparée",
   "Todo lo hecho hasta ahora está guardado. Si quieres conservar lo que hagas a partir de ahora, no cierres la pantalla antes de que desaparezca este mensaje": "Tout ce qui a été fait jusqu'à présent est enregistré. Si vous souhaitez conserver ce que vous faites à partir de maintenant, ne fermez pas l'écran avant que ce message ne disparaisse",
   "Pendiente de reparar": "Pente de réparation",
-  "Filtros activos": "Filtres actifs"
+  "Dibujar área": "Dessiner une zone",
+  "Filtros activos": "Filtres actifs",
+  "Posición": "Position",
+  "Por fabricante de módulo": "Par fabricant de module"
 }

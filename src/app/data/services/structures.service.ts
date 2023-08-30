@@ -340,26 +340,6 @@ export class StructuresService {
       });
   }
 
-  // getNormModules(thermalLayer?: ThermalLayerInterface): Observable<NormalizedModule[]> {
-  //   if (thermalLayer !== undefined) {
-  //     this.thermalLayer = thermalLayer;
-  //   }
-  //   const query$ = this.afs
-  //     .collection<NormalizedModule>('thermalLayers/' + this.thermalLayer.id + '/modulosNormalizados')
-  //     .snapshotChanges()
-  //     .pipe(
-  //       map((actions) =>
-  //         actions.map((doc) => {
-  //           const data = doc.payload.doc.data();
-  //           const id = doc.payload.doc.id;
-
-  //           return { id, ...data };
-  //         })
-  //       )
-  //     );
-  //   return query$;
-  // }
-
   async getNormModules(thermalLayer?: ThermalLayerInterface): Promise<NormalizedModule[]> {
     if (thermalLayer !== undefined) {
       this.thermalLayer = thermalLayer;
