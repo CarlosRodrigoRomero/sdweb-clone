@@ -3,7 +3,7 @@
     <mat-panel-title>{{ 'Por fabricante de módulo' | translate }}</mat-panel-title>
   </mat-expansion-panel-header>
   <li mat-menu-item *ngFor="let modeloElem of modelosElem; index as i" (click)="stopPropagation($event)">
-    <mat-checkbox
+    <mat-checkbox class="filtro_modelo"
       [checked]="modelosSelected[modeloElem.modelo]"
       [id]="'modelo_' + modeloElem.modelo"
       [name]="modeloElem.label"
