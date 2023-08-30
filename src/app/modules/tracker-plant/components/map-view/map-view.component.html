@@ -1,4 +1,4 @@
-<div class="map-view">
+<div class="map-view-content">
   <mat-card class="panel-seguidores">
     <!-- LISTADO SEGUIDORES -->
     <app-seguidor-list-container></app-seguidor-list-container>
@@ -11,67 +11,29 @@
       <app-seguidor-view></app-seguidor-view>
     </mat-sidenav>
     <mat-sidenav-content>
-      <mat-sidenav-container class="stats-container">
-        <!-- SIDENAV STATS -->
-        <mat-sidenav #sidenavStats [(opened)]="statsOpened" class="stats-sidenav" position="end" [disableClose]="true">
-          <!-- cargamos el modulo Stats -->
-          <ng-template appDynamicStats></ng-template>
-        </mat-sidenav>
+      <div class="map-area">
+        <!-- MAPA -->
+        <app-map-seguidores></app-map-seguidores>
 
-        <mat-sidenav-content>
-          <div class="rel">
-            <!-- MAPA -->
-            <app-map-seguidores></app-map-seguidores>
+        <div>
+          <div class="leyenda">
+            <!-- LEYENDA -->
+            <app-leyenda-container></app-leyenda-container>
+          </div>
 
-            <div>
-              <div class="views-area">
-                <!-- TOGGLE MAPAS -->
-                <app-view-toggle></app-view-toggle>
+          <app-view-control></app-view-control>
 
-                <!-- LEYENDA -->
-                <app-leyenda-container></app-leyenda-container>
-              </div>
+          <!-- CAPAS -->
+          <app-layers-menu></app-layers-menu>
 
-              <app-view-control></app-view-control>
-
-              <div class="map-control">
-                <!-- CONTROL TEMPORAL -->
-                <div class="temporal-control">
-                  <app-slider-temporal *ngIf="numInformes > 1 && showFilters"></app-slider-temporal>
-                </div>
-
-                <!-- CONTROLES VISUALES -->
-                <div class="visual-control">
-                  <app-zones-selector-container *ngIf="thereAreLargestZones"></app-zones-selector-container>
-                </div>
-              </div>
+          <div class="map-control">
+            <!-- CONTROL TEMPORAL -->
+            <div class="temporal-control">
+              <app-slider-temporal *ngIf="numInformes > 1 && showFilters"></app-slider-temporal>
             </div>
           </div>
-
-          <div class="btns-wrapper">
-            <!-- BOTON DESCARGAS -->
-            <app-download-report *ngIf="notSharedReport || completeView"></app-download-report>
-
-            <!-- BOTON SIDENAV STATS -->
-            <button
-              *ngIf="notSharedReport || completeView"
-              mat-raised-button
-              (click)="loadStats(); sidenavStats.toggle()"
-              matTooltip="{{ 'Estadísticas' | translate }}"
-              matTooltipClass="tooltip-style"
-              [disabled]="noAnomsReport"
-            >
-              <mat-icon>query_stats</mat-icon>
-              <mat-icon>keyboard_arrow_left</mat-icon>
-            </button>
-          </div>
-        </mat-sidenav-content>
-      </mat-sidenav-container>
+        </div>
+      </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
-
-  <!-- PROGRESS BAR DESCARGAS -->
-  <app-download-progress-bar class="progress-bar" *ngIf="generatingDownload"></app-download-progress-bar>
-
-  <div class="dark-trasp-background" *ngIf="generatingDownload"></div>
 </div>

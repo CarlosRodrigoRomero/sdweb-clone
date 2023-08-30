@@ -24,7 +24,6 @@ app-layers-menu {
 .map-control {
   position: absolute;
   bottom: 10px;
-  grid-template-columns: 100%;
   left: 50%;
   transform: translate(-50%, 0%);
 }
