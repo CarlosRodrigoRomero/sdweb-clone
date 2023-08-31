@@ -31,6 +31,9 @@ export class ThermalService {
   private _thermalLayersLoaded: boolean = false;
   thermalLayersLoaded$ = new BehaviorSubject<boolean>(this._thermalLayersLoaded);
 
+  private _paletteSelected: string = 'grayscale';
+  paletteSelected$ = new BehaviorSubject<string>(this._paletteSelected);
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(private afs: AngularFirestore) {}
@@ -212,5 +215,14 @@ export class ThermalService {
   set thermalLayersLoaded(value: boolean) {
     this._thermalLayersLoaded = value;
     this.thermalLayersLoaded$.next(value);
+  }
+
+  get paletteSelected() {
+    return this._paletteSelected;
+  }
+
+  set paletteSelected(value: string) {
+    this._paletteSelected = value;
+    this.paletteSelected$.next(value);
   }
 }

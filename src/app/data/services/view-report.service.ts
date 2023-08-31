@@ -15,7 +15,7 @@ export class ViewReportService {
   private _groupByZonesView = false;
   groupByZonesView$ = new BehaviorSubject<boolean>(this._groupByZonesView);
 
-  private _thermalLayerVisible = false;
+  private _thermalLayerVisible = true;
   thermalLayerVisible$ = new BehaviorSubject<boolean>(this._thermalLayerVisible);
 
   constructor() {}
@@ -24,6 +24,7 @@ export class ViewReportService {
     this.reportViewSelected = 'tipo';
     this.sliderTemporal = 100;
     this.groupByZonesView = false;
+    this.thermalLayerVisible = true;
   }
 
   get reportViewSelected() {

@@ -1,8 +1,22 @@
 <mat-expansion-panel>
   <mat-expansion-panel-header>
     <mat-panel-title>
-      <mat-checkbox (change)="setThermalLayerStatus($event)" class="example-margin">Térmica</mat-checkbox>
+      <mat-checkbox [(ngModel)]="initialState" (change)="setThermalLayerStatus($event)" class="example-margin"
+        >Térmica</mat-checkbox
+      >
     </mat-panel-title>
   </mat-expansion-panel-header>
-  <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider>
+
+  <div class="thermal-layer-selector-content">
+    <app-thermal-slider [informeId]="selectedInformeId"></app-thermal-slider>
+
+    <div class="palette-selector">
+      <span class="palette-selector-title">Selecciona paleta de colores</span>
+
+      <mat-radio-group (change)="changePalette()" class="palette-radio-group" [(ngModel)]="paletteSelected">
+        <mat-radio-button [value]="'grayscale'"> Escala de grises </mat-radio-button>
+        <mat-radio-button [value]="'iron'"> Iron </mat-radio-button>
+      </mat-radio-group>
+    </div>
+  </div>
 </mat-expansion-panel>

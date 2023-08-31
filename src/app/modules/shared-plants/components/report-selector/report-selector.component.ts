@@ -32,7 +32,6 @@ export class ReportSelectorComponent implements OnInit, OnDestroy {
       .slice()
       .reverse()
       .forEach((informe) => {
-        console.log(informe);
         this.reports.push({
           id: informe.id,
           date: informe.fecha,

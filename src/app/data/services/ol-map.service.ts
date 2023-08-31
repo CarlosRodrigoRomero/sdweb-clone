@@ -33,6 +33,7 @@ import XYZ_mod from '@shared/modules/ol-maps/xyz_mod.js';
 import ImageTileMod from '@shared/modules/ol-maps/ImageTileMod.js';
 import ImageTileCubiertasMod from '@shared/modules/ol-maps/ImageTileCubiertasMod.js';
 import { OSM } from 'ol/source';
+import { PALETTE } from '@data/constants/palette';
 
 @Injectable({
   providedIn: 'root',
@@ -193,27 +194,22 @@ export class OlMapService {
     });
   }
 
-  createThermalLayer(
-    thermalLayer: ThermalLayerInterface,
-    informe: InformeInterface,
-    index: number,
-    visible = false
-  ): TileLayer<any> {
+  createThermalLayer(thermalLayerDB: ThermalLayerInterface, informe: InformeInterface, index: number): TileLayer<any> {
     // Iniciar mapa térmico
     let url: string;
     if (informe.hasOwnProperty('servidorCapas')) {
       switch (informe.servidorCapas) {
         case 'geoserver': {
-          url = GEO.urlGeoserver + thermalLayer.gisName + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
+          url = GEO.urlGeoserver + thermalLayerDB.gisName + '@WebMercatorQuad@png/{z}/{x}/{y}.png?flipY=true';
           break;
         }
         case 'old': {
-          url = GEO.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
+          url = GEO.urlServidorAntiguo + thermalLayerDB.gisName + '/{z}/{x}/{y}.png';
           break;
         }
       }
     } else {
-      url = GEO.urlServidorAntiguo + thermalLayer.gisName + '/{z}/{x}/{y}.png';
+      url = GEO.urlServidorAntiguo + thermalLayerDB.gisName + '/{z}/{x}/{y}.png';
     }
 
     let tileClass = ImageTileMod;
@@ -221,25 +217,31 @@ export class OlMapService {
       tileClass = ImageTileCubiertasMod;
     }
 
-    const tl = new TileLayer({
+    const thermalLayer = new TileLayer({
       source: new XYZ_mod({
         url,
         crossOrigin: 'anonymous',
         tileClass,
         tileLoadFunction: (imageTile, src) => {
-          imageTile.rangeTempMax = thermalLayer.rangeTempMax;
-          imageTile.rangeTempMin = thermalLayer.rangeTempMin;
+          imageTile.rangeTempMax = thermalLayerDB.rangeTempMax;
+          imageTile.rangeTempMin = thermalLayerDB.rangeTempMin;
           imageTile.thermalService = this.thermalService;
           imageTile.getImage().src = src;
-          imageTile.thermalLayer = thermalLayer;
+          imageTile.thermalLayer = thermalLayerDB;
           imageTile.index = index;
         },
       }),
       preload: Infinity,
-      visible,
+      visible: true,
     });
 
-    return tl;
+    thermalLayer.setProperties({
+      name: 'thermalLayer',
+      layerDB: thermalLayerDB,
+      informeId: informe.id,
+    });
+
+    return thermalLayer;
   }
 
   createThermalLayerClippings(thermalLayer: ThermalLayerInterface, index: number): TileLayer<any> {
@@ -413,6 +415,35 @@ export class OlMapService {
       } else {
         return true;
       }
+    }
+  }
+
+  applyThermalPalette(palette: string) {
+    let paletteData: number[][];
+    if (palette === 'iron') {
+      paletteData = PALETTE.ironPalette;
+    } else {
+      paletteData = PALETTE.grayScalePalette;
+    }
+
+    if (this.map) {
+      this.map
+        .getLayers()
+        .getArray()
+        .filter((layer) => layer.getProperties().name !== undefined && layer.getProperties().name === 'thermalLayer')
+        .forEach((layer) => {
+          const thermalLayerDB: ThermalLayerInterface = layer.getProperties().layerDB;
+
+          ((layer as TileLayer<any>).getSource() as XYZ_mod).setTileLoadFunction((imageTile, src) => {
+            imageTile.rangeTempMax = thermalLayerDB.rangeTempMax;
+            imageTile.rangeTempMin = thermalLayerDB.rangeTempMin;
+            imageTile.palette = paletteData;
+            imageTile.thermalService = this.thermalService;
+            imageTile.getImage().src = src;
+            imageTile.thermalLayer = thermalLayerDB;
+            imageTile.index = 0;
+          });
+        });
     }
   }
 

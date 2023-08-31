@@ -74,7 +74,6 @@ export class MapCommentsComponent implements OnInit, OnDestroy {
           const thermalLayer = this.olMapService.createThermalLayer(thermalLayerDB, this.informe, 0);
 
           thermalLayer.setProperties({
-            informeId: this.informe.id,
             visible: false,
           });
 

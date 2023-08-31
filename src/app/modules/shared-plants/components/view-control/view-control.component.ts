@@ -109,7 +109,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
 
     /* CAPA TÉRMICA */
     this.subscriptions.add(
-      this.viewReportService.thermalLayerVisible$.pipe(skip(1)).subscribe((visible) => {
+      this.viewReportService.thermalLayerVisible$.subscribe((visible) => {
         this.thermalLayerVisible = visible;
 
         this.setLayersVisibility(this.selectedInformeId);

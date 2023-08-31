@@ -115,13 +115,7 @@ export class MapClassificationComponent implements OnInit {
           this.thermalLayerDB = layers[0];
 
           if (this.thermalLayerDB !== undefined) {
-            const thermalLayer = this.olMapService.createThermalLayer(this.thermalLayerDB, this.informe, 0, true);
-
-            thermalLayer.setProperties({
-              informeId: this.informe.id,
-              name: 'thermalLayer',
-              layerDB: this.thermalLayerDB,
-            });
+            const thermalLayer = this.olMapService.createThermalLayer(this.thermalLayerDB, this.informe, 0);
 
             this.olMapService.addThermalLayer(thermalLayer);
           }

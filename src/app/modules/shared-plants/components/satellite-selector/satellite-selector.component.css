@@ -1,3 +1,7 @@
 .satellite-selector-content {
   margin-left: 0.5rem;
 }
+
+:host ::ng-deep .mat-checkbox-layout .mat-checkbox-label {
+  font-size: 15px;
+}

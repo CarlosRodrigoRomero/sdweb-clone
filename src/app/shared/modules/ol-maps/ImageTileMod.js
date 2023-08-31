@@ -23,7 +23,7 @@ class ImageTileMod extends Tile {
      * @type {?string}
      */
     this.crossOrigin_ = 'Anonymous';
-    this.palette = PALETTE.ironPalette;
+    this.palette = PALETTE.grayScalePalette;
 
     /**
      * Image URI

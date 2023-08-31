@@ -1,1 +1,23 @@
+.thermal-layer-selector-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1rem;
+}
 
+.palette-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.palette-selector-title {
+    
+}
+
+.palette-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0 1rem 1rem;
+}

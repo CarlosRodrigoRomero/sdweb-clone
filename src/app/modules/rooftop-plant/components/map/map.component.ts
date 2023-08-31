@@ -100,10 +100,6 @@ export class MapComponent implements OnInit, OnDestroy {
           if (thermalLayerDB !== undefined) {
             const thermalLayer = this.olMapService.createThermalLayer(thermalLayerDB, informe, index);
 
-            thermalLayer.setProperties({
-              informeId: informe.id,
-            });
-
             // solo lo aplicamos a la planta DEMO
             if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
               thermalLayer.setExtent(this.extent1);

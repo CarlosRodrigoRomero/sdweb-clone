@@ -20,6 +20,7 @@ import { ShareReportService } from '@data/services/share-report.service';
 import { AnomaliasControlService } from '@data/services/anomalias-control.service';
 import { ReportControlService } from '@data/services/report-control.service';
 import { DirtyAnomsService } from '@data/services/dirty-anoms.service';
+import { ThermalService } from '@data/services/thermal.service';
 
 import { PlantaInterface } from '@core/models/planta';
 import { Anomalia } from '@core/models/anomalia';
@@ -70,7 +71,8 @@ export class MapComponent implements OnInit, OnDestroy {
     private shareReportService: ShareReportService,
     private anomaliasControlService: AnomaliasControlService,
     private reportControlService: ReportControlService,
-    private dirtyAnomsService: DirtyAnomsService
+    private dirtyAnomsService: DirtyAnomsService,
+    private thermalService: ThermalService
   ) {}
 
   ngOnInit(): void {
@@ -96,10 +98,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
           if (thermalLayerDB !== undefined) {
             const thermalLayer = this.olMapService.createThermalLayer(thermalLayerDB, informe, index);
-
-            thermalLayer.setProperties({
-              informeId: informe.id,
-            });
 
             // solo lo aplicamos a la planta DEMO
             if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
@@ -149,6 +147,13 @@ export class MapComponent implements OnInit, OnDestroy {
     /* SATELITE */
     this.olMapService.addSatelliteLayer();
     this.subscriptions.add(this.olMapService.satelliteLayer$.subscribe((layer) => (this.satelliteLayer = layer)));
+
+    /* PALETA TÉRMICA */
+    this.subscriptions.add(
+      this.thermalService.paletteSelected$.subscribe((palette) => {
+        this.olMapService.applyThermalPalette(palette);
+      })
+    );
   }
 
   initMap() {

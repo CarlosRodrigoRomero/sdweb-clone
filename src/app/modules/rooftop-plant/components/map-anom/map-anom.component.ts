@@ -30,10 +30,9 @@ import { I } from '@angular/cdk/keycodes';
 @Component({
   selector: 'app-map-anom',
   templateUrl: './map-anom.component.html',
-  styleUrls: ['./map-anom.component.css']
+  styleUrls: ['./map-anom.component.css'],
 })
 export class MapAnomComponent implements OnInit {
-
   @Input() anomalia: Anomalia;
 
   public planta: PlantaInterface;
@@ -97,10 +96,6 @@ export class MapAnomComponent implements OnInit {
 
           if (thermalLayerDB !== undefined) {
             const thermalLayer = this.olMapService.createThermalLayer(thermalLayerDB, informe, index);
-
-            thermalLayer.setProperties({
-              informeId: informe.id,
-            });
 
             // solo lo aplicamos a la planta DEMO
             if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
@@ -269,5 +264,4 @@ export class MapAnomComponent implements OnInit {
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
   }
-
 }
