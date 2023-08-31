@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Subscription, combineLatest } from 'rxjs';
@@ -12,6 +12,7 @@ import { OlMapService } from '@data/services/ol-map.service';
 import { ZonesService } from '@data/services/zones.service';
 import { InformeService } from '@data/services/informe.service';
 import { ReportRecalcService } from '@data/services/report-recalc.service';
+import { ApiCallsService } from '@data/services/api-calls.service';
 
 import { InformeInterface } from '@core/models/informe';
 import { Anomalia } from '@core/models/anomalia';
@@ -39,7 +40,8 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
     private olMapService: OlMapService,
     private zonesService: ZonesService,
     private informeService: InformeService,
-    private reportRecalcService: ReportRecalcService
+    private reportRecalcService: ReportRecalcService,
+    private apiCallsService: ApiCallsService
   ) {}
 
   ngOnInit(): void {
@@ -154,6 +156,10 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
           });
         });
       });
+  }
+
+  addDateToAnoms() {
+    this.apiCallsService.addDateToAnoms(this.selectedInforme.id);
   }
 
   corregirHoraAnomalias() {

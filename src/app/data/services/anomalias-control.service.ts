@@ -31,7 +31,6 @@ import { Colors } from '@core/classes/colors';
 
 import { COLOR } from '@data/constants/color';
 
-
 @Injectable({
   providedIn: 'root',
 })
@@ -200,46 +199,46 @@ export class AnomaliasControlService {
       source.clear();
       anomaliasInforme.forEach((anom) => {
         if (anom.featureType === 'Polygon') {
-        var feature = new Feature({
-          geometry: new Polygon([anom.featureCoords]),
-          properties: {
-            view: l.getProperties().view,
-            anomaliaId: anom.id,
-            tipo: anom.tipo,
-            informeId: anom.informeId,
-            perdidas: anom.perdidas,
-            gradienteNormalizado: anom.gradienteNormalizado,
-            type: 'anomalia',
-            featureType: 'Polygon',
-          },
-        });
-        source.addFeature(feature);
-      } else if (anom.featureType === 'Point') {
-        let delta = 4.5;
-        let coords = [
-          [anom.featureCoords[0][0] - delta, anom.featureCoords[0][1] - delta],
-          [anom.featureCoords[0][0] + delta, anom.featureCoords[0][1] - delta],
-          [anom.featureCoords[0][0] + delta, anom.featureCoords[0][1] + delta],
-          [anom.featureCoords[0][0] - delta, anom.featureCoords[0][1] + delta],
-        ]
-        var featurePoint = new Feature({
-          geometry: new Point(anom.featureCoords[0]),
-          properties: {
-            view: l.getProperties().view,
-            anomaliaId: anom.id,
-            tipo: anom.tipo,
-            informeId: anom.informeId,
-            perdidas: anom.perdidas,
-            gradienteNormalizado: anom.gradienteNormalizado,
-            type: 'anomalia',
-            featureType: 'Point',
-          },
-        });
-        featurePoint.setStyle(this.getStyleAnomalias(false));
-        source.addFeature(featurePoint);
-      }
+          var feature = new Feature({
+            geometry: new Polygon([anom.featureCoords]),
+            properties: {
+              view: l.getProperties().view,
+              anomaliaId: anom.id,
+              tipo: anom.tipo,
+              informeId: anom.informeId,
+              perdidas: anom.perdidas,
+              gradienteNormalizado: anom.gradienteNormalizado,
+              type: 'anomalia',
+              featureType: 'Polygon',
+            },
+          });
+          source.addFeature(feature);
+        } else if (anom.featureType === 'Point') {
+          let delta = 4.5;
+          let coords = [
+            [anom.featureCoords[0][0] - delta, anom.featureCoords[0][1] - delta],
+            [anom.featureCoords[0][0] + delta, anom.featureCoords[0][1] - delta],
+            [anom.featureCoords[0][0] + delta, anom.featureCoords[0][1] + delta],
+            [anom.featureCoords[0][0] - delta, anom.featureCoords[0][1] + delta],
+          ];
+          var featurePoint = new Feature({
+            geometry: new Point(anom.featureCoords[0]),
+            properties: {
+              view: l.getProperties().view,
+              anomaliaId: anom.id,
+              tipo: anom.tipo,
+              informeId: anom.informeId,
+              perdidas: anom.perdidas,
+              gradienteNormalizado: anom.gradienteNormalizado,
+              type: 'anomalia',
+              featureType: 'Point',
+            },
+          });
+          featurePoint.setStyle(this.getStyleAnomalias(false));
+          source.addFeature(featurePoint);
+        }
         // source.addFeature(feature);
-      });     
+      });
     });
     // eliminamos la interacciones anteriores si las huviese
     this.removeSelectAnomaliaInteractions();
@@ -304,7 +303,7 @@ export class AnomaliasControlService {
 
             if (feature !== undefined) {
               // cuando pasamos de una anomalia a otra directamente sin pasar por vacio
-              if (this.anomaliaSelect !== undefined){ 
+              if (this.anomaliaSelect !== undefined) {
                 if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
                   if (this.prevFeatureHover.getProperties().properties.anomaliaId !== this.anomaliaSelect.id) {
                     this.prevFeatureHover.setStyle(this.getStyleAnomalias(false, this.prevFeatureHover.featureType));
@@ -312,10 +311,9 @@ export class AnomaliasControlService {
                 }
               } else {
                 if (this.prevFeatureHover !== undefined && this.prevFeatureHover !== feature) {
-                  this.prevFeatureHover.setStyle(this.getStyleAnomalias(false, this.prevFeatureHover.featureType));  
+                  this.prevFeatureHover.setStyle(this.getStyleAnomalias(false, this.prevFeatureHover.featureType));
                 }
               }
-              
 
               const anomaliaId = feature.getProperties().properties.anomaliaId;
               const anomalia = this.listaAnomalias.filter((anom) => anom.id === anomaliaId)[0];
@@ -323,7 +321,6 @@ export class AnomaliasControlService {
               const coords = anomalia.featureCoords[0];
               this.setPopupPosition(coords);
 
-               
               feature.setStyle(this.getStyleAnomalias(true, feature.getProperties().properties.featureType));
 
               this.anomaliaHover = anomalia;
@@ -337,7 +334,7 @@ export class AnomaliasControlService {
               }
             }
           } else {
-            if (this.anomaliaHover !== undefined  && this.anomaliaSelect !== undefined) {
+            if (this.anomaliaHover !== undefined && this.anomaliaSelect !== undefined) {
               if (this.anomaliaHover.id !== this.anomaliaSelect.id) {
                 this.setExternalStyle(this.anomaliaHover.id, false, this.anomaliaHover.featureType);
               }
@@ -357,17 +354,16 @@ export class AnomaliasControlService {
   }
 
   setPopupPosition(coords: Coordinate) {
-    let zoom  = this.map.getView().getZoom();
+    let zoom = this.map.getView().getZoom();
     let delta = Math.abs(zoom - 26) / 2;
 
     const popupCoords = [coords[0] + delta, coords[1] + delta] as Coordinate;
-    if (document.getElementById('popup-anomalia-info')){
+    if (document.getElementById('popup-anomalia-info')) {
       this.map.getOverlayById('popup-anomalia-info').setPosition(popupCoords);
-    } else if (document.getElementById('popup-anomalia-rooftop')){
+    } else if (document.getElementById('popup-anomalia-rooftop')) {
       this.map.getOverlayById('popup-anomalia-rooftop').setPosition(popupCoords);
-    }  
+    }
   }
-
 
   private addSelectInteraction() {
     const select = new Select({
@@ -518,7 +514,7 @@ export class AnomaliasControlService {
       if (feature !== undefined && feature.getProperties().hasOwnProperty('properties')) {
         featureType = feature.getProperties().properties.featureType;
         let color = colorsView[this.toggleViewSelected];
-        switch (featureType){
+        switch (featureType) {
           case 'Point':
             return this.getStylePoint(focus, color);
             break;
@@ -540,7 +536,7 @@ export class AnomaliasControlService {
       //   width: 4,
       // }),
       image: new Icon({
-        src: "assets/icons/circulo_24x24.png",
+        src: 'assets/icons/circulo_24x24.png',
         crossOrigin: 'anonymous',
         anchor: [0.5, 0.5],
         scale: 0.8,
@@ -592,19 +588,21 @@ export class AnomaliasControlService {
   }
 
   setExternalStyle(anomaliaId: string, focused: boolean, featureType: string) {
-    const layersInforme = this.anomaliaLayers.filter(
-      (layer) => layer.getProperties().informeId === this.selectedInformeId
-    );
+    if (this.anomaliaLayers) {
+      const layersInforme = this.anomaliaLayers.filter(
+        (layer) => layer.getProperties().informeId === this.selectedInformeId
+      );
 
-    const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
+      const layersView = layersInforme.filter((layer) => layer.getProperties().view === this.toggleViewSelected);
 
-    const features: Feature<any>[] = [];
-    layersView.forEach((layer) => features.push(...(layer.getSource() as VectorSource<any>).getFeatures()));
-    const feature = features.find((f) => f.getProperties().properties.anomaliaId === anomaliaId);
-    if (focused) {
-      feature.setStyle(this.getStyleAnomalias(true, featureType));
-    } else {
-      feature.setStyle(this.getStyleAnomalias(false, featureType));
+      const features: Feature<any>[] = [];
+      layersView.forEach((layer) => features.push(...(layer.getSource() as VectorSource<any>).getFeatures()));
+      const feature = features.find((f) => f.getProperties().properties.anomaliaId === anomaliaId);
+      if (focused) {
+        feature.setStyle(this.getStyleAnomalias(true, featureType));
+      } else {
+        feature.setStyle(this.getStyleAnomalias(false, featureType));
+      }
     }
   }
 
