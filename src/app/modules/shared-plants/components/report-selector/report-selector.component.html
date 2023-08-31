@@ -1,8 +1,10 @@
-<mat-form-field>
-  <mat-label>Informe</mat-label>
-  <mat-select [(value)]="reportSelected" (selectionChange)="onReportChange($event)">
-    <mat-option [value]="report" *ngFor="let report of reports">{{
-      report.date * 1000 | date : 'dd/MM/yyyy'
-    }}</mat-option>
-  </mat-select>
-</mat-form-field>
+<div class="report-selector">
+  <span class="report-selector-title">Selecciona informe</span>
+  <button mat-raised-button class="report-selector-content">
+    <mat-select [(value)]="reportSelected" (selectionChange)="onReportChange($event)">
+      <mat-option [value]="report" *ngFor="let report of reports">
+        {{ report.date * 1000 | date : 'dd/MM/yyyy' }}
+      </mat-option>
+    </mat-select>
+  </button>
+</div>
