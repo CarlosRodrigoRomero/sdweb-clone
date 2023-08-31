@@ -1,0 +1,28 @@
+.plant-info {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+
+.titulo {
+  font-size: 18px;
+  margin-right: 0.6rem;
+}
+
+.subtitulo {
+  font-size: 18px;
+  margin-right: 1em;
+  font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .titulo {
+    font-size: 18px;
+  }
+
+  .subtitulo {
+    font-size: 18px;
+    display: none;
+  }
+}

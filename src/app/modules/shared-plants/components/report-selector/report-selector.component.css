@@ -16,3 +16,8 @@
 .mat-select-trigger {
   gap: 1rem;
 }
+
+.one-report {
+  font-size: 18px;
+  font-weight: 300;
+}

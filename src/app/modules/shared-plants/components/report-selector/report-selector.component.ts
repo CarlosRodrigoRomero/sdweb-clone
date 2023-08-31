@@ -17,16 +17,22 @@ interface ReportData {
 export class ReportSelectorComponent implements OnInit, OnDestroy {
   reportSelected: ReportData;
   reports: ReportData[] = [];
+  variosInformes = false;
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
+    if (this.reportControlService.informes.length > 1) {
+      this.variosInformes = true;
+    }
+
     this.reportControlService.informes
       .slice()
       .reverse()
       .forEach((informe) => {
+        console.log(informe);
         this.reports.push({
           id: informe.id,
           date: informe.fecha,

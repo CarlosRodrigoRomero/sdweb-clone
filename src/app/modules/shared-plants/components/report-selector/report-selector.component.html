@@ -1,5 +1,5 @@
-<div class="report-selector">
-  <span class="report-selector-title">Selecciona informe</span>
+<div *ngIf="variosInformes" class="report-selector">
+  <span class="report-selector-title">Seleccionar informe</span>
   <button mat-raised-button class="report-selector-content">
     <mat-select [(value)]="reportSelected" (selectionChange)="onReportChange($event)">
       <mat-option [value]="report" *ngFor="let report of reports">
@@ -8,3 +8,5 @@
     </mat-select>
   </button>
 </div>
+
+<span class="one-report" *ngIf="!variosInformes">{{ reportSelected.date * 1000 | date : 'dd/MM/yyyy' }}</span>

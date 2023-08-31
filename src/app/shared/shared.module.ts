@@ -38,6 +38,7 @@ import { SelectLanguageComponent } from './components/select-language/select-lan
 import { PortfolioRecalcComponent } from './components/portfolio-recalc/portfolio-recalc.component';
 import { ReportPrincipalDataComponent } from './components/report-principal-data/report-principal-data.component';
 import { ThermalLayerSelectorComponent } from './components/thermal-layer-selector/thermal-layer-selector.component';
+import { PlantInfoComponent } from './components/plant-info/plant-info.component';
 
 const components = [
   SpinnerComponent,
@@ -60,6 +61,7 @@ const components = [
   ReportPrincipalDataComponent,
   ReportPrincipalDataContainerComponent,
   ThermalLayerSelectorComponent,
+  PlantInfoComponent,
 ];
 
 const pipes = [GetNombreSeguidorPipe, GetNumeroModulosPipe, ValidateElementoPlantaPipe];
