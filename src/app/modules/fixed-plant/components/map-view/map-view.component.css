@@ -21,20 +21,6 @@ app-layers-menu {
   left: 10px;
 }
 
-.map-control {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translate(-50%, 0%);
-}
-
-@media (max-width: 900px) {
-  .map-control {
-    display: none;
-    gap: 0.5rem;
-  }
-}
-
 .leyenda {
   position: absolute;
   display: flex;
