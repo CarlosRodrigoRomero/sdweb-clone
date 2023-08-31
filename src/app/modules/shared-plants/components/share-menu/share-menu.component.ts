@@ -114,13 +114,13 @@ export class ShareMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let sharedType: string;
     if (this.versionTecnicos) {
-      if (this.reportControlService.plantaFija) {
+      if (this.reportControlService.plantaNoS2E) {
         sharedType = '/comments-fixed-shared/';
       } else {
         sharedType = '/comments-tracker-shared/';
       }
     } else {
-      if (this.reportControlService.plantaFija) {
+      if (this.reportControlService.plantaNoS2E) {
         sharedType = '/fixed-filterable-shared/';
         if (this.onlyFiltered) {
           sharedType = '/fixed-shared/';

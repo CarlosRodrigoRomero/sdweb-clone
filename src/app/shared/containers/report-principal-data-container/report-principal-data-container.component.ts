@@ -65,7 +65,7 @@ export class ReportPrincipalDataContainerComponent implements OnInit, OnDestroy 
               .subscribe((elems) => {
                 const elemsInforme = elems.filter((elem) => elem.informeId === this.informeSelected.id);
 
-                if (this.reportControlService.plantaFija) {
+                if (this.reportControlService.plantaNoS2E) {
                   this.numAnomsFiltered = elemsInforme.length;
                   this.numFixableAnomsFiltered = (elemsInforme as Anomalia[]).filter((anom) =>
                     GLOBAL.fixableTypes.includes(anom.tipo)

@@ -97,7 +97,7 @@ export class PlantSummaryComponent implements OnInit, OnDestroy {
           .subscribe((elems) => {
             const elemsInforme = elems.filter((elem) => elem.informeId === this.selectedInformeId);
 
-            if (this.reportControlService.plantaFija) {
+            if (this.reportControlService.plantaNoS2E) {
               this.numAnomsFiltered = elemsInforme.length;
 
               //Obtener Mae de anomalías filtradas para fijas

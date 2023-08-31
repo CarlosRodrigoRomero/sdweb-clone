@@ -97,7 +97,7 @@ export class StatusFilterComponent implements OnInit {
         .subscribe((elems) => {
           const elemsInforme = elems.filter((elem) => elem.informeId === this.selectedInformeId);
           this.statusElems.forEach((statusElem) => {
-            if (this.reportControlService.plantaFija) {
+            if (this.reportControlService.plantaNoS2E) {
               statusElem.nAnomalias = elemsInforme.filter(
                 (anom) => anom.status == GLOBAL.tipos_status[GLOBAL.labels_status.indexOf(statusElem.label)]
               ).length;

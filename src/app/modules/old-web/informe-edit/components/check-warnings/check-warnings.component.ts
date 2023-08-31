@@ -70,7 +70,7 @@ export class CheckWarningsComponent implements OnInit {
 
         this.anomalias = this.reportControlService.allAnomalias.filter((anom) => anom.informeId === this.informeId);
 
-        if (this.reportControlService.plantaFija) {
+        if (this.reportControlService.plantaNoS2E) {
           this.checked = this.warningService.checkWarnings(
             this.informe,
             this.anomalias,

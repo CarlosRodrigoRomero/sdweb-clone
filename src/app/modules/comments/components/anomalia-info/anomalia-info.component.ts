@@ -47,7 +47,7 @@ export class AnomaliaInfoComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isMobile = true;
     }
 
-    this.plantaFija = this.reportControlService.plantaFija;
+    this.plantaFija = this.reportControlService.plantaNoS2E;
 
     this.subscriptions.add(
       this.comentariosControlService.anomaliaSelected$.subscribe((anom) => {

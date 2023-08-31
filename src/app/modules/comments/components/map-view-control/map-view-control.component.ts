@@ -27,11 +27,11 @@ export class MapViewControlComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // cambiamos el zoom para fijas
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       this.viewCommentsService.zoomShowAnoms = 20;
     }
 
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       this.subscriptions.add(
         this.olMapService
           .getThermalLayers()

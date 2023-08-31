@@ -54,7 +54,7 @@ export class AnomaliasListComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
-    this.plantaFija = this.reportControlService.plantaFija;
+    this.plantaFija = this.reportControlService.plantaNoS2E;
 
     if (this.reportControlService.planta.hasOwnProperty('nombreGlobalCoords')) {
       this.headerLocLabel = '(' + this.reportControlService.planta.nombreGlobalCoords.join('.') + ')';
@@ -77,7 +77,7 @@ export class AnomaliasListComponent implements OnInit, OnChanges {
     this.comentariosControlService.anomaliaSelected = row.anomalia;
 
     // si es una planta de seguidores seleccionamos el seguidor
-    if (!this.reportControlService.plantaFija) {
+    if (!this.reportControlService.plantaNoS2E) {
       const seguidorAnom = this.filterService.filteredElements.find((seg) => {
         const seguidor = seg as Seguidor;
 
@@ -108,7 +108,7 @@ export class AnomaliasListComponent implements OnInit, OnChanges {
 
     let coords;
     let zoom;
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       coords = row.anomalia.featureCoords[0];
       zoom = this.viewCommentsService.zoomChangeAnomsView;
     } else {

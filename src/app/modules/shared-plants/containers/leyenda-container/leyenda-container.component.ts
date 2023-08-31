@@ -58,7 +58,7 @@ export class LeyendaContainerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.zoomChangeView = this.zonesControlService.zoomChangeView;
-    this.plantaFija = this.reportControlService.plantaFija;
+    this.plantaFija = this.reportControlService.plantaNoS2E;
 
     this.subscriptions.add(this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view)));
 

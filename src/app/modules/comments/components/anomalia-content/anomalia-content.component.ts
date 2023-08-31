@@ -19,11 +19,11 @@ export class AnomaliaContentComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.plantaFija = this.reportControlService.plantaFija;
+    this.plantaFija = this.reportControlService.plantaNoS2E;
   }
 
   ngAfterViewInit(): void {
-    if (!this.reportControlService.plantaFija) {
+    if (!this.reportControlService.plantaNoS2E) {
       const htmlView = document.getElementById('anomalia-content');
       htmlView.style.marginTop = this.seguidorViewCommentsService.imagesHeight - 60 + 'px';
     }

@@ -49,7 +49,7 @@ export class TotalLossContainerComponent implements OnInit, OnDestroy {
         this.filterService.filteredElements$.subscribe((elems) => {
           const elemsInforme = elems.filter((elem) => elem.informeId === this.selectedInformeId);
 
-          if (this.reportControlService.plantaFija) {
+          if (this.reportControlService.plantaNoS2E) {
             this.numTotalAnoms = elemsInforme.length;
             this.numFixableAnoms = elemsInforme.filter((anomalia) => GLOBAL.fixableTypes.includes(anomalia.tipo)).length;
 

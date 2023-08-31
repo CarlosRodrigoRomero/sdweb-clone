@@ -50,7 +50,7 @@ export class RecommendedActionsContainerComponent implements OnInit, OnDestroy {
         .subscribe((elems) => {
           const elemsInforme = elems.filter((elem) => elem.informeId === this.reportControlService.selectedInformeId);
 
-          if (this.reportControlService.plantaFija) {
+          if (this.reportControlService.plantaNoS2E) {
             this.anomaliasInforme = elemsInforme as Anomalia[];
           } else {
             var anomalias = [];

@@ -36,7 +36,7 @@ export class ViewSelectorComponent implements OnInit {
   constructor(private viewReportService: ViewReportService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       this.views = [{ view: 'tipo', label: 'Por tipo de anomalía' }, ...this.views];
     }
 

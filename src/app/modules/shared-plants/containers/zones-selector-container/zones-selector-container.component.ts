@@ -60,7 +60,7 @@ export class ZonesSelectorContainerComponent implements OnInit, OnDestroy {
     if (this.reportControlService.planta.hasOwnProperty('nombreGlobalCoords')) {
       this.nombreGlobalCoords = this.planta.nombreGlobalCoords;
       // quitamos las más pequeñas en S2E porque ya se muestran por defecto
-      if (!this.reportControlService.plantaFija) {
+      if (!this.reportControlService.plantaNoS2E) {
         this.nombreGlobalCoords = this.planta.nombreGlobalCoords.filter(
           (_, index, nombres) => index < nombres.length - 1
         );

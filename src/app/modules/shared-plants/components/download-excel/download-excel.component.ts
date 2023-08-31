@@ -114,7 +114,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       // ordenamos la lista de anomalias por su indice
       this.anomaliasInforme = this.anomaliasInforme.sort((a, b) => a.numAnom - b.numAnom);
 
-      if (!this.reportControlService.plantaFija) {
+      if (!this.reportControlService.plantaNoS2E) {
         this.columnasLink = [11];
       }
 
@@ -174,7 +174,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
   private getColumnas() {
     this.columnas[0].push(this.translation.t('# Anomalía'));
 
-    if (!this.reportControlService.plantaFija) {
+    if (!this.reportControlService.plantaNoS2E) {
       this.columnas[1].push(this.translation.t('Temperatura referencia') + ' (ºC)');
     }
 
@@ -184,7 +184,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
     this.columnas[1].push('CoA');
     this.columnas[1].push(this.translation.t('Criticidad'));
 
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       this.columnas[2].push(
         this.translation.t('Localización') +
           ' (' +
@@ -239,7 +239,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     row.numAnom = anomalia.numAnom;
 
-    if (!this.reportControlService.plantaFija) {
+    if (!this.reportControlService.plantaNoS2E) {
       row.temperaturaRef = Number(this.decimalPipe.transform(anomalia.temperaturaRef, '1.2-2'));
     }
 
@@ -253,7 +253,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
 
     row.criticidad = this.anomaliaInfoService.getCriticidadLabel(anomalia, this.anomaliaService.criterioCriticidad);
 
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       row.localizacion = this.anomaliaInfoService.getLocalizacionReducLabel(anomalia, this.planta);
     } else {
       row.localizacion = anomalia.nombreSeguidor;
@@ -266,7 +266,7 @@ export class DownloadExcelComponent implements OnInit, OnDestroy {
       row.localX = this.anomaliaInfoService.getColumnaAnom(anomalia, this.planta);
     }
 
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       row.urlMaps = this.anomaliaInfoService.getGoogleMapsUrl(this.olMapService.getCentroid(anomalia.featureCoords));
     } else {
       const seguidor = (this.allElems as Seguidor[]).find((seg) => seg.nombre === anomalia.nombreSeguidor);

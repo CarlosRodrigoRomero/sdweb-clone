@@ -100,7 +100,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
       getInformes$ = this.informeService.getInformesDePlanta(this.reportControlService.plantaId);
     }
 
-    if (this.reportControlService.plantaFija || this.selectedInforme.fecha > GLOBAL.dateS2eAnomalias) {
+    if (this.reportControlService.plantaNoS2E || this.selectedInforme.fecha > GLOBAL.dateS2eAnomalias) {
       this.subscriptions.add(
         combineLatest([
           getInformes$,
@@ -306,7 +306,7 @@ export class WarningsMenuComponent implements OnInit, OnDestroy {
 
     anomsSinModulo.forEach((anom) => {
       let modulo: ModuloInterface;
-      if (this.reportControlService.plantaFija) {
+      if (this.reportControlService.plantaNoS2E) {
         modulo = this.anomaliaService.getModule(this.olMapService.getCentroid(anom.featureCoords), this.locAreas);
 
         if (modulo !== null) {

@@ -48,7 +48,7 @@ export class SerialNumberInputComponent implements OnInit {
     event.preventDefault();
     if (this.form.valid) {
       if (this.form.get('numeroSerie').value !== null) {
-        if (this.reportControlService.plantaFija) {
+        if (this.reportControlService.plantaNoS2E) {
           this.updateAnomalia(this.form.get('numeroSerie').value, 'numeroSerie');
         } else {
           this.updatePc(this.form.get('numeroSerie').value, 'numeroSerie');

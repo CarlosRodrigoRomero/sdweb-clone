@@ -85,7 +85,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.plantaFija = this.reportControlService.plantaFija;
+    this.plantaFija = this.reportControlService.plantaNoS2E;
 
     // si hay más de una fila añadimos este apartado
     if (this.reportControlService.planta.filas > 1) {
@@ -112,7 +112,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
         if (!informe.hasOwnProperty('servidorCapas') || informe.servidorCapas === 'old') {
           this.noOrtofotos = true;
           this.anexoAnomalias = undefined;
-        } else if (this.reportControlService.plantaFija) {
+        } else if (this.reportControlService.plantaNoS2E) {
           // para Barbastro Sep22 no permitimos los mapas porque fallan
           if (informe.id === 'q915Koqc7kzUQ0GvwwWs') {
             this.noOrtofotos = true;
@@ -137,7 +137,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
           };
         }
 
-        if (this.reportControlService.plantaFija) {
+        if (this.reportControlService.plantaNoS2E) {
           if (this.elemOrtofotos === undefined) {
             this.elemOrtofotos = {
               id: 'ortofotos',
@@ -173,7 +173,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
               (elem) => elem.informeId === this.selectedInformeId
             ).length;
 
-            if (!this.reportControlService.plantaFija) {
+            if (!this.reportControlService.plantaNoS2E) {
               this.elemAnexoSeguidores = {
                 id: 'seguidores',
                 label: 'Imágenes seguidores',
@@ -189,7 +189,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
               (elem) => elem.informeId === this.selectedInformeId
             ).length;
 
-            if (!this.reportControlService.plantaFija) {
+            if (!this.reportControlService.plantaNoS2E) {
               this.elemAnexoSeguidores = {
                 id: 'seguidores',
                 label: 'Imágenes seguidores',
@@ -245,7 +245,7 @@ export class PdfDialogComponent implements OnInit, OnDestroy {
       allSecciones.push(...this.elemOrtofotos.elems);
     }
 
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       if (this.anexoAnomalias !== undefined) {
         allSecciones.push(this.anexoAnomalias);
       }

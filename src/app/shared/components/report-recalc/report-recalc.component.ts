@@ -50,7 +50,7 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
         this.selectedInforme = this.reportControlService.informes.find((informe) => informe.id === informeId);
 
         // si es una planta de S2E antigua
-        if (!this.reportControlService.plantaFija && this.selectedInforme?.fecha <= GLOBAL.dateS2eAnomalias) {
+        if (!this.reportControlService.plantaNoS2E && this.selectedInforme?.fecha <= GLOBAL.dateS2eAnomalias) {
           this.informeS2EAntiguo = true;
         }
       })
@@ -72,7 +72,7 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
         const object = data.find((item) => item.id === anom.id);
 
         if (object) {
-          if (this.reportControlService.plantaFija) {
+          if (this.reportControlService.plantaNoS2E) {
             // this.anomaliaService.updateAnomaliaField(anom.id, 'tipoNextYear', anom.tipo);
           } else {
             // this.pcService.updatePcField(anom.id, 'tipoNextYear', object.tipo2);
@@ -97,7 +97,7 @@ export class ReportRecalcComponent implements OnInit, OnDestroy {
             const anomCentroid = this.olMapService.getCentroid((anom as Anomalia).featureCoords);
             const newGlobalCoords = this.plantaService.getGlobalCoordsFromLocationAreaOl(anomCentroid, zonas);
 
-            if (this.reportControlService.plantaFija || this.selectedInforme.fecha > GLOBAL.dateS2eAnomalias) {
+            if (this.reportControlService.plantaNoS2E || this.selectedInforme.fecha > GLOBAL.dateS2eAnomalias) {
               if (anom.globalCoords.toString() !== newGlobalCoords.toString()) {
                 this.anomaliaService.updateAnomaliaField(anom.id, 'globalCoords', newGlobalCoords);
               }

@@ -53,7 +53,7 @@ export class ZonesControlService {
     return new Promise((initService) => {
       if (this.reportControlService.planta.hasOwnProperty('zoomCambioVista')) {
         this.zoomChangeView = this.reportControlService.planta.zoomCambioVista;
-      } else if (this.reportControlService.plantaFija) {
+      } else if (this.reportControlService.plantaNoS2E) {
         this.zoomChangeView = 20;
       }
 
@@ -167,7 +167,7 @@ export class ZonesControlService {
 
         // filtramos solo las cels calientes para la vista de cels calientes
         if (l.getProperties().view === 'cc') {
-          if (this.reportControlService.plantaFija) {
+          if (this.reportControlService.plantaNoS2E) {
             elemsFilteredZona = elemsFilteredZona.filter((elem) => elem.tipo == 8 || elem.tipo == 9);
           }
         }
@@ -217,7 +217,7 @@ export class ZonesControlService {
       case 'mae':
         let mae = 0;
         // para anomalías enviamos el numero de zonas para calcular el MAE
-        if (this.reportControlService.plantaFija) {
+        if (this.reportControlService.plantaNoS2E) {
           mae = this.getMaeZona(allElemsZona, informeId, zona, zonas);
         } else {
           mae = this.getMaeZona(allElemsZona, informeId);
@@ -226,7 +226,7 @@ export class ZonesControlService {
       case 'cc':
         let celsCalientes = 0;
         // para anomalías enviamos el numero de zonas para calcular el CC
-        if (this.reportControlService.plantaFija) {
+        if (this.reportControlService.plantaNoS2E) {
           celsCalientes = this.getCCZona(allElemsZona, informeId, zona, zonas);
         } else {
           celsCalientes = this.getCCZona(allElemsZona, informeId);
@@ -306,7 +306,7 @@ export class ZonesControlService {
 
   private getGradNormMaxZona(elems: FilterableElement[]): number {
     let gradNormMax = 0;
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       const anomaliasZona = elems as Anomalia[];
       if (anomaliasZona.length > 0) {
         const gradientes = anomaliasZona.map((anom) => anom.gradienteNormalizado);

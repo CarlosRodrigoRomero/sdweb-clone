@@ -46,7 +46,7 @@ export class ComentariosControlService {
   initService(): Promise<void> {
     return new Promise((initService) => {
       this.anomalias = [];
-      if (this.reportControlService.plantaFija) {
+      if (this.reportControlService.plantaNoS2E) {
         this.anomalias = this.filterService.filteredElements as Anomalia[];
       } else {
         this.seguidores = this.filterService.filteredElements.filter(
@@ -62,7 +62,7 @@ export class ComentariosControlService {
         this.comentariosService
           .getComentariosInforme(this.reportControlService.selectedInformeId)
           .subscribe((comentarios) => {
-            if (this.reportControlService.plantaFija) {
+            if (this.reportControlService.plantaNoS2E) {
               const anomalias = this.anomalias;
               anomalias.forEach((anom) => {
                 const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);

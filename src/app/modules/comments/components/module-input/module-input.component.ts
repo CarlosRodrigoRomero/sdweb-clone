@@ -95,7 +95,7 @@ export class ModuleInputComponent implements OnChanges {
     // actualizamos el label del módulo
     this.modulo = data.marca + ' (' + data.potencia + 'W)';
 
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       this.updateAnomalia(modulo, 'modulo');
     } else {
       this.updatePc(modulo, 'modulo');

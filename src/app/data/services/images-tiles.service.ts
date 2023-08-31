@@ -59,7 +59,7 @@ export class ImagesTilesService {
             loaded(true);
           }
           if (this.zonesService.thereAreZones) {
-            if (this.reportControlService.plantaFija) {
+            if (this.reportControlService.plantaNoS2E) {
               if (value === 2) {
                 loaded(true);
               }

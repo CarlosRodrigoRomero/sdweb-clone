@@ -49,7 +49,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
     this.reportControlService.initService().then((res) => {
       this.anomaliasLoaded = res;
 
-      this.plantaFija = this.reportControlService.plantaFija;
+      this.plantaFija = this.reportControlService.plantaNoS2E;
 
       this.comentariosControlService.dataLoaded = res;
 

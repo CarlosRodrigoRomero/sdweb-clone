@@ -63,7 +63,7 @@ export class ReportControlService {
   private _allAnomalias: Anomalia[] = [];
   allAnomalias$ = new BehaviorSubject<Anomalia[]>(this._allAnomalias);
   dirtyAnoms: Anomalia[] = [];
-  public plantaFija = undefined;
+  public plantaNoS2E = undefined;
   private _nombreGlobalCoords: string[] = [];
   private _numFixedGlobalCoords: number = 3;
   private _noAnomsReport = false;
@@ -144,12 +144,12 @@ export class ReportControlService {
                 }
 
                 if (this.planta.tipo !== 'seguidores') {
-                  this.plantaFija = true;
+                  this.plantaNoS2E = true;
 
                   // seleccionamos los informes nuevos de fijas. Los antiguos se muestran con la web antigua
                   this.informes = this.informeService.getOnlyNewInfomesFijas(this.informes);
                 } else {
-                  this.plantaFija = false;
+                  this.plantaNoS2E = false;
                 }
 
                 // evitamos cargar los informes dobles al navegar atras y volver
@@ -160,7 +160,7 @@ export class ReportControlService {
 
                 this.selectedInformeId = this.informesIdList[this.informesIdList.length - 1];
 
-                if (this.plantaFija) {
+                if (this.plantaNoS2E) {
                   // obtenemos todas las anomalías
                   return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
                 } else {
@@ -170,7 +170,7 @@ export class ReportControlService {
               }),
               take(1),
               switchMap((elems) => {
-                if (this.plantaFija) {
+                if (this.plantaNoS2E) {
                   // guardamos las anomalía de suciedad aparte
                   this.dirtyAnoms = (elems as Anomalia[]).filter((anom) => anom.tipo === 11);
 
@@ -212,7 +212,7 @@ export class ReportControlService {
             )
             .subscribe((comentarios: Comentario[]) => {
               // const coms = comentarios as Comentario[];
-              if (this.plantaFija) {
+              if (this.plantaNoS2E) {
                 const anomsWithComentarios = this.allFilterableElements as Anomalia[];
                 anomsWithComentarios.forEach((anom) => {
                   const comentariosAnom = comentarios.filter((com) => com.anomaliaId === anom.id);
@@ -304,11 +304,11 @@ export class ReportControlService {
                       this.informes = [informe];
 
                       if (this.router.url.includes('fixed') || this.router.url.includes('rooftop')) {
-                        this.plantaFija = true;
+                        this.plantaNoS2E = true;
 
                         return this.anomaliaService.getAnomaliasPlanta$(this.planta, this.informes);
                       } else {
-                        this.plantaFija = false;
+                        this.plantaNoS2E = false;
 
                         return this.seguidorService.getSeguidoresPlanta$(this.planta, this.informes);
                       }
@@ -316,7 +316,7 @@ export class ReportControlService {
                     take(1)
                   )
                   .subscribe((elems) => {
-                    if (this.plantaFija) {
+                    if (this.plantaNoS2E) {
                       this.allFilterableElements = this.anomaliaService.getRealAnomalias(elems as Anomalia[]);
 
                       this.allAnomalias = this.allFilterableElements as Anomalia[];
@@ -704,7 +704,7 @@ export class ReportControlService {
     this.mapLoaded = false;
     this.allAnomalias = [];
     this.allFilterableElements = [];
-    this.plantaFija = undefined;
+    this.plantaNoS2E = undefined;
     this.noAnomsReport = false;
     this.numFixedGlobalCoords = 3;
   }

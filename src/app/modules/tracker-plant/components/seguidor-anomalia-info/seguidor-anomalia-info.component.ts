@@ -93,7 +93,7 @@ export class SeguidorAnomaliaInfoComponent implements OnInit, OnDestroy {
     // quitamos 2 horas a las plantas de seguidores a partir de 2022 por el cambio de formato a TIFF
     const init2022 = 1640995200;
     const end2022 = 1672531200;
-    if (!this.reportControlService.plantaFija && date > init2022 && date < end2022) {
+    if (!this.reportControlService.plantaNoS2E && date > init2022 && date < end2022) {
       return date - 7200;
     }
     return date;

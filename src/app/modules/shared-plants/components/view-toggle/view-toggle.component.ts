@@ -19,7 +19,7 @@ export class ViewToggleComponent implements OnInit, OnDestroy {
   constructor(private viewReportService: ViewReportService, private reportControlService: ReportControlService) {}
 
   ngOnInit(): void {
-    this.plantaFija = this.reportControlService.plantaFija;
+    this.plantaFija = this.reportControlService.plantaNoS2E;
 
     this.subscriptions.add(this.viewReportService.reportViewSelected$.subscribe((view) => (this.viewSelected = view)));
   }

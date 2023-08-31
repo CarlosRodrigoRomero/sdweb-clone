@@ -80,7 +80,7 @@ export class ZonesCommentControlService {
   }
 
   mostrarSmallZones(zonas: LocationAreaInterface[], layers: VectorImageLayer<any>[]) {
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       this.subscriptions.add(
         this.comentariosControlService.anomalias$.subscribe((anoms) => this.addSmallZones(zonas, layers, anoms))
       );
@@ -102,7 +102,7 @@ export class ZonesCommentControlService {
         // solo añadimos las zonas con anomalias
         if (elemsZona.length > 0) {
           let elemsChecked;
-          if (this.reportControlService.plantaFija) {
+          if (this.reportControlService.plantaNoS2E) {
             const anomsZona = elemsZona as Anomalia[];
             elemsChecked = anomsZona.filter(
               (anom) => anom.hasOwnProperty('comentarios') && anom.comentarios.length > 0

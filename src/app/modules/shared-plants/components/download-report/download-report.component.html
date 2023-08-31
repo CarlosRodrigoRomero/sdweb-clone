@@ -20,7 +20,7 @@
       <mat-icon>picture_as_pdf</mat-icon>
       <span class="label">PDF</span>
     </a>
-    <a *ngIf="!reportControlService.plantaFija"> </a>
+    <a *ngIf="!reportControlService.plantaNoS2E"> </a>
 
     <app-download-excel *ngIf="!plantaDemo"></app-download-excel>
 
@@ -31,7 +31,7 @@
     </a>
 
     <a
-      *ngIf="!reportControlService.plantaFija"
+      *ngIf="!reportControlService.plantaNoS2E"
       mat-menu-item
       href="{{ imagesZipUrl }}"
       download=""

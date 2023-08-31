@@ -119,7 +119,7 @@ export class PdfComponent implements OnInit, OnDestroy {
       json['filtered'] = false;
     }
 
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       let anomalias;
       if (this.filteredPdf) {
         anomalias = Object.assign(

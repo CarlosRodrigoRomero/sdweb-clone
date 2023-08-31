@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
 import { ZonesService } from '@data/services/zones.service';
-import { ReportControlService } from '@data/services/report-control.service';
 
 @Component({
   selector: 'app-layers-panel',
@@ -16,14 +16,16 @@ export class LayersPanelComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private zonesService: ZonesService, private reportControlService: ReportControlService) {}
+  constructor(private zonesService: ZonesService, private router: Router) {}
 
   ngOnInit(): void {
     this.subscriptions.add(
       this.zonesService.thereAreLargestZones$.subscribe((value) => (this.thereAreLargestZones = value))
     );
 
-    this.showThermalLayer = this.reportControlService.plantaFija;
+    if (this.router.url.split('/').includes('tracker') || this.router.url.split('/').includes('rooftop')) {
+      this.showThermalLayer = false;
+    }
   }
 
   ngOnDestroy(): void {

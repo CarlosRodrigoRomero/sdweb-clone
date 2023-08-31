@@ -52,7 +52,7 @@ export class AnomStatusSelectComponent implements OnInit {
 
   changeStatus() {
     if (this.form.valid) {
-      if (this.reportControlService.plantaFija) {
+      if (this.reportControlService.plantaNoS2E) {
         this.updateAnomalia(this.form.get('status').value, 'status');
       } else {
         this.updatePc(this.form.get('status').value, 'status');

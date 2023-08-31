@@ -45,7 +45,7 @@ export class ViewControlComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscriptions.add(this.olMapService.aerialLayers$.subscribe((layers) => (this.aerialLayers = layers)));
 
-    if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E) {
       this.subscriptions.add(this.olMapService.thermalLayers$.subscribe((layers) => (this.thermalLayers = layers)));
 
       this.subscriptions.add(
@@ -124,8 +124,8 @@ export class ViewControlComponent implements OnInit, OnDestroy {
       this.setZonesLayersVisibility(informeId);
     }
 
-    if (this.reportControlService.plantaFija !== undefined) {
-      if (this.reportControlService.plantaFija) {
+    if (this.reportControlService.plantaNoS2E !== undefined) {
+      if (this.reportControlService.plantaNoS2E) {
         this.setThermalLayersVisibility(informeId);
         this.setAnomaliaLayersVisibility(informeId);
         this.setDirtyAnomsLayersVisibility(informeId);
