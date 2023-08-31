@@ -28,6 +28,7 @@ import { LayersMenuComponent } from './components/layers-menu/layers-menu.compon
 import { LayersPanelComponent } from './components/layers-panel/layers-panel.component';
 import { SatelliteSelectorComponent } from './components/satellite-selector/satellite-selector.component';
 import { ViewSelectorComponent } from './components/view-selector/view-selector.component';
+import { ReportSelectorComponent } from './components/report-selector/report-selector.component';
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import { ViewSelectorComponent } from './components/view-selector/view-selector.
     LayersPanelComponent,
     SatelliteSelectorComponent,
     ViewSelectorComponent,
+    ReportSelectorComponent,
   ],
   imports: [CommonModule, SharedModule],
   exports: [
@@ -71,6 +73,7 @@ import { ViewSelectorComponent } from './components/view-selector/view-selector.
     GroupByZonesViewComponent,
     LeyendaContainerComponent,
     LayersMenuComponent,
+    ReportSelectorComponent,
   ],
 })
 export class SharedPlantsModule {}
