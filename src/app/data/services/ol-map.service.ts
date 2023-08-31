@@ -193,7 +193,12 @@ export class OlMapService {
     });
   }
 
-  createThermalLayer(thermalLayer: ThermalLayerInterface, informe: InformeInterface, index: number): TileLayer<any> {
+  createThermalLayer(
+    thermalLayer: ThermalLayerInterface,
+    informe: InformeInterface,
+    index: number,
+    visible = false
+  ): TileLayer<any> {
     // Iniciar mapa térmico
     let url: string;
     if (informe.hasOwnProperty('servidorCapas')) {
@@ -231,7 +236,7 @@ export class OlMapService {
         },
       }),
       preload: Infinity,
-      visible: false,
+      visible,
     });
 
     return tl;

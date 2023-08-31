@@ -91,7 +91,7 @@ export class MapStructuresComponent implements OnInit, OnDestroy {
         this.thermalLayerDB = layersDB[0];
 
         if (this.thermalLayerDB !== undefined) {
-          const tL = this.olMapService.createThermalLayer(this.thermalLayerDB, this.informe, 0);
+          const tL = this.olMapService.createThermalLayer(this.thermalLayerDB, this.informe, 0, true);
 
           tL.setProperties({
             informeId: this.informe.id,
