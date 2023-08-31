@@ -43,6 +43,8 @@ export class MapComponent implements OnInit, OnDestroy {
   public anomaliaSelect: Anomalia;
   public anomaliaHover: Anomalia;
   public sliderYear: number;
+  private osmLayer: TileLayer<any>;
+  private satelliteLayer: TileLayer<any>;
   public aerialLayers: TileLayer<any>[];
   private extent1: any;
   public thermalSource;
@@ -155,38 +157,20 @@ export class MapComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(this.olMapService.getAnomaliaLayers().subscribe((layers) => (this.anomaliaLayers = layers)));
+
+    /* OSM */
+    this.olMapService.addOSMLayer();
+    this.subscriptions.add(this.olMapService.osmLayer$.subscribe((layer) => (this.osmLayer = layer)));
+
+    /* SATELITE */
+    this.olMapService.addSatelliteLayer();
+    this.subscriptions.add(this.olMapService.satelliteLayer$.subscribe((layer) => (this.satelliteLayer = layer)));
   }
 
   initMap() {
-    const satellite = new XYZ({
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      crossOrigin: '',
-    });
-    const satelliteLayer = new TileLayer({
-      source: satellite,
-      preload: Infinity,
-    });
-
-    let aerial;
-    // solo lo aplicamos a la planta DEMO
-    if (this.planta.id === 'egF0cbpXnnBnjcrusoeR') {
-      aerial = new XYZ({
-        url: 'https://solardrontech.es/demo_rgb/{z}/{x}/{y}.png',
-        crossOrigin: '',
-      });
-
-      const aerialLayer = new TileLayer({
-        source: aerial,
-        preload: Infinity,
-      });
-
-      aerialLayer.setExtent(this.extent1);
-
-      this.aerialLayers = [aerialLayer];
-    }
-
     const layers = [
-      satelliteLayer,
+      this.osmLayer,
+      this.satelliteLayer,
       ...this.aerialLayers,
       ...this.thermalLayers,
       // new TileLayer({
