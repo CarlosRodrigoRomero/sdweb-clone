@@ -22,6 +22,7 @@
   height: calc(100vh - 310px);
   overflow: auto;
   margin-top: 56px;
+  width: 400px;
 }
 
 .buscar-input {
