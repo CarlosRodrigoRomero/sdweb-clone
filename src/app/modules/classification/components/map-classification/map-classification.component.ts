@@ -455,7 +455,7 @@ export class MapClassificationComponent implements OnInit {
 
   setThermalPalette() {
     if (this.palette === PALETTE.ironPalette) {
-      this.palette = PALETTE.rainbow_hc_palette;
+      this.palette = PALETTE.grayScalePalette;
     } else {
       this.palette = PALETTE.ironPalette;
     }
