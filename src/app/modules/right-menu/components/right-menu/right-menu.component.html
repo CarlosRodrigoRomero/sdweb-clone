@@ -3,8 +3,8 @@
 </button>
 <mat-menu #rigthMenu="matMenu" (closed)="menuOpen = false" class="right-menu">
   <div class="content">
-    <button *ngIf="isAdmin" mat-menu-item routerLink="/admin">Admin</button>
-    <button *ngIf="isAdmin" mat-menu-item routerLink="/clientes">Web antigua</button>
+    <a *ngIf="isAdmin" mat-menu-item routerLink="/admin">Admin</a>
+    <a *ngIf="isAdmin" mat-menu-item routerLink="/clientes">Web antigua</a>
     <button *ngIf="isAdmin" mat-menu-item (click)="goGrafana.emit()">Grafana</button>
     <app-select-language></app-select-language>
     <app-select-initial-view></app-select-initial-view>
