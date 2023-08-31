@@ -11,10 +11,11 @@
       </mat-checkbox>
     </mat-panel-title>
   </mat-expansion-panel-header>
-
-  <li mat-menu-item *ngFor="let subtask of task.subtasks; index as i" (click)="stopPropagation($event)">
-    <mat-checkbox class="checkbox" [(ngModel)]="subtask.completed" (ngModelChange)="setVisibilityLayer.emit(i)">
-      {{ subtask.name | translate }}
-    </mat-checkbox>
-  </li>
+  <div class="elems-zones">
+    <li mat-menu-item *ngFor="let subtask of task.subtasks; index as i" (click)="stopPropagation($event)">
+      <mat-checkbox class="checkbox" [(ngModel)]="subtask.completed" (ngModelChange)="setVisibilityLayer.emit(i)">
+        {{ subtask.name | translate }}
+      </mat-checkbox>
+    </li>
+  </div>
 </mat-expansion-panel>

@@ -1,6 +1,23 @@
 .layers-btn-content {
   display: flex;
   align-items: center;
-  width: 150px;
+  width: 100%;
   justify-content: space-between;
+}
+
+.mat-expansion-panel {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.mat-expansion-panel-header {
+  order: 2;
+}
+
+.mat-expansion-panel-header.mat-expanded {
+  height: 48px;
+}
+
+:host ::ng-deep .mat-expansion-panel-body {
+  padding: 0;
 }

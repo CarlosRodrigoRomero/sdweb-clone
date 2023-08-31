@@ -13,16 +13,23 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'map', pathMatch: 'full' },
       {
-        path: 'map',
-        // loadChildren: () =>
-        //   import('@modules/map-list-report/map-list-report.module').then((m) => m.MapListReportModule),
-        component: MapViewComponent,
-      },
-      {
         path: 'analysis',
         loadChildren: () => import('@modules/loss-report/loss-report.module').then((m) => m.LossReportModule),
         canActivate: [AuthGuard],
       },
+      {
+        path: 'map',
+        // loadChildren: () =>
+        //   import('@modules/map-list-report/map-list-report.module').then((m) => m.MapListReportModule),
+        component: MapViewComponent,
+        canActivate: [AuthGuard],
+      },
+      {
+        path: 'charts',
+        loadChildren: () => import('@modules/stats-plant/stats-plant.module').then((m) => m.StatsPlantModule),
+        canActivate: [AuthGuard],
+      },
+
       {
         path: 'prediction',
         loadChildren: () =>
