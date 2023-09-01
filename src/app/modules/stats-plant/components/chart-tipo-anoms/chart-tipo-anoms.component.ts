@@ -300,6 +300,10 @@ export class ChartTipoAnomsComponent implements OnInit, OnDestroy {
         seriesNumCat.push({ name: '# ' + this.anomaliasLabel, data: data.numPorCategoria })
       );
 
+      if (this.reportControlService.planta.id === '46RlWp2aZI2EkTdbNRtf') {
+        this.coloresCategoria = [COLOR.light_orange];
+      }
+
       this.chartOptions1 = {
         series: seriesNumCat,
         colors: this.coloresCategoria,
