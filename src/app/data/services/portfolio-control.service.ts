@@ -189,11 +189,21 @@ export class PortfolioControlService {
             });
 
             let lastReportDate = 0;
+            const data: any[] = [];
             this.listaPlantas.forEach((planta) => {
               const informesPlanta = this.listaInformes.filter((inf) => inf.plantaId === planta.id);
               const informeReciente = informesPlanta.reduce((prev, current) =>
                 prev.fecha > current.fecha ? prev : current
               );
+
+              if (planta.potencia >= 40) {
+                data.push({
+                  plantaId: planta.id,
+                  mae: informeReciente.mae,
+                  potencia: planta.potencia,
+                  numAnoms: informeReciente.numsCriticidad.reduce((a, b) => a + b, 0),
+                });
+              }
 
               // obtenemos la fecha del informe mas reciente
               if (new Date(informeReciente.fecha) > new Date(lastReportDate)) {
@@ -217,6 +227,8 @@ export class PortfolioControlService {
               this.fixableMaePlantas.push(informeReciente.fixablePower);
             });
 
+            // this.calculateData(data);
+
             this.filteredPlants = this.listaPlantas;
 
             this.maeMedio = MathOperations.weightedAverage(
@@ -236,6 +248,30 @@ export class PortfolioControlService {
           }
         });
     });
+  }
+
+  private calculateData(data: any[]) {
+    const minMae = Math.min(...data.map((d) => d.mae));
+    const maxMae = Math.max(...data.map((d) => d.mae));
+    console.log(minMae);
+    console.log(maxMae);
+
+    console.log(data.map((d) => d.mae));
+    const numPlants25 = data.filter((d) => d.mae <= minMae + (maxMae - minMae) * 0.25).length;
+    console.log(minMae + (maxMae - minMae) * 0.25);
+    console.log('numPlants25', numPlants25);
+    const numPlants50 = data.filter((d) => d.mae <= minMae + (maxMae - minMae) * 0.5).length;
+    console.log(minMae + (maxMae - minMae) * 0.5);
+    console.log('numPlants50', numPlants50);
+    const numPlants75 = data.filter((d) => d.mae <= minMae + (maxMae - minMae) * 0.75).length;
+    console.log(minMae + (maxMae - minMae) * 0.75);
+    console.log('numPlants75', numPlants75);
+    const numPlants100 = data.filter((d) => d.mae <= maxMae).length;
+    console.log(maxMae);
+    console.log('numPlants100', numPlants100);
+
+    const minNumAnoms = Math.min(...data.map((d) => d.numAnoms));
+    const maxNumAnoms = Math.max(...data.map((d) => d.numAnoms));
   }
 
   getMaeMedioAndSigmaPortfolio(user: UserInterface): Observable<number[]> {

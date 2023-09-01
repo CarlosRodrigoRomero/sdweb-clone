@@ -18,3 +18,16 @@
     grid-template-columns: 1fr;
   }
 }
+
+.test {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.row-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}

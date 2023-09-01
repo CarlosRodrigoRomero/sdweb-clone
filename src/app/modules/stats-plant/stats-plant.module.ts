@@ -20,20 +20,20 @@ import { ChartSankeyPotenciaComponent } from './components/chart-sankey-potencia
 import { DynamicStatsDirective } from './directives/dynamic-stats.directive';
 
 @NgModule({
-    declarations: [
-        PlantaStatsComponent,
-        ChartAlturaComponent,
-        ChartMaeZonasComponent,
-        ChartCelsPorZonasComponent,
-        ChartCelsGradComponent,
-        ChartMaeGlobalComponent,
-        ChartTipoAnomsComponent,
-        ChartPctCelsComponent,
-        ChartSankeyComponent,
-        ChartSankeyPotenciaComponent,
-        DynamicStatsDirective,
-    ],
-    imports: [CommonModule, StatsPlantRoutingModule, SharedModule, NgApexchartsModule],
-    exports: [PlantaStatsComponent, DynamicStatsDirective]
+  declarations: [
+    PlantaStatsComponent,
+    ChartAlturaComponent,
+    ChartMaeZonasComponent,
+    ChartCelsPorZonasComponent,
+    ChartCelsGradComponent,
+    ChartMaeGlobalComponent,
+    ChartTipoAnomsComponent,
+    ChartPctCelsComponent,
+    ChartSankeyComponent,
+    ChartSankeyPotenciaComponent,
+    DynamicStatsDirective,
+  ],
+  imports: [CommonModule, StatsPlantRoutingModule, SharedModule, NgApexchartsModule],
+  exports: [PlantaStatsComponent, DynamicStatsDirective, ChartTipoAnomsComponent],
 })
 export class StatsPlantModule {}
